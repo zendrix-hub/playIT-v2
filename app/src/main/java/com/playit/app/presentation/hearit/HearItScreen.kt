@@ -13,20 +13,25 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.playit.app.presentation.components.MascotBubble
+import com.playit.app.presentation.components.PediatricButton
+import com.playit.app.presentation.components.bounceClick
+import com.playit.app.presentation.components.breathingPulse
+import com.playit.app.presentation.theme.AchievementGold
 import com.playit.app.presentation.theme.CreamWhite
 import com.playit.app.presentation.theme.GrowthGreen
 import com.playit.app.presentation.theme.LearningBlue
@@ -46,39 +51,62 @@ fun HearItScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(SoftSky)
-            .padding(24.dp)
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        SoftSky,
+                        CreamWhite
+                    )
+                )
+            )
+            .padding(20.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Header
+            // Header Bar
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onBack) {
-                    Text(text = "⬅️", fontSize = 24.sp)
+                IconButton(
+                    onClick = onBack,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(CreamWhite, CircleShape)
+                        .shadow(2.dp, CircleShape)
+                ) {
+                    Text(text = "⬅️", fontSize = 22.sp)
                 }
-                Spacer(modifier = Modifier.padding(start = 8.dp))
+                Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = "Hear It — Letter $targetLetter",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.ExtraBold,
                     color = TextPrimary
                 )
+                Spacer(modifier = Modifier.weight(1f))
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Mascot Bubble Guidance
+            MascotBubble(
+                message = "Tap the big speaker button to listen to the letter sound!",
+                mascotEmoji = "🦜"
+            )
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Big Letter Sound Card
-            Card(
+            // 3D Animated Letter Card
+            Surface(
                 modifier = Modifier
-                    .size(240.dp),
-                shape = RoundedCornerShape(32.dp),
-                colors = CardDefaults.cardColors(containerColor = CreamWhite),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                    .size(240.dp)
+                    .shadow(12.dp, RoundedCornerShape(36.dp), spotColor = LearningBlue),
+                shape = RoundedCornerShape(36.dp),
+                color = CreamWhite,
+                border = androidx.compose.foundation.BorderStroke(4.dp, SoftSky)
             ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -93,9 +121,9 @@ fun HearItScreen(
                         )
                         Text(
                             text = "Sound: /${phoneme?.letter ?: "m"}/",
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = TextPrimary
+                            fontSize = 26.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = AchievementGold
                         )
                     }
                 }
@@ -103,35 +131,33 @@ fun HearItScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Play Sound Replay Button
-            Button(
-                onClick = { viewModel.playPhonemeSound() },
+            // 3D Play Sound Replay Button
+            Surface(
                 modifier = Modifier
-                    .size(80.dp),
+                    .size(92.dp)
+                    .breathingPulse(enabled = isPlaying)
+                    .bounceClick(onClick = { viewModel.playPhonemeSound() })
+                    .shadow(10.dp, CircleShape, spotColor = LearningBlue),
                 shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = LearningBlue)
+                color = LearningBlue,
+                border = androidx.compose.foundation.BorderStroke(3.dp, CreamWhite)
             ) {
-                Text(text = if (isPlaying) "🔊" else "▶️", fontSize = 32.sp)
+                Box(contentAlignment = Alignment.Center) {
+                    Text(text = if (isPlaying) "🔊" else "▶️", fontSize = 42.sp)
+                }
             }
 
             Spacer(modifier = Modifier.weight(1f))
 
             // Continue to Say It CTA
-            Button(
+            PediatricButton(
+                text = "Next: Say It 🎤",
                 onClick = { onNext(phoneme?.id?.toString() ?: "1") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(64.dp),
-                shape = RoundedCornerShape(32.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = GrowthGreen)
-            ) {
-                Text(
-                    text = "Next: Say It 🎤",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = CreamWhite
-                )
-            }
+                backgroundColor = GrowthGreen,
+                fontSize = 22,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
+
