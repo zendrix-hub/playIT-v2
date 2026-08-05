@@ -117,8 +117,10 @@ Use these IDs in commit messages / PR descriptions / test file names so work sta
 | FR-10 | Dashboard Metrics Display | All stated metrics (incl. retention score) render correctly, fully offline |
 | FR-11 | At-Risk Letter Flags | Green/Yellow/Red thresholds apply exactly as specified |
 | FR-12 | PDF Report Export | System writes a formatted PDF to local storage on request |
+| FR-13 | Blend It Word Construction | Word selection, hint auto-lock, session heart depletion, 0-star handling |
+| FR-14 | Multi-Profile Management | Up to 6 profiles per device; profile creation, switcher, independent progress & telemetry |
 
-Two IDs worth adding that the SRS matrix doesn't cover (both already justified above): **FR-13** Blend It word construction + hint/heart mechanics (§1 Module 4), and **FR-14** multi-profile create/select/scope (§1, "Implicit Module" — flagged in §7.2 as an SRS gap to formalize).
+Formal entries added for **FR-13** (Blend It word construction + hint/heart mechanics) and **FR-14** (multi-profile create/select/scope — §1, "Implicit Module").
 
 ## 7. Conflicts Identified & Recommended Resolutions
 

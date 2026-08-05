@@ -82,3 +82,16 @@ Personas, 10-stage user journey, competitive landscape, UX/UI principles, color/
 2. Open `13_MASTER_TASKS.md` — this is the only file in the package meant to be edited as work progresses; it tells you exactly what's done.
 3. Re-read `01_REQUIREMENTS_SUMMARY.md §7` and `03_DESIGN_SYSTEM_SUMMARY.md §5` before touching any gameplay-numeric or visual-identity code — these hold the conflict resolutions that are easy to accidentally re-litigate from a fresh read of the raw source PDFs.
 4. Do not re-run analysis on the raw uploaded source documents (Proposal, SDD, Design System, the 8 research reports) — this package is the already-synthesized, already-conflict-resolved output of that analysis. Treat `00`–`22` as the source of truth going forward; the raw uploads are historical inputs, not a second opinion to reconcile against.
+
+## 17. Automated State Management Protocol
+
+**Lifecycle Rule:** You must automatically manage project state without waiting for explicit user prompting. 
+
+**Trigger:** Upon the successful completion of any defined sub-task or phase (e.g., successful file generation, clean `assembleDebug` exit code, or verified test pass).
+**Action:** 
+1. Immediately execute a file write operation on `13_MASTER_TASKS.md`.
+2. Locate the specific string corresponding to the completed task.
+3. Mutate the unchecked state `[ ]` to the checked state `[x]`.
+4. If an entire Phase is completed, verify all sub-tasks within that Phase are checked `[x]` before reporting task completion to the user.
+
+**Constraint:** Do not ask the user for permission to check off a task you have objectively completed and verified. Update the ledger in place and report the updated status in your standard output.
