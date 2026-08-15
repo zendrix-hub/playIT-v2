@@ -4,6 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.playit.app.data.audio.AudioPlayer
+import com.playit.app.data.audio.AudioResolver
+import com.playit.app.data.audio.SfxEvent
+import com.playit.app.data.audio.VoContext
 import com.playit.app.data.speech.VoskRecognizer
 import com.playit.app.domain.manager.HeartManager
 import com.playit.app.domain.manager.SpeechValidator
@@ -32,6 +35,7 @@ class SayItViewModel @Inject constructor(
     private val speechValidator: SpeechValidator,
     private val voskRecognizer: VoskRecognizer,
     private val audioPlayer: AudioPlayer,
+    private val audioResolver: AudioResolver,
     private val sessionManager: SessionManager,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -49,8 +53,19 @@ class SayItViewModel @Inject constructor(
     private val _hearts = MutableStateFlow(heartManager.currentHearts)
     val hearts: StateFlow<Int> = _hearts.asStateFlow()
 
+    private val _isPlayingPhoneme = MutableStateFlow(false)
+    val isPlayingPhoneme: StateFlow<Boolean> = _isPlayingPhoneme.asStateFlow()
+
     init {
         loadPhoneme()
+        triggerScreenIntroIfNeeded()
+    }
+
+    private fun triggerScreenIntroIfNeeded() {
+        if (sessionManager.shouldPlayScreenIntro("sayit")) {
+            val introVo = audioResolver.getVoPath(VoContext.SAYIT_INTRO_01)
+            audioPlayer.playAssetAudio(introVo)
+        }
     }
 
     private fun loadPhoneme() {
@@ -68,12 +83,36 @@ class SayItViewModel @Inject constructor(
         }
     }
 
+    fun playPhonemeSound() {
+        val letter = _phoneme.value?.letter ?: "m"
+        val path = audioResolver.getPhonemePath(letter) ?: _phoneme.value?.audioPath ?: "audio/phonemes/phoneme_m.mp3"
+        _isPlayingPhoneme.value = true
+        audioPlayer.playAssetAudio(path) {
+            _isPlayingPhoneme.value = false
+        }
+    }
+
+    fun playQuietCheckBeforeListening(onReady: () -> Unit) {
+        val quietVo = audioResolver.getVoPath(VoContext.QUIET_CHECK_01)
+        audioPlayer.playAssetAudio(quietVo) {
+            onReady()
+        }
+    }
+
+    fun playNoiseAlert() {
+        val noiseVo = audioResolver.getVoPath(VoContext.NOISE_ALERT_01)
+        audioPlayer.playAssetAudio(noiseVo)
+    }
+
     fun startListening() {
         if (_state.value is SayItState.Listening) return
-        _state.value = SayItState.Listening
-        viewModelScope.launch {
-            voskRecognizer.startListening { transcript ->
-                evaluateSpeech(transcript)
+        
+        playQuietCheckBeforeListening {
+            _state.value = SayItState.Listening
+            viewModelScope.launch {
+                voskRecognizer.startListening { transcript ->
+                    evaluateSpeech(transcript)
+                }
             }
         }
     }
@@ -97,10 +136,18 @@ class SayItViewModel @Inject constructor(
 
         if (isCorrect) {
             _state.value = SayItState.Correct(transcript.ifBlank { targetLetter })
+            val sfx = audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME)
+            val vo = audioResolver.getRotatingCorrectVo()
+            audioPlayer.playSequence(listOf(sfx, vo))
         } else {
             heartManager.deductHeart()
             _hearts.value = heartManager.currentHearts
             _state.value = SayItState.Incorrect(transcript.ifBlank { "Try again!" })
+
+            val sfxPop = audioResolver.getSfxPath(SfxEvent.INCORRECT_POP)
+            val sfxWhoosh = audioResolver.getSfxPath(SfxEvent.HEART_LOSS_WHOOSH)
+            val voEncourage = audioResolver.getRotatingEncourageVo()
+            audioPlayer.playSequence(listOf(sfxPop, sfxWhoosh, voEncourage))
         }
     }
 

@@ -27,6 +27,9 @@ android {
         unitTests {
             isIncludeAndroidResources = false
             isReturnDefaultValues = true
+            all { testTask ->
+                testTask.jvmArgs("-Djava.library.path=${buildDir.absolutePath}")
+            }
         }
     }
 
@@ -57,10 +60,6 @@ android {
             excludes += "/META-INDEX/{AL2.0,LGPL2.1}"
         }
     }
-}
-
-tasks.withType<Test>().configureEach {
-    jvmArgs("-Dfile.encoding=UTF-8")
 }
 
 dependencies {

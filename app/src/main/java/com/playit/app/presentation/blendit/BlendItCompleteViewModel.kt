@@ -3,6 +3,10 @@ package com.playit.app.presentation.blendit
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.playit.app.data.audio.AudioPlayer
+import com.playit.app.data.audio.AudioResolver
+import com.playit.app.data.audio.SfxEvent
+import com.playit.app.data.audio.VoContext
 import com.playit.app.domain.manager.BlendItStarThresholds
 import com.playit.app.domain.model.BlendItProgress
 import com.playit.app.domain.repository.BlendItProgressRepository
@@ -18,6 +22,8 @@ import javax.inject.Inject
 class BlendItCompleteViewModel @Inject constructor(
     private val blendItProgressRepository: BlendItProgressRepository,
     private val sessionManager: SessionManager,
+    private val audioPlayer: AudioPlayer,
+    private val audioResolver: AudioResolver,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -47,6 +53,19 @@ class BlendItCompleteViewModel @Inject constructor(
                     completedAt = System.currentTimeMillis()
                 )
             )
+
+            // Play completion fanfare + complete VO line + milestone/streak badge unlock audio
+            val fanfareSfx = audioResolver.getSfxPath(SfxEvent.LEVEL_COMPLETE_FANFARE)
+            val completeVo = audioResolver.getVoPath(VoContext.COMPLETE_01)
+            val streakSfx = audioResolver.getSfxPath(SfxEvent.STREAK_BADGE_UNLOCK)
+            val streakVo = audioResolver.getVoPath(VoContext.STREAK_01)
+
+            audioPlayer.playSequence(listOf(fanfareSfx, completeVo, streakSfx, streakVo))
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        audioPlayer.stop()
     }
 }

@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.playit.app.data.audio.AudioPlayer
+import com.playit.app.data.audio.AudioResolver
 import com.playit.app.domain.model.Phoneme
 import com.playit.app.domain.repository.PhonemeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,6 +18,7 @@ import javax.inject.Inject
 class HearItViewModel @Inject constructor(
     private val phonemeRepository: PhonemeRepository,
     private val audioPlayer: AudioPlayer,
+    private val audioResolver: AudioResolver,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -48,7 +50,8 @@ class HearItViewModel @Inject constructor(
     }
 
     fun playPhonemeSound() {
-        val path = _phoneme.value?.audioPath ?: "audio/phonemes/phoneme_m.mp3"
+        val letter = _phoneme.value?.letter ?: "m"
+        val path = audioResolver.getPhonemePath(letter) ?: _phoneme.value?.audioPath ?: "audio/phonemes/phoneme_m.mp3"
         _isPlaying.value = true
         audioPlayer.playAssetAudio(path) {
             _isPlaying.value = false

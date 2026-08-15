@@ -50,19 +50,17 @@ fun SplashScreen() {
     )
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        LearningBlue,
-                        Color(0xFF2563EB),
-                        SoftSky
-                    )
-                )
-            ),
+        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
+        // Edge-to-edge production background asset
+        androidx.compose.foundation.Image(
+            painter = com.playit.app.presentation.components.rememberAssetPainter("images/backgrounds/bg_splash_screen.png"),
+            contentDescription = "Splash Background",
+            contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
@@ -78,9 +76,13 @@ fun SplashScreen() {
                     .background(CreamWhite),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "🦜",
-                    fontSize = 72.sp
+                androidx.compose.foundation.Image(
+                    painter = com.playit.app.presentation.components.rememberAssetPainter(com.playit.app.presentation.components.MascotState.EXCITED.assetPath),
+                    contentDescription = "Lily Tarsier Mascot",
+                    contentScale = androidx.compose.ui.layout.ContentScale.Fit,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(12.dp)
                 )
             }
 

@@ -1,7 +1,6 @@
 package com.playit.app.presentation.blendit
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,37 +11,40 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.playit.app.presentation.components.BlendItCard
+import com.playit.app.presentation.components.GummyButton
+import com.playit.app.presentation.components.GummyContainer
 import com.playit.app.presentation.components.HeartBar
 import com.playit.app.presentation.components.MascotBubble
-import com.playit.app.presentation.components.PediatricButton
-import com.playit.app.presentation.components.bounceClick
+import com.playit.app.presentation.components.MascotState
 import com.playit.app.presentation.components.shake
 import com.playit.app.presentation.theme.AchievementGold
+import com.playit.app.presentation.theme.AchievementGoldShadow
 import com.playit.app.presentation.theme.CreamWhite
 import com.playit.app.presentation.theme.FriendlyPurple
+import com.playit.app.presentation.theme.FriendlyPurpleShadow
 import com.playit.app.presentation.theme.GentleCorrectionOrange
 import com.playit.app.presentation.theme.GrowthGreen
+import com.playit.app.presentation.theme.GrowthGreenShadow
 import com.playit.app.presentation.theme.LearningBlue
+import com.playit.app.presentation.theme.LearningBlueShadow
 import com.playit.app.presentation.theme.SoftSky
 import com.playit.app.presentation.theme.TextPrimary
 import com.playit.app.presentation.theme.TextSecondary
@@ -69,10 +71,21 @@ fun BlendItScreen(
         }
     }
 
-    val wordEmojis = mapOf(
-        "sam" to "👦", "sis" to "👧", "aim" to "🎯", "mat" to "🫐", "sit" to "🪑"
-    )
-    val currentEmoji = wordEmojis[currentWord?.word?.lowercase()] ?: "🧩"
+    // Dynamic mascot prompt message & state
+    val (mascotMessage, mascotState) = remember(uiState, wrongAttempts, isHintVisible, currentWord) {
+        when {
+            uiState is BlendItUiState.WordCorrect -> 
+                "Awesome job! You blended '${currentWord?.word}'! 🎉" to MascotState.CELEBRATING
+            uiState is BlendItUiState.WordIncorrect -> 
+                "Oops! Try again! Touch a tile to move it back. 💡" to MascotState.ENCOURAGING
+            isHintVisible -> 
+                "Here is a helpful clue for you! 🧠" to MascotState.THINKING
+            wrongAttempts >= 2 -> 
+                "Stuck? Tap the yellow hint button below! 💡" to MascotState.POINTING
+            else -> 
+                "Tap the letter tiles below to build the word!" to MascotState.ENCOURAGING
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -91,73 +104,55 @@ fun BlendItScreen(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Header Bar
+            // Header Bar with Gummy back button and 5-Heart Bar
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(
+                GummyContainer(
                     onClick = onBack,
-                    modifier = Modifier
-                        .size(48.dp)
-                        .background(CreamWhite, CircleShape)
-                        .shadow(2.dp, CircleShape)
+                    faceColor = CreamWhite,
+                    shadowColor = SoftSky,
+                    shape = CircleShape,
+                    strokeWidth = 3.dp,
+                    strokeColor = TextPrimary,
+                    depthHeight = 4.dp,
+                    modifier = Modifier.size(52.dp)
                 ) {
                     Text(text = "⬅️", fontSize = 22.sp)
                 }
 
                 Text(
                     text = "Blend ${viewModel.groupId} (${currentIndex + 1}/${words.size})",
-                    fontSize = 24.sp,
+                    fontSize = 22.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = TextPrimary
                 )
 
-                // 5-Heart Status Bar
                 HeartBar(currentHearts = hearts, maxHearts = 5)
             }
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Mascot Prompt Header
+            // Contextual Mascot Companion Speech Bubble
             MascotBubble(
-                message = "Tap the letter tiles below to build the word!",
-                mascotEmoji = "🧩"
+                message = mascotMessage,
+                mascotState = mascotState
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Target Word Picture Card
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp)
-                    .shadow(8.dp, RoundedCornerShape(32.dp), spotColor = FriendlyPurple),
-                shape = RoundedCornerShape(32.dp),
-                color = CreamWhite,
-                border = androidx.compose.foundation.BorderStroke(3.dp, SoftSky)
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = currentEmoji, fontSize = 56.sp)
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Text(
-                            text = "Build the word sound by sound!",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TextPrimary
-                        )
-                    }
-                }
-            }
+            // Target Word Picture Scene Card (with click-to-replay & bouncy success animation)
+            BlendItCard(
+                word = currentWord?.word ?: "sam",
+                isCorrect = uiState is BlendItUiState.WordCorrect,
+                onReplayAudio = { viewModel.playTargetWordAudio() }
+            )
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Constructed Word Slot Row
+            // Constructed Word Slot Row (Gummy letter slots with 6dp depth band, 68dp touch targets & static rotation)
             Row(
                 modifier = Modifier.shake(trigger = uiState is BlendItUiState.WordIncorrect),
                 horizontalArrangement = Arrangement.spacedBy(14.dp),
@@ -166,26 +161,49 @@ fun BlendItScreen(
                 val targetLength = currentWord?.word?.length ?: 3
                 for (i in 0 until targetLength) {
                     val tileChar = placedTiles.getOrNull(i)
-                    Surface(
-                        modifier = Modifier
-                            .size(68.dp)
-                            .bounceClick(enabled = tileChar != null) {
-                                viewModel.removeTile(i)
-                            }
-                            .shadow(if (tileChar != null) 6.dp else 1.dp, RoundedCornerShape(20.dp)),
-                        shape = RoundedCornerShape(20.dp),
-                        color = if (tileChar != null) FriendlyPurple else SoftSky.copy(alpha = 0.6f),
-                        border = androidx.compose.foundation.BorderStroke(
-                            width = 2.5.dp,
-                            color = if (tileChar != null) CreamWhite else FriendlyPurple.copy(alpha = 0.5f)
-                        )
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
+                    val slotRotation = remember(i) { ((i * 17) % 5 - 2).toFloat() }
+
+                    if (tileChar != null) {
+                        // Placed Tile with 6dp depth band and 68dp touch target
+                        GummyContainer(
+                            onClick = { viewModel.removeTile(i) },
+                            faceColor = FriendlyPurple,
+                            shadowColor = FriendlyPurpleShadow,
+                            shape = RoundedCornerShape(20.dp),
+                            strokeWidth = 3.dp,
+                            strokeColor = TextPrimary,
+                            depthHeight = 6.dp,
+                            modifier = Modifier
+                                .size(68.dp)
+                                .graphicsLayer { rotationZ = slotRotation }
+                        ) {
                             Text(
-                                text = tileChar?.uppercase() ?: "_",
+                                text = tileChar.uppercase(),
                                 fontSize = 32.sp,
                                 fontWeight = FontWeight.ExtraBold,
-                                color = if (tileChar != null) CreamWhite else TextSecondary
+                                color = CreamWhite
+                            )
+                        }
+                    } else {
+                        // Empty Slot Landing Area with 68dp target
+                        GummyContainer(
+                            onClick = {},
+                            enabled = false,
+                            faceColor = SoftSky.copy(alpha = 0.5f),
+                            shadowColor = SoftSky.copy(alpha = 0.3f),
+                            shape = RoundedCornerShape(20.dp),
+                            strokeWidth = 3.dp,
+                            strokeColor = FriendlyPurple.copy(alpha = 0.6f),
+                            depthHeight = 4.dp,
+                            modifier = Modifier
+                                .size(68.dp)
+                                .graphicsLayer { rotationZ = slotRotation }
+                        ) {
+                            Text(
+                                text = "_",
+                                fontSize = 32.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = TextSecondary.copy(alpha = 0.6f)
                             )
                         }
                     }
@@ -194,7 +212,7 @@ fun BlendItScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Tile Bank Row
+            // Letter Bank Row (Circle gummy tiles with 6dp depth band, 3dp outline and 68dp touch target)
             Text(
                 text = "Letter Bank:",
                 fontSize = 17.sp,
@@ -203,27 +221,29 @@ fun BlendItScreen(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                tileBank.forEach { char ->
-                    Surface(
+                tileBank.forEachIndexed { index, char ->
+                    val tileRotation = remember(index) { ((index * 29) % 5 - 2).toFloat() }
+                    GummyContainer(
+                        onClick = { viewModel.placeTile(char) },
+                        faceColor = LearningBlue,
+                        shadowColor = LearningBlueShadow,
+                        shape = CircleShape,
+                        strokeWidth = 3.dp,
+                        strokeColor = TextPrimary,
+                        depthHeight = 6.dp,
                         modifier = Modifier
-                            .size(60.dp)
-                            .bounceClick { viewModel.placeTile(char) }
-                            .shadow(6.dp, RoundedCornerShape(18.dp), spotColor = LearningBlue),
-                        shape = RoundedCornerShape(18.dp),
-                        color = LearningBlue,
-                        border = androidx.compose.foundation.BorderStroke(2.dp, CreamWhite)
+                            .size(68.dp)
+                            .graphicsLayer { rotationZ = tileRotation }
                     ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text(
-                                text = char.uppercase(),
-                                fontSize = 28.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = CreamWhite
-                            )
-                        }
+                        Text(
+                            text = char.uppercase(),
+                            fontSize = 30.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = CreamWhite
+                        )
                     }
                 }
             }
@@ -232,10 +252,11 @@ fun BlendItScreen(
 
             // Interactive Hint Button (Active after 2 wrong attempts)
             if (wrongAttempts >= 2) {
-                PediatricButton(
+                GummyButton(
                     text = "💡 Tap for Hint",
                     onClick = { viewModel.openHintModal() },
                     backgroundColor = AchievementGold,
+                    shadowColor = AchievementGoldShadow,
                     contentColor = TextPrimary,
                     fontSize = 17
                 )
@@ -243,13 +264,15 @@ fun BlendItScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Check Answer Button
-            PediatricButton(
+            // Check Answer Button (Squashes wide on correct answer)
+            GummyButton(
                 text = "Check Word ✨",
                 onClick = { viewModel.submitWord() },
                 enabled = placedTiles.size == (currentWord?.word?.length ?: 3),
                 backgroundColor = GrowthGreen,
+                shadowColor = GrowthGreenShadow,
                 fontSize = 22,
+                isSquashed = uiState is BlendItUiState.WordCorrect,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -303,10 +326,11 @@ fun BlendItScreen(
                     )
                 },
                 confirmButton = {
-                    PediatricButton(
+                    GummyButton(
                         text = "Restart with ❤️❤️❤️",
                         onClick = { viewModel.restartSession() },
                         backgroundColor = GrowthGreen,
+                        shadowColor = GrowthGreenShadow,
                         fontSize = 18
                     )
                 },
@@ -316,4 +340,3 @@ fun BlendItScreen(
         }
     }
 }
-

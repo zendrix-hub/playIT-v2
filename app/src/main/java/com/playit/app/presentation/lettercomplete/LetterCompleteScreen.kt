@@ -1,5 +1,6 @@
 package com.playit.app.presentation.lettercomplete
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,23 +9,25 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.playit.app.presentation.components.MascotBubble
+import com.playit.app.presentation.components.DockedMascotWithBubble
+import com.playit.app.presentation.components.GummyStaticContainer
+import com.playit.app.presentation.components.MascotState
 import com.playit.app.presentation.components.PediatricButton
 import com.playit.app.presentation.components.StarDisplay
-import com.playit.app.presentation.theme.AchievementGold
+import com.playit.app.presentation.components.popIn
+import com.playit.app.presentation.components.rememberAssetPainter
 import com.playit.app.presentation.theme.CreamWhite
 import com.playit.app.presentation.theme.GrowthGreen
 import com.playit.app.presentation.theme.LearningBlue
@@ -57,16 +60,32 @@ fun LetterCompleteScreen(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Docked Mascot Celebration Prompt
+            DockedMascotWithBubble(
+                message = "You mastered Letter $letter! Amazing sound practice!",
+                mascotState = MascotState.CELEBRATING
+            )
+
             Spacer(modifier = Modifier.weight(1f))
 
-            // 3D Celebration Card
-            Surface(
+            // Confetti burst flourish — pops in first, ahead of the card.
+            Image(
+                painter = rememberAssetPainter("images/rewards/reward_confetti_burst.png"),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .shadow(12.dp, RoundedCornerShape(36.dp), spotColor = AchievementGold),
-                shape = RoundedCornerShape(36.dp),
-                color = CreamWhite,
-                border = androidx.compose.foundation.BorderStroke(4.dp, AchievementGold.copy(alpha = 0.5f))
+                    .height(140.dp)
+                    .popIn()
+            )
+
+            // 3D Gummy Celebration Card (28dp radius, 3dp DarkBrownOutline, 6dp depth band)
+            // No streak badge here, unlike BlendItCompleteScreen: this ViewModel fires a
+            // NODE_UNLOCK_CHIME, not a streak event — there's no streak signal to honestly
+            // represent on this screen. Say the word if letter completions should count
+            // toward the same streak and I'll wire it up to match.
+            GummyStaticContainer(
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Column(
                     modifier = Modifier
@@ -87,7 +106,7 @@ fun LetterCompleteScreen(
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    // Bouncy Star Celebration Display
+                    // Bouncy staggered star pop-in (Modifier.popIn inside StarDisplay)
                     StarDisplay(earnedStars = starsEarned, maxStars = 3, starSize = 54.dp)
 
                     Spacer(modifier = Modifier.height(20.dp))
@@ -97,21 +116,23 @@ fun LetterCompleteScreen(
                         fontSize = 18.sp,
                         color = LearningBlue,
                         fontWeight = FontWeight.Bold,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        textAlign = TextAlign.Center
                     )
                 }
             }
 
             Spacer(modifier = Modifier.weight(1f))
 
+            // Already on the updated GummyButton contract via PediatricButton's
+            // delegation — no direct change needed here beyond that shared fix.
             PediatricButton(
                 text = "Back to Map 🗺️",
                 onClick = onReturnToMap,
                 backgroundColor = GrowthGreen,
                 fontSize = 22,
+                isSquashed = true,
                 modifier = Modifier.fillMaxWidth()
             )
         }
     }
 }
-

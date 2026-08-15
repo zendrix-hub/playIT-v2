@@ -2,6 +2,8 @@
 
 Condensed from `Design_System.pdf` v1.0, the **approved, shipped design system** — treat it as authoritative for every value below *except* where §5 flags a specific, recommended override informed by the research documents. Do not invent colors, type sizes, or spacing values outside this document without adding a note to `13_MASTER_TASKS.md`.
 
+> **Visual-layer refresh:** `23_DUOLINGO_ABC_UI_REFRESH.md` adds a Duolingo-ABC-inspired "gummy/pressable" shape and motion language on top of everything below — new depth-shadow color tokens, thicker outlines, circular map/tile shapes, press-into-depth motion. It does not override any color hue, type size, touch-target floor, or accessibility rule here; read it alongside this document, not instead of it.
+
 ## 1. Design Philosophy
 
 Clarity before decoration · Encouragement before correction · Audio before reading · Progress visibility at all times · Consistency across all learning activities · Child-friendly interactions with large touch targets · Cultural familiarity for Filipino learners.

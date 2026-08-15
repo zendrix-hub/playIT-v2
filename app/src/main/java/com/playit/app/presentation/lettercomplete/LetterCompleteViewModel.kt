@@ -3,6 +3,10 @@ package com.playit.app.presentation.lettercomplete
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.playit.app.data.audio.AudioPlayer
+import com.playit.app.data.audio.AudioResolver
+import com.playit.app.data.audio.SfxEvent
+import com.playit.app.data.audio.VoContext
 import com.playit.app.domain.manager.StarCalculator
 import com.playit.app.domain.model.LessonProgress
 import com.playit.app.domain.model.Phoneme
@@ -21,6 +25,8 @@ class LetterCompleteViewModel @Inject constructor(
     private val phonemeRepository: PhonemeRepository,
     private val lessonProgressRepository: LessonProgressRepository,
     private val sessionManager: SessionManager,
+    private val audioPlayer: AudioPlayer,
+    private val audioResolver: AudioResolver,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -64,6 +70,19 @@ class LetterCompleteViewModel @Inject constructor(
                     completedAt = System.currentTimeMillis()
                 )
             )
+
+            // Play completion fanfare + complete VO line, followed by unlock chime + unlock VO
+            val fanfareSfx = audioResolver.getSfxPath(SfxEvent.LEVEL_COMPLETE_FANFARE)
+            val completeVo = audioResolver.getVoPath(VoContext.COMPLETE_01)
+            val unlockSfx = audioResolver.getSfxPath(SfxEvent.NODE_UNLOCK_CHIME)
+            val unlockVo = audioResolver.getVoPath(VoContext.UNLOCK_01)
+
+            audioPlayer.playSequence(listOf(fanfareSfx, completeVo, unlockSfx, unlockVo))
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        audioPlayer.stop()
     }
 }

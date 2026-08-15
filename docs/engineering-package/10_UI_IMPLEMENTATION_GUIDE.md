@@ -2,6 +2,8 @@
 
 How to actually build the Compose UI. This is the practical, screen-by-screen companion to `03_DESIGN_SYSTEM_SUMMARY.md`. **Reminder: `Wireframes.md` is not a source for this document** — see `04_RESEARCH_SUMMARY.md §0`. The layout ground truth is the SDD's inline mockup descriptions per module, cross-referenced with the SDD's Front-end Component tables (already fully enumerated in `07_FOLDER_STRUCTURE.md`).
 
+> **Visual-layer refresh:** see `23_DUOLINGO_ABC_UI_REFRESH.md` for the gummy-button component spec, depth-shadow tokens, and updated map-node/mascot sizing that layer on top of the theming and component notes below.
+
 ## 1. Theming Setup
 
 - Implement `presentation/theme/` using Material 3's `Typography`/`ColorScheme`/`Shapes` overrides, per `03`. Do not use M3 dynamic/wallpaper-derived color — this app uses a fixed custom palette (`03 §2`).

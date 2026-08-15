@@ -3,6 +3,10 @@ package com.playit.app.presentation.blendit
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.playit.app.data.audio.AudioPlayer
+import com.playit.app.data.audio.AudioResolver
+import com.playit.app.data.audio.SfxEvent
+import com.playit.app.data.audio.VoContext
 import com.playit.app.domain.manager.BlendItWordSelector
 import com.playit.app.domain.manager.HeartManager
 import com.playit.app.domain.model.BlendItAttempt
@@ -31,6 +35,8 @@ class BlendItViewModel @Inject constructor(
     private val blendItAttemptRepository: BlendItAttemptRepository,
     private val blendItWordSelector: BlendItWordSelector,
     private val sessionManager: SessionManager,
+    private val audioPlayer: AudioPlayer,
+    private val audioResolver: AudioResolver,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -78,6 +84,14 @@ class BlendItViewModel @Inject constructor(
 
     init {
         loadSessionWords()
+        triggerScreenIntroIfNeeded()
+    }
+
+    private fun triggerScreenIntroIfNeeded() {
+        if (sessionManager.shouldPlayScreenIntro("blendit")) {
+            val introVo = audioResolver.getVoPath(VoContext.BLENDIT_INTRO_01)
+            audioPlayer.playAssetAudio(introVo)
+        }
     }
 
     private fun loadSessionWords() {
@@ -85,7 +99,6 @@ class BlendItViewModel @Inject constructor(
             blendItWordRepository.getWordsForGroup(groupId).collect { availableWords ->
                 val selected = blendItWordSelector.selectWordsForSession(groupId, availableWords)
                 _words.value = selected.ifEmpty {
-                    // Fallback Group 1 words if DB query empty
                     listOf(
                         BlendItWord(1, 1, "SAM", "S-A-M", "audio/words/word_sam.mp3", "images/pictures/blendword_sam.png"),
                         BlendItWord(2, 1, "SIS", "S-I-S", "audio/words/word_sis.mp3", "images/pictures/blendword_sis.png"),
@@ -105,9 +118,17 @@ class BlendItViewModel @Inject constructor(
         _isHintModalVisible.value = false
         _uiState.value = BlendItUiState.Idle
 
-        // Create scrambled tile bank for current word
         val letters = wordObj.word.toCharArray().toList().shuffled()
         _tileBank.value = letters
+
+        // Play current target word audio
+        playTargetWordAudio()
+    }
+
+    fun playTargetWordAudio() {
+        val targetObj = _words.value.getOrNull(_currentWordIndex.value) ?: return
+        val path = audioResolver.getWordPath(targetObj.word)
+        audioPlayer.playAssetAudio(path)
     }
 
     fun placeTile(letter: Char) {
@@ -149,8 +170,12 @@ class BlendItViewModel @Inject constructor(
 
         if (isCorrect) {
             _uiState.value = BlendItUiState.WordCorrect
+            val sfx = audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME)
+            val vo = audioResolver.getRotatingCorrectVo()
+            audioPlayer.playSequence(listOf(sfx, vo))
+
             viewModelScope.launch {
-                kotlinx.coroutines.delay(1000)
+                kotlinx.coroutines.delay(1200)
                 if (_currentWordIndex.value + 1 < _words.value.size) {
                     setupWordAtIndex(_currentWordIndex.value + 1)
                 } else {
@@ -163,8 +188,12 @@ class BlendItViewModel @Inject constructor(
             _totalHeartsLost.value = heartManager.heartsLost
             _wrongAttemptsForCurrentWord.value += 1
 
+            val sfxBuzz = audioResolver.getSfxPath(SfxEvent.BLENDIT_BUZZ)
+            val sfxWhoosh = audioResolver.getSfxPath(SfxEvent.HEART_LOSS_WHOOSH)
+            val voEncourage = audioResolver.getRotatingEncourageVo()
+            audioPlayer.playSequence(listOf(sfxBuzz, sfxWhoosh, voEncourage))
+
             if (isGameOver) {
-                // Constraint #1: Standard 3-heart depletion state
                 _uiState.value = BlendItUiState.HeartDepleted
             } else {
                 _uiState.value = BlendItUiState.WordIncorrect(heartManager.currentHearts)
@@ -174,17 +203,23 @@ class BlendItViewModel @Inject constructor(
 
     fun openHintModal() {
         _isHintModalVisible.value = true
+        val hintVo = audioResolver.getRotatingHintVo()
+        audioPlayer.playAssetAudio(hintVo)
     }
 
     fun closeHintModal() {
         _isHintModalVisible.value = false
     }
 
-    // Constraint #1: Restarts session with standard 3-hearts upon depletion
     fun restartSession() {
         heartManager.reset()
         _hearts.value = heartManager.currentHearts
         _totalHeartsLost.value = 0
         setupWordAtIndex(0)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        audioPlayer.stop()
     }
 }

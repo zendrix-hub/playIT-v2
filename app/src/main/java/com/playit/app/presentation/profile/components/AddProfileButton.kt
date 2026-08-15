@@ -1,7 +1,5 @@
 package com.playit.app.presentation.profile.components
 
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,19 +8,20 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.playit.app.presentation.components.GummyContainer
 import com.playit.app.presentation.theme.CreamWhite
 import com.playit.app.presentation.theme.DisabledColor
+import com.playit.app.presentation.theme.DisabledColorShadow
 import com.playit.app.presentation.theme.LearningBlue
+import com.playit.app.presentation.theme.LearningBlueShadow
+import com.playit.app.presentation.theme.TextPrimary
 
 @Composable
 fun AddProfileButton(
@@ -30,17 +29,21 @@ fun AddProfileButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val borderColor = if (enabled) LearningBlue else DisabledColor
+    val faceColor = CreamWhite
+    val shadowColor = if (enabled) LearningBlueShadow.copy(alpha = 0.4f) else DisabledColorShadow.copy(alpha = 0.3f)
     val textColor = if (enabled) LearningBlue else DisabledColor
 
-    Card(
+    GummyContainer(
+        onClick = onClick,
+        enabled = enabled,
+        faceColor = faceColor,
+        shadowColor = shadowColor,
+        shape = RoundedCornerShape(32.dp),
+        strokeWidth = 3.dp,
+        strokeColor = TextPrimary,
         modifier = modifier
             .fillMaxWidth()
             .height(80.dp)
-            .border(2.dp, borderColor, RoundedCornerShape(24.dp))
-            .clickable(enabled = enabled) { onClick() },
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = CreamWhite)
     ) {
         Row(
             modifier = Modifier

@@ -3,6 +3,10 @@ package com.playit.app.presentation.findit
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.playit.app.data.audio.AudioPlayer
+import com.playit.app.data.audio.AudioResolver
+import com.playit.app.data.audio.SfxEvent
+import com.playit.app.data.audio.VoContext
 import com.playit.app.domain.manager.GridGenerator
 import com.playit.app.domain.model.Phoneme
 import com.playit.app.domain.repository.FindItAttemptRepository
@@ -27,6 +31,8 @@ class FindItViewModel @Inject constructor(
     private val findItAttemptRepository: FindItAttemptRepository,
     private val gridGenerator: GridGenerator,
     private val sessionManager: SessionManager,
+    private val audioPlayer: AudioPlayer,
+    private val audioResolver: AudioResolver,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -41,8 +47,21 @@ class FindItViewModel @Inject constructor(
     private val _state = MutableStateFlow<FindItState>(FindItState.Idle)
     val state: StateFlow<FindItState> = _state.asStateFlow()
 
+    private val _isPlaying = MutableStateFlow(false)
+    val isPlaying: StateFlow<Boolean> = _isPlaying.asStateFlow()
+
     init {
         loadGrid()
+        triggerScreenIntroIfNeeded()
+    }
+
+    private fun triggerScreenIntroIfNeeded() {
+        if (sessionManager.shouldPlayScreenIntro("findit")) {
+            val introVo = audioResolver.getVoPath(VoContext.FINDIT_INTRO_01)
+            audioPlayer.playAssetAudio(introVo) {
+                playTargetSound()
+            }
+        }
     }
 
     private fun loadGrid() {
@@ -58,8 +77,27 @@ class FindItViewModel @Inject constructor(
                 )
                 _targetPhoneme.value = target
                 _gridItems.value = gridGenerator.generateGrid(id, allPhonemes)
+
+                // Play target phoneme sound if screen intro was already played
+                if (!sessionManager.shouldPlayScreenIntro("findit")) {
+                    playTargetSound()
+                }
             }
         }
+    }
+
+    fun playTargetSound() {
+        val target = _targetPhoneme.value ?: return
+        val path = audioResolver.getPhonemePath(target.letter) ?: target.audioPath
+        _isPlaying.value = true
+        audioPlayer.playAssetAudio(path) {
+            _isPlaying.value = false
+        }
+    }
+
+    fun playHintAudio() {
+        val hintVo = audioResolver.getRotatingHintVo()
+        audioPlayer.playAssetAudio(hintVo)
     }
 
     fun selectItem(selected: Phoneme) {
@@ -78,8 +116,19 @@ class FindItViewModel @Inject constructor(
 
         if (isCorrect) {
             _state.value = FindItState.Correct(selected)
+            val sfx = audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME)
+            val vo = audioResolver.getRotatingCorrectVo()
+            audioPlayer.playSequence(listOf(sfx, vo))
         } else {
             _state.value = FindItState.Incorrect(selected)
+            val sfx = audioResolver.getSfxPath(SfxEvent.INCORRECT_POP)
+            val vo = audioResolver.getRotatingEncourageVo()
+            audioPlayer.playSequence(listOf(sfx, vo))
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        audioPlayer.stop()
     }
 }

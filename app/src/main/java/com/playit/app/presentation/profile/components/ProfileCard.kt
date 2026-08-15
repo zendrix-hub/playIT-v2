@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -98,30 +99,24 @@ fun ProfileCard(
 
 @Composable
 fun AvatarCircle(avatarId: Int, size: Int) {
-    val avatarEmojis = listOf("🦁", "🐯", "🐻", "🐸", "🐰", "🦊", "🐼", "🦄")
-    val bgColors = listOf(
-        LearningBlue,
-        Color(0xFFFF7043),
-        Color(0xFFAB47BC),
-        Color(0xFF26A69A),
-        AchievementGold,
-        Color(0xFFEC407A),
-        Color(0xFF8B5CF6),
-        Color(0xFF10B981)
-    )
-    val index = (avatarId - 1).coerceIn(0, avatarEmojis.size - 1)
+    val safeAvatarId = avatarId.coerceIn(1, 6)
+    val assetPath = "images/mascot/avatar_%02d.png".format(safeAvatarId)
 
     Box(
         modifier = Modifier
             .size(size.dp)
             .clip(CircleShape)
-            .background(bgColors[index])
+            .background(SoftSky)
             .border(3.dp, CreamWhite, CircleShape),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = avatarEmojis[index],
-            fontSize = (size / 2.2).sp
+        androidx.compose.foundation.Image(
+            painter = com.playit.app.presentation.components.rememberAssetPainter(assetPath),
+            contentDescription = "Avatar $safeAvatarId",
+            contentScale = androidx.compose.ui.layout.ContentScale.Fit,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(2.dp)
         )
     }
 }

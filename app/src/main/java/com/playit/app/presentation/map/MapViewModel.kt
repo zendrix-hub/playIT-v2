@@ -2,6 +2,10 @@ package com.playit.app.presentation.map
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.playit.app.data.audio.AudioPlayer
+import com.playit.app.data.audio.AudioResolver
+import com.playit.app.data.audio.SfxEvent
+import com.playit.app.data.audio.VoContext
 import com.playit.app.domain.manager.GroupUnlockManager
 import com.playit.app.domain.manager.StreakTracker
 import com.playit.app.domain.manager.UnlockManager
@@ -41,7 +45,9 @@ class MapViewModel @Inject constructor(
     private val sessionManager: SessionManager,
     private val unlockManager: UnlockManager,
     private val groupUnlockManager: GroupUnlockManager,
-    private val streakTracker: StreakTracker
+    private val streakTracker: StreakTracker,
+    private val audioPlayer: AudioPlayer,
+    private val audioResolver: AudioResolver
 ) : ViewModel() {
 
     val activeProfileId: StateFlow<Long?> = sessionManager.activeProfileId
@@ -52,9 +58,23 @@ class MapViewModel @Inject constructor(
                 if (profileId != null) {
                     streakTracker.resetIfInactive(profileId)
                     streakTracker.recordActivity(profileId)
+                    triggerReturnWelcomeIfNeeded()
                 }
             }
         }
+    }
+
+    private fun triggerReturnWelcomeIfNeeded() {
+        if (!sessionManager.hasPlayedReturnWelcome) {
+            sessionManager.markReturnWelcomePlayed()
+            val welcomeVo = audioResolver.getVoPath(VoContext.RETURN_WELCOME_01)
+            audioPlayer.playAssetAudio(welcomeVo)
+        }
+    }
+
+    fun playHeartRecoverySound() {
+        val sfx = audioResolver.getSfxPath(SfxEvent.HEART_RECOVERY_SPARKLE)
+        audioPlayer.playAssetAudio(sfx)
     }
 
     val userStats: StateFlow<UserMapStats> = activeProfileId.flatMapLatest { profileId ->
@@ -126,4 +146,9 @@ class MapViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
+
+    override fun onCleared() {
+        super.onCleared()
+        audioPlayer.stop()
+    }
 }
