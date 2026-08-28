@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PlayIT Splash Screen — Option C Dynamic Interactive Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800;900&family=Andika:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F5EFE6;
+    --card-bg: #FFFFFF;
+    --ink: #1F3A3D;
+    --ink-soft: #5C7679;
+    --mango: #FA7B28;
+    --mango-cream: #FFEBCD;
+    --ear-inner: #FFAF78;
+    --outline: #2D373E;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+  body {
+    font-family: 'Lexend', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 20px 60px;
+  }
+  header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  h1 {
+    font-size: 34px;
+    font-weight: 900;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  p.subtitle {
+    font-size: 16px;
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
+  .preview-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .phone-card {
+    background: var(--card-bg);
+    border-radius: 46px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.1), 0 2px 6px rgba(0,0,0,0.06);
+    border: 12px solid #1E252B;
+    width: 360px;
+    height: 740px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .phone-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 26px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    z-index: 10;
+  }
+  .screen-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 75px;
+    position: relative;
+    background: #FFFFFF;
+  }
+  .wordmark {
+    font-size: 42px;
+    font-weight: 900;
+    color: var(--ink);
+    letter-spacing: -0.5px;
+  }
+  .tagline {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-top: 6px;
+    text-align: center;
+    padding: 0 24px;
+  }
+  .mascot-layer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 420px;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .btn-container {
+    position: absolute;
+    bottom: 32px;
+    left: 24px;
+    right: 24px;
+    z-index: 20;
+  }
+  .gummy-btn {
+    width: 100%;
+    height: 60px;
+    background: #FFFFFF;
+    border: 3.5px solid var(--outline);
+    border-radius: 30px;
+    box-shadow: 0 7px 0 var(--outline);
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--outline);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .gummy-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 3px 0 var(--outline);
+  }
+  svg.tarsier-art {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Breathing Animation */
+  .breathe-anim {
+    animation: breathe 3.8s ease-in-out infinite;
+    transform-origin: bottom center;
+  }
+  @keyframes breathe {
+    0%, 100% { transform: scaleY(1) scaleX(1); }
+    50% { transform: scaleY(1.035) scaleX(1.015); }
+  }
+
+  /* Natural Blinking Animation */
+  .eyes-open {
+    opacity: 1;
+    animation: blink-open 4.5s infinite;
+  }
+  .eyes-closed {
+    opacity: 0;
+    animation: blink-closed 4.5s infinite;
+  }
+  @keyframes blink-open {
+    0%, 82%, 92%, 100% { opacity: 1; transform: scaleY(1); }
+    86%, 90% { opacity: 0; transform: scaleY(0.1); }
+  }
+  @keyframes blink-closed {
+    0%, 82%, 92%, 100% { opacity: 0; transform: scaleY(0.1); }
+    86%, 90% { opacity: 1; transform: scaleY(1); }
+  }
+
+  .interactive-controls {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+  }
+  .control-btn {
+    padding: 10px 18px;
+    background: #FFFFFF;
+    border: 2px solid var(--outline);
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 3px 0 var(--outline);
+  }
+  .control-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 var(--outline);
+  }
+  .info-pill {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    background: #FFFFFF;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Option C: Dynamic Headspace Tarsier</h1>
+  <p class="subtitle">Natural breathing cycle with periodic blink between curious open eyes & serene closed arcs</p>
+</header>
+
+<div class="preview-wrapper">
+  <div class="phone-card">
+    <div class="phone-header"><span>9:41</span><span>100%</span></div>
+    <div class="screen-content">
+      <div class="wordmark">PlayIT</div>
+      <div class="tagline">Mabuhay! Ready to learn to read?</div>
+      
+      <!-- Mascot Dome Layer with Breathing and Blinking -->
+      <div id="mascotLayer" class="mascot-layer breathe-anim" onclick="triggerTapWink()">
+        <svg class="tarsier-art" viewBox="0 0 340 390" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Ears -->
+          <ellipse cx="78" cy="170" rx="55" ry="62" fill="#FA7B28"/>
+          <ellipse cx="78" cy="170" rx="34" ry="40" fill="#FFAF78"/>
+          <ellipse cx="262" cy="170" rx="55" ry="62" fill="#FA7B28"/>
+          <ellipse cx="262" cy="170" rx="34" ry="40" fill="#FFAF78"/>
+
+          <!-- Main Head Dome -->
+          <ellipse cx="170" cy="380" rx="240" ry="230" fill="#FA7B28"/>
+
+          <!-- Eye Patches (Always Present) -->
+          <ellipse cx="125" cy="190" rx="32" ry="32" fill="#FFEBCD"/>
+          <ellipse cx="215" cy="190" rx="32" ry="32" fill="#FFEBCD"/>
+
+          <!-- OPEN EYES GROUP -->
+          <g id="openEyesGroup" class="eyes-open" style="transform-origin: 170px 190px;">
+            <circle cx="125" cy="190" r="18" fill="#2D373E"/>
+            <circle cx="215" cy="190" r="18" fill="#2D373E"/>
+            <circle cx="120" cy="185" r="6" fill="#FFFFFF"/>
+            <circle cx="210" cy="185" r="6" fill="#FFFFFF"/>
+          </g>
+
+          <!-- CLOSED SERENE EYES GROUP -->
+          <g id="closedEyesGroup" class="eyes-closed" style="transform-origin: 170px 190px;">
+            <path d="M 107 190 Q 125 208 143 190" stroke="#2D373E" stroke-width="7" stroke-linecap="round" fill="none"/>
+            <path d="M 197 190 Q 215 208 233 190" stroke="#2D373E" stroke-width="7" stroke-linecap="round" fill="none"/>
+          </g>
+
+          <!-- Warm Gentle Smile Arc -->
+          <path d="M 145 228 Q 170 248 195 228" stroke="#2D373E" stroke-width="7" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+
+      <!-- Bottom Pinned Gummy CTA -->
+      <div class="btn-container">
+        <div class="gummy-btn">Simulan Natin • Start</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="interactive-controls">
+    <button class="control-btn" onclick="forceState('open')">Keep Eyes Open</button>
+    <button class="control-btn" onclick="forceState('closed')">Keep Eyes Serene</button>
+    <button class="control-btn" onclick="forceState('auto')">Auto Breathe & Blink</button>
+  </div>
+
+  <div class="info-pill">Tip: Tap anywhere on Lily to trigger an interactive happy wink!</div>
+</div>
+
+<script>
+  let mode = 'auto';
+  const openGroup = document.getElementById('openEyesGroup');
+  const closedGroup = document.getElementById('closedEyesGroup');
+
+  function forceState(state) {
+    mode = state;
+    if (state === 'open') {
+      openGroup.className = '';
+      closedGroup.className = '';
+      openGroup.style.opacity = '1';
+      closedGroup.style.opacity = '0';
+    } else if (state === 'closed') {
+      openGroup.className = '';
+      closedGroup.className = '';
+      openGroup.style.opacity = '0';
+      closedGroup.style.opacity = '1';
+    } else {
+      openGroup.className = 'eyes-open';
+      closedGroup.className = 'eyes-closed';
+      openGroup.style.opacity = '';
+      closedGroup.style.opacity = '';
+    }
+  }
+
+  function triggerTapWink() {
+    openGroup.className = '';
+    closedGroup.className = '';
+    openGroup.style.opacity = '0';
+    closedGroup.style.opacity = '1';
+    setTimeout(() => {
+      if (mode === 'auto') {
+        forceState('auto');
+      } else {
+        forceState(mode);
+      }
+    }, 800);
+  }
+</script>
+
+</body>
+</html>

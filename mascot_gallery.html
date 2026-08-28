@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PlayIT Companion Mascot Suite — Lily the Tarsier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800;900&family=Andika:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F5EFE6;
+    --card-bg: #FFFFFF;
+    --ink: #1F3A3D;
+    --ink-soft: #5C7679;
+    --mango: #FA7B28;
+    --mango-light: #FFF0E0;
+    --outline: #2D373E;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+  body {
+    font-family: 'Lexend', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 36px 20px 80px;
+  }
+  header {
+    text-align: center;
+    margin-bottom: 36px;
+    max-width: 700px;
+  }
+  h1 {
+    font-size: 36px;
+    font-weight: 900;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  p.subtitle {
+    font-size: 16px;
+    color: var(--ink-soft);
+    font-weight: 500;
+    line-height: 1.5;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 24px;
+    max-width: 1200px;
+    width: 100%;
+  }
+  .mascot-card {
+    background: var(--card-bg);
+    border-radius: 28px;
+    padding: 24px 20px;
+    border: 3px solid rgba(45, 55, 62, 0.12);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.04), 0 2px 6px rgba(0,0,0,0.03);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .mascot-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 36px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.05);
+  }
+  .img-box {
+    width: 190px;
+    height: 190px;
+    background: var(--mango-light);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    overflow: hidden;
+    position: relative;
+  }
+  .img-box img {
+    width: 160px;
+    height: 160px;
+    object-fit: contain;
+    transition: transform 0.2s;
+  }
+  .mascot-card:hover .img-box img {
+    transform: scale(1.06);
+  }
+  .pose-name {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+  .pose-state {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--mango);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .pose-desc {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+  }
+  .badge {
+    margin-top: 12px;
+    display: inline-block;
+    padding: 4px 10px;
+    background: #E8F5E9;
+    color: #2E7D32;
+    border-radius: 12px;
+    font-size: 11.5px;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Lily the Tarsier — Companion Mascot Suite</h1>
+  <p class="subtitle">Updated with authentic slender tufted tail, refined pointing hand, and modern listening headset</p>
+</header>
+
+<div class="grid">
+
+  <!-- 1. Idle -->
+  <div class="mascot-card">
+    <div class="img-box">
+      <img src="app/src/main/assets/images/mascot/lily_idle.png?v=3" alt="Lily Idle">
+    </div>
+    <div class="pose-state">MascotState.IDLE</div>
+    <div class="pose-name">Lily Neutral / Idle</div>
+    <div class="pose-desc">Standard calm standing posture with authentic slender tufted tail, cream mitten paws, and curious eyes.</div>
+    <div class="badge">MapScreen & Profile Hub</div>
+  </div>
+
+  <!-- 2. Waving -->
+  <div class="mascot-card">
+    <div class="img-box">
+      <img src="app/src/main/assets/images/mascot/lily_waving.png?v=3" alt="Lily Waving">
+    </div>
+    <div class="pose-state">MascotState.WAVING</div>
+    <div class="pose-name">Lily Greeting Wave</div>
+    <div class="pose-desc">Friendly right-hand wave greeting the learner with open 3-fingered waving mitten paw.</div>
+    <div class="badge">Splash & Name Prompt</div>
+  </div>
+
+  <!-- 3. Pointing -->
+  <div class="mascot-card">
+    <div class="img-box">
+      <img src="app/src/main/assets/images/mascot/lily_pointing.png?v=3" alt="Lily Pointing">
+    </div>
+    <div class="pose-state">MascotState.POINTING</div>
+    <div class="pose-name">Lily Instructional Point</div>
+    <div class="pose-desc">Right arm extended rightward with clear cartoon pointing index finger and folded thumb.</div>
+    <div class="badge">Hear It & Blend It</div>
+  </div>
+
+  <!-- 4. Celebrating -->
+  <div class="mascot-card">
+    <div class="img-box">
+      <img src="app/src/main/assets/images/mascot/lily_celebrating.png?v=3" alt="Lily Celebrating">
+    </div>
+    <div class="pose-state">MascotState.CELEBRATING</div>
+    <div class="pose-name">Lily Joyful Celebration</div>
+    <div class="pose-desc">Arms raised high with golden sparkles and ecstatic closed smiling eyes for level completion.</div>
+    <div class="badge">Letter & Blend Complete</div>
+  </div>
+
+  <!-- 5. Encouraging -->
+  <div class="mascot-card">
+    <div class="img-box">
+      <img src="app/src/main/assets/images/mascot/lily_encouraging.png?v=3" alt="Lily Encouraging">
+    </div>
+    <div class="pose-state">MascotState.ENCOURAGING</div>
+    <div class="pose-name">Lily Reassuring Wink</div>
+    <div class="pose-desc">Playful wink with hand over heart offering warm, non-punitive reassurance after a mistake.</div>
+    <div class="badge">Say It & Find It Retry</div>
+  </div>
+
+  <!-- 6. Thinking -->
+  <div class="mascot-card">
+    <div class="img-box">
+      <img src="app/src/main/assets/images/mascot/lily_thinking.png?v=3" alt="Lily Thinking">
+    </div>
+    <div class="pose-state">MascotState.THINKING</div>
+    <div class="pose-name">Lily Pondering / Hint</div>
+    <div class="pose-desc">Paw touching chin with tilted head guiding the learner through puzzle thinking.</div>
+    <div class="badge">Blend It Hint Trigger</div>
+  </div>
+
+  <!-- 7. Listening -->
+  <div class="mascot-card">
+    <div class="img-box">
+      <img src="app/src/main/assets/images/mascot/lily_listening.png?v=3" alt="Lily Listening">
+    </div>
+    <div class="pose-state">MascotState.LISTENING</div>
+    <div class="pose-name">Lily Active Listening</div>
+    <div class="pose-desc">Modern indigo headset snugly on ears with serene closed eyes as mic captures audio.</div>
+    <div class="badge">Say It Mic Listening</div>
+  </div>
+
+</div>
+
+</body>
+</html>
