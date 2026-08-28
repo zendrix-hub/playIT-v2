@@ -60,10 +60,10 @@ Winding-path layout per the SDD mockup (28 `LetterNode`s + 7 `BlendItChallengeNo
 `AnimatedLetterCard` + `PlayButton` (large, center) + `ReplayCounter` (dot indicators) + `MascotBubble` (prompt changes after first play) + `NextButton` (disabled until ≥1 full playback — `01 §1 Module 1`).
 
 ### `SayItScreen`
-`HeartDisplay` (5 hearts) + `PhonemePromptCard` + `MicrophoneButton` (hold-to-record, pulse while held) + `ListeningAnimation` + `FeedbackCard` (binary green/red) + `AttemptTracker` (max 5 dots) + `NoiseLevelIndicator` (red above 40dB, `01 §2`) + `HeartRecoveryAnimation`. Implement the pre-mic "quiet as a mouse" 3-second check here (`04 §7`) before the recognizer activates.
+`HeartDisplay` (5 hearts) + `PhonemePromptCard` + `MicrophoneButton` (tap-to-record, pulse while listening) + `ListeningAnimation` + `FeedbackCard` (Leaf green / Kalamansi amber retry — strictly non-red) + `AttemptTracker` (max 3 dots, no harsh X marks) + `NoiseLevelIndicator` (Kalamansi warning above 40dB, `01 §2`) + `HeartRecoveryAnimation`. Implement the pre-mic "quiet as a mouse" 3-second check here (`04 §7`) before the recognizer activates.
 
 ### `FindItScreen`
-`HeartDisplay` (continues the Say It pool per `01 §1 Module 3`'s pre-condition — reset to 5) + `ImageGrid` (5-card responsive grid) + `PictureCard` (tap → green/red flash) + `ScoreIndicator` ("X of 3") + `MascotBubble` + `CompletionAnimation`.
+`HeartDisplay` (continues the Say It pool per `01 §1 Module 3`'s pre-condition — reset to 5) + `ImageGrid` (4-card 2x2 responsive grid) + `PictureCard` (tap → Leaf green squash-pop / Kalamansi warm retry shake — never red flash) + `ScoreIndicator` ("X of 3") + `MascotBubble` + `CompletionAnimation`.
 
 ### `LetterCompleteScreen`
 `StarAnimation` — 1–3 stars, bounce drop-in, per `03 §4`'s Star Reward spec (drop/bounce/glow + confetti + sound).

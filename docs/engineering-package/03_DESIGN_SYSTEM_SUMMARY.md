@@ -29,6 +29,8 @@ Clarity before decoration · Encouragement before correction · Audio before rea
 
 **Hard rule carried over unchanged:** no large red "X," no flashing red, no punishment visuals — incorrect answers are always Gentle Correction Orange, never red.
 
+**Zero-Emoji Policy:** Emojis are strictly NOT needed and MUST NOT be used in UI text, button labels, speech bubbles, cards, or titles anywhere in the app. All visual icons must use clean Android Vector Graphics (`Icons.Filled.*`, `Icons.AutoMirrored.*`) or transparent production PNG illustration assets (`images/rewards/`, `images/pictures/`, etc.). Never append or embed emojis (e.g., 🚀, 🎉, 🍎, 🔥, ⭐, 🔒) in text strings or button labels.
+
 ## 3. Typography (as shipped — see §5.2 for a flagged conflict)
 
 - Primary: **Nunito**, Fallback: **Poppins** (rounded, child-friendly, readable).

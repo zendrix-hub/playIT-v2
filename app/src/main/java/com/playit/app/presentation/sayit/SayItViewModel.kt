@@ -53,8 +53,20 @@ class SayItViewModel @Inject constructor(
     private val _hearts = MutableStateFlow(heartManager.currentHearts)
     val hearts: StateFlow<Int> = _hearts.asStateFlow()
 
+    private val _attempts = MutableStateFlow<List<Boolean>>(emptyList())
+    val attempts: StateFlow<List<Boolean>> = _attempts.asStateFlow()
+
     private val _isPlayingPhoneme = MutableStateFlow(false)
     val isPlayingPhoneme: StateFlow<Boolean> = _isPlayingPhoneme.asStateFlow()
+
+    private val _audioAmplitude = MutableStateFlow(0f)
+    val audioAmplitude: StateFlow<Float> = _audioAmplitude.asStateFlow()
+
+    private val _isNoisyEnvironment = MutableStateFlow(false)
+    val isNoisyEnvironment: StateFlow<Boolean> = _isNoisyEnvironment.asStateFlow()
+
+    private val _loadError = MutableStateFlow(false)
+    val loadError: StateFlow<Boolean> = _loadError.asStateFlow()
 
     init {
         loadPhoneme()
@@ -71,13 +83,11 @@ class SayItViewModel @Inject constructor(
     private fun loadPhoneme() {
         val id = phonemeIdArg?.toIntOrNull() ?: 1
         viewModelScope.launch {
-            val p = phonemeRepository.getPhonemeById(id) ?: Phoneme(
-                id = 1,
-                letter = "m",
-                audioPath = "audio/phonemes/phoneme_m.mp3",
-                imagePath = "images/pictures/word_mouse.png",
-                exampleWord = "Mouse"
-            )
+            val p = phonemeRepository.getPhonemeById(id)
+            if (p == null) {
+                _loadError.value = true
+                return@launch
+            }
             _phoneme.value = p
             voskRecognizer.initModel()
         }
@@ -106,29 +116,55 @@ class SayItViewModel @Inject constructor(
 
     fun startListening() {
         if (_state.value is SayItState.Listening) return
+
+        val target = _phoneme.value?.letter?.lowercase() ?: "m"
+        val exampleWord = _phoneme.value?.exampleWord?.lowercase() ?: "mouse"
+        voskRecognizer.setGrammar(listOf(target, exampleWord, "${target}uh", "${target}a", "em", "es", "bee", "cat", "dog"))
         
         playQuietCheckBeforeListening {
             _state.value = SayItState.Listening
+            _isNoisyEnvironment.value = false
+            var noisyFramesCount = 0
+
             viewModelScope.launch {
-                voskRecognizer.startListening { transcript ->
-                    evaluateSpeech(transcript)
-                }
+                voskRecognizer.startListening(
+                    onResult = { transcript ->
+                        evaluateSpeech(transcript)
+                    },
+                    onAmplitude = { db, norm ->
+                        _audioAmplitude.value = norm
+                        if (db > 68f && _state.value is SayItState.Listening) {
+                            noisyFramesCount++
+                            if (noisyFramesCount == 12) {
+                                _isNoisyEnvironment.value = true
+                                playNoiseAlert()
+                            }
+                        } else if (db < 60f) {
+                            noisyFramesCount = 0
+                            _isNoisyEnvironment.value = false
+                        }
+                    }
+                )
             }
         }
     }
 
     fun stopListening() {
         val transcript = voskRecognizer.stopListening()
+        _audioAmplitude.value = 0f
         if (_state.value is SayItState.Listening) {
             evaluateSpeech(transcript)
         }
     }
 
     fun evaluateSpeech(transcript: String) {
+        _audioAmplitude.value = 0f
         val targetLetter = _phoneme.value?.letter ?: "m"
         val isCorrect = speechValidator.validate(transcript, targetLetter)
         val profileId = sessionManager.activeProfileId.value ?: 1L
         val phonemeId = _phoneme.value?.id ?: 1
+
+        _attempts.value = _attempts.value + isCorrect
 
         viewModelScope.launch {
             sayItAttemptRepository.saveAttempt(profileId, phonemeId, isCorrect)

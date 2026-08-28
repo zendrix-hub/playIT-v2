@@ -1,6 +1,16 @@
 package com.playit.app.presentation.hearit
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,35 +18,50 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.VolumeUp
+import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.playit.app.presentation.components.DockedMascotWithBubble
 import com.playit.app.presentation.components.GummyButton
 import com.playit.app.presentation.components.GummyContainer
+import com.playit.app.presentation.components.LessonStep
+import com.playit.app.presentation.components.LessonTopBar
+import com.playit.app.presentation.components.LetterCard
+import com.playit.app.presentation.components.MascotSpeechHeader
 import com.playit.app.presentation.components.MascotState
-import com.playit.app.presentation.components.breathingPulse
 import com.playit.app.presentation.theme.CreamWhite
 import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.GrowthGreen
-import com.playit.app.presentation.theme.GrowthGreenShadow
-import com.playit.app.presentation.theme.LearningBlue
-import com.playit.app.presentation.theme.LearningBlueShadow
-import com.playit.app.presentation.theme.SoftSky
-import com.playit.app.presentation.theme.TextPrimary
+import com.playit.app.presentation.theme.Ink
+import com.playit.app.presentation.theme.Mango
+import com.playit.app.presentation.theme.MangoShadow
+import com.playit.app.presentation.theme.Sand
+import com.playit.app.presentation.theme.Sky
+import com.playit.app.presentation.theme.Ube
+import com.playit.app.presentation.theme.UbeLight
+import com.playit.app.presentation.theme.UbeShadow
+
+private val AUDIO_CTA_SIZE = 88.dp
+private val AUDIO_CTA_RING_BOUNDS = 132.dp
 
 @Composable
 fun HearItScreen(
@@ -46,12 +71,56 @@ fun HearItScreen(
 ) {
     val phoneme by viewModel.phoneme.collectAsState()
     val isPlaying by viewModel.isPlaying.collectAsState()
+    val playCount by viewModel.playCount.collectAsState()
     val targetLetter = phoneme?.letter?.uppercase() ?: "M"
 
-    // Seeded deterministic static card rotation (-2° to +2°)
     val cardRotation = remember(phoneme?.id) {
         val seed = phoneme?.id ?: 0
         ((seed * 37) % 5 - 2).toFloat()
+    }
+
+    val infiniteTransition = rememberInfiniteTransition(label = "PulseRing")
+    val pulseScale by infiniteTransition.animateFloat(
+        initialValue = 0.95f,
+        targetValue = 1.35f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1400),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "pulseScale"
+    )
+    val pulseAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.5f,
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1400),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "pulseAlpha"
+    )
+
+    // Unlock-pop on transition from locked -> unlocked state
+    val isUnlocked = playCount > 0
+    var wasUnlocked by remember { mutableStateOf(isUnlocked) }
+    val unlockScale = remember { Animatable(1f) }
+    LaunchedEffect(isUnlocked) {
+        if (isUnlocked && !wasUnlocked) {
+            unlockScale.animateTo(
+                targetValue = 1.12f,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessMedium
+                )
+            )
+            unlockScale.animateTo(
+                targetValue = 1f,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessMedium
+                )
+            )
+        }
+        wasUnlocked = isUnlocked
     }
 
     Box(
@@ -60,91 +129,148 @@ fun HearItScreen(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        SoftSky,
-                        CreamWhite
+                        Sky,
+                        Sand
                     )
                 )
             )
-            .padding(20.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxSize()
         ) {
-            // Header Bar
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = onBack,
-                    modifier = Modifier
-                        .size(48.dp)
-                        .background(CreamWhite, CircleShape)
-                        .shadow(2.dp, CircleShape)
-                ) {
-                    Text(text = "⬅️", fontSize = 22.sp)
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                Text(
-                    text = "Hear It — Letter $targetLetter",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = TextPrimary
-                )
-                Spacer(modifier = Modifier.weight(1f))
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Docked Mascot Prompt Guidance
-            DockedMascotWithBubble(
-                message = "Tap the big speaker button to listen to the letter sound!",
-                mascotState = MascotState.LISTENING
+            // 3-Segment Capsule Progress Top Bar
+            LessonTopBar(
+                currentStep = LessonStep.HEAR_IT,
+                onBack = onBack
             )
 
-            Spacer(modifier = Modifier.weight(1f))
-
-            // 3D Gummy Animated Letter Card overlaying illustration PNG asset.
-            // Tapping the card itself now also replays the phoneme (redundant with
-            // the speaker button below by design — mirrors the whole-card-is-tappable
-            // pattern already used on BlendItCard).
-            com.playit.app.presentation.components.LetterCard(
-                letter = targetLetter,
-                soundText = "Sound: /${phoneme?.letter ?: "m"}/",
-                cardRotation = cardRotation,
-                wordOverride = phoneme?.exampleWord,
-                onTapReplay = { viewModel.playPhonemeSound() }
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // 3D Gummy Play Sound Replay Button
-            GummyContainer(
-                onClick = { viewModel.playPhonemeSound() },
-                faceColor = LearningBlue,
-                shadowColor = LearningBlueShadow,
-                shape = CircleShape,
-                strokeWidth = 3.dp,
-                strokeColor = DarkBrownOutline,
+            Column(
                 modifier = Modifier
-                    .size(92.dp)
-                    .breathingPulse(enabled = isPlaying)
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 20.dp, vertical = 6.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = if (isPlaying) "🔊" else "▶️", fontSize = 42.sp)
+                // Mascot speech bubble prompt
+                MascotSpeechHeader(
+                    message = if (playCount == 0) {
+                        "Makinig nang mabuti, pagkatapos ay pindutin ang play! • Listen closely, then tap play!"
+                    } else {
+                        "Magaling! Pindutin ang Susunod kapag handa ka na. • Nice! Tap Next when you're ready."
+                    },
+                    mascotState = if (isPlaying) MascotState.LISTENING else if (playCount > 0) MascotState.POINTING else MascotState.IDLE,
+                    onMascotTap = { viewModel.playPhonemeSound() }
+                )
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                // 3D Bento Animated Letter Card with breathing pulse & 24sp floor
+                LetterCard(
+                    letter = targetLetter,
+                    soundText = "Tunog • Sound: /${phoneme?.letter ?: "m"}/",
+                    cardRotation = cardRotation,
+                    wordOverride = phoneme?.exampleWord,
+                    onTapReplay = { viewModel.playPhonemeSound() }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Pulsating 88dp Ube Speaker Replay Button
+                Box(
+                    modifier = Modifier.size(AUDIO_CTA_RING_BOUNDS),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isPlaying) {
+                        Box(
+                            modifier = Modifier
+                                .size(AUDIO_CTA_SIZE)
+                                .scale(pulseScale)
+                                .clip(CircleShape)
+                                .background(UbeLight.copy(alpha = pulseAlpha))
+                        )
+                    }
+
+                    GummyContainer(
+                        onClick = { viewModel.playPhonemeSound() },
+                        faceColor = Ube,
+                        shadowColor = UbeShadow,
+                        shape = CircleShape,
+                        strokeWidth = 3.dp,
+                        strokeColor = DarkBrownOutline,
+                        depthHeight = 5.dp,
+                        modifier = Modifier.size(AUDIO_CTA_SIZE)
+                    ) {
+                        Icon(
+                            imageVector = if (isPlaying) Icons.AutoMirrored.Rounded.VolumeUp else Icons.Rounded.PlayArrow,
+                            contentDescription = if (isPlaying) "Playing" else "Play Sound",
+                            tint = CreamWhite,
+                            modifier = Modifier.size(44.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Gummy Radial Gradient Replay Dots
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    for (i in 0 until 5) {
+                        val filled = i < playCount
+                        Box(
+                            modifier = Modifier
+                                .size(14.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    brush = Brush.radialGradient(
+                                        colors = if (filled) {
+                                            listOf(Ube, UbeShadow)
+                                        } else {
+                                            listOf(UbeLight.copy(alpha = 0.35f), UbeLight.copy(alpha = 0.15f))
+                                        }
+                                    )
+                                )
+                                .border(
+                                    width = 1.dp,
+                                    color = DarkBrownOutline.copy(alpha = if (filled) 0.4f else 0.15f),
+                                    shape = CircleShape
+                                )
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
             }
 
-            Spacer(modifier = Modifier.weight(1f))
-
-            // Continue to Say It CTA — squishy GummyButton per session design system
-            GummyButton(
-                text = "Next: Say It 🎤",
-                onClick = { onNext(phoneme?.id?.toString() ?: "1") },
-                backgroundColor = GrowthGreen,
-                shadowColor = GrowthGreenShadow,
-                fontSize = 22,
-                modifier = Modifier.fillMaxWidth()
-            )
+            // Pinned Clean Bottom Action Bar (Non-overlapping, 64dp floor)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 24.dp, vertical = 12.dp)
+            ) {
+                GummyButton(
+                    text = "Susunod: Bigkasin • Next: Say It",
+                    onClick = {
+                        if (isUnlocked) {
+                            onNext(phoneme?.id?.toString() ?: "1")
+                        }
+                    },
+                    enabled = isUnlocked,
+                    backgroundColor = Mango,
+                    shadowColor = MangoShadow,
+                    contentColor = Ink,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(64.dp)
+                        .graphicsLayer {
+                            scaleX = unlockScale.value
+                            scaleY = unlockScale.value
+                        }
+                )
+            }
         }
     }
 }

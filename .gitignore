@@ -32,3 +32,15 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# Root level test screenshots and mock archive artifacts
+/*.png
+/*.pdf
+/*.zip
+/stitch_export/
+/stitch_app_interface_export/
+/screenshots/
+
+# Agent and MCP local configs (may contain personal credentials)
+.agents/
+

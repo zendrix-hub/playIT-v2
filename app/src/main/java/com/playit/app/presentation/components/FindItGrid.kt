@@ -1,12 +1,16 @@
 package com.playit.app.presentation.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,8 +25,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.domain.model.Phoneme
 import com.playit.app.presentation.theme.CreamWhite
-import com.playit.app.presentation.theme.LearningBlueShadow
-import com.playit.app.presentation.theme.TextPrimary
+import com.playit.app.presentation.theme.CreamWhiteShadow
+import com.playit.app.presentation.theme.DarkBrownOutline
+import com.playit.app.presentation.theme.Ink
+import com.playit.app.presentation.theme.LexendFontFamily
 
 /**
  * Grid choice card component rendering picture_<lowercase_word>.png assets from assets/images/pictures/.
@@ -31,6 +37,7 @@ import com.playit.app.presentation.theme.TextPrimary
 fun FindItCard(
     phoneme: Phoneme,
     borderColor: Color,
+    faceColor: Color = CreamWhite,
     index: Int,
     isCorrect: Boolean = false,
     isIncorrect: Boolean = false,
@@ -42,11 +49,12 @@ fun FindItCard(
 
     GummyContainer(
         onClick = onClick,
-        faceColor = CreamWhite,
-        shadowColor = LearningBlueShadow.copy(alpha = 0.3f),
-        shape = RoundedCornerShape(28.dp),
-        strokeWidth = 3.dp,
+        faceColor = faceColor,
+        shadowColor = CreamWhiteShadow,
+        shape = RoundedCornerShape(22.dp),
+        strokeWidth = 2.5.dp,
         strokeColor = borderColor,
+        depthHeight = 5.dp,
         isSquashed = isCorrect,
         modifier = Modifier
             .fillMaxWidth()
@@ -54,23 +62,46 @@ fun FindItCard(
             .graphicsLayer { rotationZ = rotationAngle }
             .shake(trigger = isIncorrect)
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+        androidx.compose.foundation.layout.Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            Image(
-                painter = rememberAssetPainter(assetPath),
-                contentDescription = phoneme.exampleWord,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier.size(68.dp)
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = phoneme.exampleWord,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = TextPrimary
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                androidx.compose.foundation.layout.Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.size(72.dp)
+                ) {
+                    // Soft circular ambient backing
+                    androidx.compose.foundation.layout.Box(
+                        modifier = Modifier
+                            .size(64.dp)
+                            .background(
+                                color = com.playit.app.presentation.theme.Sky.copy(alpha = 0.6f),
+                                shape = androidx.compose.foundation.shape.CircleShape
+                            )
+                    )
+
+                    GummyMotionAsset(
+                        assetPath = assetPath,
+                        contentDescription = phoneme.exampleWord,
+                        isIdleFloating = true,
+                        floatDistance = 3.dp,
+                        celebrateTrigger = isCorrect,
+                        modifier = Modifier.size(64.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = phoneme.exampleWord,
+                    fontFamily = LexendFontFamily,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Ink
+                )
+            }
         }
     }
 }

@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -55,86 +56,62 @@ import com.playit.app.presentation.theme.GrowthGreenShadow
 import com.playit.app.presentation.theme.LearningBlue
 import com.playit.app.presentation.theme.LearningBlueShadow
 import com.playit.app.presentation.theme.LocalReducedMotion
+import com.playit.app.presentation.theme.LexendFontFamily
 import com.playit.app.presentation.theme.SoftSky
 import com.playit.app.presentation.theme.SoftSkyShadow
 import com.playit.app.presentation.theme.TextPrimary
 
 /**
- * High-fidelity 3D Gummy Pediatric Button with 64dp height floor, 32dp corner radius, 
- * 3dp outline, and press-into-depth motion.
- */
-@Composable
-fun PediatricButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    backgroundColor: Color = LearningBlue,
-    shadowColor: Color = LearningBlueShadow,
-    contentColor: Color = CreamWhite,
-    enabled: Boolean = true,
-    icon: ImageVector? = null,
-    fontSize: Int = 20,
-    isSquashed: Boolean = false
-) {
-    val resolvedShadow = when (backgroundColor) {
-        LearningBlue -> LearningBlueShadow
-        GrowthGreen -> GrowthGreenShadow
-        AchievementGold -> AchievementGoldShadow
-        EnergyOrange -> EnergyOrangeShadow
-        FriendlyPurple -> FriendlyPurpleShadow
-        GentleCorrectionOrange -> GentleCorrectionOrangeShadow
-        else -> shadowColor
-    }
-
-    GummyButton(
-        text = text,
-        onClick = onClick,
-        modifier = modifier,
-        backgroundColor = backgroundColor,
-        shadowColor = resolvedShadow,
-        contentColor = contentColor,
-        enabled = enabled,
-        icon = icon,
-        fontSize = fontSize,
-        isSquashed = isSquashed
-    )
-}
-
-
-/**
- * Playful Mascot Prompt Speech Bubble rendering Lily the Tarsier.
- *
- * NOT refactored to the gummy system in this pass — this screen-refresh session hasn't
- * reached BlendItScreen/MapScreen yet (its only two callers), so its flat Surface chrome
- * is left as-is rather than changed blind. Same fix as DockedMascotWithBubble below is
- * the obvious follow-up once we get to those screens.
+ * Playful Mascot Prompt Speech Bubble rendering Lily the Tarsier with 3D Gummy containers and tap response.
  */
 @Composable
 fun MascotBubble(
     message: String,
     modifier: Modifier = Modifier,
     mascotState: MascotState = MascotState.IDLE,
-    mascotEmoji: String? = null,
-    backgroundColor: Color = CreamWhite
+    backgroundColor: Color = CreamWhite,
+    onMascotTap: (() -> Unit)? = null
 ) {
-    Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .shadow(4.dp, RoundedCornerShape(20.dp)),
-        shape = RoundedCornerShape(20.dp),
-        color = backgroundColor,
-        border = androidx.compose.foundation.BorderStroke(2.dp, SoftSky)
+    var tapTrigger by remember { mutableStateOf(0) }
+    val tapBounceScale by animateFloatAsState(
+        targetValue = if (tapTrigger % 2 == 1) 1.22f else 1.0f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        finishedListener = {
+            if (tapTrigger % 2 == 1) tapTrigger++
+        },
+        label = "mascotTapBounce"
+    )
+
+    GummyStaticContainer(
+        modifier = modifier.fillMaxWidth(),
+        faceColor = backgroundColor,
+        shadowColor = if (backgroundColor == CreamWhite) CreamWhiteShadow else backgroundColor,
+        shape = RoundedCornerShape(22.dp),
+        depthHeight = 4.dp
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
+            GummyContainer(
+                onClick = {
+                    tapTrigger++
+                    onMascotTap?.invoke()
+                },
                 modifier = Modifier
-                    .size(54.dp)
-                    .clip(CircleShape)
-                    .background(SoftSky),
-                contentAlignment = Alignment.Center
+                    .size(62.dp)
+                    .graphicsLayer {
+                        scaleX = tapBounceScale
+                        scaleY = tapBounceScale
+                    }
+                    .idleBounce(enabled = true),
+                faceColor = SoftSky,
+                shadowColor = SoftSkyShadow,
+                shape = CircleShape,
+                depthHeight = 3.dp
             ) {
                 androidx.compose.foundation.Image(
                     painter = rememberAssetPainter(mascotState.assetPath),
@@ -146,14 +123,14 @@ fun MascotBubble(
                 )
             }
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(14.dp))
 
             Text(
                 text = message,
-                fontSize = 18.sp,
+                fontSize = 17.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = TextPrimary,
-                lineHeight = 24.sp,
+                lineHeight = 23.sp,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -162,22 +139,31 @@ fun MascotBubble(
 
 /**
  * Duolingo ABC-inspired Docked Mascot Prompt (occupies ~25-30% height anchored bottom/side
- * with docked speech bubble and hop-in entrance animation on screen load).
- *
- * Refactored onto GummyStaticContainer (not GummyContainer): the avatar and speech bubble
- * are purely informational, not tappable, so they get the family's non-pressable static
- * variant rather than a fake onClick bolted on to satisfy a pressable-only API.
+ * with docked speech bubble, hop-in entrance animation, breathing life pulse, and interactive tap bounce).
  */
 @Composable
 fun DockedMascotWithBubble(
     message: String,
     modifier: Modifier = Modifier,
     mascotState: MascotState = MascotState.IDLE,
-    mascotEmoji: String? = null,
-    backgroundColor: Color = CreamWhite
+    backgroundColor: Color = CreamWhite,
+    onMascotTap: (() -> Unit)? = null
 ) {
     val isReducedMotion = LocalReducedMotion.current
     var hasAppeared by rememberSaveable { mutableStateOf(false) }
+    var tapTrigger by remember { mutableStateOf(0) }
+
+    val tapBounceScale by animateFloatAsState(
+        targetValue = if (tapTrigger % 2 == 1) 1.2f else 1.0f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        finishedListener = {
+            if (tapTrigger % 2 == 1) tapTrigger++
+        },
+        label = "mascotDockedTapBounce"
+    )
 
     val animOffsetY by animateFloatAsState(
         targetValue = if (hasAppeared) 0f else 120f,
@@ -212,9 +198,19 @@ fun DockedMascotWithBubble(
         verticalAlignment = Alignment.Bottom,
         horizontalArrangement = Arrangement.Start
     ) {
-        // Prominent mascot character face (~25-30% screen presence)
-        GummyStaticContainer(
-            modifier = Modifier.size(92.dp),
+        // Prominent mascot character face (~25-30% screen presence) with interactive tap response
+        GummyContainer(
+            onClick = {
+                tapTrigger++
+                onMascotTap?.invoke()
+            },
+            modifier = Modifier
+                .size(92.dp)
+                .graphicsLayer {
+                    scaleX = tapBounceScale
+                    scaleY = tapBounceScale
+                }
+                .breathingPulse(enabled = !isReducedMotion),
             faceColor = SoftSky,
             shadowColor = SoftSkyShadow,
             shape = CircleShape,
@@ -232,8 +228,7 @@ fun DockedMascotWithBubble(
 
         Spacer(modifier = Modifier.width(10.dp))
 
-        // Speech bubble docked directly to mascot — same asymmetric tail-notch shape as
-        // before, just drawn by GummyStaticContainer now instead of a flat Surface.
+        // Speech bubble docked directly to mascot
         GummyStaticContainer(
             modifier = Modifier.weight(1f),
             faceColor = backgroundColor,
@@ -243,10 +238,11 @@ fun DockedMascotWithBubble(
         ) {
             Text(
                 text = message,
-                fontSize = 18.sp,
+                fontFamily = LexendFontFamily,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = TextPrimary,
-                lineHeight = 24.sp,
+                lineHeight = 32.sp,
                 modifier = Modifier.padding(16.dp)
             )
         }
@@ -268,7 +264,7 @@ fun HeartBar(
                 color = CreamWhite.copy(alpha = 0.9f),
                 shape = RoundedCornerShape(16.dp)
             )
-            .border(1.5.dp, SoftSky, RoundedCornerShape(16.dp))
+            .border(1.5.dp, com.playit.app.presentation.theme.Sky, RoundedCornerShape(16.dp))
             .padding(horizontal = 12.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically

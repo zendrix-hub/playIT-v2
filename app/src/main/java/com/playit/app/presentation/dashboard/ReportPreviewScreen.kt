@@ -1,39 +1,54 @@
 package com.playit.app.presentation.dashboard
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
-import com.playit.app.presentation.theme.CreamWhite
-import com.playit.app.presentation.theme.FriendlyPurple
-import com.playit.app.presentation.theme.SoftSky
-import com.playit.app.presentation.theme.TextPrimary
-import com.playit.app.presentation.theme.TextSecondary
+import com.playit.app.presentation.components.GummyBackButton
+import com.playit.app.presentation.components.GummyButton
+import com.playit.app.presentation.theme.Cloud
+import com.playit.app.presentation.theme.DarkBrownOutline
+import com.playit.app.presentation.theme.Ink
+import com.playit.app.presentation.theme.InkSoft
+import com.playit.app.presentation.theme.Leaf
+import com.playit.app.presentation.theme.LeafShadow
+import com.playit.app.presentation.theme.LexendFontFamily
+import com.playit.app.presentation.theme.Sand
+import com.playit.app.presentation.theme.SandDeep
+import com.playit.app.presentation.theme.Sky
+import com.playit.app.presentation.theme.SkyDeep
+import com.playit.app.presentation.theme.Ube
+import com.playit.app.presentation.theme.UbeShadow
 import java.io.File
 
 @Composable
@@ -42,78 +57,104 @@ fun ReportPreviewScreen(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
-    val pdfFile = File(pdfFilePath)
+    val pdfFile = remember(pdfFilePath) { File(pdfFilePath) }
+    val fileSizeKb = remember(pdfFilePath) { if (pdfFile.exists()) pdfFile.length() / 1024 else 0L }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(SoftSky)
-            .padding(24.dp)
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        SkyDeep,
+                        Sky,
+                        Sand,
+                        SandDeep
+                    )
+                )
+            )
+            .statusBarsPadding()
+            .navigationBarsPadding()
+            .padding(20.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Header
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            // Header — Box overlay instead of Row + matched-width Spacer,
+            // so the title stays centered regardless of GummyBackButton's
+            // actual measured width.
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
             ) {
-                IconButton(onClick = onBack) {
-                    Text(text = "⬅️", fontSize = 24.sp)
-                }
+                GummyBackButton(
+                    onClick = onBack,
+                    modifier = Modifier.align(Alignment.CenterStart)
+                )
                 Text(
                     text = "Report Ready",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = TextPrimary
+                    fontFamily = LexendFontFamily,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Ink,
+                    modifier = Modifier.align(Alignment.Center)
                 )
-                Spacer(modifier = Modifier.height(24.dp))
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = CreamWhite),
-                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = Cloud),
+                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+                border = BorderStroke(3.dp, DarkBrownOutline)
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = "📄", fontSize = 64.sp)
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Icon(
+                        imageVector = Icons.Filled.Description,
+                        contentDescription = "PDF Report",
+                        tint = Ube,
+                        modifier = Modifier
+                            .size(56.dp)
+                            .padding(bottom = 12.dp)
+                    )
 
                     Text(
                         text = pdfFile.name,
-                        fontSize = 18.sp,
+                        fontFamily = LexendFontFamily,
+                        fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,
-                        color = TextPrimary
+                        color = Ink
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
 
-                    val fileSizeKb = if (pdfFile.exists()) pdfFile.length() / 1024 else 0
                     Text(
                         text = "File Size: $fileSizeKb KB | Format: PDF",
+                        fontFamily = LexendFontFamily,
                         fontSize = 14.sp,
-                        color = TextSecondary
+                        color = InkSoft
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
                         text = "Saved locally to application documents folder.",
-                        fontSize = 12.sp,
-                        color = TextSecondary
+                        fontFamily = LexendFontFamily,
+                        fontSize = 14.sp,
+                        color = InkSoft
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    Button(
+                    GummyButton(
+                        text = "Open PDF Document",
                         onClick = {
                             if (pdfFile.exists()) {
                                 try {
@@ -127,22 +168,27 @@ fun ReportPreviewScreen(
                                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                     }
                                     context.startActivity(intent)
-                                } catch (e: Exception) {
+                                } catch (e: ActivityNotFoundException) {
                                     Toast.makeText(context, "No PDF viewer app found on device.", Toast.LENGTH_LONG).show()
                                 }
                             } else {
                                 Toast.makeText(context, "File does not exist.", Toast.LENGTH_SHORT).show()
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = FriendlyPurple),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Open PDF Document", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = CreamWhite)
-                    }
+                        backgroundColor = Ube,
+                        shadowColor = UbeShadow,
+                        contentColor = Cloud,
+                        fontSize = 16,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp)
+                    )
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    OutlinedButton(
+                    GummyButton(
+                        text = "Share Report",
+                        icon = Icons.Filled.Share,
                         onClick = {
                             if (pdfFile.exists()) {
                                 try {
@@ -162,10 +208,14 @@ fun ReportPreviewScreen(
                                 }
                             }
                         },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Share Report", fontSize = 16.sp, color = TextPrimary)
-                    }
+                        backgroundColor = Leaf,
+                        shadowColor = LeafShadow,
+                        contentColor = Cloud,
+                        fontSize = 16,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp)
+                    )
                 }
             }
         }

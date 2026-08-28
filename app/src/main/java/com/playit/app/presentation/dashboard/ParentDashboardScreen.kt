@@ -1,6 +1,5 @@
 package com.playit.app.presentation.dashboard
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,33 +9,51 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.playit.app.presentation.dashboard.components.AtRiskSection
-import com.playit.app.presentation.dashboard.components.BlendItSummaryCard
-import com.playit.app.presentation.dashboard.components.LetterPerformanceTable
-import com.playit.app.presentation.dashboard.components.OverallStatsCard
+import com.playit.app.presentation.components.GummyBackButton
+import com.playit.app.presentation.components.GummyButton
+import com.playit.app.presentation.dashboard.components.BadgeCollectionCase
+import com.playit.app.presentation.dashboard.components.LearnerHeroCard
+import com.playit.app.presentation.dashboard.components.MasteredSoundsShelf
+import com.playit.app.presentation.dashboard.components.PracticeFocusSection
 import com.playit.app.presentation.dashboard.components.ProfileSwitcherDropdown
-import com.playit.app.presentation.theme.CreamWhite
-import com.playit.app.presentation.theme.FriendlyPurple
-import com.playit.app.presentation.theme.SoftSky
-import com.playit.app.presentation.theme.TextPrimary
-import com.playit.app.presentation.theme.TextSecondary
+import com.playit.app.presentation.dashboard.components.WordBlendingShelf
+import com.playit.app.presentation.theme.Cloud
+import com.playit.app.presentation.theme.Ink
+import com.playit.app.presentation.theme.InkSoft
+import com.playit.app.presentation.theme.LexendFontFamily
+import com.playit.app.presentation.theme.Sand
+import com.playit.app.presentation.theme.SandDeep
+import com.playit.app.presentation.theme.Sky
+import com.playit.app.presentation.theme.SkyDeep
+import com.playit.app.presentation.theme.Tan
+import com.playit.app.presentation.theme.TanDark
+import com.playit.app.presentation.theme.Ube
+import com.playit.app.presentation.theme.UbeShadow
 import java.io.File
 
 @Composable
@@ -46,17 +63,16 @@ fun ParentDashboardScreen(
     onReportPreview: (File) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(uiState.exportStatus) {
         when (val status = uiState.exportStatus) {
             is ExportStatus.Success -> {
-                Toast.makeText(context, "PDF Report generated successfully!", Toast.LENGTH_SHORT).show()
                 onReportPreview(status.file)
                 viewModel.resetExportStatus()
             }
             is ExportStatus.Error -> {
-                Toast.makeText(context, "Error: ${status.message}", Toast.LENGTH_LONG).show()
+                snackbarHostState.showSnackbar("Error: ${status.message}")
                 viewModel.resetExportStatus()
             }
             else -> {}
@@ -66,44 +82,88 @@ fun ParentDashboardScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(SoftSky)
-            .padding(16.dp)
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        SkyDeep,
+                        Sky,
+                        Sand,
+                        SandDeep
+                    )
+                )
+            )
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            // Header Row
+        // Bohol Chocolate Hills bottom silhouette
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp)
+                .align(Alignment.BottomCenter),
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            val hillWidths = listOf(70.dp, 100.dp, 85.dp, 115.dp, 80.dp, 95.dp)
+            hillWidths.forEachIndexed { index, width ->
+                Box(
+                    modifier = Modifier
+                        .size(width = width, height = width * 0.55f)
+                        .offset(x = if (index == 0) 0.dp else ((-14) * index).dp)
+                        .clip(RoundedCornerShape(topStartPercent = 50, topEndPercent = 50))
+                        .background(
+                            if (index % 2 == 0) Tan.copy(alpha = 0.35f) else TanDark.copy(alpha = 0.25f)
+                        )
+                )
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding()
+                .padding(horizontal = 18.dp, vertical = 12.dp)
+        ) {
+            // Header Row: Back button, Title & PDF Export CTA
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 6.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onBack) {
-                    Text(text = "⬅️", fontSize = 24.sp)
+                GummyBackButton(onClick = onBack)
+
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "Learner Insights",
+                        fontFamily = LexendFontFamily,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Ink
+                    )
+                    Text(
+                        text = "Progress & Phonics Mastery",
+                        fontFamily = LexendFontFamily,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = InkSoft
+                    )
                 }
 
-                Text(
-                    text = "Parent Dashboard",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = TextPrimary
-                )
-
-                Button(
+                GummyButton(
+                    text = if (uiState.exportStatus is ExportStatus.Exporting) "Exporting" else "PDF",
+                    icon = Icons.Filled.PictureAsPdf,
                     onClick = { viewModel.exportPdfReport() },
-                    colors = ButtonDefaults.buttonColors(containerColor = FriendlyPurple),
-                    enabled = uiState.exportStatus !is ExportStatus.Exporting && uiState.selectedProfile != null
-                ) {
-                    if (uiState.exportStatus is ExportStatus.Exporting) {
-                        CircularProgressIndicator(
-                            color = CreamWhite,
-                            modifier = Modifier.height(18.dp)
-                        )
-                    } else {
-                        Text("📄 Export PDF", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = CreamWhite)
-                    }
-                }
+                    backgroundColor = Ube,
+                    shadowColor = UbeShadow,
+                    contentColor = Cloud,
+                    enabled = uiState.exportStatus !is ExportStatus.Exporting && uiState.selectedProfile != null,
+                    fontSize = 13,
+                    modifier = Modifier.height(52.dp)
+                )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Profile Switcher Dropdown
             ProfileSwitcherDropdown(
@@ -112,16 +172,16 @@ fun ParentDashboardScreen(
                 onProfileSelect = { profile -> viewModel.selectProfile(profile) }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             if (uiState.isLoading) {
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f),
+                        .weight(1f)
+                        .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = FriendlyPurple)
+                    CircularProgressIndicator(color = Ube)
                 }
             } else {
                 val dashboardData = uiState.dashboardData
@@ -132,35 +192,38 @@ fun ParentDashboardScreen(
                             .fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
+                        item { LearnerHeroCard(data = dashboardData) }
+                        item { MasteredSoundsShelf(letterPerformances = dashboardData.letterPerformances) }
+                        item { PracticeFocusSection(atRiskLetters = dashboardData.atRiskLetters) }
                         item {
-                            OverallStatsCard(data = dashboardData)
+                            WordBlendingShelf(
+                                completedGroups = dashboardData.blendItCompletedCount,
+                                totalGroups = dashboardData.blendItTotalCount
+                            )
                         }
-
-                        item {
-                            AtRiskSection(atRiskLetters = dashboardData.atRiskLetters)
-                        }
-
-                        item {
-                            BlendItSummaryCard(completedGroups = dashboardData.blendItCompletedCount)
-                        }
-
-                        item {
-                            LetterPerformanceTable(letterPerformances = dashboardData.letterPerformances)
-                        }
+                        item { BadgeCollectionCase(completedLettersCount = dashboardData.completedLettersCount) }
                     }
                 } else {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = "No profile data available.",
+                            fontFamily = LexendFontFamily,
                             fontSize = 16.sp,
-                            color = TextSecondary
+                            color = InkSoft
                         )
                     }
                 }
             }
         }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }

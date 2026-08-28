@@ -1,6 +1,7 @@
 package com.playit.app.presentation.dashboard.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,7 +21,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.domain.model.LetterPerformance
-import com.playit.app.presentation.theme.DestructiveRed
+import com.playit.app.presentation.theme.Cloud
+import com.playit.app.presentation.theme.DarkBrownOutline
+import com.playit.app.presentation.theme.Ink
+import com.playit.app.presentation.theme.InkSoft
+import com.playit.app.presentation.theme.Kalamansi
+import com.playit.app.presentation.theme.LexendFontFamily
 
 @Composable
 fun AtRiskSection(
@@ -31,28 +37,31 @@ fun AtRiskSection(
 
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFECEC)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Kalamansi.copy(alpha = 0.15f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = androidx.compose.foundation.BorderStroke(2.5.dp, Kalamansi)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(18.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "⚠️ At-Risk Phonemes (${atRiskLetters.size})",
+                    text = "Practice Recommended (${atRiskLetters.size} Letters)",
+                    fontFamily = LexendFontFamily,
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = DestructiveRed
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Ink
                 )
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "The child is encountering difficulty with these target sounds. Extra practice in Hear It / Say It is recommended:",
-                fontSize = 12.sp,
-                color = Color(0xFF555555)
+                text = "These sounds need a bit more practice. Extra time in Hear It / Say It will help strengthen mastery:",
+                fontFamily = LexendFontFamily,
+                fontSize = 13.sp,
+                color = InkSoft
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -72,10 +81,23 @@ private fun BoxBadge(symbol: String, accuracy: Int) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .background(Color.White, shape = RoundedCornerShape(8.dp))
-            .padding(horizontal = 12.dp, vertical = 6.dp)
+            .background(Cloud, shape = RoundedCornerShape(10.dp))
+            .border(1.5.dp, DarkBrownOutline.copy(alpha = 0.3f), RoundedCornerShape(10.dp))
+            .padding(horizontal = 14.dp, vertical = 8.dp)
     ) {
-        Text(text = symbol, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = DestructiveRed)
-        Text(text = "$accuracy%", fontSize = 10.sp, color = Color.Gray)
+        Text(
+            text = symbol,
+            fontFamily = LexendFontFamily,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.ExtraBold,
+            color = Kalamansi
+        )
+        Text(
+            text = "$accuracy%",
+            fontFamily = LexendFontFamily,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold,
+            color = InkSoft
+        )
     }
 }

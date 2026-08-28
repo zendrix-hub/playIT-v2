@@ -42,3 +42,8 @@
 
 - Every icon-only interactive element ships a content description (`contentDescription` in Compose) for screen-reader support, even though the primary target user is pre-literate — this matters for the Parent Dashboard surfaces and for any future accessibility-tooling audits.
 - Maintain the dual-coding rule from `03 §6`/`16 §7`: no icon is the sole carrier of meaning.
+
+## 7. Zero-Emoji Policy
+
+- Emojis are strictly prohibited as icons, button decorations, status markers, or placeholder graphics.
+- All visual affordances must be either official Android Material Vector Icons (`Icons.Filled.*`, `Icons.AutoMirrored.*`) or custom transparent PNG illustration assets from the asset pipeline (`images/rewards/`, `images/pictures/`, etc.). Never use Unicode emojis in place of proper UI icons.

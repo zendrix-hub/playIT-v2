@@ -41,7 +41,7 @@ object DatabaseModule {
         @ApplicationContext context: Context,
         databaseProvider: Provider<PlayItDatabase>
     ): PlayItDatabase {
-        return Room.databaseBuilder(
+        val builder = Room.databaseBuilder(
             context,
             PlayItDatabase::class.java,
             PlayItDatabase.DATABASE_NAME
@@ -53,34 +53,34 @@ object DatabaseModule {
 
                     // Seed 28 Phonemes
                     val phonemeList = listOf(
-                        PhonemeEntity(1, "m", "audio/phonemes/phoneme_m.mp3", "images/pictures/word_mouse.png", "Mouse"),
-                        PhonemeEntity(2, "s", "audio/phonemes/phoneme_s.mp3", "images/pictures/word_sun.png", "Sun"),
-                        PhonemeEntity(3, "a", "audio/phonemes/phoneme_a.mp3", "images/pictures/word_apple.png", "Apple"),
-                        PhonemeEntity(4, "i", "audio/phonemes/phoneme_i.mp3", "images/pictures/word_iguana.png", "Iguana"),
-                        PhonemeEntity(5, "o", "audio/phonemes/phoneme_o.mp3", "images/pictures/word_octopus.png", "Octopus"),
-                        PhonemeEntity(6, "b", "audio/phonemes/phoneme_b.mp3", "images/pictures/word_ball.png", "Ball"),
-                        PhonemeEntity(7, "e", "audio/phonemes/phoneme_e.mp3", "images/pictures/word_elephant.png", "Elephant"),
-                        PhonemeEntity(8, "u", "audio/phonemes/phoneme_u.mp3", "images/pictures/word_umbrella.png", "Umbrella"),
-                        PhonemeEntity(9, "t", "audio/phonemes/phoneme_t.mp3", "images/pictures/word_turtle.png", "Turtle"),
-                        PhonemeEntity(10, "k", "audio/phonemes/phoneme_k.mp3", "images/pictures/word_kite.png", "Kite"),
-                        PhonemeEntity(11, "l", "audio/phonemes/phoneme_l.mp3", "images/pictures/word_lion.png", "Lion"),
-                        PhonemeEntity(12, "y", "audio/phonemes/phoneme_y.mp3", "images/pictures/word_yoyo.png", "Yo-yo"),
-                        PhonemeEntity(13, "n", "audio/phonemes/phoneme_n.mp3", "images/pictures/word_nest.png", "Nest"),
-                        PhonemeEntity(14, "g", "audio/phonemes/phoneme_g.mp3", "images/pictures/word_goat.png", "Goat"),
-                        PhonemeEntity(15, "p", "audio/phonemes/phoneme_p.mp3", "images/pictures/word_pencil.png", "Pencil"),
-                        PhonemeEntity(16, "ng", "", "", "PENDING_SME_REVIEW"),
-                        PhonemeEntity(17, "r", "audio/phonemes/phoneme_r.mp3", "images/pictures/word_rabbit.png", "Rabbit"),
-                        PhonemeEntity(18, "d", "audio/phonemes/phoneme_d.mp3", "images/pictures/word_dog.png", "Dog"),
-                        PhonemeEntity(19, "h", "audio/phonemes/phoneme_h.mp3", "images/pictures/word_hat.png", "Hat"),
-                        PhonemeEntity(20, "w", "audio/phonemes/phoneme_w.mp3", "images/pictures/word_watch.png", "Watch"),
-                        PhonemeEntity(21, "c", "audio/phonemes/phoneme_c.mp3", "images/pictures/word_cat.png", "Cat"),
-                        PhonemeEntity(22, "f", "audio/phonemes/phoneme_f.mp3", "images/pictures/word_fish.png", "Fish"),
-                        PhonemeEntity(23, "j", "audio/phonemes/phoneme_j.mp3", "images/pictures/word_jug.png", "Jug"),
+                        PhonemeEntity(1, "m", "audio/phonemes/phoneme_m.mp3", "images/pictures/picture_mouse.png", "Mouse"),
+                        PhonemeEntity(2, "s", "audio/phonemes/phoneme_s.mp3", "images/pictures/picture_sun.png", "Sun"),
+                        PhonemeEntity(3, "a", "audio/phonemes/phoneme_a.mp3", "images/pictures/picture_apple.png", "Apple"),
+                        PhonemeEntity(4, "i", "audio/phonemes/phoneme_i.mp3", "images/pictures/picture_insect.png", "Insect"),
+                        PhonemeEntity(5, "o", "audio/phonemes/phoneme_o.mp3", "images/pictures/picture_orange.png", "Orange"),
+                        PhonemeEntity(6, "b", "audio/phonemes/phoneme_b.mp3", "images/pictures/picture_ball.png", "Ball"),
+                        PhonemeEntity(7, "e", "audio/phonemes/phoneme_e.mp3", "images/pictures/picture_elephant.png", "Elephant"),
+                        PhonemeEntity(8, "u", "audio/phonemes/phoneme_u.mp3", "images/pictures/picture_umbrella.png", "Umbrella"),
+                        PhonemeEntity(9, "t", "audio/phonemes/phoneme_t.mp3", "images/pictures/picture_tiger.png", "Tiger"),
+                        PhonemeEntity(10, "k", "audio/phonemes/phoneme_k.mp3", "images/pictures/picture_kite.png", "Kite"),
+                        PhonemeEntity(11, "l", "audio/phonemes/phoneme_l.mp3", "images/pictures/picture_lion.png", "Lion"),
+                        PhonemeEntity(12, "y", "audio/phonemes/phoneme_y.mp3", "images/pictures/picture_yoyo.png", "Yoyo"),
+                        PhonemeEntity(13, "n", "audio/phonemes/phoneme_n.mp3", "images/pictures/picture_nest.png", "Nest"),
+                        PhonemeEntity(14, "g", "audio/phonemes/phoneme_g.mp3", "images/pictures/picture_goat.png", "Goat"),
+                        PhonemeEntity(15, "ng", "", "", "PENDING_SME_REVIEW"),
+                        PhonemeEntity(16, "p", "audio/phonemes/phoneme_p.mp3", "images/pictures/picture_pig.png", "Pig"),
+                        PhonemeEntity(17, "r", "audio/phonemes/phoneme_r.mp3", "images/pictures/picture_rabbit.png", "Rabbit"),
+                        PhonemeEntity(18, "d", "audio/phonemes/phoneme_d.mp3", "images/pictures/picture_dog.png", "Dog"),
+                        PhonemeEntity(19, "h", "audio/phonemes/phoneme_h.mp3", "images/pictures/picture_hat.png", "Hat"),
+                        PhonemeEntity(20, "w", "audio/phonemes/phoneme_w.mp3", "images/pictures/picture_watch.png", "Watch"),
+                        PhonemeEntity(21, "c", "audio/phonemes/phoneme_c.mp3", "images/pictures/picture_cat.png", "Cat"),
+                        PhonemeEntity(22, "f", "audio/phonemes/phoneme_f.mp3", "images/pictures/picture_fish.png", "Fish"),
+                        PhonemeEntity(23, "j", "audio/phonemes/phoneme_j.mp3", "images/pictures/picture_jug.png", "Jug"),
                         PhonemeEntity(24, "ñ", "", "", "PENDING_SME_REVIEW"),
-                        PhonemeEntity(25, "q", "audio/phonemes/phoneme_q.mp3", "images/pictures/word_queen.png", "Queen"),
-                        PhonemeEntity(26, "v", "audio/phonemes/phoneme_v.mp3", "images/pictures/word_van.png", "Van"),
-                        PhonemeEntity(27, "x", "audio/phonemes/phoneme_x.mp3", "images/pictures/word_xylophone.png", "Xylophone"),
-                        PhonemeEntity(28, "z", "audio/phonemes/phoneme_z.mp3", "images/pictures/word_zebra.png", "Zebra")
+                        PhonemeEntity(25, "q", "audio/phonemes/phoneme_q.mp3", "images/pictures/picture_queen.png", "Queen"),
+                        PhonemeEntity(26, "v", "audio/phonemes/phoneme_v.mp3", "images/pictures/picture_van.png", "Van"),
+                        PhonemeEntity(27, "x", "audio/phonemes/phoneme_x.mp3", "images/pictures/picture_box.png", "Box"),
+                        PhonemeEntity(28, "z", "audio/phonemes/phoneme_z.mp3", "images/pictures/picture_zebra.png", "Zebra")
                     )
                     dbInstance.phonemeDao().insertPhonemes(phonemeList)
 
@@ -126,13 +126,44 @@ object DatabaseModule {
                         BlendItWordEntity(10, 3, "CAT", "C-A-T", "audio/words/word_cat.mp3", "images/pictures/blendword_cat.png"),
                         BlendItWordEntity(11, 3, "MAT", "M-A-T", "audio/words/word_mat.mp3", "images/pictures/blendword_mat.png"),
                         BlendItWordEntity(12, 3, "KIT", "K-I-T", "audio/words/word_kit.mp3", "images/pictures/blendword_kit.png"),
-                        BlendItWordEntity(13, 3, "LIT", "L-I-T", "audio/words/word_lit.mp3", "images/pictures/blendword_lit.png")
+                        BlendItWordEntity(13, 3, "LIT", "L-I-T", "audio/words/word_lit.mp3", "images/pictures/blendword_lit.png"),
+
+                        // Group 4 (5 words)
+                        BlendItWordEntity(14, 4, "PIG", "P-I-G", "audio/words/word_pig.mp3", "images/pictures/blendword_pig.png"),
+                        BlendItWordEntity(15, 4, "PAN", "P-A-N", "audio/words/word_pan.mp3", "images/pictures/blendword_pan.png"),
+                        BlendItWordEntity(16, 4, "GAP", "G-A-P", "audio/words/word_gap.mp3", "images/pictures/blendword_gap.png"),
+                        BlendItWordEntity(17, 4, "SPIN", "S-P-I-N", "audio/words/word_spin.mp3", "images/pictures/blendword_spin.png"),
+                        BlendItWordEntity(18, 4, "NAP", "N-A-P", "audio/words/word_nap.mp3", "images/pictures/blendword_nap.png"),
+
+                        // Group 5 (5 words)
+                        BlendItWordEntity(19, 5, "BIRD", "B-I-R-D", "audio/words/word_bird.mp3", "images/pictures/blendword_bird.png"),
+                        BlendItWordEntity(20, 5, "HAND", "H-A-N-D", "audio/words/word_hand.mp3", "images/pictures/blendword_hand.png"),
+                        BlendItWordEntity(21, 5, "WARM", "W-A-R-M", "audio/words/word_warm.mp3", "images/pictures/blendword_warm.png"),
+                        BlendItWordEntity(22, 5, "ROAD", "R-O-A-D", "audio/words/word_road.mp3", "images/pictures/blendword_road.png"),
+                        BlendItWordEntity(23, 5, "DRAW", "D-R-A-W", "audio/words/word_draw.mp3", "images/pictures/blendword_draw.png"),
+
+                        // Group 6 (5 words)
+                        BlendItWordEntity(24, 6, "FACE", "F-A-C-E", "audio/words/word_face.mp3", "images/pictures/blendword_face.png"),
+                        BlendItWordEntity(25, 6, "CAKE", "C-A-K-E", "audio/words/word_cake.mp3", "images/pictures/blendword_cake.png"),
+                        BlendItWordEntity(26, 6, "FISH", "F-I-S-H", "audio/words/word_fish.mp3", "images/pictures/blendword_fish.png"),
+                        BlendItWordEntity(27, 6, "CAT", "C-A-T", "audio/words/word_cat.mp3", "images/pictures/blendword_cat.png"),
+                        BlendItWordEntity(28, 6, "FAN", "F-A-N", "audio/words/word_fan.mp3", "images/pictures/blendword_fan.png"),
+
+                        // Group 7 (5 words)
+                        BlendItWordEntity(29, 7, "ZOO", "Z-O-O", "audio/words/word_zoo.mp3", "images/pictures/blendword_zoo.png"),
+                        BlendItWordEntity(30, 7, "VAN", "V-A-N", "audio/words/word_van.mp3", "images/pictures/blendword_van.png"),
+                        BlendItWordEntity(31, 7, "BOX", "B-O-X", "audio/words/word_box.mp3", "images/pictures/blendword_box.png"),
+                        BlendItWordEntity(32, 7, "QUIZ", "Q-U-I-Z", "audio/words/word_quiz.mp3", "images/pictures/blendword_quiz.png"),
+                        BlendItWordEntity(33, 7, "FOX", "F-O-X", "audio/words/word_fox.mp3", "images/pictures/blendword_fox.png")
                     )
                     dbInstance.blendItWordDao().insertWords(blendWordList)
                 }
             }
-        }).fallbackToDestructiveMigration()
-         .build()
+        })
+        if (com.playit.app.BuildConfig.DEBUG) {
+            builder.fallbackToDestructiveMigration()
+        }
+        return builder.build()
     }
 
     @Provides

@@ -66,6 +66,10 @@ Personas, 10-stage user journey, competitive landscape, UX/UI principles, color/
 
 **Content gap, repeated because it matters:** letters `ng` and `ñ` (and draft `x`) have no approved English-phonics example content yet — every asset doc above flags them `PENDING SME REVIEW`. Do not invent pedagogical content for these to unblock a build; ship the pipeline so they slot in later, per `08_DATABASE_SPEC.md §5`.
 
+**Mockup vs. Asset Creation Scope:** The prototype mockup (`playit-mockup.html`) is used strictly for UI layout, styling, and animation improvements. Asset creation (illustrations, icons, character designs, audio) remains strictly governed by our original engineering package plan (`14_ASSET_MANIFEST.md`, `15_IMAGE_GENERATION_PROMPTS.md`, `16_ILLUSTRATION_STYLE_GUIDE.md`, anchor style sheet `images/_style-reference-sheet/anchor_letter-card.png`) and must NOT change based on the mockup unless explicitly stated by the stakeholder.
+
+**Zero-Emoji Policy:** Emojis are strictly NOT needed and MUST NOT be used in UI text, button labels, speech bubbles, cards, or titles anywhere across child-facing and adult-facing screens. All visual icons must use clean Android Vector Graphics (`Icons.Filled.*`, `Icons.AutoMirrored.*`) or transparent production PNG assets (`images/rewards/`, `images/pictures/`, etc.). Never append or embed emojis (e.g., 🚀, 🎉, 🍎, 🔥, ⭐, 🔒) in text strings or button labels.
+
 ## 14. Current Project Status
 
 **This package is a design/specification handoff — zero application code exists yet.** Status as of this handoff: all 27 documents in this package (`00`–`22`, `99`) are complete and internally cross-referenced. `13_MASTER_TASKS.md`'s Phase 0 checklist has not been started. If you are resuming work and some code *does* exist, your first action should be to check `13_MASTER_TASKS.md` for which boxes are already checked before assuming any particular phase is the current one.

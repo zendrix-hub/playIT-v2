@@ -60,4 +60,14 @@ class MapPathGeometryTest {
 
         assertEquals("Terrain prop positions must be deterministic", firstRunOffsets, secondRunOffsets)
     }
+
+    @Test
+    fun getMarungkoLettersForGroup_returnsExpectedLetters() {
+        assertEquals("M • S • A • I • O", com.playit.app.presentation.map.components.getMarungkoLettersForGroup(1))
+        assertEquals("B • U • T • K • L", com.playit.app.presentation.map.components.getMarungkoLettersForGroup(2))
+        assertEquals("Y • N • G • R • P", com.playit.app.presentation.map.components.getMarungkoLettersForGroup(3))
+        assertEquals("D • H • W • C • V", com.playit.app.presentation.map.components.getMarungkoLettersForGroup(4))
+        assertEquals("Z • J • F • X • Q", com.playit.app.presentation.map.components.getMarungkoLettersForGroup(5))
+        assertEquals("Ñ • NG", com.playit.app.presentation.map.components.getMarungkoLettersForGroup(6))
+    }
 }

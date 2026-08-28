@@ -14,6 +14,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.playit.app.data.audio.AudioPlayer
+import com.playit.app.data.audio.AudioResolver
+import com.playit.app.data.audio.SfxEvent
+import com.playit.app.data.audio.VoContext
 
 sealed class ProfileUiState {
     object Idle : ProfileUiState()
@@ -25,7 +29,9 @@ sealed class ProfileUiState {
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val audioPlayer: AudioPlayer,
+    private val audioResolver: AudioResolver
 ) : ViewModel() {
 
     val profiles: StateFlow<List<Profile>> = profileRepository.getAllProfiles()
@@ -38,8 +44,33 @@ class ProfileViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<ProfileUiState>(ProfileUiState.Idle)
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 
+    private val _showArithmeticGuard = MutableStateFlow(false)
+    val showArithmeticGuard: StateFlow<Boolean> = _showArithmeticGuard.asStateFlow()
+
+    fun requestParentAccess() { _showArithmeticGuard.value = true }
+    fun dismissArithmeticGuard() { _showArithmeticGuard.value = false }
+    fun onArithmeticGuardPassed() {
+        _showArithmeticGuard.value = false
+    }
+
     fun selectProfile(profileId: Long) {
         sessionManager.setActiveProfile(profileId)
+    }
+
+    fun playProfileSelectSound() {
+        audioPlayer.playAssetAudio(audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME))
+    }
+
+    fun playArithmeticSuccessSound() {
+        audioPlayer.playAssetAudio(audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME))
+    }
+
+    fun playArithmeticFailureSound() {
+        audioPlayer.playAssetAudio(audioResolver.getSfxPath(SfxEvent.INCORRECT_POP))
+    }
+
+    fun playWelcomeGreeting() {
+        audioPlayer.playAssetAudio(audioResolver.getVoPath(VoContext.WELCOME_01))
     }
 
     fun createProfile(name: String, avatarResId: Int) {

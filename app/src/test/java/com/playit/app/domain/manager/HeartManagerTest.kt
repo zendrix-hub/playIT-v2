@@ -1,5 +1,6 @@
 package com.playit.app.domain.manager
 
+import com.playit.app.domain.model.GameplayConstants
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -12,7 +13,7 @@ class HeartManagerTest {
 
     @Before
     fun setUp() {
-        heartManager = HeartManager(initialHearts = 5)
+        heartManager = HeartManager(initialHearts = GameplayConstants.STARTING_HEARTS)
     }
 
     @Test
@@ -37,14 +38,31 @@ class HeartManagerTest {
         assertEquals(0, heartManager.getHearts())
         assertTrue(isGameOver)
         assertTrue(heartManager.isGameOver)
+
+        // Further deduction should remain 0 and return gameOver
+        val subsequentGameOver = heartManager.deductHeart()
+        assertEquals(0, heartManager.getHearts())
+        assertTrue(subsequentGameOver)
     }
 
     @Test
     fun restartAtReducedPoolOnDepletion() {
         heartManager.deductHeart()
-        heartManager.resetForRestart(newPool = 3)
+        heartManager.resetForRestart(newPool = GameplayConstants.DEPLETED_RESTART_HEARTS)
         assertEquals(3, heartManager.getHearts())
         assertEquals(3, heartManager.initialHearts)
+        assertEquals(0, heartManager.heartsLost)
+    }
+
+    @Test
+    fun reset_restoresInitialStartingPool() {
+        heartManager.deductHeart()
+        heartManager.deductHeart()
+        assertEquals(3, heartManager.getHearts())
+        assertEquals(2, heartManager.heartsLost)
+
+        heartManager.reset()
+        assertEquals(5, heartManager.getHearts())
         assertEquals(0, heartManager.heartsLost)
     }
 

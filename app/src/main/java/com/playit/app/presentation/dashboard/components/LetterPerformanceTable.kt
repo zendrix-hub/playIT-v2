@@ -9,11 +9,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,11 +23,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.domain.model.LetterPerformance
 import com.playit.app.domain.model.RiskStatus
-import com.playit.app.presentation.theme.CreamWhite
-import com.playit.app.presentation.theme.DestructiveRed
-import com.playit.app.presentation.theme.GrowthGreen
-import com.playit.app.presentation.theme.TextPrimary
-import com.playit.app.presentation.theme.TextSecondary
+import com.playit.app.presentation.theme.Cloud
+import com.playit.app.presentation.theme.DarkBrownOutline
+import com.playit.app.presentation.theme.Ink
+import com.playit.app.presentation.theme.InkSoft
+import com.playit.app.presentation.theme.Kalamansi
+import com.playit.app.presentation.theme.Leaf
+import com.playit.app.presentation.theme.LexendFontFamily
+import com.playit.app.presentation.theme.Mango
+import com.playit.app.presentation.theme.Sky
 
 @Composable
 fun LetterPerformanceTable(
@@ -37,18 +40,20 @@ fun LetterPerformanceTable(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = CreamWhite),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Cloud),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        border = androidx.compose.foundation.BorderStroke(3.dp, DarkBrownOutline)
     ) {
         Column(
             modifier = Modifier.padding(20.dp)
         ) {
             Text(
-                text = "🔤 Phoneme Mastery Matrix (${letterPerformances.size} Letters)",
+                text = "Phoneme Mastery Matrix (${letterPerformances.size} Letters)",
+                fontFamily = LexendFontFamily,
                 fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = TextPrimary
+                fontWeight = FontWeight.ExtraBold,
+                color = Ink
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -57,16 +62,16 @@ fun LetterPerformanceTable(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFEDF2F7), shape = RoundedCornerShape(8.dp))
+                    .background(Sky, shape = RoundedCornerShape(10.dp))
                     .padding(horizontal = 12.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "Letter", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextSecondary, modifier = Modifier.weight(1f))
-                Text(text = "Status", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextSecondary, modifier = Modifier.weight(1.5f))
-                Text(text = "Accuracy", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextSecondary, modifier = Modifier.weight(1.2f))
-                Text(text = "Attempts", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextSecondary, modifier = Modifier.weight(1f))
-                Text(text = "Stars", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextSecondary, modifier = Modifier.weight(0.8f))
+                Text(text = "Letter", fontFamily = LexendFontFamily, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = InkSoft, modifier = Modifier.weight(1f))
+                Text(text = "Status", fontFamily = LexendFontFamily, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = InkSoft, modifier = Modifier.weight(1.5f))
+                Text(text = "Accuracy", fontFamily = LexendFontFamily, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = InkSoft, modifier = Modifier.weight(1.2f))
+                Text(text = "Attempts", fontFamily = LexendFontFamily, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = InkSoft, modifier = Modifier.weight(1f))
+                Text(text = "Stars", fontFamily = LexendFontFamily, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = InkSoft, modifier = Modifier.weight(0.8f))
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -75,7 +80,7 @@ fun LetterPerformanceTable(
             letterPerformances.forEachIndexed { index, lp ->
                 TableRow(lp = lp)
                 if (index < letterPerformances.size - 1) {
-                    Divider(color = Color(0xFFE2E8F0), thickness = 0.5.dp)
+                    HorizontalDivider(color = DarkBrownOutline.copy(alpha = 0.15f), thickness = 0.5.dp)
                 }
             }
         }
@@ -93,9 +98,10 @@ private fun TableRow(lp: LetterPerformance) {
     ) {
         Text(
             text = lp.symbol,
+            fontFamily = LexendFontFamily,
             fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = TextPrimary,
+            fontWeight = FontWeight.ExtraBold,
+            color = Ink,
             modifier = Modifier.weight(1f)
         )
 
@@ -103,23 +109,26 @@ private fun TableRow(lp: LetterPerformance) {
 
         Text(
             text = "${lp.accuracyPercentage.toInt()}%",
+            fontFamily = LexendFontFamily,
             fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold,
-            color = TextPrimary,
+            color = Ink,
             modifier = Modifier.weight(1.2f)
         )
 
         Text(
             text = "${lp.totalAttempts}",
+            fontFamily = LexendFontFamily,
             fontSize = 14.sp,
-            color = TextSecondary,
+            color = InkSoft,
             modifier = Modifier.weight(1f)
         )
 
         Text(
-            text = "⭐ ${lp.starsEarned}",
+            text = "${lp.starsEarned}",
+            fontFamily = LexendFontFamily,
             fontSize = 14.sp,
-            color = TextPrimary,
+            color = Ink,
             modifier = Modifier.weight(0.8f)
         )
     }
@@ -128,9 +137,9 @@ private fun TableRow(lp: LetterPerformance) {
 @Composable
 private fun StatusBadge(status: RiskStatus, modifier: Modifier = Modifier) {
     val (bgColor, textColor, label) = when (status) {
-        RiskStatus.GREEN -> Triple(Color(0xFFE6F4EA), GrowthGreen, "Mastered")
-        RiskStatus.YELLOW -> Triple(Color(0xFFFEF3D6), Color(0xFFD69E2E), "Developing")
-        RiskStatus.RED -> Triple(Color(0xFFFFECEC), DestructiveRed, "At-Risk")
+        RiskStatus.GREEN -> Triple(Color(0xFFEAF7EE), Leaf, "Mastered")
+        RiskStatus.YELLOW -> Triple(Mango.copy(alpha = 0.2f), Mango, "Developing")
+        RiskStatus.RED -> Triple(Kalamansi.copy(alpha = 0.2f), Kalamansi, "At-Risk")
     }
 
     Box(
@@ -139,6 +148,12 @@ private fun StatusBadge(status: RiskStatus, modifier: Modifier = Modifier) {
             .padding(horizontal = 8.dp, vertical = 4.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(text = label, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = textColor)
+        Text(
+            text = label,
+            fontFamily = LexendFontFamily,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.ExtraBold,
+            color = textColor
+        )
     }
 }

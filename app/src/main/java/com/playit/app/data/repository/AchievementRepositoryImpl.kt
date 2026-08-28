@@ -26,7 +26,12 @@ class AchievementRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getAchievementByTitle(profileId: Long, title: String): Achievement? {
-        return achievementDao.getAchievementByTitle(profileId, title)?.toDomain()
+        return try {
+            achievementDao.getAchievementByTitle(profileId, title)?.toDomain()
+        } catch (e: Exception) {
+            android.util.Log.e("AchievementRepositoryImpl", "Failed to read data", e)
+            null
+        }
     }
 
     override suspend fun unlockAchievement(
@@ -34,15 +39,26 @@ class AchievementRepositoryImpl @Inject constructor(
         title: String,
         unlockedAt: Long
     ): Achievement {
-        val existing = achievementDao.getAchievementByTitle(profileId, title)
-        val entityToSave = existing?.copy(isUnlocked = true, unlockedAt = unlockedAt)
-            ?: com.playit.app.data.local.entity.AchievementEntity(
+        return try {
+            val existing = achievementDao.getAchievementByTitle(profileId, title)
+            val entityToSave = existing?.copy(isUnlocked = true, unlockedAt = unlockedAt)
+                ?: com.playit.app.data.local.entity.AchievementEntity(
+                    profileId = profileId,
+                    title = title,
+                    isUnlocked = true,
+                    unlockedAt = unlockedAt
+                )
+            val id = achievementDao.insertOrUpdate(entityToSave)
+            entityToSave.copy(achievementId = if (existing != null) existing.achievementId else id).toDomain()
+        } catch (e: Exception) {
+            android.util.Log.e("AchievementRepositoryImpl", "Failed to save data", e)
+            Achievement(
+                id = 0L,
                 profileId = profileId,
                 title = title,
                 isUnlocked = true,
                 unlockedAt = unlockedAt
             )
-        val id = achievementDao.insertOrUpdate(entityToSave)
-        return entityToSave.copy(achievementId = if (existing != null) existing.achievementId else id).toDomain()
+        }
     }
 }

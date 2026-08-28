@@ -8,6 +8,7 @@ import com.playit.app.data.audio.AudioResolver
 import com.playit.app.data.audio.SfxEvent
 import com.playit.app.data.audio.VoContext
 import com.playit.app.domain.manager.StarCalculator
+import com.playit.app.domain.manager.StreakTracker
 import com.playit.app.domain.model.LessonProgress
 import com.playit.app.domain.model.Phoneme
 import com.playit.app.domain.repository.LessonProgressRepository
@@ -24,6 +25,7 @@ import javax.inject.Inject
 class LetterCompleteViewModel @Inject constructor(
     private val phonemeRepository: PhonemeRepository,
     private val lessonProgressRepository: LessonProgressRepository,
+    private val streakTracker: StreakTracker,
     private val sessionManager: SessionManager,
     private val audioPlayer: AudioPlayer,
     private val audioResolver: AudioResolver,
@@ -59,7 +61,7 @@ class LetterCompleteViewModel @Inject constructor(
             val stars = StarCalculator.calculateStars(heartsLost = 0)
             _starsEarned.value = stars
 
-            // Save lesson completion
+            // Save lesson completion and record streak activity
             lessonProgressRepository.saveProgress(
                 LessonProgress(
                     profileId = profileId,
@@ -70,6 +72,7 @@ class LetterCompleteViewModel @Inject constructor(
                     completedAt = System.currentTimeMillis()
                 )
             )
+            streakTracker.recordActivity(profileId)
 
             // Play completion fanfare + complete VO line, followed by unlock chime + unlock VO
             val fanfareSfx = audioResolver.getSfxPath(SfxEvent.LEVEL_COMPLETE_FANFARE)

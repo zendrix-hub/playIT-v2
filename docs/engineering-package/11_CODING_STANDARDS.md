@@ -27,6 +27,7 @@
 - State hoisting: a component receives state + lambdas, never reaches into a ViewModel or `SessionManager` directly — this is what keeps `presentation/components/` reusable and previewable.
 - Mark stable data classes passed into Composables with `@Immutable`/`@Stable` (`05 §4`).
 - `@Preview` for every reusable component in `presentation/components/`, with at least a light-content example — this project has no dedicated design tool handoff, so Compose Previews are the de facto visual QA surface during development.
+- **Zero-Emoji Policy**: Emojis are strictly NOT needed and MUST NOT be used in UI text, button labels, speech bubbles, cards, or titles. All visual icons must use clean Android Vector Graphics (`Icons.Filled.*`, `Icons.AutoMirrored.*`) or transparent production PNG illustration assets (`images/rewards/`, `images/pictures/`, etc.). Never append or embed emojis (e.g., 🚀, 🎉, 🍎, 🔥, ⭐, 🔒) in text strings or button labels.
 
 ## 6. Error Handling
 - Expected gameplay outcomes (wrong answer, heart depletion, session-ends-with-0-stars) are modeled as sealed-class results returned from domain functions — not thrown exceptions.

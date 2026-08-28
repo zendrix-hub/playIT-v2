@@ -57,10 +57,11 @@ fun MascotBubbleComponent(
                     .background(SoftSky),
                 contentAlignment = Alignment.Center
             ) {
-                Image(
-                    painter = rememberAssetPainter(mascotState.assetPath),
+                GummyMotionAsset(
+                    assetPath = mascotState.assetPath,
                     contentDescription = "Lily the Tarsier (${mascotState.name})",
-                    contentScale = ContentScale.Fit,
+                    isIdleFloating = true,
+                    floatDistance = 2.dp,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(4.dp)

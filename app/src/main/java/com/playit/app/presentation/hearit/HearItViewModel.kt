@@ -30,6 +30,12 @@ class HearItViewModel @Inject constructor(
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying.asStateFlow()
 
+    private val _playCount = MutableStateFlow(0)
+    val playCount: StateFlow<Int> = _playCount.asStateFlow()
+
+    private val _loadError = MutableStateFlow(false)
+    val loadError: StateFlow<Boolean> = _loadError.asStateFlow()
+
     init {
         loadPhoneme()
     }
@@ -37,13 +43,11 @@ class HearItViewModel @Inject constructor(
     private fun loadPhoneme() {
         val id = phonemeIdArg?.toIntOrNull() ?: 1
         viewModelScope.launch {
-            val p = phonemeRepository.getPhonemeById(id) ?: Phoneme(
-                id = 1,
-                letter = "m",
-                audioPath = "audio/phonemes/phoneme_m.mp3",
-                imagePath = "images/pictures/word_mouse.png",
-                exampleWord = "Mouse"
-            )
+            val p = phonemeRepository.getPhonemeById(id)
+            if (p == null) {
+                _loadError.value = true
+                return@launch
+            }
             _phoneme.value = p
             playPhonemeSound()
         }
@@ -53,6 +57,7 @@ class HearItViewModel @Inject constructor(
         val letter = _phoneme.value?.letter ?: "m"
         val path = audioResolver.getPhonemePath(letter) ?: _phoneme.value?.audioPath ?: "audio/phonemes/phoneme_m.mp3"
         _isPlaying.value = true
+        _playCount.value++
         audioPlayer.playAssetAudio(path) {
             _isPlaying.value = false
         }

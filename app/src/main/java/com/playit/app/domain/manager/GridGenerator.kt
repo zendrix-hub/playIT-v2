@@ -22,9 +22,9 @@ class GridGenerator @Inject constructor() {
             // Fallback distractor items for Letter 1 edge case (01_REQUIREMENTS_SUMMARY.md §5)
             gridItems.addAll(distractors)
             val fallbackCandidates = listOf(
-                Phoneme(2, "s", "audio/phonemes/phoneme_s.mp3", "images/pictures/word_sun.png", "Sun"),
-                Phoneme(3, "a", "audio/phonemes/phoneme_a.mp3", "images/pictures/word_apple.png", "Apple"),
-                Phoneme(4, "i", "audio/phonemes/phoneme_i.mp3", "images/pictures/word_iguana.png", "Iguana")
+                Phoneme(2, "s", "audio/phonemes/phoneme_s.mp3", "images/pictures/picture_sun.png", "Sun"),
+                Phoneme(3, "a", "audio/phonemes/phoneme_a.mp3", "images/pictures/picture_apple.png", "Apple"),
+                Phoneme(4, "i", "audio/phonemes/phoneme_i.mp3", "images/pictures/picture_insect.png", "Insect")
             )
             for (candidate in fallbackCandidates) {
                 if (gridItems.size < 4 && gridItems.none { it.id == candidate.id }) {

@@ -87,17 +87,55 @@ class StreakTrackerTest {
 
     @Test
     fun milestoneBadges_unlockedAt5_10_15_20() = runBlocking {
-        val profile = Profile(id = 1, name = "Learner", avatarResId = 1, lastPlayedAt = simulatedTime, currentStreak = 4)
-        fakeProfileRepository.profiles[1L] = profile
-
         val tracker = createTracker()
-        // Next day -> streak hits 5
+
+        // Test 5-day badge
+        val profile5 = Profile(id = 1, name = "Learner", avatarResId = 1, lastPlayedAt = simulatedTime, currentStreak = 4)
+        fakeProfileRepository.profiles[1L] = profile5
         simulatedTime += 24 * 60 * 60 * 1000L
         tracker.recordActivity(1L)
+        val badge5 = fakeAchievementRepository.getAchievementByTitle(1L, "5-Day Streak")
+        assertNotNull(badge5)
+        assertEquals(true, badge5?.isUnlocked)
 
-        val badge = fakeAchievementRepository.getAchievementByTitle(1L, "5-Day Streak")
-        assertNotNull(badge)
-        assertEquals(true, badge?.isUnlocked)
+        // Test 10-day badge
+        val profile10 = Profile(id = 2, name = "Learner2", avatarResId = 1, lastPlayedAt = simulatedTime, currentStreak = 9)
+        fakeProfileRepository.profiles[2L] = profile10
+        simulatedTime += 24 * 60 * 60 * 1000L
+        tracker.recordActivity(2L)
+        val badge10 = fakeAchievementRepository.getAchievementByTitle(2L, "10-Day Streak")
+        assertNotNull(badge10)
+        assertEquals(true, badge10?.isUnlocked)
+
+        // Test 15-day badge
+        val profile15 = Profile(id = 3, name = "Learner3", avatarResId = 1, lastPlayedAt = simulatedTime, currentStreak = 14)
+        fakeProfileRepository.profiles[3L] = profile15
+        simulatedTime += 24 * 60 * 60 * 1000L
+        tracker.recordActivity(3L)
+        val badge15 = fakeAchievementRepository.getAchievementByTitle(3L, "15-Day Streak")
+        assertNotNull(badge15)
+        assertEquals(true, badge15?.isUnlocked)
+
+        // Test 20-day badge
+        val profile20 = Profile(id = 4, name = "Learner4", avatarResId = 1, lastPlayedAt = simulatedTime, currentStreak = 19)
+        fakeProfileRepository.profiles[4L] = profile20
+        simulatedTime += 24 * 60 * 60 * 1000L
+        tracker.recordActivity(4L)
+        val badge20 = fakeAchievementRepository.getAchievementByTitle(4L, "20-Day Streak")
+        assertNotNull(badge20)
+        assertEquals(true, badge20?.isUnlocked)
+    }
+
+    @Test
+    fun checkMilestone_returnsFormattedTitleForMilestonesOnly() {
+        val tracker = createTracker()
+        assertEquals("5-Day Streak", tracker.checkMilestone(5))
+        assertEquals("10-Day Streak", tracker.checkMilestone(10))
+        assertEquals("15-Day Streak", tracker.checkMilestone(15))
+        assertEquals("20-Day Streak", tracker.checkMilestone(20))
+        assertNull(tracker.checkMilestone(4))
+        assertNull(tracker.checkMilestone(6))
+        assertNull(tracker.checkMilestone(25))
     }
 
     @Test

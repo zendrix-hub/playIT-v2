@@ -29,11 +29,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class UserMapStats(
+    val profileName: String = "",
     val totalStars: Int = 0,
     val currentStreak: Int = 0,
     val unlockedBadgesCount: Int = 0
 )
 
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val phonemeRepository: PhonemeRepository,
@@ -77,6 +79,22 @@ class MapViewModel @Inject constructor(
         audioPlayer.playAssetAudio(sfx)
     }
 
+    fun playMascotTapReaction() {
+        val sfx = audioResolver.getSfxPath(SfxEvent.NODE_UNLOCK_CHIME)
+        val vo = audioResolver.getRotatingEncourageVo()
+        audioPlayer.playSequence(listOf(sfx, vo))
+    }
+
+    fun onLockedNodeTapped() {
+        val sfx = audioResolver.getSfxPath(SfxEvent.INCORRECT_POP)
+        val vo = audioResolver.getRotatingEncourageVo()
+        audioPlayer.playSequence(listOf(sfx, vo))
+    }
+
+    fun clearSession() {
+        sessionManager.clearActiveProfile()
+    }
+
     val userStats: StateFlow<UserMapStats> = activeProfileId.flatMapLatest { profileId ->
         if (profileId == null) return@flatMapLatest flowOf(UserMapStats())
 
@@ -85,6 +103,7 @@ class MapViewModel @Inject constructor(
             achievementRepository.getUnlockedAchievements(profileId)
         ) { profile, unlockedAchievements ->
             UserMapStats(
+                profileName = profile?.name ?: "",
                 totalStars = profile?.totalStars ?: 0,
                 currentStreak = profile?.currentStreak ?: 0,
                 unlockedBadgesCount = unlockedAchievements.size
@@ -96,51 +115,54 @@ class MapViewModel @Inject constructor(
         initialValue = UserMapStats()
     )
 
-    val mapNodes: StateFlow<List<MapNode>> = combine(
-        phonemeRepository.getAllPhonemes(),
-        letterGroupRepository.getAllGroups(),
-        letterGroupMemberRepository.getAllMembers(),
-        sessionManager.activeProfileId
-    ) { phonemes, groups, members, profileId ->
-        if (profileId == null) return@combine emptyList()
+    val mapNodes: StateFlow<List<MapNode>> = activeProfileId.flatMapLatest { profileId ->
+        if (profileId == null) return@flatMapLatest flowOf(emptyList())
 
-        val progressList = lessonProgressRepository.getProgressForProfile(profileId).stateIn(viewModelScope).value
-        val nodesList = mutableListOf<MapNode>()
-        var globalIndex = 0
+        combine(
+            phonemeRepository.getAllPhonemes(),
+            letterGroupRepository.getAllGroups(),
+            letterGroupMemberRepository.getAllMembers(),
+            lessonProgressRepository.getProgressForProfile(profileId)
+        ) { phonemes, groups, members, progressList ->
+            val nodesList = mutableListOf<MapNode>()
+            var globalIndex = 0
 
-        groups.sortedBy { it.groupNumber }.forEach { group ->
-            val groupMembers = members.filter { it.groupId == group.groupId }.sortedBy { it.position }
-            groupMembers.forEach { member ->
-                val phoneme = phonemes.find { it.id == member.phonemeId }
-                if (phoneme != null) {
-                    val progress = progressList.find { it.phonemeId == phoneme.id }
-                    val isUnlocked = unlockManager.isPhonemeUnlocked(phoneme.id, progressList)
-                    nodesList.add(
-                        MapNode.LetterNode(
-                            id = phoneme.id.toString(),
-                            orderIndex = globalIndex++,
-                            isUnlocked = isUnlocked,
-                            symbol = phoneme.letter.uppercase(),
-                            starsEarned = progress?.starsEarned ?: 0
+            groups.sortedBy { it.groupNumber }.forEach { group ->
+                val groupMembers = members.filter { it.groupId == group.groupId }.sortedBy { it.position }
+                groupMembers.forEach { member ->
+                    val phoneme = phonemes.find { it.id == member.phonemeId }
+                    if (phoneme != null) {
+                        val progress = progressList.find { it.phonemeId == phoneme.id }
+                        val isUnlocked = unlockManager.isPhonemeUnlocked(phoneme.id, progressList)
+                        nodesList.add(
+                            MapNode.LetterNode(
+                                id = phoneme.id.toString(),
+                                orderIndex = globalIndex++,
+                                isUnlocked = isUnlocked,
+                                groupNumber = group.groupNumber,
+                                symbol = phoneme.letter.uppercase(),
+                                starsEarned = progress?.starsEarned ?: 0
+                            )
                         )
-                    )
+                    }
                 }
+
+                // Insert BlendIt Challenge Node after each group of letters
+                val isGroupUnlocked = groupUnlockManager.isGroupUnlocked(group.groupId, members, progressList)
+                nodesList.add(
+                    MapNode.BlendItNode(
+                        id = "blend_${group.groupId}",
+                        orderIndex = globalIndex++,
+                        isUnlocked = isGroupUnlocked,
+                        groupNumber = group.groupNumber,
+                        groupId = group.groupId.toString(),
+                        starsEarned = 0
+                    )
+                )
             }
 
-            // Insert BlendIt Challenge Node after each group of 4 letters
-            val isGroupUnlocked = groupUnlockManager.isGroupUnlocked(group.groupId, members, progressList)
-            nodesList.add(
-                MapNode.BlendItNode(
-                    id = "blend_${group.groupId}",
-                    orderIndex = globalIndex++,
-                    isUnlocked = isGroupUnlocked,
-                    groupId = group.groupId.toString(),
-                    starsEarned = 0
-                )
-            )
+            nodesList
         }
-
-        nodesList
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),

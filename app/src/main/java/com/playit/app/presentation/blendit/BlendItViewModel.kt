@@ -18,6 +18,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -49,15 +52,9 @@ class BlendItViewModel @Inject constructor(
     private val _currentWordIndex = MutableStateFlow(0)
     val currentWordIndex: StateFlow<Int> = _currentWordIndex.asStateFlow()
 
-    val currentWord: StateFlow<BlendItWord?> = _currentWordIndex.let { indexFlow ->
-        MutableStateFlow<BlendItWord?>(null).apply {
-            viewModelScope.launch {
-                indexFlow.collect { index ->
-                    value = _words.value.getOrNull(index)
-                }
-            }
-        }
-    }
+    val currentWord: StateFlow<BlendItWord?> = combine(_words, _currentWordIndex) { wordsList, index ->
+        wordsList.getOrNull(index)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     val heartManager = HeartManager()
 
@@ -76,8 +73,11 @@ class BlendItViewModel @Inject constructor(
     private val _wrongAttemptsForCurrentWord = MutableStateFlow(0)
     val wrongAttemptsForCurrentWord: StateFlow<Int> = _wrongAttemptsForCurrentWord.asStateFlow()
 
-    private val _isHintModalVisible = MutableStateFlow(false)
-    val isHintModalVisible: StateFlow<Boolean> = _isHintModalVisible.asStateFlow()
+    private val _isHintApplied = MutableStateFlow(false)
+    val isHintApplied: StateFlow<Boolean> = _isHintApplied.asStateFlow()
+
+    private val _lockedHintCount = MutableStateFlow(0)
+    val lockedHintCount: StateFlow<Int> = _lockedHintCount.asStateFlow()
 
     private val _uiState = MutableStateFlow<BlendItUiState>(BlendItUiState.Idle)
     val uiState: StateFlow<BlendItUiState> = _uiState.asStateFlow()
@@ -115,7 +115,8 @@ class BlendItViewModel @Inject constructor(
         _currentWordIndex.value = index
         _placedTiles.value = emptyList()
         _wrongAttemptsForCurrentWord.value = 0
-        _isHintModalVisible.value = false
+        _isHintApplied.value = false
+        _lockedHintCount.value = 0
         _uiState.value = BlendItUiState.Idle
 
         val letters = wordObj.word.toCharArray().toList().shuffled()
@@ -131,6 +132,11 @@ class BlendItViewModel @Inject constructor(
         audioPlayer.playAssetAudio(path)
     }
 
+    fun playHintAudio() {
+        val hintVo = audioResolver.getRotatingHintVo()
+        audioPlayer.playAssetAudio(hintVo)
+    }
+
     fun placeTile(letter: Char) {
         val currentBank = _tileBank.value.toMutableList()
         val index = currentBank.indexOf(letter)
@@ -138,15 +144,24 @@ class BlendItViewModel @Inject constructor(
             currentBank.removeAt(index)
             _tileBank.value = currentBank
             _placedTiles.value = _placedTiles.value + letter
+
+            val phonemeAudio = audioResolver.getPhonemePath(letter.toString())
+            if (phonemeAudio != null) {
+                audioPlayer.playAssetAudio(phonemeAudio)
+            }
         }
     }
 
     fun removeTile(index: Int) {
+        if (index < _lockedHintCount.value) return
         val currentPlaced = _placedTiles.value.toMutableList()
         if (index in currentPlaced.indices) {
             val removedChar = currentPlaced.removeAt(index)
             _placedTiles.value = currentPlaced
             _tileBank.value = _tileBank.value + removedChar
+
+            val popSfx = audioResolver.getSfxPath(SfxEvent.INCORRECT_POP)
+            audioPlayer.playAssetAudio(popSfx)
         }
     }
 
@@ -201,14 +216,47 @@ class BlendItViewModel @Inject constructor(
         }
     }
 
-    fun openHintModal() {
-        _isHintModalVisible.value = true
+    fun applyHint() {
+        val targetWord = _words.value.getOrNull(_currentWordIndex.value)?.word ?: return
+        val hintIndex = _lockedHintCount.value
+        if (hintIndex >= targetWord.length) return
+        
+        val correctChar = targetWord[hintIndex]
+        
+        val bank = _tileBank.value.toMutableList()
+        val bankIndex = bank.indexOfFirst { it.equals(correctChar, ignoreCase = true) }
+        
+        if (bankIndex != -1) {
+            bank.removeAt(bankIndex)
+        } else {
+            val placed = _placedTiles.value.toMutableList()
+            val placedIdx = placed.indexOfLast { it.equals(correctChar, ignoreCase = true) && placed.indexOf(it) >= hintIndex }
+            if (placedIdx != -1) {
+                placed.removeAt(placedIdx)
+                _placedTiles.value = placed
+            }
+        }
+        
+        val newPlaced = _placedTiles.value.toMutableList()
+        if (newPlaced.size > hintIndex) {
+            val displacedChar = newPlaced.removeAt(hintIndex)
+            newPlaced.add(hintIndex, correctChar)
+            if (!displacedChar.equals(correctChar, ignoreCase = true)) {
+                _tileBank.value = _tileBank.value + displacedChar
+            }
+        } else {
+            newPlaced.add(hintIndex, correctChar)
+        }
+        
+        _placedTiles.value = newPlaced
+        if (bankIndex != -1) {
+            _tileBank.value = bank
+        }
+        
+        _lockedHintCount.value += 1
+        val hintSfx = audioResolver.getSfxPath(SfxEvent.HEART_RECOVERY_SPARKLE)
         val hintVo = audioResolver.getRotatingHintVo()
-        audioPlayer.playAssetAudio(hintVo)
-    }
-
-    fun closeHintModal() {
-        _isHintModalVisible.value = false
+        audioPlayer.playSequence(listOf(hintSfx, hintVo))
     }
 
     fun restartSession() {

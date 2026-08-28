@@ -83,3 +83,12 @@ Compose-drawn placeholder shapes (rounded blobs, foliage clusters as layered cir
 correct positions and z-order now, so the curved-path layout work isn't blocked on art — and
 flag clearly in the report which props are placeholder-drawn vs. generated, so real assets can
 be dropped in later without a layout rework.
+
+## 6. Duolingo ABC Learning Path Structural Upgrades
+
+In accordance with stakeholder guidance and pedagogical parity with Duolingo ABC:
+- **Bilingual Marungko Group Chapter Banners**: Each Marungko letter group (Groups 1–6) begins with a milestone banner (`Pangkat X • Group X`, letter list summary, and completion/in-progress/locked status chip) to divide the 28-letter sequence into digestible, rewarding units.
+- **Smooth Auto-Scroll to Active Node**: Upon entering `MapScreen`, the viewport automatically centers on the current active lesson node with smooth easing.
+- **Dynamic Companion Mascot & Speech Dialogue**: Lily the mascot dynamically alternates left or right of the active node with an anchored mini dialogue bubble (`Tara na! • Let's go!`), reacting interactively with cheerful animations and sound on tap.
+- **Active Pulsing Focus Ring & Locked Shake**: Active nodes feature a radial expanding focus aura; tapping locked nodes triggers a tactile horizontal shake animation and encouraging audio feedback.
+

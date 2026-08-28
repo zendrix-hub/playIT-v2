@@ -13,6 +13,10 @@ class BlendItAttemptRepositoryImpl @Inject constructor(
 ) : BlendItAttemptRepository {
 
     override suspend fun saveAttempt(attempt: BlendItAttempt) {
-        blendItAttemptDao.insertAttempt(attempt.toEntity())
+        try {
+            blendItAttemptDao.insertAttempt(attempt.toEntity())
+        } catch (e: Exception) {
+            android.util.Log.e("BlendItAttemptRepositoryImpl", "Failed to save data", e)
+        }
     }
 }

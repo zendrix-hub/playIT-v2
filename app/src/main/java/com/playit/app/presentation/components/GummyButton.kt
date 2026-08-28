@@ -40,17 +40,46 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.playit.app.presentation.theme.CreamWhite
-import com.playit.app.presentation.theme.CreamWhiteShadow
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.DisabledColor
-import com.playit.app.presentation.theme.DisabledColorShadow
-import com.playit.app.presentation.theme.LearningBlue
-import com.playit.app.presentation.theme.LearningBlueShadow
-import com.playit.app.presentation.theme.LocalReducedMotion
-import com.playit.app.presentation.theme.TextPrimary
+import com.playit.app.presentation.theme.*
 import kotlin.math.roundToInt
 
+// Resolve the depth-band shadow color for any known face color.
+// Filipino-themed palette entries come first; legacy entries follow.
+private fun Color.toShadow(): Color {
+    return when (this) {
+        // Filipino-themed palette (Phase 10)
+        Mango -> MangoShadow
+        MangoDark -> Color(0xFFBF8300)
+        Ube -> UbeShadow
+        UbeDark -> Color(0xFF583282)
+        UbeLight -> Color(0xFFBEB6C6)
+        Guava -> GuavaShadow
+        GuavaDark -> Color(0xFFB43D5A)
+        Leaf -> LeafShadow
+        LeafDark -> Color(0xFF256E41)
+        Kalamansi -> KalamansiShadow
+        KalamansiDark -> Color(0xFFB87700)
+        Tan -> TanShadow
+        TanDark -> Color(0xFF6E5535)
+        Rope -> RopeShadow
+        Sand -> SandShadow
+        Sky -> SkyShadow               // also matches SoftSky (alias)
+        SkyDeep -> Color(0xFFA6BACC)
+        Cloud -> CloudShadow
+        // Legacy / non-aliased colors
+        LearningBlue -> LearningBlueShadow
+        GrowthGreen -> GrowthGreenShadow
+        AchievementGold -> AchievementGoldShadow
+        GentleCorrectionOrange -> GentleCorrectionOrangeShadow
+        FriendlyPurple -> FriendlyPurpleShadow
+        EnergyOrange -> EnergyOrangeShadow
+        DestructiveRed -> DestructiveRedShadow
+        CreamWhite -> CreamWhiteShadow
+        DisabledColor -> DisabledColorShadow
+        // Fallback: compute -20% per-channel
+        else -> this.copy(red = red * 0.8f, green = green * 0.8f, blue = blue * 0.8f)
+    }
+}
 /**
  * Reusable Duolingo ABC-inspired Gummy Box with 3D depth-band bottom shadow,
  * 3dp DarkBrownOutline outline, and press-into-depth motion on tap.
@@ -115,7 +144,8 @@ fun GummyContainer(
                 indication = null,
                 enabled = enabled,
                 onClick = onClick
-            )
+            ),
+        contentAlignment = Alignment.Center
     ) {
         // Bottom depth band layer (shadow color)
         Box(
@@ -155,7 +185,7 @@ fun GummyButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     backgroundColor: Color = LearningBlue,
-    shadowColor: Color = LearningBlueShadow,
+    shadowColor: Color = backgroundColor.toShadow(),
     contentColor: Color = CreamWhite,
     enabled: Boolean = true,
     icon: ImageVector? = null,
@@ -171,11 +201,13 @@ fun GummyButton(
         strokeWidth = 3.dp,
         isSquashed = isSquashed,
         modifier = modifier
-            .defaultMinSize(minHeight = 64.dp)
+            .defaultMinSize(minHeight = 58.dp)
             .fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 24.dp, vertical = 14.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 20.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
@@ -184,12 +216,13 @@ fun GummyButton(
                     imageVector = icon,
                     contentDescription = null,
                     tint = contentColor,
-                    modifier = Modifier.size(28.dp)
+                    modifier = Modifier.size(24.dp)
                 )
-                Spacer(modifier = Modifier.width(10.dp))
+                Spacer(modifier = Modifier.width(8.dp))
             }
             Text(
                 text = text,
+                fontFamily = com.playit.app.presentation.theme.LexendFontFamily,
                 fontSize = fontSize.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = if (enabled) contentColor else TextPrimary.copy(alpha = 0.6f),
@@ -258,7 +291,10 @@ fun GummyStaticContainer(
     depthHeight: Dp = 6.dp,
     content: @Composable () -> Unit
 ) {
-    Box(modifier = modifier) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
         // Bottom depth band layer
         Box(
             modifier = Modifier
@@ -271,7 +307,6 @@ fun GummyStaticContainer(
         // Top face layer + content
         Box(
             modifier = Modifier
-                .matchParentSize()
                 .background(faceColor, shape)
                 .border(strokeWidth, strokeColor, shape),
             contentAlignment = Alignment.Center

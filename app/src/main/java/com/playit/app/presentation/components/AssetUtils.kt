@@ -24,10 +24,10 @@ fun rememberAssetPainter(assetPath: String): Painter {
             if (bitmap != null) {
                 BitmapPainter(bitmap.asImageBitmap())
             } else {
-                ColorPainter(Color.Red)
+                ColorPainter(Color.Transparent)
             }
         } catch (e: Exception) {
-            ColorPainter(Color.Red)
+            ColorPainter(Color.Transparent)
         }
     }
 }
@@ -36,12 +36,11 @@ fun rememberAssetPainter(assetPath: String): Painter {
  * Mascot Lily character states mapped to their production PNG asset paths in assets/images/mascot/.
  */
 enum class MascotState(val assetPath: String) {
-    IDLE("images/mascot/mascot_lily_idle.png"),
-    HAPPY("images/mascot/mascot_lily_cheer.png"),
-    THINKING("images/mascot/mascot_lily_thinking.png"),
-    ENCOURAGING("images/mascot/mascot_lily_encouraging.png"),
-    CELEBRATING("images/mascot/mascot_lily_celebrating.png"),
-    LISTENING("images/mascot/mascot_lily_listening.png"),
-    POINTING("images/mascot/mascot_lily_point.png"),
-    EXCITED("images/mascot/mascot_lily_excited.png")
+    IDLE("images/mascot/lily_idle.png"),
+    CELEBRATING("images/mascot/lily_celebrating.png"),
+    ENCOURAGING("images/mascot/lily_encouraging.png"),
+    LISTENING("images/mascot/lily_listening.png"),
+    POINTING("images/mascot/lily_pointing.png"),
+    WAVING("images/mascot/lily_waving.png"),
+    THINKING("images/mascot/lily_thinking.png")
 }

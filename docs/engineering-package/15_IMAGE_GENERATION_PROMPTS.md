@@ -64,21 +64,20 @@ Apply to the 35-word draft bank in `19_AUDIO_SCRIPTS.md §3` (7 groups × 5 word
 
 ## 5. Unique Hero Assets — Individual Prompts
 
-### Mascot pose set (8 images — see `17_CHARACTER_DESIGN_GUIDE.md` for full character spec first)
-Base prompt for all 8, varying only the `[EXPRESSION/POSE]` bracket:
+### Mascot pose set (7 canonical poses — see `26_MASCOT_COPLAYER_SYSTEM.md` & `17_CHARACTER_DESIGN_GUIDE.md`)
+Universal base prompt template incorporating the Duolingo ABC gummy physicality, Drops clean silhouette, and Headspace emotional warmth:
 
-> "[MASCOT CHARACTER DESCRIPTION FROM 17_CHARACTER_DESIGN_GUIDE.md], [EXPRESSION/POSE], [STYLE from §1], three-quarter view, isolated on transparent background, bold consistent outline matching the character's established design, bright friendly colors, no text."
+> "Pediatric vector illustration of Lily the cute Philippine tarsier mascot, [EXPRESSION/POSE], small plush pear-shaped body, oversized rounded head, giant warm hazel glossy eyes with specular highlight dot, soft rounded plush ears with energy-orange inner glow, stubby rounded paws with no sharp claws, thick clean dark espresso vector outline, 2-tier flat cel shading, vibrant colors, Duolingo ABC and Headspace character design style, centered composition, isolated on a plain solid magenta background (#FF00FF), no text, no watermark, no signature"
 
-| Pose | Expression/Pose bracket |
+| State | Expression/Pose Bracket |
 |---|---|
-| Happy | Wide warm smile, relaxed stance, one paw/hand raised in a small wave |
-| Excited | Jumping slightly, arms/paws up, big open-mouth smile, small motion lines |
-| Thinking | Head tilted, one paw near chin, curious raised-eyebrow expression |
-| Encouraging | Gentle smile, leaning slightly forward, both paws open in a "you've got this" gesture |
-| Celebrating | Arms/paws raised high, eyes closed in joy, confetti-ready open pose |
-| Neutral/Idle | Calm, relaxed standing pose, soft pleasant smile, default state |
-| Listening (Say It) | Paw cupped near ear, attentive focused expression, leaning in slightly |
-| Pointing (onboarding) | One paw/arm extended forward pointing at an implied off-frame UI target, encouraging expression |
+| `IDLE` | Standing calmly, facing forward, gentle friendly resting smile, relaxed upright companion posture |
+| `WAVING` | Welcoming cheerful one-paw wave, body leaning slightly forward, big open joyful smile |
+| `LISTENING` | Attentive focused expression, head tilted 10 degrees, one rounded paw cupped near ear |
+| `POINTING` | Friendly directional gaze, one rounded arm/paw extended pointing to the right side |
+| `ENCOURAGING` | Warm empathetic forward lean, one rounded paw open in a supportive reassuring gesture, kind caring smile |
+| `THINKING` | Thoughtful inquisitive posture, one rounded paw gently touching chin, head tilted upward curiously |
+| `CELEBRATING` | Explosive double-paw skyward hop, big open smile, eyes crinkled with pure delight, high energy |
 
 ### Reward/celebration burst
 > "Abstract confetti and sparkle burst illustration, [STYLE from §1] but with more energetic scattered composition, Achievement Gold/Energy Orange/Friendly Purple confetti pieces and star shapes radiating from center, isolated on transparent background, no characters, no text, celebratory and joyful, suitable as an overlay effect."

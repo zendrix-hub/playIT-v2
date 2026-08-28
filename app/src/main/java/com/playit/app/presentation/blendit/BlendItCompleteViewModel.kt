@@ -8,6 +8,7 @@ import com.playit.app.data.audio.AudioResolver
 import com.playit.app.data.audio.SfxEvent
 import com.playit.app.data.audio.VoContext
 import com.playit.app.domain.manager.BlendItStarThresholds
+import com.playit.app.domain.manager.StreakTracker
 import com.playit.app.domain.model.BlendItProgress
 import com.playit.app.domain.repository.BlendItProgressRepository
 import com.playit.app.navigation.SessionManager
@@ -21,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class BlendItCompleteViewModel @Inject constructor(
     private val blendItProgressRepository: BlendItProgressRepository,
+    private val streakTracker: StreakTracker,
     private val sessionManager: SessionManager,
     private val audioPlayer: AudioPlayer,
     private val audioResolver: AudioResolver,
@@ -53,6 +55,7 @@ class BlendItCompleteViewModel @Inject constructor(
                     completedAt = System.currentTimeMillis()
                 )
             )
+            streakTracker.recordActivity(profileId)
 
             // Play completion fanfare + complete VO line + milestone/streak badge unlock audio
             val fanfareSfx = audioResolver.getSfxPath(SfxEvent.LEVEL_COMPLETE_FANFARE)

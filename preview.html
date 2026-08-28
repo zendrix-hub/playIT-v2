@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PlayIT v2 — Complete Tri-Benchmark Screen Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800;900&family=Andika:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ============================= TOKENS ============================= */
+:root {
+  --sky: #EAF6FF;
+  --sky-deep: #CFE9FF;
+  --sky-shadow: #B8DBFA;
+  --sand: #FFF3D9;
+  --sand-deep: #EBD9A6;
+  --sand-shadow: #D8C38B;
+  --mango: #FFC107;
+  --mango-dark: #E0A400;
+  --mango-shadow: #D99B00;
+  --ube: #8B5FBF;
+  --ube-dark: #6E3FA3;
+  --ube-shadow: #5C328E;
+  --ube-light: #EEE3F8;
+  --guava: #FF6F91;
+  --guava-dark: #E14C71;
+  --guava-shadow: #D83B62;
+  --leaf: #48C774;
+  --leaf-dark: #34A863;
+  --leaf-shadow: #288E50;
+  --kalamansi: #FFB74D;
+  --kalamansi-dark: #E59A2E;
+  --kalamansi-shadow: #D1841C;
+  --tan: #C9A06B;
+  --tan-dark: #8A6A42;
+  --rope: #B98A4F;
+  --ink: #1F3A3D;
+  --ink-soft: #5C7679;
+  --ink-faint: #9DB0B2;
+  --cloud: #FFFFFF;
+  --cloud-shadow: #E2E8F0;
+  --outline: #2D1F1D;
+  --font-ui: 'Lexend', system-ui, sans-serif;
+  --font-letter: 'Andika', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  background: radial-gradient(circle at 15% 10%, #F5EFE6 0%, transparent 45%),
+              radial-gradient(circle at 85% 90%, #EBE5D8 0%, transparent 45%),
+              #ECE6D8;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 10px 40px;
+  color: var(--ink);
+}
+
+/* ============================= HARNESS CONTROLS ============================= */
+.preview-header {
+  width: 100%;
+  max-width: 960px;
+  margin-bottom: 18px;
+  text-align: center;
+}
+.preview-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.preview-sub {
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-bottom: 14px;
+}
+.screen-nav-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.7);
+  padding: 10px 14px;
+  border-radius: 20px;
+  border: 2px solid var(--outline);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+.nav-chip {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 2px solid var(--outline);
+  background: var(--cloud);
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: 0 3px 0 var(--outline);
+  transition: all 0.12s ease;
+}
+.nav-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 var(--outline);
+}
+.nav-chip:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--outline);
+}
+.nav-chip.active {
+  background: var(--mango);
+  color: var(--ink);
+  border-color: var(--outline);
+}
+
+/* ============================= PHONE VIEWPORT ============================= */
+.phone-wrapper {
+  position: relative;
+  width: 390px;
+  max-width: 95vw;
+  height: 844px;
+  max-height: 88vh;
+  background: #1A2526;
+  border-radius: 50px;
+  padding: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4), 0 0 0 4px #2D3E40;
+}
+.phone-notch {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 24px;
+  background: #1A2526;
+  border-radius: 0 0 16px 16px;
+  z-index: 100;
+}
+.phone-home {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 130px;
+  height: 4px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 4px;
+  z-index: 100;
+}
+.phone-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 40px;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--sky-deep) 0%, var(--sky) 30%, var(--sand) 70%, var(--sand-deep) 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================= SCREEN STACK ============================= */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 28px 18px 24px;
+  z-index: 10;
+}
+.screen.active {
+  display: flex;
+}
+.screen::-webkit-scrollbar { display: none; }
+
+/* ============================= REUSABLE GUMMY ATOMS ============================= */
+.gummy-btn {
+  font-family: var(--font-ui);
+  font-weight: 800;
+  border: 3px solid var(--outline);
+  border-radius: 32px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  width: 100%;
+  text-align: center;
+}
+.gummy-btn.child-floor { min-height: 64px; font-size: 20px; }
+.gummy-btn.adult-floor { min-height: 52px; font-size: 15px; border-radius: 20px; }
+
+.btn-mango { background: var(--mango); color: var(--ink); box-shadow: 0 5px 0 var(--mango-shadow), 0 5px 0 3px var(--outline); }
+.btn-leaf { background: var(--leaf); color: var(--cloud); box-shadow: 0 5px 0 var(--leaf-shadow), 0 5px 0 3px var(--outline); }
+.btn-ube { background: var(--ube); color: var(--cloud); box-shadow: 0 5px 0 var(--ube-shadow), 0 5px 0 3px var(--outline); }
+.btn-cloud { background: var(--cloud); color: var(--ink); box-shadow: 0 4px 0 var(--cloud-shadow), 0 4px 0 3px var(--outline); }
+
+.gummy-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--outline) !important;
+}
+
+.gummy-back-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--cloud);
+  border: 3px solid var(--outline);
+  box-shadow: 0 4px 0 var(--cloud-shadow), 0 4px 0 3px var(--outline);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.gummy-back-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--outline);
+}
+
+.bento-card {
+  background: var(--cloud);
+  border: 3px solid var(--outline);
+  border-radius: 24px;
+  padding: 16px;
+  box-shadow: 0 5px 0 var(--cloud-shadow), 0 5px 0 3px var(--outline);
+  margin-bottom: 14px;
+}
+
+/* Bohol Landscape Silhouette */
+.bohol-hills {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 90px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1;
+}
+.hill {
+  border-radius: 50% 50% 0 0;
+  background: rgba(201, 160, 107, 0.35);
+  margin: 0 -10px;
+}
+
+/* Mascot Pulse & Bounce */
+@keyframes breathingPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+@keyframes idleBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.pulse-anim { animation: breathingPulse 2s infinite ease-in-out; }
+.bounce-anim { animation: idleBounce 2.5s infinite ease-in-out; }
+
+/* Speech Bubble */
+.speech-bubble {
+  background: var(--cloud);
+  border: 3px solid var(--outline);
+  border-radius: 22px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 0 var(--cloud-shadow), 0 4px 0 3px var(--outline);
+  position: relative;
+  text-align: center;
+  margin-bottom: 12px;
+}
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 10px 10px 0;
+  border-style: solid;
+  border-color: var(--outline) transparent;
+  display: block;
+  width: 0;
+}
+
+/* Top Stats Bar */
+.top-stats-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(8px);
+  border: 2.5px solid var(--outline);
+  border-radius: 24px;
+  padding: 6px 12px;
+  margin-bottom: 14px;
+}
+.stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  font-size: 14px;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+.stat-streak { background: rgba(255, 193, 7, 0.25); color: var(--ink); }
+.stat-stars { background: rgba(139, 95, 191, 0.2); color: var(--ube); }
+
+/* SVG Icons Helper */
+.icon-svg { width: 22px; height: 22px; fill: currentColor; }
+</style>
+</head>
+<body>
+
+<div class="preview-header">
+  <div class="preview-title">PlayIT v2 — Master Screen Suite</div>
+  <div class="preview-sub">Tri-Benchmark (Duolingo ABC + Headspace + Drops) • Verified Compose Presentation Layer</div>
+  
+  <div class="screen-nav-bar">
+    <button class="nav-chip active" onclick="showScreen('splash')">1. Splash</button>
+    <button class="nav-chip" onclick="showScreen('profileselect')">2. Profile Select</button>
+    <button class="nav-chip" onclick="showScreen('nameprompt')">3. Name & Avatar</button>
+    <button class="nav-chip" onclick="showScreen('map')">4. Map Screen</button>
+    <button class="nav-chip" onclick="showScreen('hearit')">5. Hear It</button>
+    <button class="nav-chip" onclick="showScreen('sayit')">6. Say It</button>
+    <button class="nav-chip" onclick="showScreen('findit')">7. Find It</button>
+    <button class="nav-chip" onclick="showScreen('complete')">8. Celebration</button>
+    <button class="nav-chip" onclick="showScreen('blendit')">9. Blend It</button>
+    <button class="nav-chip" onclick="showScreen('parentgate')">10. PIN Gate</button>
+    <button class="nav-chip" onclick="showScreen('parentdash')">11. Parent Dashboard</button>
+    <button class="nav-chip" onclick="showScreen('reportpreview')">12. PDF Export</button>
+  </div>
+</div>
+
+<div class="phone-wrapper">
+  <div class="phone-notch"></div>
+  <div class="phone-home"></div>
+  
+  <div class="phone-screen">
+    
+    <!-- Bohol Background Hills Layer -->
+    <div class="bohol-hills">
+      <div class="hill" style="width:90px;height:55px;"></div>
+      <div class="hill" style="width:130px;height:75px;background:rgba(138,106,66,0.3);"></div>
+      <div class="hill" style="width:110px;height:65px;"></div>
+      <div class="hill" style="width:140px;height:80px;background:rgba(138,106,66,0.25);"></div>
+      <div class="hill" style="width:100px;height:60px;"></div>
+    </div>
+
+    <!-- ==================== 1. SPLASH SCREEN ==================== -->
+    <section class="screen active" id="screen-splash">
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; z-index:2;">
+        <div class="speech-bubble" style="margin-top:10px;">
+          <div style="font-size:20px; font-weight:800; color:var(--ink);">Mabuhay! Handa ka na?</div>
+          <div style="font-size:15px; font-weight:600; color:var(--ink-soft); margin-top:2px;">Welcome! Ready to learn to read?</div>
+        </div>
+
+        <div class="pulse-anim bounce-anim" style="margin:8px 0;">
+          <img src="app/src/main/assets/images/mascot/lily_waving.png" alt="Lily" style="width:130px; height:140px; object-fit:contain;" onerror="this.src='https://api.iconify.design/fluent-emoji-flat:monkey-face.svg'">
+        </div>
+
+        <div style="font-size:36px; font-weight:900; color:var(--ink); letter-spacing:1px; margin-top:-4px;">PlayIT</div>
+        
+        <div style="background:rgba(139,95,191,0.15); border:2px solid var(--outline); padding:4px 14px; border-radius:999px; font-size:14px; font-weight:800; color:var(--ube); margin:6px 0 16px;">
+          Grade 1 · Marungko Phonics
+        </div>
+
+        <div style="width:100%; display:flex; flex-direction:column; gap:8px;">
+          <div class="bento-card" style="padding:10px 14px; margin:0; display:flex; align-items:center; gap:12px;">
+            <div style="width:40px; height:40px; border-radius:50%; background:rgba(139,95,191,0.2); display:flex; align-items:center; justify-content:center; color:var(--ube); font-weight:900;">🔊</div>
+            <div>
+              <div style="font-size:15px; font-weight:800;">Pakinggan at Sabihin</div>
+              <div style="font-size:13px; color:var(--ink-soft);">Sound recognition & speech practice</div>
+            </div>
+          </div>
+
+          <div class="bento-card" style="padding:10px 14px; margin:0; display:flex; align-items:center; gap:12px;">
+            <div style="width:40px; height:40px; border-radius:50%; background:rgba(255,193,7,0.25); display:flex; align-items:center; justify-content:center; color:var(--ink); font-weight:900;">🧩</div>
+            <div>
+              <div style="font-size:15px; font-weight:800;">Pagsamahin ang Tunog</div>
+              <div style="font-size:13px; color:var(--ink-soft);">Tactile syllable & word building</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="z-index:2; margin-top:12px;">
+        <button class="gummy-btn child-floor btn-mango" onclick="showScreen('profileselect')">
+          Tara, Simulan Na! • Get Started
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== 2. PROFILE SELECT ==================== -->
+    <section class="screen" id="screen-profileselect">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; z-index:2;">
+        <div>
+          <div style="font-size:24px; font-weight:900;">Who is playing?</div>
+          <div style="font-size:14px; color:var(--ink-soft);">Pumili ng iyong profile</div>
+        </div>
+        <button class="gummy-btn adult-floor btn-ube" style="width:auto; padding:8px 14px;" onclick="showScreen('parentgate')">
+          🔒 Parent Zone
+        </button>
+      </div>
+
+      <div class="speech-bubble" style="z-index:2;">
+        <div style="font-size:16px; font-weight:800;">Who's ready to learn sounds today? Tap your name!</div>
+      </div>
+
+      <div style="flex:1; display:flex; flex-direction:column; gap:12px; z-index:2;">
+        <!-- Profile Card 1 -->
+        <div class="bento-card" style="display:flex; align-items:center; gap:14px; cursor:pointer;" onclick="showScreen('map')">
+          <div style="width:68px; height:68px; border-radius:50%; background:var(--sky); border:3px solid var(--outline); overflow:hidden; display:flex; align-items:center; justify-content:center;">
+            <img src="app/src/main/assets/images/mascot/avatar_01.png" style="width:56px; height:56px; object-fit:contain;" onerror="this.src='https://api.iconify.design/fluent-emoji-flat:cat-face.svg'">
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:24px; font-weight:900;">Leo</div>
+            <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,193,7,0.25); padding:3px 10px; border-radius:10px; font-size:15px; font-weight:800; margin-top:4px;">
+              ⭐ 12 Stars
+            </div>
+          </div>
+          <div style="width:40px; height:40px; border-radius:50%; background:var(--ube); border:2px solid var(--outline); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:900;">➔</div>
+        </div>
+
+        <!-- Add Profile Button -->
+        <button class="gummy-btn child-floor btn-mango" onclick="showScreen('nameprompt')">
+          ➕ Add New Profile (1/6)
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== 3. NAME & AVATAR PROMPT ==================== -->
+    <section class="screen" id="screen-nameprompt">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px; z-index:2;">
+        <button class="gummy-back-btn" onclick="showScreen('profileselect')">⬅</button>
+        <div>
+          <div style="font-size:24px; font-weight:900;">New Player Profile</div>
+          <div style="font-size:14px; color:var(--ink-soft);">Gumawa ng bagong profile</div>
+        </div>
+      </div>
+
+      <div class="speech-bubble" style="z-index:2;">
+        <div style="font-size:16px; font-weight:800;">Type your name and pick your favorite animal friend!</div>
+      </div>
+
+      <div style="flex:1; display:flex; flex-direction:column; gap:14px; z-index:2;">
+        <div class="bento-card" style="padding:12px 16px;">
+          <label style="font-size:13px; font-weight:800; color:var(--ink-soft); display:block; margin-bottom:6px;">CHILD'S NAME</label>
+          <input type="text" value="Maya" style="width:100%; border:2.5px solid var(--outline); border-radius:14px; padding:12px 14px; font-family:var(--font-ui); font-size:20px; font-weight:800; color:var(--ink); outline:none;">
+        </div>
+
+        <div class="bento-card">
+          <div style="font-size:18px; font-weight:900; margin-bottom:2px;">Choose Your Avatar</div>
+          <div style="font-size:13px; color:var(--ink-soft); margin-bottom:12px;">Pick your animal companion</div>
+          
+          <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;">
+            <div style="border:3px solid var(--mango); background:rgba(255,193,7,0.25); border-radius:16px; padding:8px; display:flex; flex-direction:column; align-items:center;">
+              <img src="app/src/main/assets/images/mascot/avatar_01.png" style="width:48px;height:48px;" onerror="this.src='https://api.iconify.design/fluent-emoji-flat:cat-face.svg'">
+              <span style="font-size:13px; font-weight:800; margin-top:4px;">Cat</span>
+            </div>
+            <div style="border:2px solid var(--outline); border-radius:16px; padding:8px; display:flex; flex-direction:column; align-items:center;">
+              <img src="app/src/main/assets/images/mascot/avatar_02.png" style="width:48px;height:48px;" onerror="this.src='https://api.iconify.design/fluent-emoji-flat:monkey-face.svg'">
+              <span style="font-size:13px; font-weight:800; margin-top:4px;">Monkey</span>
+            </div>
+            <div style="border:2px solid var(--outline); border-radius:16px; padding:8px; display:flex; flex-direction:column; align-items:center;">
+              <img src="app/src/main/assets/images/mascot/avatar_03.png" style="width:48px;height:48px;" onerror="this.src='https://api.iconify.design/fluent-emoji-flat:rabbit-face.svg'">
+              <span style="font-size:13px; font-weight:800; margin-top:4px;">Bunny</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="z-index:2;">
+        <button class="gummy-btn child-floor btn-leaf" onclick="showScreen('map')">
+          Let's Play! • Simulan Na
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== 4. MAP SCREEN ==================== -->
+    <section class="screen" id="screen-map">
+      <div class="top-stats-bar" style="z-index:2;">
+        <div class="stat-pill stat-streak">🔥 3d Streak</div>
+        <div style="font-weight:900; font-size:16px;">Map Explorer</div>
+        <div class="stat-pill stat-stars">⭐ 12 Stars</div>
+      </div>
+
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; position:relative; z-index:2; padding:10px 0;">
+        <!-- Chapter Milestone Banner -->
+        <div style="background:var(--cloud); border:2.5px solid var(--outline); border-radius:16px; padding:8px 16px; width:100%; text-align:center; box-shadow:0 3px 0 var(--cloud-shadow), 0 3px 0 2px var(--outline); margin-bottom:20px;">
+          <div style="font-size:14px; font-weight:900; color:var(--ube);">PANGKAT 1 • GROUP 1</div>
+          <div style="font-size:16px; font-weight:800; color:var(--ink);">M, S, A, I, O (3 of 5 Done)</div>
+        </div>
+
+        <!-- Node Trail SVG Connection Simulation -->
+        <div style="display:flex; flex-direction:column; align-items:center; gap:26px; width:100%;">
+          
+          <!-- Node: Letter M (Completed) -->
+          <div style="width:72px; height:72px; border-radius:50%; background:var(--leaf); border:3.5px solid var(--outline); box-shadow:0 5px 0 var(--leaf-shadow), 0 5px 0 3px var(--outline); display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-weight:900; font-size:24px; cursor:pointer;" onclick="showScreen('hearit')">
+            M
+            <span style="font-size:11px; margin-top:-2px;">⭐⭐⭐</span>
+          </div>
+
+          <!-- Node: Letter S (Active / Current) with Mascot Lily Floating -->
+          <div style="position:relative; cursor:pointer;" onclick="showScreen('hearit')">
+            <div class="pulse-anim" style="width:78px; height:78px; border-radius:50%; background:var(--mango); border:3.5px solid var(--outline); box-shadow:0 6px 0 var(--mango-shadow), 0 6px 0 3px var(--outline); display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--ink); font-weight:900; font-size:28px;">
+              S
+              <span style="font-size:11px;">▶ PLAY</span>
+            </div>
+            
+            <!-- Anchored Mascot Lily -->
+            <div class="bounce-anim" style="position:absolute; left:92px; top:-10px; display:flex; align-items:center; gap:6px; pointer-events:none;">
+              <img src="app/src/main/assets/images/mascot/lily_pointing.png" style="width:65px; height:70px; object-fit:contain;" onerror="this.src='https://api.iconify.design/fluent-emoji-flat:monkey-face.svg'">
+              <div style="background:#fff; border:2px solid var(--outline); border-radius:10px; padding:4px 8px; font-size:12px; font-weight:800; white-space:nowrap;">Tara na!</div>
+            </div>
+          </div>
+
+          <!-- Node: Letter A (Locked) -->
+          <div style="width:68px; height:68px; border-radius:50%; background:rgba(255,255,255,0.6); border:2.5px solid var(--outline); display:flex; align-items:center; justify-content:center; color:var(--ink-soft); font-weight:800; font-size:22px;">
+            🔒 A
+          </div>
+
+          <!-- Node: Blend It Challenge Milestone -->
+          <div class="bento-card" style="width:100%; display:flex; align-items:center; justify-content:space-between; padding:12px 18px; cursor:pointer; background:linear-gradient(135deg, var(--ube-light), #fff);" onclick="showScreen('blendit')">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="font-size:26px;">🧩</div>
+              <div>
+                <div style="font-size:16px; font-weight:900; color:var(--ube);">Pagsamahin ang Tunog</div>
+                <div style="font-size:13px; color:var(--ink-soft);">Blend It Challenge (Group 1)</div>
+              </div>
+            </div>
+            <div style="background:var(--ube); color:#fff; font-weight:800; font-size:12px; padding:4px 10px; border-radius:999px; border:2px solid var(--outline);">CHALLENGE</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 5. HEAR IT SCREEN ==================== -->
+    <section class="screen" id="screen-hearit">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; z-index:2;">
+        <button class="gummy-back-btn" onclick="showScreen('map')">⬅</button>
+        <div style="flex:1; display:flex; gap:6px;">
+          <div style="flex:1; height:12px; border-radius:999px; background:var(--mango); border:2px solid var(--outline);"></div>
+          <div style="flex:1; height:12px; border-radius:999px; background:rgba(0,0,0,0.1); border:2px solid var(--outline);"></div>
+          <div style="flex:1; height:12px; border-radius:999px; background:rgba(0,0,0,0.1); border:2px solid var(--outline);"></div>
+        </div>
+      </div>
+
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:2;">
+        <!-- Letter Card -->
+        <div class="bento-card pulse-anim" style="width:100%; text-align:center; padding:22px 16px;">
+          <div style="font-size:72px; font-family:var(--font-letter); font-weight:900; color:var(--ube); line-height:1;">Ss</div>
+          <div style="font-size:24px; font-weight:900; color:var(--ink); margin-top:4px;">Saging</div>
+          <div style="font-size:18px; font-weight:700; color:var(--ink-soft);">/s/ sound</div>
+        </div>
+
+        <!-- 88dp Pulse CTA Play Button -->
+        <div class="pulse-anim" style="width:96px; height:96px; border-radius:50%; background:var(--ube); border:3.5px solid var(--outline); box-shadow:0 6px 0 var(--ube-shadow), 0 6px 0 3px var(--outline); display:flex; align-items:center; justify-content:center; color:#fff; font-size:36px; cursor:pointer; margin:16px 0;">
+          🔊
+        </div>
+        <div style="font-size:14px; font-weight:800; color:var(--ink-soft);">Pindutin para marinig (Tap to listen)</div>
+
+        <!-- Replay Dots -->
+        <div style="display:flex; gap:8px; margin-top:14px;">
+          <div style="width:14px; height:14px; border-radius:50%; background:var(--mango); border:2px solid var(--outline);"></div>
+          <div style="width:14px; height:14px; border-radius:50%; background:var(--mango); border:2px solid var(--outline);"></div>
+          <div style="width:14px; height:14px; border-radius:50%; background:rgba(0,0,0,0.15); border:2px solid var(--outline);"></div>
+          <div style="width:14px; height:14px; border-radius:50%; background:rgba(0,0,0,0.15); border:2px solid var(--outline);"></div>
+        </div>
+      </div>
+
+      <div style="z-index:2;">
+        <button class="gummy-btn child-floor btn-leaf" onclick="showScreen('sayit')">
+          Kasunod • Next Step ➔
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== 6. SAY IT SCREEN ==================== -->
+    <section class="screen" id="screen-sayit">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; z-index:2;">
+        <button class="gummy-back-btn" onclick="showScreen('hearit')">⬅</button>
+        <div style="flex:1; display:flex; gap:6px;">
+          <div style="flex:1; height:12px; border-radius:999px; background:var(--leaf); border:2px solid var(--outline);"></div>
+          <div style="flex:1; height:12px; border-radius:999px; background:var(--mango); border:2px solid var(--outline);"></div>
+          <div style="flex:1; height:12px; border-radius:999px; background:rgba(0,0,0,0.1); border:2px solid var(--outline);"></div>
+        </div>
+        <div style="font-weight:900; font-size:16px;">❤️❤️❤️❤️❤️</div>
+      </div>
+
+      <div class="speech-bubble" style="z-index:2;">
+        <div style="font-size:20px; font-weight:900;">Sabihin ang tunog: /s/</div>
+        <div style="font-size:14px; color:var(--ink-soft);">Say the sound aloud clearly!</div>
+      </div>
+
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:2;">
+        <div style="font-size:64px; font-family:var(--font-letter); font-weight:900; color:var(--guava);">Ss</div>
+        
+        <!-- 88dp Mic CTA with Audio Waveform Amplitude Ring -->
+        <div class="pulse-anim" style="width:96px; height:96px; border-radius:50%; background:var(--guava); border:3.5px solid var(--outline); box-shadow:0 6px 0 var(--guava-shadow), 0 6px 0 3px var(--outline); display:flex; align-items:center; justify-content:center; color:#fff; font-size:38px; cursor:pointer; margin:16px 0;">
+          🎤
+        </div>
+
+        <!-- Waveform Simulation -->
+        <div style="display:flex; align-items:center; gap:6px; height:32px;">
+          <div style="width:6px; height:16px; background:var(--guava); border-radius:4px;"></div>
+          <div style="width:6px; height:28px; background:var(--guava); border-radius:4px;"></div>
+          <div style="width:6px; height:22px; background:var(--guava); border-radius:4px;"></div>
+          <div style="width:6px; height:30px; background:var(--guava); border-radius:4px;"></div>
+          <div style="width:6px; height:14px; background:var(--guava); border-radius:4px;"></div>
+        </div>
+
+        <!-- Reassuring Feedback Toast -->
+        <div style="background:rgba(72,199,116,0.2); border:2.5px solid var(--leaf); padding:8px 16px; border-radius:16px; font-size:15px; font-weight:800; color:var(--leaf-dark); margin-top:16px;">
+          ✓ Magaling! Narinig ko ang /s/!
+        </div>
+      </div>
+
+      <div style="z-index:2;">
+        <button class="gummy-btn child-floor btn-leaf" onclick="showScreen('findit')">
+          Kasunod • Next Step ➔
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== 7. FIND IT SCREEN ==================== -->
+    <section class="screen" id="screen-findit">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; z-index:2;">
+        <button class="gummy-back-btn" onclick="showScreen('sayit')">⬅</button>
+        <div style="flex:1; display:flex; gap:6px;">
+          <div style="flex:1; height:12px; border-radius:999px; background:var(--leaf); border:2px solid var(--outline);"></div>
+          <div style="flex:1; height:12px; border-radius:999px; background:var(--leaf); border:2px solid var(--outline);"></div>
+          <div style="flex:1; height:12px; border-radius:999px; background:var(--mango); border:2px solid var(--outline);"></div>
+        </div>
+      </div>
+
+      <div class="speech-bubble" style="z-index:2;">
+        <div style="font-size:18px; font-weight:900;">Hanapin ang nagsisimula sa /s/!</div>
+      </div>
+
+      <!-- 2x2 Picture Card Grid -->
+      <div style="flex:1; display:grid; grid-template-columns:1fr 1fr; gap:12px; z-index:2; align-content:center;">
+        <div class="bento-card" style="text-align:center; padding:16px 10px; cursor:pointer; background:rgba(72,199,116,0.15); border-color:var(--leaf);" onclick="showScreen('complete')">
+          <div style="font-size:42px;">🍌</div>
+          <div style="font-size:18px; font-weight:900; margin-top:6px;">Saging</div>
+        </div>
+
+        <div class="bento-card" style="text-align:center; padding:16px 10px; cursor:pointer;" onclick="this.style.background='rgba(255,183,77,0.2)'; this.style.borderColor='var(--kalamansi)';">
+          <div style="font-size:42px;">🍎</div>
+          <div style="font-size:18px; font-weight:900; margin-top:6px;">Mansanas</div>
+        </div>
+
+        <div class="bento-card" style="text-align:center; padding:16px 10px; cursor:pointer;">
+          <div style="font-size:42px;">☀️</div>
+          <div style="font-size:18px; font-weight:900; margin-top:6px;">Araw</div>
+        </div>
+
+        <div class="bento-card" style="text-align:center; padding:16px 10px; cursor:pointer;">
+          <div style="font-size:42px;">🐟</div>
+          <div style="font-size:18px; font-weight:900; margin-top:6px;">Isda</div>
+        </div>
+      </div>
+
+      <div style="z-index:2;">
+        <button class="gummy-btn child-floor btn-leaf" onclick="showScreen('complete')">
+          Tapos Na • Check! ➔
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== 8. CELEBRATION / COMPLETE ==================== -->
+    <section class="screen" id="screen-complete" style="background:linear-gradient(180deg, var(--ube-dark) 0%, var(--ube) 100%); color:#fff; text-align:center;">
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:2;">
+        <div style="font-size:28px; font-weight:900; margin-bottom:6px;">Napakagaling! 🎉</div>
+        <div style="font-size:16px; opacity:0.9;">You learned the Letter /s/ sound!</div>
+
+        <!-- 3 Stars Drop Animation -->
+        <div style="display:flex; justify-content:center; gap:12px; margin:24px 0;">
+          <div class="bounce-anim" style="font-size:52px;">⭐</div>
+          <div class="bounce-anim" style="font-size:64px; margin-top:-14px;">⭐</div>
+          <div class="bounce-anim" style="font-size:52px;">⭐</div>
+        </div>
+
+        <!-- Score & Stats Pill -->
+        <div style="background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.4); border-radius:20px; padding:12px 24px; margin-bottom:20px;">
+          <div style="font-size:20px; font-weight:900;">+3 Stars Earned</div>
+          <div style="font-size:14px; opacity:0.85;">Streak extended to 4 Days! 🔥</div>
+        </div>
+
+        <img src="app/src/main/assets/images/mascot/lily_celebrating.png" style="width:120px; height:120px; object-fit:contain;" onerror="this.src='https://api.iconify.design/fluent-emoji-flat:monkey-face.svg'">
+      </div>
+
+      <div style="z-index:2;">
+        <button class="gummy-btn child-floor btn-mango" onclick="showScreen('map')">
+          Ipagpatuloy • Continue ➔
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== 9. BLEND IT CHALLENGE ==================== -->
+    <section class="screen" id="screen-blendit">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; z-index:2;">
+        <button class="gummy-back-btn" onclick="showScreen('map')">⬅</button>
+        <div style="flex:1; height:14px; border-radius:999px; background:var(--ube); border:2px solid var(--outline);"></div>
+        <div style="font-weight:900; font-size:14px; color:var(--ube);">Word 1/3</div>
+      </div>
+
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:2;">
+        <!-- Picture Card -->
+        <div class="bento-card" style="width:100%; text-align:center; padding:18px;">
+          <div style="font-size:64px;">🐱</div>
+          <div style="font-size:14px; font-weight:800; color:var(--ink-soft); margin-top:6px;">Pindutin para marinig (Tap to hear)</div>
+        </div>
+
+        <!-- Target Placement Letter Slots -->
+        <div style="display:flex; gap:10px; margin:20px 0;">
+          <div style="width:68px; height:68px; border-radius:18px; background:var(--cloud); border:3px solid var(--outline); box-shadow:0 4px 0 var(--cloud-shadow), 0 4px 0 3px var(--outline); display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:900;">
+            P
+          </div>
+          <div style="width:68px; height:68px; border-radius:18px; background:var(--cloud); border:3px solid var(--outline); box-shadow:0 4px 0 var(--cloud-shadow), 0 4px 0 3px var(--outline); display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:900;">
+            U
+          </div>
+          <div style="width:68px; height:68px; border-radius:18px; background:rgba(0,0,0,0.06); border:3px dashed var(--outline); display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:900; color:var(--ink-soft);">
+            ?
+          </div>
+        </div>
+
+        <!-- Letter Tile Bank -->
+        <div style="font-size:13px; font-weight:800; color:var(--ink-soft); margin-bottom:8px;">AVAILABLE LETTER TILES</div>
+        <div style="display:flex; gap:10px;">
+          <div class="bounce-anim" style="width:64px; height:64px; border-radius:18px; background:var(--mango); border:3px solid var(--outline); box-shadow:0 5px 0 var(--mango-shadow), 0 5px 0 3px var(--outline); display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:900; cursor:pointer;">
+            S
+          </div>
+          <div class="bounce-anim" style="width:64px; height:64px; border-radius:18px; background:var(--mango); border:3px solid var(--outline); box-shadow:0 5px 0 var(--mango-shadow), 0 5px 0 3px var(--outline); display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:900; cursor:pointer;">
+            A
+          </div>
+          <div class="bounce-anim" style="width:64px; height:64px; border-radius:18px; background:var(--mango); border:3px solid var(--outline); box-shadow:0 5px 0 var(--mango-shadow), 0 5px 0 3px var(--outline); display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:900; cursor:pointer;">
+            O
+          </div>
+        </div>
+      </div>
+
+      <div style="z-index:2;">
+        <button class="gummy-btn child-floor btn-leaf" onclick="showScreen('complete')">
+          Tiyakin ang Salita • Check Word ➔
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== 10. PARENT ARITHMETIC GATE ==================== -->
+    <section class="screen" id="screen-parentgate">
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:2;">
+        <div class="bento-card" style="width:100%; text-align:center; padding:20px 16px;">
+          <div style="width:52px; height:52px; border-radius:50%; background:var(--sky); border:2.5px solid var(--outline); margin:0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:22px;">
+            🔒
+          </div>
+          <div style="font-size:22px; font-weight:900;">Parent Zone</div>
+          <div style="font-size:15px; font-weight:700; color:var(--ink-soft); margin-top:2px;">Solve to enter: 7 + 6 = ?</div>
+
+          <!-- Answer Input Display -->
+          <div style="background:var(--sky); border:2.5px solid var(--outline); border-radius:14px; height:48px; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:900; letter-spacing:4px; margin:14px 0;">
+            13
+          </div>
+
+          <!-- 3x3 + 1 Keypad (52dp GummyContainer) -->
+          <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-bottom:14px;">
+            <button class="gummy-btn adult-floor btn-cloud">1</button>
+            <button class="gummy-btn adult-floor btn-cloud">2</button>
+            <button class="gummy-btn adult-floor btn-cloud">3</button>
+            <button class="gummy-btn adult-floor btn-cloud">4</button>
+            <button class="gummy-btn adult-floor btn-cloud">5</button>
+            <button class="gummy-btn adult-floor btn-cloud">6</button>
+            <button class="gummy-btn adult-floor btn-cloud">7</button>
+            <button class="gummy-btn adult-floor btn-cloud">8</button>
+            <button class="gummy-btn adult-floor btn-cloud">9</button>
+            <div style="visibility:hidden;"></div>
+            <button class="gummy-btn adult-floor btn-cloud">0</button>
+            <button class="gummy-btn adult-floor btn-cloud">DEL</button>
+          </div>
+
+          <button class="gummy-btn adult-floor btn-leaf" onclick="showScreen('parentdash')">
+            Verify & Enter
+          </button>
+          <button style="background:none; border:none; color:var(--ink-soft); font-family:var(--font-ui); font-weight:800; font-size:14px; margin-top:10px; cursor:pointer;" onclick="showScreen('profileselect')">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 11. PARENT DASHBOARD ==================== -->
+    <section class="screen" id="screen-parentdash">
+      <!-- Header -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; z-index:2;">
+        <button class="gummy-back-btn" onclick="showScreen('profileselect')">⬅</button>
+        <div style="text-align:center;">
+          <div style="font-size:20px; font-weight:900;">Learner Insights</div>
+          <div style="font-size:14px; color:var(--ink-soft);">Progress & Phonics Mastery</div>
+        </div>
+        <button class="gummy-btn adult-floor btn-ube" style="width:auto; padding:6px 12px;" onclick="showScreen('reportpreview')">
+          📄 PDF
+        </button>
+      </div>
+
+      <div style="flex:1; display:flex; flex-direction:column; gap:12px; z-index:2;">
+        <!-- Learner Hero Card -->
+        <div class="bento-card">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+            <div style="width:52px; height:52px; border-radius:50%; background:var(--sky); border:2.5px solid var(--outline); display:flex; align-items:center; justify-content:center; font-size:24px;">🐱</div>
+            <div style="flex:1;">
+              <div style="font-size:20px; font-weight:900;">Leo</div>
+              <div style="font-size:14px; color:var(--ink-soft);">Marungko Phonics Explorer</div>
+            </div>
+            <div style="background:rgba(255,193,7,0.2); border:2px solid var(--mango); border-radius:999px; padding:4px 10px; font-size:14px; font-weight:900;">🔥 4d</div>
+          </div>
+          <div style="font-size:14px; font-weight:800; display:flex; justify-content:space-between; margin-bottom:6px;">
+            <span>Curriculum Mastery</span>
+            <span style="color:var(--ube);">18 of 28 Sounds (64%)</span>
+          </div>
+          <div style="height:12px; border-radius:999px; background:rgba(0,0,0,0.08); overflow:hidden;">
+            <div style="width:64%; height:100%; background:var(--leaf);"></div>
+          </div>
+        </div>
+
+        <!-- Mastered Sounds Shelf -->
+        <div class="bento-card">
+          <div style="font-size:16px; font-weight:900; margin-bottom:2px;">Mastered Sounds (18)</div>
+          <div style="font-size:14px; color:var(--ink-soft); margin-bottom:10px;">Sounds decoded & practiced</div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            <div style="width:44px; height:44px; border-radius:12px; background:var(--leaf); border:2.5px solid var(--outline); box-shadow:0 3px 0 var(--leaf-shadow); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:900; font-size:18px;">M</div>
+            <div style="width:44px; height:44px; border-radius:12px; background:var(--leaf); border:2.5px solid var(--outline); box-shadow:0 3px 0 var(--leaf-shadow); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:900; font-size:18px;">S</div>
+            <div style="width:44px; height:44px; border-radius:12px; background:var(--leaf); border:2.5px solid var(--outline); box-shadow:0 3px 0 var(--leaf-shadow); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:900; font-size:18px;">A</div>
+            <div style="width:44px; height:44px; border-radius:12px; background:var(--leaf); border:2.5px solid var(--outline); box-shadow:0 3px 0 var(--leaf-shadow); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:900; font-size:18px;">I</div>
+            <div style="width:44px; height:44px; border-radius:12px; background:var(--leaf); border:2.5px solid var(--outline); box-shadow:0 3px 0 var(--leaf-shadow); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:900; font-size:18px;">O</div>
+          </div>
+        </div>
+
+        <!-- Practice & Focus Sounds (Headspace Non-Punitive Kalamansi Guidance) -->
+        <div class="bento-card">
+          <div style="font-size:16px; font-weight:900; color:var(--ink);">Practice & Focus Sounds</div>
+          <div style="font-size:14px; color:var(--ink-soft); margin-bottom:10px;">Pedagogical recommendations for today</div>
+          <div style="display:flex; gap:8px;">
+            <div style="background:rgba(255,183,77,0.2); border:2px solid var(--kalamansi); border-radius:12px; padding:6px 12px; font-weight:900; font-size:15px;">
+              G · <span style="font-size:14px; color:var(--outline);">42%</span>
+            </div>
+            <div style="background:rgba(255,183,77,0.2); border:2px solid var(--kalamansi); border-radius:12px; padding:6px 12px; font-weight:900; font-size:15px;">
+              P · <span style="font-size:14px; color:var(--outline);">50%</span>
+            </div>
+          </div>
+          <div style="background:rgba(255,243,217,0.5); border-radius:12px; padding:10px; font-size:14px; color:var(--ink-soft); margin-top:10px;">
+            💡 Tip: Spend 2-3 minutes practicing short pronunciation in 'Hear It' and 'Say It'.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 12. REPORT PREVIEW & EXPORT ==================== -->
+    <section class="screen" id="screen-reportpreview">
+      <!-- Centered Header -->
+      <div style="position:relative; width:100%; height:44px; display:flex; align-items:center; justify-content:center; margin-bottom:16px; z-index:2;">
+        <button class="gummy-back-btn" style="position:absolute; left:0;" onclick="showScreen('parentdash')">⬅</button>
+        <div style="font-size:22px; font-weight:900;">Report Ready</div>
+      </div>
+
+      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; z-index:2;">
+        <div class="bento-card" style="text-align:center; padding:24px 18px;">
+          <div style="font-size:52px; color:var(--ube); margin-bottom:8px;">📄</div>
+          <div style="font-size:18px; font-weight:900;">playIT_Report_Leo.pdf</div>
+          <div style="font-size:14px; color:var(--ink-soft); margin-top:4px;">File Size: 128 KB | Format: PDF</div>
+          <div style="font-size:14px; color:var(--ink-soft); margin-top:2px;">Saved locally to application documents folder.</div>
+
+          <div style="margin-top:24px; display:flex; flex-direction:column; gap:10px;">
+            <button class="gummy-btn adult-floor btn-ube">
+              Open PDF Document
+            </button>
+            <button class="gummy-btn adult-floor btn-leaf">
+              Share Report
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+function showScreen(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-chip').forEach(c => c.classList.remove('active'));
+  
+  const target = document.getElementById('screen-' + screenId);
+  if (target) target.classList.add('active');
+
+  const chips = document.querySelectorAll('.nav-chip');
+  const screens = ['splash', 'profileselect', 'nameprompt', 'map', 'hearit', 'sayit', 'findit', 'complete', 'blendit', 'parentgate', 'parentdash', 'reportpreview'];
+  const idx = screens.indexOf(screenId);
+  if (idx >= 0 && chips[idx]) {
+    chips[idx].classList.add('active');
+  }
+}
+</script>
+
+</body>
+</html>

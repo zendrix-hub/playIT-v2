@@ -24,27 +24,45 @@ class ProfileRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getProfileById(id: Long): Profile? {
-        return profileDao.getProfileById(id)?.toDomain()
+        return try {
+            profileDao.getProfileById(id)?.toDomain()
+        } catch (e: Exception) {
+            android.util.Log.e("ProfileRepositoryImpl", "Failed to read data", e)
+            null
+        }
     }
 
     override suspend fun createProfile(name: String, avatarResId: Int): Result<Long> {
-        val count = profileDao.getProfileCount()
-        if (count >= GameplayConstants.MAX_PROFILES) {
-            return Result.failure(IllegalStateException("Maximum of ${GameplayConstants.MAX_PROFILES} profiles reached."))
+        return try {
+            val count = profileDao.getProfileCount()
+            if (count >= GameplayConstants.MAX_PROFILES) {
+                return Result.failure(IllegalStateException("Maximum of ${GameplayConstants.MAX_PROFILES} profiles reached."))
+            }
+            val entity = ProfileEntity(
+                name = name,
+                avatarResId = avatarResId
+            )
+            val newId = profileDao.insertProfile(entity)
+            Result.success(newId)
+        } catch (e: Exception) {
+            android.util.Log.e("ProfileRepositoryImpl", "Failed to save data", e)
+            Result.failure(e)
         }
-        val entity = ProfileEntity(
-            name = name,
-            avatarResId = avatarResId
-        )
-        val newId = profileDao.insertProfile(entity)
-        return Result.success(newId)
     }
 
     override suspend fun updateProfile(profile: Profile) {
-        profileDao.updateProfile(profile.toEntity())
+        try {
+            profileDao.updateProfile(profile.toEntity())
+        } catch (e: Exception) {
+            android.util.Log.e("ProfileRepositoryImpl", "Failed to save data", e)
+        }
     }
 
     override suspend fun deleteProfile(profile: Profile) {
-        profileDao.deleteProfile(profile.toEntity())
+        try {
+            profileDao.deleteProfile(profile.toEntity())
+        } catch (e: Exception) {
+            android.util.Log.e("ProfileRepositoryImpl", "Failed to save data", e)
+        }
     }
 }

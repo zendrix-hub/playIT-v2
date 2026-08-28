@@ -16,6 +16,12 @@ import java.io.FileOutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * Native Android PdfDocument exporter generating offline, thesis-ready academic progress reports.
+ * Formats executive summary, 7-day retention, at-risk letter alerts, and full 28-phoneme performance matrices.
+ *
+ * Implements 01_REQUIREMENTS_SUMMARY.md §1 Module 6 / §6 FR-12, FR-13.
+ */
 @Singleton
 class PdfExporter @Inject constructor(
     @ApplicationContext private val context: Context
@@ -29,99 +35,104 @@ class PdfExporter @Inject constructor(
 
             val pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create()
             val page = pdfDocument.startPage(pageInfo)
-            val canvas = page.canvas
+            val canvas: Canvas = page.canvas
 
             val paint = Paint().apply {
                 isAntiAlias = true
             }
 
-            // Header Background (Purple)
-            paint.color = Color.parseColor("#6C5CE7")
-            canvas.drawRect(0f, 0f, pageWidth.toFloat(), 100f, paint)
+            // 1. Header Banner (Theme FriendlyPurple / LearningBlue)
+            paint.color = Color.parseColor("#4C68D7")
+            canvas.drawRect(0f, 0f, pageWidth.toFloat(), 72f, paint)
 
-            // Header Text
             paint.color = Color.WHITE
-            paint.textSize = 24f
+            paint.textSize = 20f
             paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            canvas.drawText("playIT — Progress & Retention Report", 24f, 45f, paint)
+            canvas.drawText("playIT — Phonics Progress & Retention Report", 24f, 36f, paint)
 
-            paint.textSize = 12f
+            paint.textSize = 10.5f
             paint.typeface = Typeface.DEFAULT
-            canvas.drawText("Student Profile: ${reportData.profileName}  |  Generated: ${reportData.generatedDate}", 24f, 75f, paint)
+            canvas.drawText("Learner: ${reportData.profileName}   |   Generated: ${reportData.generatedDate}   |   Offline Assessment", 24f, 56f, paint)
 
-            var yPos = 130f
+            var yPos = 86f
 
-            // Overview Section Card
-            paint.color = Color.parseColor("#F4F6F9")
-            val overviewRect = RectF(24f, yPos, (pageWidth - 24).toFloat(), yPos + 100f)
-            canvas.drawRoundRect(overviewRect, 12f, 12f, paint)
+            // 2. Executive Summary Card
+            paint.color = Color.parseColor("#F4F7FC")
+            val overviewHeight = 64f
+            val overviewRect = RectF(24f, yPos, (pageWidth - 24).toFloat(), yPos + overviewHeight)
+            canvas.drawRoundRect(overviewRect, 10f, 10f, paint)
 
             paint.color = Color.parseColor("#2D3436")
-            paint.textSize = 14f
+            paint.textSize = 11.5f
             paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            canvas.drawText("Executive Summary", 40f, yPos + 28f, paint)
+            canvas.drawText("Executive Summary", 38f, yPos + 20f, paint)
 
-            paint.textSize = 11f
+            paint.textSize = 10f
             paint.typeface = Typeface.DEFAULT
-            canvas.drawText("Overall Accuracy: ${reportData.overallAccuracyPercentage}%", 40f, yPos + 52f, paint)
-            canvas.drawText("7-Day Retention: ${reportData.retentionScorePercentage}%", 40f, yPos + 72f, paint)
-            canvas.drawText("Letters Completed: ${reportData.completedLettersCount} / ${reportData.totalLettersCount}", 300f, yPos + 52f, paint)
-            canvas.drawText("Total Stars: ${reportData.totalStars}  |  Blend-It: ${reportData.blendItCompletedCount}/${reportData.blendItTotalCount}", 300f, yPos + 72f, paint)
+            canvas.drawText("Overall Accuracy: ${reportData.overallAccuracyPercentage}%", 38f, yPos + 38f, paint)
+            canvas.drawText("7-Day Retention: ${reportData.retentionScorePercentage}%", 38f, yPos + 54f, paint)
+            canvas.drawText("Letters Mastered: ${reportData.completedLettersCount} / ${reportData.totalLettersCount}", 290f, yPos + 38f, paint)
+            canvas.drawText("Total Stars: ${reportData.totalStars} ★   |   Blend-It: ${reportData.blendItCompletedCount}/${reportData.blendItTotalCount}", 290f, yPos + 54f, paint)
 
-            yPos += 120f
+            yPos += overviewHeight + 12f
 
-            // At Risk Warning Section (if any)
+            // 3. At-Risk Warning Banner (if any)
             if (reportData.atRiskLetters.isNotEmpty()) {
-                paint.color = Color.parseColor("#FFECEC")
-                val atRiskRect = RectF(24f, yPos, (pageWidth - 24).toFloat(), yPos + 60f)
+                paint.color = Color.parseColor("#FFF1F0")
+                val atRiskHeight = 36f
+                val atRiskRect = RectF(24f, yPos, (pageWidth - 24).toFloat(), yPos + atRiskHeight)
                 canvas.drawRoundRect(atRiskRect, 8f, 8f, paint)
 
                 paint.color = Color.parseColor("#D63031")
-                paint.textSize = 12f
+                paint.textSize = 10f
                 paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-                canvas.drawText("⚠️ At-Risk Letters Needing Attention (${reportData.atRiskLetters.size}):", 40f, yPos + 25f, paint)
+                canvas.drawText("⚠️ At-Risk Phonemes Requiring Practice (${reportData.atRiskLetters.size}):", 38f, yPos + 16f, paint)
 
                 paint.typeface = Typeface.DEFAULT
-                val symbols = reportData.atRiskLetters.joinToString(", ") { "${it.symbol} (${it.accuracyPercentage.toInt()}%)" }
-                canvas.drawText("Letters: $symbols", 40f, yPos + 45f, paint)
+                val symbols = reportData.atRiskLetters.take(8).joinToString(", ") { "${it.symbol} (${it.accuracyPercentage.toInt()}%)" }
+                canvas.drawText(symbols, 38f, yPos + 30f, paint)
 
-                yPos += 75f
+                yPos += atRiskHeight + 10f
             }
 
-            // Letter Matrix Table Header
-            paint.color = Color.parseColor("#00CEC9")
-            paint.textSize = 13f
+            // 4. Letter Matrix Table Header
+            paint.color = Color.parseColor("#4C68D7")
+            paint.textSize = 11.5f
             paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            canvas.drawText("Detailed Letter Performance Matrix", 24f, yPos, paint)
+            canvas.drawText("28-Letter Phonics Mastery Matrix", 24f, yPos + 12f, paint)
 
-            yPos += 15f
-            paint.color = Color.parseColor("#DFE6E9")
-            canvas.drawRect(24f, yPos, (pageWidth - 24).toFloat(), yPos + 22f, paint)
+            yPos += 18f
+            paint.color = Color.parseColor("#E4EBF5")
+            canvas.drawRect(24f, yPos, (pageWidth - 24).toFloat(), yPos + 18f, paint)
 
             paint.color = Color.parseColor("#2D3436")
-            paint.textSize = 10f
-            canvas.drawText("Letter", 34f, yPos + 15f, paint)
-            canvas.drawText("Status", 100f, yPos + 15f, paint)
-            canvas.drawText("Accuracy", 210f, yPos + 15f, paint)
-            canvas.drawText("Attempts", 300f, yPos + 15f, paint)
-            canvas.drawText("Hearts Lost", 400f, yPos + 15f, paint)
-            canvas.drawText("Stars", 490f, yPos + 15f, paint)
+            paint.textSize = 9.5f
+            paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+            canvas.drawText("Letter", 34f, yPos + 13f, paint)
+            canvas.drawText("Status", 110f, yPos + 13f, paint)
+            canvas.drawText("Accuracy", 220f, yPos + 13f, paint)
+            canvas.drawText("Attempts", 310f, yPos + 13f, paint)
+            canvas.drawText("Hearts Lost", 400f, yPos + 13f, paint)
+            canvas.drawText("Stars", 490f, yPos + 13f, paint)
 
-            yPos += 22f
+            yPos += 18f
 
-            // Table Rows
+            // 5. Letter Matrix Table Rows (All 28 Phonemes)
             paint.typeface = Typeface.DEFAULT
+            val rowHeight = 17f
+
             reportData.letterPerformances.take(28).forEachIndexed { index, lp ->
-                if (yPos > pageHeight - 40) return@forEachIndexed
+                if (yPos + rowHeight > pageHeight - 30) return@forEachIndexed
 
                 if (index % 2 == 1) {
-                    paint.color = Color.parseColor("#F9FAFC")
-                    canvas.drawRect(24f, yPos, (pageWidth - 24).toFloat(), yPos + 20f, paint)
+                    paint.color = Color.parseColor("#F9FBFE")
+                    canvas.drawRect(24f, yPos, (pageWidth - 24).toFloat(), yPos + rowHeight, paint)
                 }
 
                 paint.color = Color.parseColor("#2D3436")
+                paint.textSize = 9.5f
                 paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-                canvas.drawText(lp.symbol, 34f, yPos + 14f, paint)
+                canvas.drawText(lp.symbol.uppercase(), 34f, yPos + 12f, paint)
 
                 paint.typeface = Typeface.DEFAULT
                 val statusText = when (lp.riskStatus) {
@@ -131,24 +142,30 @@ class PdfExporter @Inject constructor(
                 }
                 val statusColor = when (lp.riskStatus) {
                     RiskStatus.GREEN -> Color.parseColor("#00B894")
-                    RiskStatus.YELLOW -> Color.parseColor("#FDCB6E")
+                    RiskStatus.YELLOW -> Color.parseColor("#E67E22")
                     RiskStatus.RED -> Color.parseColor("#D63031")
                 }
                 paint.color = statusColor
-                canvas.drawText(statusText, 100f, yPos + 14f, paint)
+                canvas.drawText(statusText, 110f, yPos + 12f, paint)
 
                 paint.color = Color.parseColor("#2D3436")
-                canvas.drawText("${lp.accuracyPercentage.toInt()}%", 210f, yPos + 14f, paint)
-                canvas.drawText("${lp.totalAttempts}", 300f, yPos + 14f, paint)
-                canvas.drawText("${lp.heartsLost}", 400f, yPos + 14f, paint)
-                canvas.drawText("${lp.starsEarned} ★", 490f, yPos + 14f, paint)
+                canvas.drawText("${lp.accuracyPercentage.toInt()}%", 220f, yPos + 12f, paint)
+                canvas.drawText("${lp.totalAttempts}", 310f, yPos + 12f, paint)
+                canvas.drawText("${lp.heartsLost}", 400f, yPos + 12f, paint)
+                canvas.drawText("${lp.starsEarned} ★", 490f, yPos + 12f, paint)
 
-                yPos += 20f
+                yPos += rowHeight
             }
+
+            // 6. Footer Note
+            paint.color = Color.parseColor("#8395A7")
+            paint.textSize = 8.5f
+            paint.typeface = Typeface.DEFAULT
+            canvas.drawText("playIT Early Literacy Phonics System — Evaluated via Marungko Phonics Progression", 24f, pageHeight - 16f, paint)
 
             pdfDocument.finishPage(page)
 
-            // Save PDF to documents/files directory
+            // Save PDF to documents directory
             val docsDir = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) ?: context.filesDir
             if (!docsDir.exists()) docsDir.mkdirs()
 

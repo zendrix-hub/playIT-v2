@@ -4,6 +4,8 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
@@ -12,10 +14,11 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.playit.app.domain.model.MapNode
-import com.playit.app.presentation.theme.CreamWhite
-import com.playit.app.presentation.theme.DisabledColor
-import com.playit.app.presentation.theme.GrowthGreen
-import com.playit.app.presentation.theme.TextPrimary
+import com.playit.app.presentation.theme.DarkBrownOutline
+import com.playit.app.presentation.theme.Rope
+import com.playit.app.presentation.theme.RopeShadow
+import com.playit.app.presentation.theme.SandDeep
+import com.playit.app.presentation.theme.Tan
 
 /**
  * Calculates a deterministic horizontal offset for a given node index.
@@ -27,12 +30,11 @@ fun calculateNodeXOffsetDp(index: Int, amplitudeDp: Dp = 50.dp): Dp {
 }
 
 /**
- * Canvas drawing the winding Bezier path behind map nodes.
- *
- * Renders each segment between node `i` and `i+1` with:
- * 1. An outer dark outline stroke (`TextPrimary`, 20dp wide)
- * 2. An inner path stroke (12dp wide, `GrowthGreen` for unlocked, `DisabledColor` for locked)
- * 3. An inner dashed accent line for extra texture
+ * Canvas drawing the winding Bezier path behind map nodes with tactile world integration:
+ * 1. 3D Node Grounding Pedestals / Island Bases
+ * 2. River Wood Bridge Planks (for Chapter 2)
+ * 3. Base shadow track and vibrant dashed rope trail
+ * 4. Stepping stone pavers
  */
 @Composable
 fun MapPathCanvas(
@@ -40,18 +42,43 @@ fun MapPathCanvas(
     nodes: List<MapNode>,
     modifier: Modifier = Modifier
 ) {
-    if (nodeCenters.size < 2) return
+    if (nodeCenters.isEmpty()) return
 
     Canvas(modifier = modifier) {
-        val outerStrokePx = 20.dp.toPx()
-        val innerStrokePx = 12.dp.toPx()
-        val dashStrokePx = 3.dp.toPx()
+        val pathDash = PathEffect.dashPathEffect(floatArrayOf(8.dp.toPx(), 6.dp.toPx()), 0f)
 
+        // ── Step 1: Draw Grounding Pedestals under each Node ─────────────────
+        nodeCenters.forEachIndexed { index, center ->
+            val node = nodes.getOrNull(index)
+            val isBlendIt = node is MapNode.BlendItNode
+            val pedestalRadiusX = if (isBlendIt) 72.dp.toPx() else 48.dp.toPx()
+            val pedestalRadiusY = if (isBlendIt) 32.dp.toPx() else 24.dp.toPx()
+
+            // Pedestal drop shadow on landscape
+            drawOval(
+                color = Color(0xFF1E293B).copy(alpha = 0.16f),
+                topLeft = Offset(center.x - pedestalRadiusX, center.y - pedestalRadiusY + 8.dp.toPx()),
+                size = Size(pedestalRadiusX * 2f, pedestalRadiusY * 2f)
+            )
+
+            // Pedestal soil rim / ground paver base
+            drawOval(
+                color = if (isBlendIt) Color(0xFFE9D5FF) else SandDeep.copy(alpha = 0.75f),
+                topLeft = Offset(center.x - pedestalRadiusX, center.y - pedestalRadiusY + 3.dp.toPx()),
+                size = Size(pedestalRadiusX * 2f, pedestalRadiusY * 2f)
+            )
+            drawOval(
+                color = DarkBrownOutline.copy(alpha = 0.35f),
+                topLeft = Offset(center.x - pedestalRadiusX, center.y - pedestalRadiusY + 3.dp.toPx()),
+                size = Size(pedestalRadiusX * 2f, pedestalRadiusY * 2f),
+                style = Stroke(width = 2.dp.toPx())
+            )
+        }
+
+        // ── Step 2: Draw Connecting Paths & Bridges ───────────────────────────
         for (i in 0 until nodeCenters.size - 1) {
             val start = nodeCenters[i]
             val end = nodeCenters[i + 1]
-            val targetNode = nodes.getOrNull(i + 1)
-            val isSegmentUnlocked = targetNode?.isUnlocked ?: false
 
             val dy = end.y - start.y
             val segmentPath = Path().apply {
@@ -63,39 +90,93 @@ fun MapPathCanvas(
                 )
             }
 
-            // Layer 1: Outer dark outline
-            drawPath(
-                path = segmentPath,
-                color = TextPrimary,
-                style = Stroke(
-                    width = outerStrokePx,
-                    cap = StrokeCap.Round,
-                    join = StrokeJoin.Round
-                )
-            )
+            val isRiverCrossing = i in 6..12
 
-            // Layer 2: Inner color stroke
-            val segmentColor = if (isSegmentUnlocked) GrowthGreen else DisabledColor
-            drawPath(
-                path = segmentPath,
-                color = segmentColor,
-                style = Stroke(
-                    width = innerStrokePx,
-                    cap = StrokeCap.Round,
-                    join = StrokeJoin.Round
-                )
-            )
-
-            // Layer 3: Dashed centerline decoration
-            if (isSegmentUnlocked) {
+            if (isRiverCrossing) {
+                // Wooden Boardwalk Bridge over Loboc River
                 drawPath(
                     path = segmentPath,
-                    color = CreamWhite.copy(alpha = 0.6f),
+                    color = DarkBrownOutline.copy(alpha = 0.35f),
                     style = Stroke(
-                        width = dashStrokePx,
+                        width = 16.dp.toPx(),
                         cap = StrokeCap.Round,
-                        pathEffect = PathEffect.dashPathEffect(floatArrayOf(12.dp.toPx(), 12.dp.toPx()), 0f)
+                        join = StrokeJoin.Round
                     )
+                )
+                // Bridge deck in Tan
+                drawPath(
+                    path = segmentPath,
+                    color = Tan,
+                    style = Stroke(
+                        width = 12.dp.toPx(),
+                        cap = StrokeCap.Round,
+                        join = StrokeJoin.Round
+                    )
+                )
+                // Bridge wooden rungs / planks
+                val rungsDash = PathEffect.dashPathEffect(floatArrayOf(3.dp.toPx(), 7.dp.toPx()), 0f)
+                drawPath(
+                    path = segmentPath,
+                    color = DarkBrownOutline,
+                    style = Stroke(
+                        width = 14.dp.toPx(),
+                        cap = StrokeCap.Butt,
+                        join = StrokeJoin.Round,
+                        pathEffect = rungsDash
+                    )
+                )
+            } else {
+                // Layer 1: Outer shadow track
+                drawPath(
+                    path = segmentPath,
+                    color = RopeShadow.copy(alpha = 0.45f),
+                    style = Stroke(
+                        width = 9.dp.toPx(),
+                        cap = StrokeCap.Round,
+                        join = StrokeJoin.Round
+                    )
+                )
+
+                // Layer 2: Main dashed rope trail
+                drawPath(
+                    path = segmentPath,
+                    color = Rope,
+                    style = Stroke(
+                        width = 4.5.dp.toPx(),
+                        cap = StrokeCap.Round,
+                        join = StrokeJoin.Round,
+                        pathEffect = pathDash
+                    )
+                )
+
+                // Layer 3: Tactile Stepping Stones at 1/3 and 2/3 of segment
+                val midX1 = start.x * 0.67f + end.x * 0.33f
+                val midY1 = start.y + dy * 0.33f
+                val midX2 = start.x * 0.33f + end.x * 0.67f
+                val midY2 = start.y + dy * 0.67f
+
+                drawCircle(
+                    color = Color.White.copy(alpha = 0.9f),
+                    radius = 4.dp.toPx(),
+                    center = Offset(midX1, midY1)
+                )
+                drawCircle(
+                    color = DarkBrownOutline.copy(alpha = 0.35f),
+                    radius = 4.dp.toPx(),
+                    center = Offset(midX1, midY1),
+                    style = Stroke(width = 1.5.dp.toPx())
+                )
+
+                drawCircle(
+                    color = Color.White.copy(alpha = 0.9f),
+                    radius = 4.dp.toPx(),
+                    center = Offset(midX2, midY2)
+                )
+                drawCircle(
+                    color = DarkBrownOutline.copy(alpha = 0.35f),
+                    radius = 4.dp.toPx(),
+                    center = Offset(midX2, midY2),
+                    style = Stroke(width = 1.5.dp.toPx())
                 )
             }
         }

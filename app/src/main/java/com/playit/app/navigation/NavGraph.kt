@@ -1,15 +1,6 @@
 package com.playit.app.navigation
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -36,7 +27,6 @@ import com.playit.app.presentation.profile.ProfileViewModel
 import com.playit.app.presentation.sayit.SayItScreen
 import com.playit.app.presentation.sayit.SayItViewModel
 import com.playit.app.presentation.splash.SplashScreen
-import kotlinx.coroutines.delay
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 
@@ -49,13 +39,13 @@ fun NavGraph(
         startDestination = Routes.SPLASH
     ) {
         composable(Routes.SPLASH) {
-            LaunchedEffect(Unit) {
-                delay(1200)
-                navController.navigate(Routes.PROFILE_SELECT) {
-                    popUpTo(Routes.SPLASH) { inclusive = true }
+            SplashScreen(
+                onStartClick = {
+                    navController.navigate(Routes.PROFILE_SELECT) {
+                        popUpTo(Routes.SPLASH) { inclusive = true }
+                    }
                 }
-            }
-            SplashScreen()
+            )
         }
 
         composable(Routes.PROFILE_SELECT) {
@@ -101,6 +91,12 @@ fun NavGraph(
                         navController.navigate(Routes.blendIt(groupId))
                     } else {
                         navController.navigate(Routes.hearIt(nodeId))
+                    }
+                },
+                onBack = {
+                    viewModel.clearSession()
+                    navController.navigate(Routes.PROFILE_SELECT) {
+                        popUpTo(Routes.MAP) { inclusive = true }
                     }
                 }
             )

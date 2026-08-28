@@ -13,13 +13,17 @@ class SayItAttemptRepositoryImpl @Inject constructor(
 ) : SayItAttemptRepository {
 
     override suspend fun saveAttempt(profileId: Long, phonemeId: Int, isCorrect: Boolean) {
-        sayItAttemptDao.insertAttempt(
-            SayItAttemptEntity(
-                profileId = profileId,
-                phonemeId = phonemeId,
-                isCorrect = isCorrect
+        try {
+            sayItAttemptDao.insertAttempt(
+                SayItAttemptEntity(
+                    profileId = profileId,
+                    phonemeId = phonemeId,
+                    isCorrect = isCorrect
+                )
             )
-        )
+        } catch (e: Exception) {
+            android.util.Log.e("SayItAttemptRepositoryImpl", "Failed to save data", e)
+        }
     }
 
     override suspend fun getAttemptsForProfile(profileId: Long): List<SayItAttempt> {

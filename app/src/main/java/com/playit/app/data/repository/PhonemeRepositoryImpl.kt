@@ -21,10 +21,20 @@ class PhonemeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getPhonemeById(id: Int): Phoneme? {
-        return phonemeDao.getPhonemeById(id)?.toDomain()
+        return try {
+            phonemeDao.getPhonemeById(id)?.toDomain()
+        } catch (e: Exception) {
+            android.util.Log.e("PhonemeRepositoryImpl", "Failed to read data", e)
+            null
+        }
     }
 
     override suspend fun getPhonemeByLetter(letter: String): Phoneme? {
-        return phonemeDao.getPhonemeByLetter(letter)?.toDomain()
+        return try {
+            phonemeDao.getPhonemeByLetter(letter)?.toDomain()
+        } catch (e: Exception) {
+            android.util.Log.e("PhonemeRepositoryImpl", "Failed to read data", e)
+            null
+        }
     }
 }

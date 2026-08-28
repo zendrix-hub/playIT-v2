@@ -8,6 +8,7 @@ import com.playit.app.data.audio.AudioResolver
 import com.playit.app.data.audio.SfxEvent
 import com.playit.app.data.audio.VoContext
 import com.playit.app.domain.manager.GridGenerator
+import com.playit.app.domain.manager.HeartManager
 import com.playit.app.domain.model.Phoneme
 import com.playit.app.domain.repository.FindItAttemptRepository
 import com.playit.app.domain.repository.PhonemeRepository
@@ -23,6 +24,7 @@ sealed class FindItState {
     object Idle : FindItState()
     data class Correct(val phoneme: Phoneme) : FindItState()
     data class Incorrect(val selectedPhoneme: Phoneme) : FindItState()
+    object GameOver : FindItState()
 }
 
 @HiltViewModel
@@ -47,8 +49,18 @@ class FindItViewModel @Inject constructor(
     private val _state = MutableStateFlow<FindItState>(FindItState.Idle)
     val state: StateFlow<FindItState> = _state.asStateFlow()
 
+    val heartManager = HeartManager()
+
+    private val _hearts = MutableStateFlow(heartManager.currentHearts)
+    val hearts: StateFlow<Int> = _hearts.asStateFlow()
+
+    private var consecutiveCorrect = 0
+
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying.asStateFlow()
+
+    private val _loadError = MutableStateFlow(false)
+    val loadError: StateFlow<Boolean> = _loadError.asStateFlow()
 
     init {
         loadGrid()
@@ -68,13 +80,11 @@ class FindItViewModel @Inject constructor(
         val id = phonemeIdArg?.toIntOrNull() ?: 1
         viewModelScope.launch {
             phonemeRepository.getAllPhonemes().collect { allPhonemes ->
-                val target = allPhonemes.find { it.id == id } ?: Phoneme(
-                    id = 1,
-                    letter = "m",
-                    audioPath = "audio/phonemes/phoneme_m.mp3",
-                    imagePath = "images/pictures/word_mouse.png",
-                    exampleWord = "Mouse"
-                )
+                val target = allPhonemes.find { it.id == id }
+                if (target == null) {
+                    _loadError.value = true
+                    return@collect
+                }
                 _targetPhoneme.value = target
                 _gridItems.value = gridGenerator.generateGrid(id, allPhonemes)
 
@@ -115,16 +125,40 @@ class FindItViewModel @Inject constructor(
         }
 
         if (isCorrect) {
+            consecutiveCorrect++
+            val isRecovered = heartManager.checkRecovery(consecutiveCorrect)
+            if (isRecovered) {
+                _hearts.value = heartManager.currentHearts
+            }
             _state.value = FindItState.Correct(selected)
             val sfx = audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME)
+            val recoverySfx = if (isRecovered) listOf(audioResolver.getSfxPath(SfxEvent.HEART_RECOVERY_SPARKLE)) else emptyList()
             val vo = audioResolver.getRotatingCorrectVo()
-            audioPlayer.playSequence(listOf(sfx, vo))
+            audioPlayer.playSequence(listOf(sfx) + recoverySfx + listOf(vo))
         } else {
-            _state.value = FindItState.Incorrect(selected)
-            val sfx = audioResolver.getSfxPath(SfxEvent.INCORRECT_POP)
+            consecutiveCorrect = 0
+            val isGameOver = heartManager.deductHeart()
+            _hearts.value = heartManager.currentHearts
+
+            val sfxPop = audioResolver.getSfxPath(SfxEvent.INCORRECT_POP)
+            val sfxWhoosh = audioResolver.getSfxPath(SfxEvent.HEART_LOSS_WHOOSH)
             val vo = audioResolver.getRotatingEncourageVo()
-            audioPlayer.playSequence(listOf(sfx, vo))
+
+            if (isGameOver) {
+                _state.value = FindItState.GameOver
+                audioPlayer.playSequence(listOf(sfxPop, sfxWhoosh, vo))
+            } else {
+                _state.value = FindItState.Incorrect(selected)
+                audioPlayer.playSequence(listOf(sfxPop, sfxWhoosh, vo))
+            }
         }
+    }
+
+    fun restartSession() {
+        heartManager.resetForRestart()
+        _hearts.value = heartManager.currentHearts
+        _state.value = FindItState.Idle
+        loadGrid()
     }
 
     override fun onCleared() {
