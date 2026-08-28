@@ -81,7 +81,7 @@ class MapViewModel @Inject constructor(
 
     fun playMascotTapReaction() {
         val sfx = audioResolver.getSfxPath(SfxEvent.NODE_UNLOCK_CHIME)
-        val vo = audioResolver.getRotatingEncourageVo()
+        val vo = audioResolver.getVoPath(VoContext.MAP_TARANA)
         audioPlayer.playSequence(listOf(sfx, vo))
     }
 

@@ -40,6 +40,10 @@ fun NamePromptScreen(
         else -> MascotState.POINTING
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.playNamePromptIntro()
+    }
+
     LaunchedEffect(uiState) {
         if (uiState is ProfileUiState.Created) {
             val id = (uiState as ProfileUiState.Created).profileId

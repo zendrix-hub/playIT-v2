@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PlayIT x Khan Academy Kids — Style Synthesis Showcase</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky-top: #A4D9F8;
+    --sky-bottom: #DCEEFB;
+    --sand: #FFF5E6;
+    --hill-1: #8BC34A;
+    --hill-2: #689F38;
+    --hill-3: #558B2F;
+    --mango: #FA7B28;
+    --mango-shadow: #D75F14;
+    --ube: #8B5FBF;
+    --leaf: #4CAF50;
+    --leaf-shadow: #2E7D32;
+    --ink: #1F3A3D;
+    --ink-soft: #506B6E;
+    --cloud: #FFFFFF;
+    --outline: #2D373E;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+  body {
+    font-family: 'Lexend', sans-serif;
+    background: #F0F6FA;
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 36px 20px 80px;
+  }
+  header {
+    text-align: center;
+    margin-bottom: 32px;
+    max-width: 800px;
+  }
+  h1 {
+    font-size: 34px;
+    font-weight: 900;
+    color: var(--ink);
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  p.subtitle {
+    font-size: 16px;
+    color: var(--ink-soft);
+    font-weight: 500;
+    line-height: 1.5;
+  }
+  .tag-pill {
+    display: inline-block;
+    padding: 6px 14px;
+    background: #E1F5FE;
+    color: #0288D1;
+    border-radius: 20px;
+    font-weight: 800;
+    font-size: 13px;
+    margin-top: 10px;
+    border: 2px solid #81D4FA;
+  }
+
+  /* Synthesis Grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 28px;
+    max-width: 1200px;
+    width: 100%;
+  }
+  .preview-card {
+    background: var(--cloud);
+    border-radius: 28px;
+    border: 3.5px solid var(--outline);
+    box-shadow: 0 10px 0 rgba(45, 55, 62, 0.15);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .preview-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 0 rgba(45, 55, 62, 0.18);
+  }
+  .card-hero {
+    height: 220px;
+    background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 60%, var(--sand) 100%);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  /* Storybook Hills */
+  .hill {
+    position: absolute;
+    bottom: -40px;
+    border-radius: 50% 50% 0 0;
+    border: 3px solid var(--outline);
+  }
+  .hill-bg-1 { width: 220px; height: 130px; left: -30px; background: var(--hill-3); }
+  .hill-bg-2 { width: 240px; height: 140px; right: -40px; background: var(--hill-2); }
+  .hill-fg { width: 340px; height: 110px; left: 50%; transform: translateX(-50%); background: var(--hill-1); }
+
+  .hero-mascot {
+    width: 140px;
+    height: 140px;
+    position: relative;
+    z-index: 5;
+    animation: gentle-bounce 3s infinite ease-in-out;
+  }
+  @keyframes gentle-bounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-8px) scale(1.02); }
+  }
+
+  .card-content {
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .card-title {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .card-desc {
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.45;
+    margin-bottom: 16px;
+    flex: 1;
+  }
+  .btn-sample {
+    height: 52px;
+    border-radius: 18px;
+    background: var(--leaf);
+    color: #FFF;
+    font-size: 16px;
+    font-weight: 800;
+    border: 3px solid var(--outline);
+    box-shadow: 0 5px 0 var(--leaf-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .btn-sample:active {
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 var(--leaf-shadow);
+  }
+
+  /* Character Cast Shelf */
+  .shelf-section {
+    max-width: 1200px;
+    width: 100%;
+    margin-top: 40px;
+    background: #FFF;
+    border-radius: 32px;
+    border: 3.5px solid var(--outline);
+    box-shadow: 0 10px 0 rgba(45, 55, 62, 0.12);
+    padding: 28px 24px;
+  }
+  .shelf-title {
+    font-size: 24px;
+    font-weight: 900;
+    margin-bottom: 4px;
+  }
+  .shelf-sub {
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-bottom: 20px;
+  }
+  .avatar-row {
+    display: flex;
+    gap: 18px;
+    justify-content: space-around;
+    flex-wrap: wrap;
+  }
+  .avatar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .avatar-circle-box {
+    width: 86px;
+    height: 86px;
+    border-radius: 50%;
+    border: 3px solid var(--outline);
+    background: #FFF8E7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 0 rgba(45,55,62,0.15);
+    margin-bottom: 8px;
+    transition: transform 0.2s;
+  }
+  .avatar-circle-box:hover {
+    transform: scale(1.1) rotate(4deg);
+  }
+  .avatar-circle-box img {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+  }
+  .avatar-name {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--ink);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>PlayIT x Khan Academy Kids Synthesis</h1>
+  <p class="subtitle">Blending Khan Academy Kids' joyful storybook world & friendly character warmth with PlayIT's Duolingo ABC gummy depth and Filipino cultural theming.</p>
+  <div class="tag-pill">Option 3: Benchmark Profiling & Visual Synthesis</div>
+</header>
+
+<div class="grid">
+
+  <!-- Pillar 1: Friendly Co-Player Mascot -->
+  <div class="preview-card">
+    <div class="card-hero">
+      <div class="hill hill-bg-1"></div>
+      <div class="hill hill-bg-2"></div>
+      <div class="hill hill-fg"></div>
+      <img src="app/src/main/assets/images/mascot/lily_waving.png" class="hero-mascot" alt="Lily Waving">
+    </div>
+    <div class="card-content">
+      <div class="card-title">1. Emotive Co-Player Character</div>
+      <div class="card-desc">
+        Inspired by Khan Academy Kids' <strong>Kodi & Reya</strong>: Lily the Tarsier acts as a constant, warm, empathetic co-player. Features sparkling glossy eyes, endearing gestures, and positive effort praise ("Great try! Let's listen again").
+      </div>
+      <div class="btn-sample" onclick="alert('Tara na! Let\'s learn together!')">Tara na! • Let's Play</div>
+    </div>
+  </div>
+
+  <!-- Pillar 2: Storybook Winding Biomes -->
+  <div class="preview-card">
+    <div class="card-hero" style="background: linear-gradient(180deg, #FFE0B2 0%, #FFF3E0 60%, #E8F5E9 100%);">
+      <div class="hill" style="width: 200px; height: 120px; left: -20px; background: #81C784;"></div>
+      <div class="hill" style="width: 220px; height: 130px; right: -30px; background: #66BB6A;"></div>
+      <div class="hill hill-fg" style="background: #4CAF50;"></div>
+      <img src="app/src/main/assets/images/mascot/lily_pointing.png" class="hero-mascot" alt="Lily Pointing">
+    </div>
+    <div class="card-content">
+      <div class="card-title">2. Whimsical Storybook Worlds</div>
+      <div class="card-desc">
+        Transforms the 28-node journey into vibrant Philippine biomes: Chocolate Hills meadows, crayon bridges, and sunny skies with playful milestone chapter banners.
+      </div>
+      <div class="btn-sample" style="background: var(--mango); box-shadow: 0 5px 0 var(--mango-shadow);" onclick="alert('Exploring Group Chapter!')">Explore Map Path</div>
+    </div>
+  </div>
+
+  <!-- Pillar 3: Tactile Pillowy Cards & Micro-celebrations -->
+  <div class="preview-card">
+    <div class="card-hero" style="background: linear-gradient(180deg, #E1BEE7 0%, #F3E5F5 60%, #FFFFFF 100%);">
+      <div class="hill" style="width: 220px; height: 120px; left: -20px; background: #BA68C8;"></div>
+      <div class="hill" style="width: 240px; height: 130px; right: -30px; background: #AB47BC;"></div>
+      <div class="hill hill-fg" style="background: #8E24AA;"></div>
+      <img src="app/src/main/assets/images/mascot/lily_celebrating.png" class="hero-mascot" alt="Lily Celebrating">
+    </div>
+    <div class="card-content">
+      <div class="card-title">3. Tactile Feedback & Delights</div>
+      <div class="card-desc">
+        Combines Duolingo ABC's chunky 4dp tactile bounce with Khan Academy Kids' rewarding celebration bursts, gold star drops, and confetti celebrations upon completing sounds.
+      </div>
+      <div class="btn-sample" style="background: var(--ube); box-shadow: 0 5px 0 #5E35B1;" onclick="alert('Stars collected!')">Claim Stars</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Companion Animal Cast Shelf -->
+<div class="shelf-section">
+  <div class="shelf-title">Curated Companion Animal Cast</div>
+  <div class="shelf-sub">Six friendly animal companions designed with Khan Academy Kids' approachable charm</div>
+  
+  <div class="avatar-row">
+    <div class="avatar-item">
+      <div class="avatar-circle-box" style="background: #FFF3E0;"><img src="app/src/main/assets/images/mascot/avatar_01.png" alt="Cat"></div>
+      <div class="avatar-name">Cat (Pusa)</div>
+    </div>
+    <div class="avatar-item">
+      <div class="avatar-circle-box" style="background: #EFEBE9;"><img src="app/src/main/assets/images/mascot/avatar_02.png" alt="Monkey"></div>
+      <div class="avatar-name">Monkey (Unggoy)</div>
+    </div>
+    <div class="avatar-item">
+      <div class="avatar-circle-box" style="background: #FCE4EC;"><img src="app/src/main/assets/images/mascot/avatar_03.png" alt="Bunny"></div>
+      <div class="avatar-name">Bunny (Kuneho)</div>
+    </div>
+    <div class="avatar-item">
+      <div class="avatar-circle-box" style="background: #FFF8E1;"><img src="app/src/main/assets/images/mascot/avatar_04.png" alt="Bear"></div>
+      <div class="avatar-name">Bear (Oso)</div>
+    </div>
+    <div class="avatar-item">
+      <div class="avatar-circle-box" style="background: #E8F5E9;"><img src="app/src/main/assets/images/mascot/avatar_05.png" alt="Frog"></div>
+      <div class="avatar-name">Frog (Palaka)</div>
+    </div>
+    <div class="avatar-item">
+      <div class="avatar-circle-box" style="background: #EDE7F6;"><img src="app/src/main/assets/images/mascot/avatar_06.png" alt="Owl"></div>
+      <div class="avatar-name">Owl (Kuwago)</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

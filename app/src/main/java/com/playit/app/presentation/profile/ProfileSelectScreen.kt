@@ -40,6 +40,9 @@ fun ProfileSelectScreen(
     }
 
     if (showArithmeticGuard) {
+        LaunchedEffect(Unit) {
+            viewModel.playParentGateAudio()
+        }
         ArithmeticGuardDialog(
             onPass = {
                 viewModel.onArithmeticGuardPassed()

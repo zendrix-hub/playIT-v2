@@ -73,6 +73,14 @@ class ProfileViewModel @Inject constructor(
         audioPlayer.playAssetAudio(audioResolver.getVoPath(VoContext.WELCOME_01))
     }
 
+    fun playNamePromptIntro() {
+        audioPlayer.playAssetAudio(audioResolver.getVoPath(VoContext.NAMEPROMPT_INTRO))
+    }
+
+    fun playParentGateAudio() {
+        audioPlayer.playAssetAudio(audioResolver.getVoPath(VoContext.PARENT_GATE))
+    }
+
     fun createProfile(name: String, avatarResId: Int) {
         val trimmedName = name.trim()
         if (trimmedName.isBlank()) {
