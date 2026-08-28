@@ -1,9 +1,14 @@
 package com.playit.app.data.audio
 
 import android.content.Context
+import android.media.AudioAttributes
 import android.media.MediaPlayer
+import android.media.SoundPool
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -18,6 +23,51 @@ class AudioPlayer @Inject constructor(
     private var mediaPlayer: MediaPlayer? = null
     private var isSequencePlaying = false
 
+    private val soundPool: SoundPool by lazy {
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_GAME)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .build()
+        SoundPool.Builder()
+            .setMaxStreams(6)
+            .setAudioAttributes(audioAttributes)
+            .build()
+    }
+
+    private val sfxSoundIdCache = ConcurrentHashMap<String, Int>()
+
+    init {
+        preloadCommonSfx()
+    }
+
+    /**
+     * Pre-loads all standard SFX into SoundPool memory for 0ms latency hardware playback.
+     */
+    private fun preloadCommonSfx() {
+        try {
+            SfxEvent.values().forEach { event ->
+                val sfxPath = audioResolver.getSfxPath(event)
+                loadSoundIntoPool(sfxPath)
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to preload some SFX assets into SoundPool", e)
+        }
+    }
+
+    private fun loadSoundIntoPool(assetPath: String): Int? {
+        sfxSoundIdCache[assetPath]?.let { return it }
+        return try {
+            val afd = context.assets.openFd(assetPath)
+            val soundId = soundPool.load(afd.fileDescriptor, afd.startOffset, afd.length, 1)
+            afd.close()
+            sfxSoundIdCache[assetPath] = soundId
+            soundId
+        } catch (e: Exception) {
+            Log.e(TAG, "Error loading SFX into SoundPool: $assetPath", e)
+            null
+        }
+    }
+
     /**
      * When set to true, audio playback falls back to audible dev placeholders
      * in `assets/audio/_dev_placeholder/` while emitting loud debug logs.
@@ -25,8 +75,27 @@ class AudioPlayer @Inject constructor(
     var useDevPlaceholders: Boolean = false
 
     /**
+     * Plays an SFX event instantly with zero latency via SoundPool.
+     */
+    @Synchronized
+    fun playSfx(event: SfxEvent, onComplete: (() -> Unit)? = null) {
+        val path = audioResolver.getSfxPath(event)
+        playSfxInternal(path, onComplete)
+    }
+
+    private fun playSfxInternal(assetPath: String, onComplete: (() -> Unit)? = null) {
+        val soundId = sfxSoundIdCache[assetPath] ?: loadSoundIntoPool(assetPath)
+        if (soundId != null && soundId > 0) {
+            soundPool.play(soundId, 1.0f, 1.0f, 1, 0, 1.0f)
+            onComplete?.invoke()
+        } else {
+            playWithMediaPlayer(assetPath, onComplete)
+        }
+    }
+
+    /**
      * Plays a single asset file safely.
-     * Reuses / resets the MediaPlayer instance cleanly to support rapid replay tapping.
+     * Routes SFX to SoundPool for zero latency, and VO / speech to MediaPlayer.
      */
     @Synchronized
     fun playAssetAudio(assetPath: String, onComplete: (() -> Unit)? = null) {
@@ -37,12 +106,21 @@ class AudioPlayer @Inject constructor(
 
         val targetPath = if (useDevPlaceholders && !assetPath.startsWith("audio/_dev_placeholder/")) {
             val devPath = audioResolver.getDevPlaceholderForAsset(assetPath)
-            Log.w(TAG, "🚨 DEV PLACEHOLDER AUDIO ACTIVE: Playing dev placeholder '$devPath' for production asset '$assetPath'")
+            Log.w(TAG, "DEV PLACEHOLDER AUDIO ACTIVE: Playing dev placeholder '$devPath' for production asset '$assetPath'")
             devPath
         } else {
             assetPath
         }
 
+        if (targetPath.contains("/sfx_") || targetPath.startsWith("audio/ui/sfx_")) {
+            playSfxInternal(targetPath, onComplete)
+            return
+        }
+
+        playWithMediaPlayer(targetPath, onComplete)
+    }
+
+    private fun playWithMediaPlayer(targetPath: String, onComplete: (() -> Unit)?) {
         stopInternal()
 
         try {
@@ -78,7 +156,7 @@ class AudioPlayer @Inject constructor(
     @Synchronized
     fun playDevPlaceholder(category: DevAudioCategory, onComplete: (() -> Unit)? = null) {
         val devPath = audioResolver.getDevPlaceholderPath(category)
-        Log.w(TAG, "🚨 DEV PLACEHOLDER AUDIO ACTIVE: Playing category dev placeholder '$devPath' (${category.name})")
+        Log.w(TAG, "DEV PLACEHOLDER AUDIO ACTIVE: Playing category dev placeholder '$devPath' (${category.name})")
         playAssetAudio(devPath, onComplete)
     }
 
@@ -104,8 +182,20 @@ class AudioPlayer @Inject constructor(
             return
         }
 
-        playAssetAudio(paths[index]) {
-            playNextInSequence(paths, index + 1, onComplete)
+        val currentPath = paths[index]
+        val isSfx = currentPath.contains("/sfx_") || currentPath.startsWith("audio/ui/sfx_")
+
+        if (isSfx && index + 1 < paths.size) {
+            playSfxInternal(currentPath)
+            Handler(Looper.getMainLooper()).postDelayed({
+                if (isSequencePlaying) {
+                    playNextInSequence(paths, index + 1, onComplete)
+                }
+            }, 300L)
+        } else {
+            playAssetAudio(currentPath) {
+                playNextInSequence(paths, index + 1, onComplete)
+            }
         }
     }
 
@@ -142,5 +232,9 @@ class AudioPlayer @Inject constructor(
             mediaPlayer?.release()
         } catch (_: Exception) {}
         mediaPlayer = null
+        try {
+            soundPool.release()
+        } catch (_: Exception) {}
+        sfxSoundIdCache.clear()
     }
 }
