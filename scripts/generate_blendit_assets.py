@@ -1,763 +1,739 @@
 """
-PlayIT Blend It Assets Generator — 4-Benchmark Synthesis (Human & Kid-Friendly Redesign)
-Generates high-definition, 100% transparent vector illustrations for all 32 Blend It words.
-Redesigned with rich pediatric clarity:
-- BAT: Cute storybook flying fruit bat with purple wings, big glossy eyes & friendly smile
-- DRAW: Hand holding a chunky red crayon actively drawing a colorful rainbow & sun doodle
-- FACE: Lovable human child's face with hair bangs, ears, eyebrows, nose & warm smile
-- GAP: Stepping stones over water with a cute frog leaping across the clear gap
-- HAND: Anatomically clear 5-finger cartoon child's hand waving in greeting
-- MAT: Cozy woven floor mat with a cute pair of red toddler slippers resting on it
-- NAP: Sweet child sleeping peacefully in bed tucked under a cozy blanket with Zzz
-- SAM: Full-body cheerful boy character with spiky hair, blue shirt & waving hand
-- SIS: Full-body cheerful girl character with pigtail ribbons, yellow dress & waving hand
+Master PlayIT Blend It Assets Generator — Complete 33-Word Concrete Bank (Final Polish)
 """
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 import math
 import os
 
 SIZE = 512
-SCALE = 2
+SCALE = 3
 W = SIZE * SCALE
 H = SIZE * SCALE
 
-# Standard Palette
-DARK_OUTLINE = (45, 55, 62, 255)       # #2D373E Slate Charcoal
+DARK = (45, 55, 62, 255)            # #2D373E Slate Charcoal
 WHITE = (255, 255, 255, 255)
-PINK_CHEEK = (255, 140, 140, 220)      # Khan Rosy Blush
-MANGO = (250, 123, 40, 255)           # #FA7B28 Warm Orange
-CREAM = (255, 238, 215, 255)          # Soft Skin / Tummy Cream
-SKIN_TONE = (255, 224, 189, 255)      # Warm Human Skin Tone
-GOLD_SUN = (255, 204, 0, 255)         # Bright Sunny Yellow
-GOLD_DARK = (245, 166, 35, 255)
-LEAF_GREEN = (76, 175, 80, 255)       # Fresh Green
-SKY_BLUE = (56, 189, 248, 255)        # Clean Sky Blue
-OCEAN_BLUE = (2, 132, 199, 255)
-UBE_PURPLE = (139, 95, 191, 255)      # Royal Ube
-GUAVA_RED = (255, 90, 110, 255)       # Warm Red / Guava
-WOOD_BROWN = (180, 115, 65, 255)
-WOOD_DARK = (130, 80, 45, 255)
+PINK_BLUSH = (255, 145, 155, 230)   # Rosy Cheek
+SKIN = (255, 222, 192, 255)         # Warm Toddler Skin
+HAIR_BROWN = (165, 100, 50, 255)    # Chestnut Hair
+HAIR_DARK = (115, 65, 30, 255)
+GOLD = (255, 204, 0, 255)           # Sunny Yellow
+ORANGE = (250, 125, 40, 255)        # Mango Orange
+RED = (255, 90, 110, 255)           # Guava Red
+BLUE_SKY = (56, 189, 248, 255)      # Sky Blue
+GREEN = (76, 175, 80, 255)          # Fresh Green
+PURPLE = (145, 100, 195, 255)       # Royal Ube
+CREAM = (255, 242, 225, 255)
+WOOD = (185, 120, 70, 255)
 
-def draw_thick_line(draw, start, end, color=DARK_OUTLINE, width=20):
-    draw.line([start, end], fill=color, width=width, joint="curve")
+def stroke_layer(layer_img, stroke_width=14, stroke_color=DARK):
+    alpha = layer_img.getchannel("A")
+    dilated = alpha.filter(ImageFilter.MaxFilter(stroke_width * 2 + 1))
+    stroke_img = Image.new("RGBA", layer_img.size, stroke_color)
+    stroke_img.putalpha(dilated)
+    stroke_img.alpha_composite(layer_img)
+    return stroke_img
 
-def draw_face(draw, cx, cy, eye_spacing=65, eye_y_offset=0, eye_r=24, smile_w=70, smile_h=40, blush=True):
-    eye_y = cy + eye_y_offset
-    for ex in [cx - eye_spacing, cx + eye_spacing]:
-        draw.ellipse([ex - eye_r, eye_y - eye_r, ex + eye_r, eye_y + eye_r], fill=DARK_OUTLINE)
-        draw.ellipse([ex - 8 - 7, eye_y - 8 - 7, ex - 8 + 7, eye_y - 8 + 7], fill=WHITE)
-        draw.ellipse([ex + 6 - 3, eye_y + 6 - 3, ex + 6 + 3, eye_y + 6 + 3], fill=WHITE)
-    if blush:
-        draw.ellipse([cx - eye_spacing - 35 - 20, eye_y + 20 - 12, cx - eye_spacing - 35 + 20, eye_y + 20 + 12], fill=PINK_CHEEK)
-        draw.ellipse([cx + eye_spacing + 35 - 20, eye_y + 20 - 12, cx + eye_spacing + 35 + 20, eye_y + 20 + 12], fill=PINK_CHEEK)
-    draw.arc([cx - smile_w/2, eye_y + 5, cx + smile_w/2, eye_y + 5 + smile_h], start=10, end=170, fill=DARK_OUTLINE, width=14)
+def draw_glossy_eyes(draw, lx, ly, rx, ry, r=40):
+    for (ex, ey) in [(lx, ly), (rx, ry)]:
+        draw.ellipse([ex - r, ey - r, ex + r, ey + r], fill=DARK)
+        cr1 = r * 0.38
+        draw.ellipse([ex - r*0.35 - cr1, ey - r*0.35 - cr1, ex - r*0.35 + cr1, ey - r*0.35 + cr1], fill=WHITE)
+        cr2 = r * 0.18
+        draw.ellipse([ex + r*0.35 - cr2, ey + r*0.35 - cr2, ex + r*0.35 + cr2, ey + r*0.35 + cr2], fill=WHITE)
 
-# ── Redesigned Kid-Friendly & Human Illustrators ──────────────────────────────
+def draw_blush(draw, lx, ly, rx, ry, rw=48, rh=28):
+    for (cx, cy) in [(lx, ly), (rx, ry)]:
+        draw.ellipse([cx - rw, cy - rh, cx + rw, cy + rh], fill=PINK_BLUSH)
 
-def draw_bat():
-    """Cute storybook nocturnal bat with purple wings, big glossy eyes, rosy cheeks & little smile."""
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2 + 20
-
-    # Scalloped Wings Left & Right
-    # Left Wing
-    l_wing = [
-        (cx - 50, cy + 60),
-        (cx - 380, cy - 140),
-        (cx - 300, cy + 30),
-        (cx - 220, cy + 140),
-        (cx - 120, cy + 160),
-        (cx - 50, cy + 100)
-    ]
-    draw.polygon(l_wing, fill=UBE_PURPLE, outline=DARK_OUTLINE)
-    for i in range(len(l_wing)-1):
-        draw_thick_line(draw, l_wing[i], l_wing[i+1], DARK_OUTLINE, 20)
-
-    # Right Wing
-    r_wing = [
-        (cx + 50, cy + 60),
-        (cx + 380, cy - 140),
-        (cx + 300, cy + 30),
-        (cx + 220, cy + 140),
-        (cx + 120, cy + 160),
-        (cx + 50, cy + 100)
-    ]
-    draw.polygon(r_wing, fill=UBE_PURPLE, outline=DARK_OUTLINE)
-    for i in range(len(r_wing)-1):
-        draw_thick_line(draw, r_wing[i], r_wing[i+1], DARK_OUTLINE, 20)
-
-    # Pointy Ears
-    draw.polygon([(cx - 140, cy - 60), (cx - 100, cy - 240), (cx - 20, cy - 120)], fill=UBE_PURPLE, outline=DARK_OUTLINE)
-    draw.polygon([(cx - 120, cy - 70), (cx - 100, cy - 200), (cx - 40, cy - 110)], fill=PINK_CHEEK)
-    draw.polygon([(cx + 140, cy - 60), (cx + 100, cy - 240), (cx + 20, cy - 120)], fill=UBE_PURPLE, outline=DARK_OUTLINE)
-    draw.polygon([(cx + 120, cy - 70), (cx + 100, cy - 200), (cx + 40, cy - 110)], fill=PINK_CHEEK)
-
-    # Bat Body & Head (Pear shape)
-    draw.ellipse([cx - 160, cy - 120, cx + 160, cy + 200], fill=UBE_PURPLE, outline=DARK_OUTLINE, width=22)
-    draw.ellipse([cx - 100, cy + 20, cx + 100, cy + 180], fill=CREAM)
-
-    # Cute Face
-    draw.ellipse([cx - 65 - 24, cy - 24, cx - 65 + 24, cy + 24], fill=DARK_OUTLINE)
-    draw.ellipse([cx + 65 - 24, cy - 24, cx + 65 + 24, cy + 24], fill=DARK_OUTLINE)
-    draw.ellipse([cx - 72, cy - 16, cx - 58, cy - 2], fill=WHITE)
-    draw.ellipse([cx + 58, cy - 16, cx + 72, cy - 2], fill=WHITE)
-    # Rosy Cheeks
-    draw.ellipse([cx - 120, cy + 15, cx - 70, cy + 45], fill=PINK_CHEEK)
-    draw.ellipse([cx + 70, cy + 15, cx + 120, cy + 45], fill=PINK_CHEEK)
-    # Smile & Tiny Fangs
-    draw.arc([cx - 45, cy + 10, cx + 45, cy + 70], 10, 170, fill=DARK_OUTLINE, width=14)
-    draw.polygon([(cx - 20, cy + 45), (cx - 10, cy + 45), (cx - 15, cy + 65)], fill=WHITE, outline=DARK_OUTLINE)
-    draw.polygon([(cx + 10, cy + 45), (cx + 20, cy + 45), (cx + 15, cy + 65)], fill=WHITE, outline=DARK_OUTLINE)
-
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-def draw_draw():
-    """A child's hand gripping a bright red crayon actively drawing a colorful rainbow & sun doodle."""
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2
-
-    # Drawing Paper Sheet
-    draw.rounded_rectangle([cx - 300, cy - 260, cx + 220, cy + 260], radius=35, fill=WHITE, outline=DARK_OUTLINE, width=22)
-
-    # Rainbow Doodle on Paper
-    draw.arc([cx - 260, cy - 180, cx + 60, cy + 140], 180, 360, fill=GUAVA_RED, width=20)
-    draw.arc([cx - 230, cy - 150, cx + 30, cy + 110], 180, 360, fill=GOLD_SUN, width=20)
-    draw.arc([cx - 200, cy - 120, cx, cy + 80], 180, 360, fill=SKY_BLUE, width=20)
-
-    # Happy Little Sun Doodle
-    sx, sy = cx - 180, cy - 140
-    draw.ellipse([sx - 40, sy - 40, sx + 40, sy + 40], fill=GOLD_SUN, outline=DARK_OUTLINE, width=10)
-
-    # Chunky Red Crayon angled across the page
-    cr_start = (cx + 150, cy + 180)
-    cr_end = (cx - 20, cy + 20)
-    draw_thick_line(draw, cr_start, cr_end, DARK_OUTLINE, 64)
-    draw_thick_line(draw, cr_start, cr_end, GUAVA_RED, 48)
-    # Crayon Wrapper Label
-    draw_thick_line(draw, (cx + 90, cy + 120), (cx + 40, cy + 70), GOLD_SUN, 48)
-    # Crayon Tip Point
-    draw.polygon([(cx - 20, cy + 20), (cx - 60, cy - 10), (cx - 5, cy - 25)], fill=GUAVA_RED, outline=DARK_OUTLINE)
-
-    # Child's Hand gripping the crayon
-    hx, hy = cx + 80, cy + 100
-    draw.ellipse([hx - 70, hy - 60, hx + 70, hy + 60], fill=SKIN_TONE, outline=DARK_OUTLINE, width=18)
-    for fx in [-30, 0, 30]:
-        draw.ellipse([hx + fx - 22, hy - 80, hx + fx + 22, hy - 20], fill=SKIN_TONE, outline=DARK_OUTLINE, width=14)
-
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-def draw_face_asset():
-    """Lovable human child's face with cute hair bangs, ears, eyebrows, button nose & warm smile."""
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2
-
-    # Ears Left & Right
-    draw.ellipse([cx - 260, cy - 40, cx - 180, cy + 60], fill=SKIN_TONE, outline=DARK_OUTLINE, width=18)
-    draw.ellipse([cx + 180, cy - 40, cx + 260, cy + 60], fill=SKIN_TONE, outline=DARK_OUTLINE, width=18)
-
-    # Hair Back
-    draw.ellipse([cx - 240, cy - 260, cx + 240, cy + 120], fill=WOOD_BROWN, outline=DARK_OUTLINE, width=22)
-
-    # Child Face Head Oval
-    draw.ellipse([cx - 220, cy - 180, cx + 220, cy + 220], fill=SKIN_TONE, outline=DARK_OUTLINE, width=22)
-
-    # Hair Front / Bangs
-    draw.polygon([(cx - 220, cy - 120), (cx - 140, cy - 20), (cx - 60, cy - 90), (cx + 20, cy - 20), (cx + 120, cy - 80), (cx + 220, cy - 120), (cx + 180, cy - 240), (cx - 180, cy - 240)], fill=WOOD_BROWN, outline=DARK_OUTLINE)
-
-    # Eyebrows
-    draw_thick_line(draw, (cx - 120, cy - 60), (cx - 50, cy - 70), WOOD_DARK, 14)
-    draw_thick_line(draw, (cx + 50, cy - 70), (cx + 120, cy - 60), WOOD_DARK, 14)
-
-    # Big Expressive Eyes with Highlights
-    draw.ellipse([cx - 85 - 28, cy - 20 - 28, cx - 85 + 28, cy - 20 + 28], fill=DARK_OUTLINE)
-    draw.ellipse([cx + 85 - 28, cy - 20 - 28, cx + 85 + 28, cy - 20 + 28], fill=DARK_OUTLINE)
-    draw.ellipse([cx - 95, cy - 30, cx - 75, cy - 10], fill=WHITE)
-    draw.ellipse([cx + 75, cy - 30, cx + 95, cy - 10], fill=WHITE)
-
-    # Rosy Cheeks
-    draw.ellipse([cx - 165, cy + 30, cx - 105, cy + 70], fill=PINK_CHEEK)
-    draw.ellipse([cx + 105, cy + 30, cx + 165, cy + 70], fill=PINK_CHEEK)
-
-    # Button Nose
-    draw.arc([cx - 20, cy + 10, cx + 20, cy + 40], 0, 180, fill=DARK_OUTLINE, width=12)
-
-    # Cheerful Open Smile
-    draw.chord([cx - 65, cy + 60, cx + 65, cy + 150], 0, 180, fill=(235, 87, 87, 255), outline=DARK_OUTLINE, width=16)
-
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-def draw_gap():
-    """Two green stepping platforms across a sparkling blue stream with a cute frog leaping the GAP."""
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2
-
-    # Sparkling Blue Water at bottom
-    draw.rounded_rectangle([cx - 360, cy + 100, cx + 360, cy + 280], radius=40, fill=SKY_BLUE, outline=DARK_OUTLINE, width=20)
-    draw_thick_line(draw, (cx - 160, cy + 190), (cx - 40, cy + 190), WHITE, 12)
-    draw_thick_line(draw, (cx + 60, cy + 220), (cx + 180, cy + 220), WHITE, 12)
-
-    # Left Stepping Platform
-    draw.rounded_rectangle([cx - 340, cy - 40, cx - 90, cy + 240], radius=35, fill=LEAF_GREEN, outline=DARK_OUTLINE, width=22)
-    draw.rounded_rectangle([cx - 320, cy - 20, cx - 110, cy + 40], radius=20, fill=(120, 205, 90, 255))
-
-    # Right Stepping Platform (Clear Visible GAP in between)
-    draw.rounded_rectangle([cx + 90, cy - 40, cx + 340, cy + 240], radius=35, fill=LEAF_GREEN, outline=DARK_OUTLINE, width=22)
-    draw.rounded_rectangle([cx + 110, cy - 20, cx + 320, cy + 40], radius=20, fill=(120, 205, 90, 255))
-
-    # Dashed Leap Arc over the Gap
-    for a in range(200, 340, 25):
-        rad = math.radians(a)
-        px = cx + 120 * math.cos(rad)
-        py = cy - 40 + 80 * math.sin(rad)
-        draw.ellipse([px - 8, py - 8, px + 8, py + 8], fill=GOLD_SUN)
-
-    # Cute Little Green Frog Mid-Leap in the Air
-    fx, fy = cx, cy - 140
-    # Frog Body
-    draw.ellipse([fx - 80, fy - 60, fx + 80, fy + 60], fill=LEAF_GREEN, outline=DARK_OUTLINE, width=16)
-    # Frog Eye Domes
-    draw.ellipse([fx - 65, fy - 105, fx - 15, fy - 45], fill=LEAF_GREEN, outline=DARK_OUTLINE, width=12)
-    draw.ellipse([fx + 15, fy - 105, fx + 65, fy - 45], fill=LEAF_GREEN, outline=DARK_OUTLINE, width=12)
-    draw.ellipse([fx - 50, fy - 85, fx - 30, fy - 65], fill=DARK_OUTLINE)
-    draw.ellipse([fx + 30, fy - 85, fx + 50, fy - 65], fill=DARK_OUTLINE)
-    draw.arc([fx - 35, fy - 10, fx + 35, fy + 30], 10, 170, fill=DARK_OUTLINE, width=10)
-
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-def draw_hand():
-    """Anatomically clear 5-finger cartoon child's hand waving in greeting with palm creases."""
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2 + 20
-
-    # Wrist / Arm Base
-    draw.rounded_rectangle([cx - 95, cy + 120, cx + 95, cy + 280], radius=35, fill=SKIN_TONE, outline=DARK_OUTLINE, width=22)
-
-    # Main Palm
-    draw.ellipse([cx - 160, cy - 70, cx + 160, cy + 180], fill=SKIN_TONE, outline=DARK_OUTLINE, width=22)
-
-    # 4 Straight Fingers (Pinky, Ring, Middle, Index)
-    fingers = [
-        (-105, -170, 48, 170),   # Pinky
-        (-40, -240, 54, 220),    # Ring
-        (30, -260, 56, 240),     # Middle
-        (95, -220, 54, 210),     # Index
-    ]
-    for (fx, fy, fw, fh) in fingers:
-        draw.rounded_rectangle([cx + fx - fw/2, cy + fy, cx + fx + fw/2, cy + fy + fh], radius=int(fw/2), fill=SKIN_TONE, outline=DARK_OUTLINE, width=18)
-
-    # Thumb spread out to the right
-    draw.rounded_rectangle([cx + 110, cy - 20, cx + 240, cy + 60], radius=30, fill=SKIN_TONE, outline=DARK_OUTLINE, width=18)
-
-    # Palm Heart / Life Creases
-    draw.arc([cx - 80, cy + 10, cx + 40, cy + 110], 20, 140, fill=PINK_CHEEK, width=10)
-    draw.arc([cx - 20, cy + 20, cx + 90, cy + 120], 30, 150, fill=PINK_CHEEK, width=10)
-
-    # Cheerful Waving Motion Lines
-    draw.arc([cx - 240, cy - 240, cx - 180, cy - 100], 110, 250, fill=SKY_BLUE, width=14)
-    draw.arc([cx + 180, cy - 240, cx + 240, cy - 100], 290, 70, fill=SKY_BLUE, width=14)
-
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-def draw_mat():
-    """Cozy woven floor welcome mat with a cute pair of red toddler slippers resting on it."""
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2
-
-    # Woven Floor Mat Base
-    draw.rounded_rectangle([cx - 300, cy - 180, cx + 300, cy + 180], radius=40, fill=GOLD_SUN, outline=DARK_OUTLINE, width=22)
-    # Mat Fringe / Border Stripes
-    draw.rounded_rectangle([cx - 260, cy - 140, cx + 260, cy + 140], radius=25, fill=CREAM, outline=DARK_OUTLINE, width=14)
-    for x in range(-200, 240, 70):
-        draw_thick_line(draw, (cx + x, cy - 130), (cx + x, cy + 130), MANGO, 10)
-
-    # Cute Pair of Red Toddler Slippers resting on the Mat
-    # Left Slipper
-    lx, ly = cx - 90, cy + 10
-    draw.rounded_rectangle([lx - 55, ly - 90, lx + 55, ly + 80], radius=35, fill=GUAVA_RED, outline=DARK_OUTLINE, width=16)
-    draw.ellipse([lx - 40, ly - 70, lx + 40, ly - 10], fill=WHITE, outline=DARK_OUTLINE, width=10)
-
-    # Right Slipper
-    rx, ry = cx + 90, cy + 10
-    draw.rounded_rectangle([rx - 55, ry - 90, rx + 55, ry + 80], radius=35, fill=GUAVA_RED, outline=DARK_OUTLINE, width=16)
-    draw.ellipse([rx - 40, ry - 70, rx + 40, ry - 10], fill=WHITE, outline=DARK_OUTLINE, width=10)
-
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-def draw_nap():
-    """Sweet child sleeping peacefully in bed tucked under a cozy blanket with Zzz bubbles."""
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2 + 20
-
-    # Wooden Bed Frame
-    draw.rounded_rectangle([cx - 320, cy - 100, cx + 320, cy + 240], radius=40, fill=WOOD_BROWN, outline=DARK_OUTLINE, width=22)
-
-    # Fluffy White Pillow
-    draw.rounded_rectangle([cx - 240, cy - 160, cx + 240, cy + 20], radius=45, fill=WHITE, outline=DARK_OUTLINE, width=18)
-
-    # Child's Sleeping Head resting on pillow
-    hx, hy = cx - 30, cy - 70
-    draw.ellipse([hx - 110, hy - 90, hx + 110, hy + 90], fill=SKIN_TONE, outline=DARK_OUTLINE, width=18)
-    # Hair
-    draw.arc([hx - 110, hy - 100, hx + 110, hy], 180, 360, fill=WOOD_BROWN, width=45)
-    # Peaceful Closed Sleeping Eyes
-    draw.arc([hx - 65, hy - 10, hx - 15, hy + 30], 10, 170, fill=DARK_OUTLINE, width=12)
-    draw.arc([hx + 15, hy - 10, hx + 65, hy + 30], 10, 170, fill=DARK_OUTLINE, width=12)
-    draw.ellipse([hx - 70, hy + 25, hx - 30, hy + 50], fill=PINK_CHEEK)
-    draw.ellipse([hx + 30, hy + 25, hx + 70, hy + 50], fill=PINK_CHEEK)
-    draw.arc([hx - 25, hy + 25, hx + 25, hy + 60], 10, 170, fill=DARK_OUTLINE, width=10)
-
-    # Cozy Polka-Dot Blanket Tucked In
-    draw.rounded_rectangle([cx - 300, cy - 20, cx + 300, cy + 220], radius=35, fill=SKY_BLUE, outline=DARK_OUTLINE, width=22)
-    draw.rounded_rectangle([cx - 300, cy - 20, cx + 300, cy + 50], radius=20, fill=GOLD_SUN, outline=DARK_OUTLINE, width=14)
-    # Blanket Polka-dots
-    for px in [-200, -100, 0, 100, 200]:
-        draw.ellipse([cx + px - 18, cy + 120, cx + px + 18, cy + 156], fill=WHITE)
-
-    # Peaceful ZZZ Bubbles floating up
-    for (zx, zy, sz) in [(cx + 170, cy - 140, "z"), (cx + 230, cy - 210, "Z")]:
-        draw.text((zx, zy), sz, fill=UBE_PURPLE)
-
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+# ── GROUP 1 (M, S, A, I) ─────────────────────────────────────────────────────
 
 def draw_sam():
-    """Full-body cheerful boy character Sam in blue t-shirt & shorts waving enthusiastically."""
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2 + 20
+    canvas = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    cx, cy = W/2 - 30, H/2 + 70
+    arm_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    ad = ImageDraw.Draw(arm_layer)
+    ad.line([(cx + 120, cy + 120), (cx + 310, cy - 80)], fill=SKIN, width=120, joint="curve")
+    hx, hy = cx + 330, cy - 100
+    ad.ellipse([hx - 70, hy - 70, hx + 70, hy + 70], fill=SKIN)
+    ad.rounded_rectangle([hx - 40, hy - 140, hx + 40, hy - 30], radius=35, fill=SKIN)
+    ad.rounded_rectangle([hx - 90, hy - 120, hx - 20, hy - 20], radius=30, fill=SKIN)
+    ad.rounded_rectangle([hx + 10, hy - 120, hx + 80, hy - 20], radius=30, fill=SKIN)
+    ad.rounded_rectangle([hx - 120, hy - 30, hx - 30, hy + 40], radius=30, fill=SKIN)
+    canvas.alpha_composite(stroke_layer(arm_layer, stroke_width=14, stroke_color=DARK))
 
-    # Legs & Shoes
-    draw_thick_line(draw, (cx - 50, cy + 140), (cx - 50, cy + 220), SKIN_TONE, 32)
-    draw_thick_line(draw, (cx + 50, cy + 140), (cx + 50, cy + 220), SKIN_TONE, 32)
-    draw.rounded_rectangle([cx - 85, cy + 220, cx - 15, cy + 260], radius=18, fill=GUAVA_RED, outline=DARK_OUTLINE, width=14)
-    draw.rounded_rectangle([cx + 15, cy + 220, cx + 85, cy + 260], radius=18, fill=GUAVA_RED, outline=DARK_OUTLINE, width=14)
+    body_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    bd = ImageDraw.Draw(body_layer)
+    bd.rounded_rectangle([cx - 210, cy + 80, cx + 210, cy + 420], radius=70, fill=BLUE_SKY)
+    canvas.alpha_composite(stroke_layer(body_layer, stroke_width=14, stroke_color=DARK))
 
-    # Blue T-Shirt & Shorts
-    draw.rounded_rectangle([cx - 70, cy + 90, cx + 70, cy + 160], radius=16, fill=WOOD_BROWN, outline=DARK_OUTLINE, width=16)
-    draw.rounded_rectangle([cx - 95, cy - 20, cx + 95, cy + 110], radius=28, fill=SKY_BLUE, outline=DARK_OUTLINE, width=20)
+    draw = ImageDraw.Draw(canvas)
+    draw.rounded_rectangle([cx - 190, cy + 170, cx + 190, cy + 230], radius=20, fill=WHITE)
+    draw.rounded_rectangle([cx - 190, cy + 280, cx + 190, cy + 340], radius=20, fill=WHITE)
 
-    # Arms: Left arm on hip, Right arm waving high
-    draw_thick_line(draw, (cx - 85, cy), (cx - 150, cy + 60), SKIN_TONE, 32)
-    draw.ellipse([cx - 170, cy + 45, cx - 130, cy + 85], fill=SKIN_TONE, outline=DARK_OUTLINE, width=12)
+    neck = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    nd = ImageDraw.Draw(neck)
+    nd.rounded_rectangle([cx - 65, cy + 20, cx + 65, cy + 110], radius=25, fill=SKIN)
+    canvas.alpha_composite(stroke_layer(neck, stroke_width=12, stroke_color=DARK))
 
-    draw_thick_line(draw, (cx + 85, cy), (cx + 160, cy - 80), SKIN_TONE, 32)
-    draw.ellipse([cx + 140, cy - 120, cx + 195, cy - 65], fill=SKIN_TONE, outline=DARK_OUTLINE, width=12)
+    head_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    hd = ImageDraw.Draw(head_layer)
+    bx, by = cx, cy - 150
+    hd.ellipse([bx - 280, by - 50, bx - 170, by + 60], fill=SKIN)
+    hd.ellipse([bx + 170, by - 50, bx + 280, by + 60], fill=SKIN)
+    hd.ellipse([bx - 230, by - 200, bx + 230, by + 200], fill=SKIN)
+    canvas.alpha_composite(stroke_layer(head_layer, stroke_width=14, stroke_color=DARK))
 
-    # Head & Spiky Hair
-    hx, hy = cx, cy - 130
-    draw.ellipse([hx - 110, hy - 110, hx + 110, hy + 110], fill=SKIN_TONE, outline=DARK_OUTLINE, width=20)
-    # Spiky Brown Hair
-    draw.polygon([(hx - 110, hy - 40), (hx - 90, hy - 150), (hx - 30, hy - 180), (hx + 30, hy - 180), (hx + 90, hy - 150), (hx + 110, hy - 40), (hx + 70, hy - 70), (hx, hy - 100), (hx - 70, hy - 70)], fill=WOOD_BROWN, outline=DARK_OUTLINE)
+    hair = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    hrd = ImageDraw.Draw(hair)
+    for (hx, hy, hr) in [
+        (bx - 170, by - 150, 120), (bx - 90, by - 220, 130),
+        (bx, by - 240, 140), (bx + 90, by - 220, 130),
+        (bx + 170, by - 150, 120), (bx - 90, by - 110, 110),
+        (bx + 60, by - 100, 110), (bx + 150, by - 90, 95)
+    ]:
+        hrd.ellipse([hx - hr, hy - hr, hx + hr, hy + hr], fill=HAIR_BROWN)
+    canvas.alpha_composite(stroke_layer(hair, stroke_width=14, stroke_color=DARK))
 
-    # Cute Face
-    draw.ellipse([hx - 45 - 18, hy - 10 - 18, hx - 45 + 18, hy - 10 + 18], fill=DARK_OUTLINE)
-    draw.ellipse([hx + 45 - 18, hy - 10 - 18, hx + 45 + 18, hy - 10 + 18], fill=DARK_OUTLINE)
-    draw.ellipse([hx - 52, hy - 18, hx - 38, hy - 4], fill=WHITE)
-    draw.ellipse([hx + 38, hy - 18, hx + 52, hy - 4], fill=WHITE)
-    draw.ellipse([hx - 80, hy + 20, hx - 45, hy + 45], fill=PINK_CHEEK)
-    draw.ellipse([hx + 45, hy + 20, hx + 80, hy + 45], fill=PINK_CHEEK)
-    draw.arc([hx - 35, hy + 15, hx + 35, hy + 65], 10, 170, fill=DARK_OUTLINE, width=12)
-
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+    draw = ImageDraw.Draw(canvas)
+    draw_glossy_eyes(draw, bx - 85, by + 25, bx + 85, by + 25, r=42)
+    draw_blush(draw, bx - 150, by + 75, bx + 150, by + 75, rw=48, rh=28)
+    draw.chord([bx - 70, by + 85, bx + 70, by + 195], 0, 180, fill=RED, outline=DARK, width=22)
+    draw.ellipse([bx - 32, by + 140, bx + 32, by + 190], fill=PINK_BLUSH)
+    return canvas.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
 
 def draw_sis():
-    """Full-body cheerful girl character Sis in yellow dress with pigtails & pink ribbons waving."""
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2 + 20
+    canvas = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    cx, cy = W/2 - 30, H/2 + 70
+    arm_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    ad = ImageDraw.Draw(arm_layer)
+    ad.line([(cx + 120, cy + 120), (cx + 310, cy - 80)], fill=SKIN, width=120, joint="curve")
+    hx, hy = cx + 330, cy - 100
+    ad.ellipse([hx - 70, hy - 70, hx + 70, hy + 70], fill=SKIN)
+    ad.rounded_rectangle([hx - 40, hy - 140, hx + 40, hy - 30], radius=35, fill=SKIN)
+    ad.rounded_rectangle([hx - 90, hy - 120, hx - 20, hy - 20], radius=30, fill=SKIN)
+    ad.rounded_rectangle([hx + 10, hy - 120, hx + 80, hy - 20], radius=30, fill=SKIN)
+    ad.rounded_rectangle([hx - 120, hy - 30, hx - 30, hy + 40], radius=30, fill=SKIN)
+    canvas.alpha_composite(stroke_layer(arm_layer, stroke_width=14, stroke_color=DARK))
 
-    # Legs & Shoes
-    draw_thick_line(draw, (cx - 45, cy + 140), (cx - 45, cy + 220), SKIN_TONE, 30)
-    draw_thick_line(draw, (cx + 45, cy + 140), (cx + 45, cy + 220), SKIN_TONE, 30)
-    draw.rounded_rectangle([cx - 80, cy + 220, cx - 15, cy + 260], radius=18, fill=GUAVA_RED, outline=DARK_OUTLINE, width=14)
-    draw.rounded_rectangle([cx + 15, cy + 220, cx + 80, cy + 260], radius=18, fill=GUAVA_RED, outline=DARK_OUTLINE, width=14)
+    pigtails = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    pd = ImageDraw.Draw(pigtails)
+    bx, by = cx, cy - 140
+    pd.ellipse([bx - 360, by - 120, bx - 180, by + 60], fill=HAIR_BROWN)
+    pd.ellipse([bx + 180, by - 120, bx + 360, by + 60], fill=HAIR_BROWN)
+    canvas.alpha_composite(stroke_layer(pigtails, stroke_width=14, stroke_color=DARK))
 
-    # Yellow A-Line Dress
-    dress_pts = [(cx - 45, cy - 20), (cx + 45, cy - 20), (cx + 110, cy + 150), (cx - 110, cy + 150)]
-    draw.polygon(dress_pts, fill=GOLD_SUN, outline=DARK_OUTLINE)
-    for i in range(4):
-        draw_thick_line(draw, dress_pts[i], dress_pts[(i+1)%4], DARK_OUTLINE, 18)
+    bows = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    bwd = ImageDraw.Draw(bows)
+    bwd.ellipse([bx - 240, by - 60, bx - 160, by + 10], fill=PINK_BLUSH)
+    bwd.ellipse([bx + 160, by - 60, bx + 240, by + 10], fill=PINK_BLUSH)
+    canvas.alpha_composite(stroke_layer(bows, stroke_width=12, stroke_color=DARK))
 
-    # Arms: Left arm on hip, Right arm waving
-    draw_thick_line(draw, (cx - 65, cy), (cx - 140, cy + 60), SKIN_TONE, 30)
-    draw.ellipse([cx - 160, cy + 45, cx - 120, cy + 85], fill=SKIN_TONE, outline=DARK_OUTLINE, width=12)
+    dress_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    dd = ImageDraw.Draw(dress_layer)
+    dress_pts = [(cx - 150, cy + 90), (cx + 150, cy + 90), (cx + 250, cy + 420), (cx - 250, cy + 420)]
+    dd.polygon(dress_pts, fill=GOLD)
+    canvas.alpha_composite(stroke_layer(dress_layer, stroke_width=14, stroke_color=DARK))
 
-    draw_thick_line(draw, (cx + 65, cy), (cx + 150, cy - 80), SKIN_TONE, 30)
-    draw.ellipse([cx + 130, cy - 120, cx + 185, cy - 65], fill=SKIN_TONE, outline=DARK_OUTLINE, width=12)
+    draw = ImageDraw.Draw(canvas)
+    draw.chord([cx - 110, cy + 70, cx + 110, cy + 170], 0, 180, fill=WHITE, outline=DARK, width=18)
 
-    # Pigtails with Pink Ribbons
-    hx, hy = cx, cy - 130
-    draw.ellipse([hx - 190, hy - 80, hx - 90, hy + 20], fill=WOOD_BROWN, outline=DARK_OUTLINE, width=16)
-    draw.ellipse([hx - 120, hy - 40, hx - 80, hy], fill=PINK_CHEEK, outline=DARK_OUTLINE, width=8)
+    neck = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    nd = ImageDraw.Draw(neck)
+    nd.rounded_rectangle([cx - 65, cy + 20, cx + 65, cy + 110], radius=25, fill=SKIN)
+    canvas.alpha_composite(stroke_layer(neck, stroke_width=12, stroke_color=DARK))
 
-    draw.ellipse([hx + 90, hy - 80, hx + 190, hy + 20], fill=WOOD_BROWN, outline=DARK_OUTLINE, width=16)
-    draw.ellipse([hx + 80, hy - 40, hx + 120, hy], fill=PINK_CHEEK, outline=DARK_OUTLINE, width=8)
+    head_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    hd = ImageDraw.Draw(head_layer)
+    hd.ellipse([bx - 230, by - 200, bx + 230, by + 200], fill=SKIN)
+    canvas.alpha_composite(stroke_layer(head_layer, stroke_width=14, stroke_color=DARK))
 
-    # Girl Head & Bangs
-    draw.ellipse([hx - 110, hy - 110, hx + 110, hy + 110], fill=SKIN_TONE, outline=DARK_OUTLINE, width=20)
-    draw.arc([hx - 110, hy - 110, hx + 110, hy], 180, 360, fill=WOOD_BROWN, width=40)
+    hair = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    hrd = ImageDraw.Draw(hair)
+    for (hx, hy, hr) in [
+        (bx - 160, by - 150, 120), (bx, by - 230, 150),
+        (bx + 160, by - 150, 120), (bx - 70, by - 120, 115),
+        (bx + 70, by - 120, 115)
+    ]:
+        hrd.ellipse([hx - hr, hy - hr, hx + hr, hy + hr], fill=HAIR_BROWN)
+    canvas.alpha_composite(stroke_layer(hair, stroke_width=14, stroke_color=DARK))
 
-    # Cute Face
-    draw.ellipse([hx - 45 - 18, hy - 10 - 18, hx - 45 + 18, hy - 10 + 18], fill=DARK_OUTLINE)
-    draw.ellipse([hx + 45 - 18, hy - 10 - 18, hx + 45 + 18, hy - 10 + 18], fill=DARK_OUTLINE)
-    draw.ellipse([hx - 52, hy - 18, hx - 38, hy - 4], fill=WHITE)
-    draw.ellipse([hx + 38, hy - 18, hx + 52, hy - 4], fill=WHITE)
-    draw.ellipse([hx - 80, hy + 20, hx - 45, hy + 45], fill=PINK_CHEEK)
-    draw.ellipse([hx + 45, hy + 20, hx + 80, hy + 45], fill=PINK_CHEEK)
-    draw.arc([hx - 35, hy + 15, hx + 35, hy + 65], 10, 170, fill=DARK_OUTLINE, width=12)
-
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-# ── Existing Illustrations ───────────────────────────────────────────────────
+    draw = ImageDraw.Draw(canvas)
+    draw_glossy_eyes(draw, bx - 85, by + 25, bx + 85, by + 25, r=42)
+    draw_blush(draw, bx - 150, by + 75, bx + 150, by + 75, rw=48, rh=28)
+    draw.chord([bx - 70, by + 85, bx + 70, by + 195], 0, 180, fill=RED, outline=DARK, width=22)
+    draw.ellipse([bx - 32, by + 140, bx + 32, by + 190], fill=PINK_BLUSH)
+    return canvas.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
 
 def draw_aim():
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     cx, cy = W/2, H/2 + 20
-    draw.ellipse([cx-320, cy-320, cx+320, cy+320], fill=GUAVA_RED, outline=DARK_OUTLINE, width=22)
-    draw.ellipse([cx-240, cy-240, cx+240, cy+240], fill=WHITE, outline=DARK_OUTLINE, width=18)
-    draw.ellipse([cx-160, cy-160, cx+160, cy+160], fill=SKY_BLUE, outline=DARK_OUTLINE, width=18)
-    draw.ellipse([cx-80, cy-80, cx+80, cy+80], fill=GOLD_SUN, outline=DARK_OUTLINE, width=18)
-    draw_face(draw, cx, cy, eye_spacing=30, eye_y_offset=-10, eye_r=12, smile_w=30, smile_h=16, blush=False)
-    draw_thick_line(draw, (cx+180, cy-180), (cx+15, cy-15), DARK_OUTLINE, 24)
-    draw_thick_line(draw, (cx+180, cy-180), (cx+15, cy-15), WOOD_BROWN, 16)
-    draw.polygon([(cx+180, cy-180), (cx+230, cy-160), (cx+210, cy-210)], fill=GUAVA_RED, outline=DARK_OUTLINE)
+    draw.ellipse([cx-320, cy-320, cx+320, cy+320], fill=RED, outline=DARK, width=24)
+    draw.ellipse([cx-240, cy-240, cx+240, cy+240], fill=WHITE, outline=DARK, width=20)
+    draw.ellipse([cx-160, cy-160, cx+160, cy+160], fill=BLUE_SKY, outline=DARK, width=20)
+    draw.ellipse([cx-80, cy-80, cx+80, cy+80], fill=GOLD, outline=DARK, width=20)
+    draw.line([(cx+220, cy-220), (cx+20, cy-20)], fill=DARK, width=32, joint="curve")
+    draw.line([(cx+220, cy-220), (cx+20, cy-20)], fill=WOOD, width=20, joint="curve")
+    draw.polygon([(cx+220, cy-220), (cx+280, cy-200), (cx+260, cy-260)], fill=RED, outline=DARK)
     return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
 
-def draw_bam():
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2
-    pts = []
-    for i in range(16):
-        a = math.radians(i * (360/16) - 90)
-        r = 380 if i % 2 == 0 else 200
-        pts.append((cx + r * math.cos(a), cy + r * math.sin(a)))
-    draw.polygon(pts, fill=GOLD_SUN, outline=DARK_OUTLINE)
-    for i in range(16):
-        draw.line([pts[i], pts[(i+1)%16]], fill=DARK_OUTLINE, width=22, joint="curve")
-    pts2 = []
-    for i in range(16):
-        a = math.radians(i * (360/16) - 90)
-        r = 250 if i % 2 == 0 else 130
-        pts2.append((cx + r * math.cos(a), cy + r * math.sin(a)))
-    draw.polygon(pts2, fill=MANGO)
-    draw_face(draw, cx, cy, eye_spacing=50, eye_y_offset=-15, eye_r=20, smile_w=50, smile_h=26)
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-def draw_bird():
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2 + 20
-    draw.ellipse([cx-190, cy-170, cx+170, cy+190], fill=SKY_BLUE, outline=DARK_OUTLINE, width=22)
-    draw.ellipse([cx-130, cy+10, cx+120, cy+180], fill=CREAM)
-    draw.ellipse([cx-180, cy-20, cx-40, cy+140], fill=OCEAN_BLUE, outline=DARK_OUTLINE, width=16)
-    draw.polygon([(cx+150, cy-30), (cx+240, cy), (cx+150, cy+30)], fill=GOLD_SUN, outline=DARK_OUTLINE)
-    draw_face(draw, cx+50, cy-50, eye_spacing=40, eye_y_offset=0, eye_r=18, smile_w=30, smile_h=15)
-    draw.polygon([(cx-180, cy+20), (cx-300, cy-40), (cx-240, cy+80)], fill=OCEAN_BLUE, outline=DARK_OUTLINE)
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-def draw_box():
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2 + 30
-    bw, bh = 240, 200
-    draw.rectangle([cx-bw, cy-bh+50, cx+bw, cy+bh], fill=GOLD_SUN, outline=DARK_OUTLINE, width=22)
-    draw.rectangle([cx-bw-20, cy-bh, cx+bw+20, cy-bh+60], fill=MANGO, outline=DARK_OUTLINE, width=22)
-    draw.rectangle([cx-35, cy-bh+50, cx+35, cy+bh], fill=GUAVA_RED)
-    draw.rectangle([cx-35, cy-bh, cx+35, cy-bh+60], fill=GUAVA_RED)
-    draw.ellipse([cx-90, cy-bh-70, cx-10, cy-bh+10], fill=GUAVA_RED, outline=DARK_OUTLINE, width=16)
-    draw.ellipse([cx+10, cy-bh-70, cx+90, cy-bh+10], fill=GUAVA_RED, outline=DARK_OUTLINE, width=16)
-    draw.ellipse([cx-25, cy-bh-30, cx+25, cy-bh+20], fill=GUAVA_RED, outline=DARK_OUTLINE, width=16)
-    draw_face(draw, cx, cy+60, eye_spacing=65, eye_y_offset=0, eye_r=20, smile_w=55, smile_h=30)
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+# ── GROUP 2 (+ O, B, E, U) ───────────────────────────────────────────────────
 
 def draw_bus():
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     cx, cy = W/2, H/2
-    draw.rounded_rectangle([cx-300, cy-180, cx+300, cy+140], radius=60, fill=GOLD_SUN, outline=DARK_OUTLINE, width=22)
-    for wx in [-190, -40, 110]:
-        draw.rounded_rectangle([cx+wx-55, cy-140, cx+wx+55, cy-30], radius=20, fill=SKY_BLUE, outline=DARK_OUTLINE, width=14)
-    draw.rectangle([cx-320, cy+80, cx+320, cy+130], fill=CREAM, outline=DARK_OUTLINE, width=16)
-    for wx in [-180, 180]:
-        draw.ellipse([cx+wx-65, cy+90, cx+wx+65, cy+220], fill=DARK_OUTLINE)
-        draw.ellipse([cx+wx-35, cy+120, cx+wx+35, cy+190], fill=CREAM)
-    draw_face(draw, cx, cy+40, eye_spacing=75, eye_y_offset=0, eye_r=18, smile_w=60, smile_h=26)
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-def draw_cake():
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2 + 50
-    draw.rounded_rectangle([cx-240, cy+20, cx+240, cy+180], radius=35, fill=CREAM, outline=DARK_OUTLINE, width=22)
-    draw.rounded_rectangle([cx-170, cy-110, cx+170, cy+20], radius=30, fill=GUAVA_RED, outline=DARK_OUTLINE, width=22)
-    for fx in [-190, -110, -30, 50, 130, 200]:
-        draw.ellipse([cx+fx-25, cy+10, cx+fx+25, cy+60], fill=GUAVA_RED)
-    draw.rectangle([cx-18, cy-220, cx+18, cy-110], fill=SKY_BLUE, outline=DARK_OUTLINE, width=14)
-    draw.ellipse([cx-22, cy-280, cx+22, cy-220], fill=GOLD_SUN, outline=DARK_OUTLINE, width=12)
-    draw_face(draw, cx, cy+90, eye_spacing=65, eye_y_offset=0, eye_r=20, smile_w=55, smile_h=28)
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-def draw_cat():
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2
-    draw.polygon([(cx-220, cy-80), (cx-150, cy-280), (cx-50, cy-170)], fill=MANGO, outline=DARK_OUTLINE)
-    draw.polygon([(cx-190, cy-90), (cx-150, cy-240), (cx-80, cy-160)], fill=PINK_CHEEK)
-    draw.polygon([(cx+220, cy-80), (cx+150, cy-280), (cx+50, cy-170)], fill=MANGO, outline=DARK_OUTLINE)
-    draw.polygon([(cx+190, cy-90), (cx+150, cy-240), (cx+80, cy-160)], fill=PINK_CHEEK)
-    draw.ellipse([cx-250, cy-210, cx+250, cy+230], fill=MANGO, outline=DARK_OUTLINE, width=22)
-    draw.ellipse([cx-170, cy-80, cx+170, cy+210], fill=CREAM)
-    draw_face(draw, cx, cy-30, eye_spacing=85, eye_y_offset=0, eye_r=26, smile_w=70, smile_h=35)
-    draw.polygon([(cx-15, cy+30), (cx+15, cy+30), (cx, cy+48)], fill=DARK_OUTLINE)
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-def draw_fan():
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2 - 40
-    draw.ellipse([cx-240, cy-240, cx+240, cy+240], fill=WHITE, outline=DARK_OUTLINE, width=22)
-    for a in [0, 90, 180, 270]:
-        rad = math.radians(a)
-        bx = cx + 110 * math.cos(rad)
-        by = cy + 110 * math.sin(rad)
-        draw.ellipse([bx-55, by-55, bx+55, by+55], fill=SKY_BLUE, outline=DARK_OUTLINE, width=12)
-    draw.ellipse([cx-75, cy-75, cx+75, cy+75], fill=GOLD_SUN, outline=DARK_OUTLINE, width=16)
-    draw_face(draw, cx, cy, eye_spacing=24, eye_y_offset=-6, eye_r=8, smile_w=22, smile_h=12, blush=False)
-    draw.rectangle([cx-25, cy+240, cx+25, cy+380], fill=DARK_OUTLINE)
-    draw.rounded_rectangle([cx-140, cy+360, cx+140, cy+420], radius=25, fill=SKY_BLUE, outline=DARK_OUTLINE, width=18)
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-def draw_fish():
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2 - 20, H/2
-    draw.ellipse([cx-230, cy-170, cx+180, cy+170], fill=MANGO, outline=DARK_OUTLINE, width=22)
-    draw.rectangle([cx-60, cy-160, cx, cy+160], fill=WHITE, outline=DARK_OUTLINE, width=14)
-    draw.polygon([(cx-190, cy), (cx-320, cy-130), (cx-280, cy), (cx-320, cy+130)], fill=MANGO, outline=DARK_OUTLINE)
-    draw.ellipse([cx-30, cy-230, cx+60, cy-130], fill=MANGO, outline=DARK_OUTLINE, width=14)
-    draw.ellipse([cx-30, cy+130, cx+60, cy+230], fill=MANGO, outline=DARK_OUTLINE, width=14)
-    draw_face(draw, cx+90, cy-20, eye_spacing=35, eye_y_offset=0, eye_r=22, smile_w=40, smile_h=22)
-    for (bx, by, r) in [(cx+220, cy-120, 24), (cx+270, cy-180, 18), (cx+240, cy-240, 14)]:
-        draw.ellipse([bx-r, by-r, bx+r, by+r], fill=SKY_BLUE, outline=DARK_OUTLINE, width=8)
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-def draw_fox():
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2
-    draw.polygon([(cx-230, cy-70), (cx-170, cy-300), (cx-40, cy-160)], fill=MANGO, outline=DARK_OUTLINE)
-    draw.polygon([(cx-190, cy-80), (cx-160, cy-250), (cx-70, cy-150)], fill=DARK_OUTLINE)
-    draw.polygon([(cx+230, cy-70), (cx+170, cy-300), (cx+40, cy-160)], fill=MANGO, outline=DARK_OUTLINE)
-    draw.polygon([(cx+190, cy-80), (cx+160, cy-250), (cx+70, cy-150)], fill=DARK_OUTLINE)
-    draw.ellipse([cx-250, cy-180, cx+250, cy+210], fill=MANGO, outline=DARK_OUTLINE, width=22)
-    draw.polygon([(cx, cy+170), (cx-220, cy+10), (cx-100, cy-60), (cx, cy), (cx+100, cy-60), (cx+220, cy+10)], fill=WHITE, outline=DARK_OUTLINE)
-    draw_face(draw, cx, cy-30, eye_spacing=85, eye_y_offset=0, eye_r=24, smile_w=65, smile_h=30)
-    draw.ellipse([cx-20, cy+130, cx+20, cy+165], fill=DARK_OUTLINE)
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-def draw_kit():
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2 + 30
-    draw.rounded_rectangle([cx-260, cy-150, cx+260, cy+180], radius=45, fill=GUAVA_RED, outline=DARK_OUTLINE, width=22)
-    draw.arc([cx-100, cy-270, cx+100, cy-110], 180, 360, fill=DARK_OUTLINE, width=26)
-    draw.rectangle([cx-30, cy-80, cx+30, cy+80], fill=WHITE)
-    draw.rectangle([cx-80, cy-30, cx+80, cy+30], fill=WHITE)
-    draw_face(draw, cx, cy+100, eye_spacing=65, eye_y_offset=0, eye_r=16, smile_w=50, smile_h=22, blush=False)
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-def draw_lit():
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2 + 40
-    draw.rounded_rectangle([cx-100, cy-80, cx+100, cy+200], radius=30, fill=WHITE, outline=DARK_OUTLINE, width=22)
-    draw_thick_line(draw, (cx, cy-80), (cx, cy-130), DARK_OUTLINE, 14)
-    draw.ellipse([cx-70, cy-290, cx+70, cy-120], fill=GOLD_SUN, outline=DARK_OUTLINE, width=18)
-    draw.ellipse([cx-40, cy-250, cx+40, cy-140], fill=MANGO)
-    draw_face(draw, cx, cy+40, eye_spacing=45, eye_y_offset=0, eye_r=16, smile_w=40, smile_h=20)
-    for a in [0, 45, 90, 135, 180, 225, 270, 315]:
-        rad = math.radians(a)
-        draw_thick_line(draw, (cx + 150*math.cos(rad), (cy-200) + 150*math.sin(rad)),
-                              (cx + 180*math.cos(rad), (cy-200) + 180*math.sin(rad)), GOLD_SUN, 12)
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-def draw_mob():
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2
-    positions = [(-160, -40, SKY_BLUE), (160, -40, MANGO), (0, 70, GOLD_SUN)]
-    for (px, py, col) in positions:
-        draw.ellipse([cx+px-115, cy+py-115, cx+px+115, cy+py+115], fill=col, outline=DARK_OUTLINE, width=18)
-        draw_face(draw, cx+px, cy+py, eye_spacing=35, eye_y_offset=-10, eye_r=14, smile_w=35, smile_h=18)
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-def draw_pan():
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2 - 40, H/2
-    draw.ellipse([cx-210, cy-210, cx+210, cy+210], fill=DARK_OUTLINE)
-    draw.ellipse([cx-180, cy-180, cx+180, cy+180], fill=(80, 95, 105, 255))
-    draw_thick_line(draw, (cx+180, cy), (cx+340, cy), DARK_OUTLINE, 45)
-    draw_thick_line(draw, (cx+180, cy), (cx+340, cy), WOOD_BROWN, 32)
-    draw.ellipse([cx-110, cy-100, cx+110, cy+110], fill=WHITE, outline=DARK_OUTLINE, width=14)
-    draw.ellipse([cx-55, cy-55, cx+55, cy+55], fill=GOLD_SUN, outline=DARK_OUTLINE, width=12)
-    draw_face(draw, cx, cy, eye_spacing=20, eye_y_offset=-5, eye_r=7, smile_w=18, smile_h=10, blush=False)
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-def draw_pig():
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2
-    draw.polygon([(cx-220, cy-110), (cx-160, cy-270), (cx-60, cy-180)], fill=PINK_CHEEK, outline=DARK_OUTLINE)
-    draw.polygon([(cx+220, cy-110), (cx+160, cy-270), (cx+60, cy-180)], fill=PINK_CHEEK, outline=DARK_OUTLINE)
-    draw.ellipse([cx-250, cy-220, cx+250, cy+230], fill=PINK_CHEEK, outline=DARK_OUTLINE, width=22)
-    draw.ellipse([cx-100, cy+10, cx+100, cy+130], fill=(255, 170, 180, 255), outline=DARK_OUTLINE, width=16)
-    draw.ellipse([cx-50, cy+50, cx-20, cy+90], fill=DARK_OUTLINE)
-    draw.ellipse([cx+20, cy+50, cx+50, cy+90], fill=DARK_OUTLINE)
-    draw_face(draw, cx, cy-60, eye_spacing=85, eye_y_offset=0, eye_r=22, smile_w=50, smile_h=20, blush=False)
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-def draw_quiz():
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2
-    draw.rounded_rectangle([cx-220, cy-260, cx+180, cy+260], radius=35, fill=WHITE, outline=DARK_OUTLINE, width=22)
-    for qy in [-140, -20, 100]:
-        draw_thick_line(draw, (cx-150, cy+qy), (cx-110, cy+qy+30), LEAF_GREEN, 20)
-        draw_thick_line(draw, (cx-110, cy+qy+30), (cx-50, cy+qy-30), LEAF_GREEN, 20)
-        draw.rectangle([cx-20, cy+qy-10, cx+120, cy+qy+10], fill=SKY_BLUE)
-    draw_thick_line(draw, (cx+180, cy-180), (cx+260, cy+180), GOLD_SUN, 40)
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-def draw_road():
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2
-    draw.ellipse([cx-400, cy-100, cx+200, cy+380], fill=LEAF_GREEN, outline=DARK_OUTLINE, width=20)
-    draw.ellipse([cx-100, cy-160, cx+450, cy+380], fill=(120, 200, 90, 255), outline=DARK_OUTLINE, width=20)
-    draw.polygon([(cx-80, cy-140), (cx+80, cy-140), (cx+260, cy+320), (cx-260, cy+320)], fill=(100, 115, 125, 255), outline=DARK_OUTLINE)
-    draw_thick_line(draw, (cx, cy-120), (cx, cy+300), GOLD_SUN, 16)
-    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-def draw_spin():
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx, cy = W/2, H/2
-    draw.polygon([(cx, cy-220), (cx+220, cy-40), (cx, cy+240), (cx-220, cy-40)], fill=GUAVA_RED, outline=DARK_OUTLINE)
-    draw.polygon([(cx, cy-120), (cx+140, cy-40), (cx, cy+140), (cx-140, cy-40)], fill=GOLD_SUN)
-    draw_face(draw, cx, cy-40, eye_spacing=45, eye_y_offset=0, eye_r=16, smile_w=40, smile_h=20)
-    draw.arc([cx-260, cy-180, cx+260, cy+180], 30, 150, fill=SKY_BLUE, width=18)
-    draw.arc([cx-260, cy-180, cx+260, cy+180], 210, 330, fill=SKY_BLUE, width=18)
+    draw.rounded_rectangle([cx-360, cy-200, cx+360, cy+160], radius=70, fill=GOLD, outline=DARK, width=28)
+    for wx in [-230, -50, 130]:
+        draw.rounded_rectangle([cx+wx-65, cy-150, cx+wx+65, cy-30], radius=24, fill=BLUE_SKY, outline=DARK, width=18)
+    draw.rectangle([cx-380, cy+90, cx+380, cy+150], fill=CREAM, outline=DARK, width=18)
+    for wx in [-210, 210]:
+        draw.ellipse([cx+wx-80, cy+100, cx+wx+80, cy+260], fill=DARK)
+        draw.ellipse([cx+wx-45, cy+135, cx+wx+45, cy+225], fill=CREAM)
+    draw_glossy_eyes(draw, cx - 80, cy + 40, cx + 80, cy + 40, r=22)
+    draw_blush(draw, cx - 140, cy + 60, cx + 140, cy + 60, rw=28, rh=16)
+    draw.arc([cx - 50, cy + 45, cx + 50, cy + 85], 10, 170, fill=DARK, width=14)
     return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
 
 def draw_sub():
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     cx, cy = W/2, H/2
-    draw.ellipse([cx-260, cy-140, cx+220, cy+160], fill=GOLD_SUN, outline=DARK_OUTLINE, width=22)
-    draw.rectangle([cx-40, cy-240, cx+20, cy-120], fill=MANGO, outline=DARK_OUTLINE, width=16)
-    draw.rectangle([cx-40, cy-260, cx+80, cy-210], fill=MANGO, outline=DARK_OUTLINE, width=16)
-    for px in [-120, -10, 100]:
-        draw.ellipse([cx+px-40, cy-40, cx+px+40, cy+40], fill=SKY_BLUE, outline=DARK_OUTLINE, width=14)
-    draw.polygon([(cx-250, cy), (cx-320, cy-70), (cx-300, cy), (cx-320, cy+70)], fill=MANGO, outline=DARK_OUTLINE)
+    draw.ellipse([cx-320, cy-170, cx+280, cy+190], fill=GOLD, outline=DARK, width=28)
+    draw.rectangle([cx-50, cy-290, cx+30, cy-150], fill=ORANGE, outline=DARK, width=20)
+    draw.rectangle([cx-50, cy-310, cx+100, cy-250], fill=ORANGE, outline=DARK, width=20)
+    for px in [-150, -10, 130]:
+        draw.ellipse([cx+px-50, cy-50, cx+px+50, cy+50], fill=BLUE_SKY, outline=DARK, width=18)
+    draw.polygon([(cx-310, cy), (cx-400, cy-90), (cx-370, cy), (cx-400, cy+90)], fill=ORANGE, outline=DARK)
     return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
 
-def draw_sum():
+def draw_mom():
+    canvas = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    cx, cy = W/2, H/2 + 70
+
+    dress_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    dd = ImageDraw.Draw(dress_layer)
+    dd.polygon([(cx - 150, cy + 90), (cx + 150, cy + 90), (cx + 260, cy + 420), (cx - 260, cy + 420)], fill=PINK_BLUSH)
+    dd.ellipse([cx - 230, cy + 80, cx - 120, cy + 200], fill=PINK_BLUSH)
+    dd.ellipse([cx + 120, cy + 80, cx + 230, cy + 200], fill=PINK_BLUSH)
+    canvas.alpha_composite(stroke_layer(dress_layer, stroke_width=14, stroke_color=DARK))
+
+    draw = ImageDraw.Draw(canvas)
+    draw.chord([cx - 110, cy + 70, cx + 110, cy + 170], 0, 180, fill=WHITE, outline=DARK, width=18)
+    for px in [-60, -30, 0, 30, 60]:
+        draw.ellipse([cx + px - 12, cy + 120, cx + px + 12, cy + 144], fill=CREAM)
+
+    neck = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    nd = ImageDraw.Draw(neck)
+    nd.rounded_rectangle([cx - 65, cy + 20, cx + 65, cy + 110], radius=25, fill=SKIN)
+    canvas.alpha_composite(stroke_layer(neck, stroke_width=12, stroke_color=DARK))
+
+    bun_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    bnd = ImageDraw.Draw(bun_layer)
+    bx, by = cx, cy - 140
+    bnd.ellipse([bx - 140, by - 360, bx + 140, by - 120], fill=HAIR_BROWN)
+    bnd.ellipse([bx + 110, by - 240, bx + 210, by - 140], fill=PINK_BLUSH)
+    canvas.alpha_composite(stroke_layer(bun_layer, stroke_width=14, stroke_color=DARK))
+
+    head_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    hd = ImageDraw.Draw(head_layer)
+    hd.ellipse([bx - 230, by - 200, bx + 230, by + 200], fill=SKIN)
+    hd.ellipse([bx - 250, by + 20, bx - 210, by + 60], fill=CREAM)
+    hd.ellipse([bx + 210, by + 20, bx + 250, by + 60], fill=CREAM)
+    canvas.alpha_composite(stroke_layer(head_layer, stroke_width=14, stroke_color=DARK))
+
+    hair = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    hrd = ImageDraw.Draw(hair)
+    for (hx, hy, hr) in [
+        (bx - 170, by - 140, 120), (bx, by - 220, 140),
+        (bx + 170, by - 140, 120), (bx - 90, by - 110, 110), (bx + 90, by - 110, 110),
+        (bx - 210, by + 20, 70), (bx + 210, by + 20, 70)
+    ]:
+        hrd.ellipse([hx - hr, hy - hr, hx + hr, hy + hr], fill=HAIR_BROWN)
+    canvas.alpha_composite(stroke_layer(hair, stroke_width=14, stroke_color=DARK))
+
+    draw = ImageDraw.Draw(canvas)
+    draw_glossy_eyes(draw, bx - 85, by + 20, bx + 85, by + 20, r=42)
+    draw_blush(draw, bx - 150, by + 75, bx + 150, by + 75, rw=48, rh=28)
+    draw.chord([bx - 65, by + 85, bx + 65, by + 180], 0, 180, fill=RED, outline=DARK, width=22)
+    draw.ellipse([bx - 30, by + 130, bx + 30, by + 175], fill=PINK_BLUSH)
+    return canvas.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+def draw_bee():
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    cx, cy = W/2, H/2 + 20
+    draw.ellipse([cx - 240, cy - 260, cx - 40, cy - 60], fill=(200, 240, 255, 220), outline=DARK, width=22)
+    draw.ellipse([cx + 40, cy - 260, cx + 240, cy - 60], fill=(200, 240, 255, 220), outline=DARK, width=22)
+    draw.ellipse([cx - 260, cy - 140, cx + 260, cy + 180], fill=GOLD, outline=DARK, width=28)
+    draw.rectangle([cx - 80, cy - 130, cx - 10, cy + 170], fill=DARK)
+    draw.rectangle([cx + 80, cy - 130, cx + 150, cy + 170], fill=DARK)
+    draw.line([(cx - 120, cy - 130), (cx - 180, cy - 240)], fill=DARK, width=20, joint="curve")
+    draw.ellipse([cx - 210, cy - 270, cx - 150, cy - 210], fill=DARK)
+    draw.line([(cx - 40, cy - 130), (cx - 70, cy - 240)], fill=DARK, width=20, joint="curve")
+    draw.ellipse([cx - 100, cy - 270, cx - 40, cy - 210], fill=DARK)
+    draw_glossy_eyes(draw, cx - 180, cy + 10, cx - 110, cy + 10, r=26)
+    draw_blush(draw, cx - 210, cy + 50, cx - 80, cy + 50, rw=26, rh=16)
+    draw.arc([cx - 170, cy + 30, cx - 120, cy + 75], 10, 170, fill=DARK, width=14)
+    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+def draw_bib():
+    canvas = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    cx, cy = W/2, H/2 + 20
+    bib_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    bd = ImageDraw.Draw(bib_layer)
+    bd.ellipse([cx - 200, cy - 260, cx + 200, cy + 20], fill=BLUE_SKY)
+    bd.rounded_rectangle([cx - 240, cy - 80, cx + 240, cy + 280], radius=85, fill=BLUE_SKY)
+    bd.ellipse([cx - 120, cy - 260, cx + 120, cy - 60], fill=(0, 0, 0, 0))
+    canvas.alpha_composite(stroke_layer(bib_layer, stroke_width=14, stroke_color=DARK))
+
+    draw = ImageDraw.Draw(canvas)
+    draw.rounded_rectangle([cx - 170, cy + 40, cx + 170, cy + 220], radius=55, fill=WHITE, outline=DARK, width=20)
+    draw.ellipse([cx - 55, cy + 85, cx + 10, cy + 150], fill=RED)
+    draw.ellipse([cx - 10, cy + 85, cx + 55, cy + 150], fill=RED)
+    draw.polygon([(cx - 55, cy + 120), (cx + 55, cy + 120), (cx, cy + 180)], fill=RED)
+    return canvas.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+# ── GROUP 3 (+ T, K, L, Y) ───────────────────────────────────────────────────
+
+def draw_bat():
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    cx, cy = W/2, H/2 + 20
+    l_wing = [(cx-60, cy+80), (cx-450, cy-160), (cx-350, cy+40), (cx-250, cy+160), (cx-140, cy+180), (cx-60, cy+120)]
+    draw.polygon(l_wing, fill=PURPLE, outline=DARK)
+    for i in range(len(l_wing)-1):
+        draw.line([l_wing[i], l_wing[i+1]], fill=DARK, width=28, joint="curve")
+    r_wing = [(cx+60, cy+80), (cx+450, cy-160), (cx+350, cy+40), (cx+250, cy+160), (cx+140, cy+180), (cx+60, cy+120)]
+    draw.polygon(r_wing, fill=PURPLE, outline=DARK)
+    for i in range(len(r_wing)-1):
+        draw.line([r_wing[i], r_wing[i+1]], fill=DARK, width=28, joint="curve")
+    draw.polygon([(cx-160, cy-70), (cx-110, cy-310), (cx-20, cy-140)], fill=PURPLE, outline=DARK)
+    draw.polygon([(cx-140, cy-80), (cx-110, cy-250), (cx-50, cy-130)], fill=PINK_BLUSH)
+    draw.polygon([(cx+160, cy-70), (cx+110, cy-310), (cx+20, cy-140)], fill=PURPLE, outline=DARK)
+    draw.polygon([(cx+140, cy-80), (cx+110, cy-250), (cx+50, cy-130)], fill=PINK_BLUSH)
+    draw.ellipse([cx-190, cy-150, cx+190, cy+230], fill=PURPLE, outline=DARK, width=30)
+    draw.ellipse([cx-120, cy-20, cx+120, cy+210], fill=CREAM)
+    draw_glossy_eyes(draw, cx-80, cy-10, cx+80, cy-10, r=38)
+    draw_blush(draw, cx-145, cy+45, cx+145, cy+45, rw=48, rh=28)
+    draw.arc([cx-55, cy+25, cx+55, cy+95], 10, 170, fill=DARK, width=18)
+    draw.polygon([(cx-26, cy+65), (cx-12, cy+65), (cx-19, cy+90)], fill=WHITE, outline=DARK)
+    draw.polygon([(cx+12, cy+65), (cx+26, cy+65), (cx+19, cy+90)], fill=WHITE, outline=DARK)
+    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+def draw_mat():
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     cx, cy = W/2, H/2
-    draw.rounded_rectangle([cx-280, cy-140, cx-120, cy+140], radius=25, fill=SKY_BLUE, outline=DARK_OUTLINE, width=18)
-    draw.text((cx-225, cy-70), "1", fill=WHITE)
-    draw_thick_line(draw, (cx-80, cy), (cx-20, cy), DARK_OUTLINE, 18)
-    draw_thick_line(draw, (cx-50, cy-30), (cx-50, cy+30), DARK_OUTLINE, 18)
-    draw.rounded_rectangle([cx+20, cy-140, cx+180, cy+140], radius=25, fill=GOLD_SUN, outline=DARK_OUTLINE, width=18)
-    draw.text((cx+75, cy-70), "2", fill=WHITE)
-    draw_face(draw, cx+100, cy+60, eye_spacing=26, eye_y_offset=0, eye_r=8, smile_w=24, smile_h=12, blush=False)
+    draw.ellipse([cx - 420, cy - 240, cx + 420, cy + 240], fill=GOLD, outline=DARK, width=32)
+    draw.ellipse([cx - 360, cy - 180, cx + 360, cy + 180], fill=CREAM, outline=DARK, width=22)
+    for x in range(-260, 320, 90):
+        draw.line([(cx + x, cy - 170), (cx + x, cy + 170)], fill=ORANGE, width=16)
+    lx, ly = cx - 120, cy
+    draw.rounded_rectangle([lx - 75, ly - 115, lx + 75, ly + 105], radius=50, fill=RED, outline=DARK, width=24)
+    draw.ellipse([lx - 50, ly - 85, lx + 50, ly - 5], fill=WHITE, outline=DARK, width=14)
+    rx, ry = cx + 120, cy
+    draw.rounded_rectangle([rx - 75, ry - 115, rx + 75, ry + 105], radius=50, fill=RED, outline=DARK, width=24)
+    draw.ellipse([rx - 50, ry - 85, rx + 50, ry - 5], fill=WHITE, outline=DARK, width=14)
     return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+def draw_kit():
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    cx, cy = W/2, H/2 + 40
+    draw.arc([cx - 120, cy - 320, cx + 120, cy - 120], 180, 360, fill=DARK, width=32)
+    draw.rounded_rectangle([cx - 300, cy - 180, cx + 300, cy + 220], radius=60, fill=RED, outline=DARK, width=28)
+    draw.rectangle([cx - 35, cy - 90, cx + 35, cy + 110], fill=WHITE)
+    draw.rectangle([cx - 100, cy - 25, cx + 100, cy + 45], fill=WHITE)
+    draw_glossy_eyes(draw, cx - 80, cy + 130, cx + 80, cy + 130, r=20)
+    draw.arc([cx - 40, cy + 140, cx + 40, cy + 180], 10, 170, fill=DARK, width=14)
+    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+def draw_toy():
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    cx, cy = W/2, H/2
+    draw.polygon([(cx, cy - 260), (cx + 260, cy - 40), (cx, cy + 280), (cx - 260, cy - 40)], fill=RED, outline=DARK)
+    draw.polygon([(cx, cy - 150), (cx + 170, cy - 40), (cx, cy + 170), (cx - 170, cy - 40)], fill=GOLD)
+    draw.ellipse([cx - 60, cy - 310, cx + 60, cy - 210], fill=BLUE_SKY, outline=DARK, width=20)
+    draw_glossy_eyes(draw, cx - 55, cy - 40, cx + 55, cy - 40, r=22)
+    draw_blush(draw, cx - 110, cy - 15, cx + 110, cy - 15, rw=28, rh=16)
+    draw.arc([cx - 40, cy - 25, cx + 40, cy + 20], 10, 170, fill=DARK, width=14)
+    draw.arc([cx - 320, cy - 200, cx + 320, cy + 200], 30, 150, fill=BLUE_SKY, width=22)
+    draw.arc([cx - 320, cy - 200, cx + 320, cy + 200], 210, 330, fill=BLUE_SKY, width=22)
+    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+def draw_boy():
+    return draw_sam()
+
+# ── GROUP 4 (+ N, G, NG, P) ──────────────────────────────────────────────────
+
+def draw_pig():
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    cx, cy = W/2, H/2
+    draw.polygon([(cx - 260, cy - 120), (cx - 190, cy - 310), (cx - 70, cy - 200)], fill=PINK_BLUSH, outline=DARK)
+    draw.polygon([(cx + 260, cy - 120), (cx + 190, cy - 310), (cx + 70, cy - 200)], fill=PINK_BLUSH, outline=DARK)
+    draw.ellipse([cx - 290, cy - 240, cx + 290, cy + 260], fill=PINK_BLUSH, outline=DARK, width=28)
+    draw.ellipse([cx - 120, cy + 10, cx + 120, cy + 150], fill=(255, 175, 190, 255), outline=DARK, width=20)
+    draw.ellipse([cx - 60, cy + 50, cx - 25, cy + 100], fill=DARK)
+    draw.ellipse([cx + 25, cy + 50, cx + 60, cy + 100], fill=DARK)
+    draw_glossy_eyes(draw, cx - 110, cy - 70, cx + 110, cy - 70, r=32)
+    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+def draw_pan():
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    cx, cy = W/2 - 50, H/2
+    draw.ellipse([cx - 240, cy - 240, cx + 240, cy + 240], fill=DARK)
+    draw.ellipse([cx - 210, cy - 210, cx + 210, cy + 210], fill=(80, 95, 105, 255))
+    draw.line([(cx + 210, cy), (cx + 410, cy)], fill=DARK, width=58, joint="curve")
+    draw.line([(cx + 210, cy), (cx + 410, cy)], fill=WOOD, width=40, joint="curve")
+    draw.ellipse([cx - 130, cy - 120, cx + 130, cy + 130], fill=WHITE, outline=DARK, width=16)
+    draw.ellipse([cx - 65, cy - 65, cx + 65, cy + 65], fill=GOLD, outline=DARK, width=14)
+    draw_glossy_eyes(draw, cx - 25, cy - 10, cx + 25, cy - 10, r=10)
+    draw.arc([cx - 20, cy + 5, cx + 20, cy + 30], 10, 170, fill=DARK, width=8)
+    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+def draw_bug():
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    cx, cy = W/2, H/2 + 20
+    draw.ellipse([cx - 140, cy - 240, cx + 140, cy - 20], fill=DARK)
+    draw.line([(cx - 70, cy - 210), (cx - 150, cy - 320)], fill=DARK, width=20, joint="curve")
+    draw.ellipse([cx - 180, cy - 350, cx - 120, cy - 290], fill=DARK)
+    draw.line([(cx + 70, cy - 210), (cx + 150, cy - 320)], fill=DARK, width=20, joint="curve")
+    draw.ellipse([cx + 120, cy - 350, cx + 180, cy - 290], fill=DARK)
+    draw.ellipse([cx - 270, cy - 120, cx + 270, cy + 280], fill=RED, outline=DARK, width=28)
+    draw.line([(cx, cy - 120), (cx, cy + 280)], fill=DARK, width=22)
+    for (sx, sy) in [(-140, 0), (-160, 140), (-70, 190), (140, 0), (160, 140), (70, 190)]:
+        draw.ellipse([cx + sx - 35, cy + sy - 35, cx + sx + 35, cy + sy + 35], fill=DARK)
+    draw_glossy_eyes(draw, cx - 60, cy - 120, cx + 60, cy - 120, r=24)
+    draw_blush(draw, cx - 100, cy - 80, cx + 100, cy - 80, rw=24, rh=14)
+    draw.arc([cx - 40, cy - 90, cx + 40, cy - 50], 10, 170, fill=WHITE, width=12)
+    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+def draw_pin():
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    cx, cy = W/2, H/2
+    draw.rounded_rectangle([cx - 100, cy - 280, cx + 100, cy - 120], radius=50, fill=WHITE, outline=DARK, width=26)
+    draw.ellipse([cx - 180, cy - 100, cx + 180, cy + 280], fill=WHITE, outline=DARK, width=26)
+    draw.rectangle([cx - 95, cy - 170, cx + 95, cy - 130], fill=RED)
+    draw.rectangle([cx - 105, cy - 100, cx + 105, cy - 60], fill=RED)
+    draw_glossy_eyes(draw, cx - 45, cy - 210, cx + 45, cy - 210, r=18)
+    draw_blush(draw, cx - 80, cy - 180, cx + 80, cy - 180, rw=20, rh=12)
+    draw.arc([cx - 30, cy - 190, cx + 30, cy - 155], 10, 170, fill=DARK, width=10)
+    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+def draw_nap():
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    cx, cy = W/2, H/2 + 30
+    draw.rounded_rectangle([cx - 420, cy - 220, cx + 420, cy + 300], radius=55, fill=WOOD, outline=DARK, width=32)
+    draw.rounded_rectangle([cx - 340, cy - 250, cx + 340, cy], radius=65, fill=WHITE, outline=DARK, width=28)
+    hx, hy = cx - 30, cy - 130
+    draw.ellipse([hx - 160, hy - 140, hx + 160, hy + 140], fill=SKIN, outline=DARK, width=28)
+    draw.arc([hx - 160, hy - 150, hx + 160, hy + 10], 180, 360, fill=HAIR_BROWN, width=70)
+    draw.arc([hx - 95, hy - 10, hx - 25, hy + 50], 10, 170, fill=DARK, width=18)
+    draw.arc([hx + 25, hy - 10, hx + 95, hy + 50], 10, 170, fill=DARK, width=18)
+    draw_blush(draw, hx - 85, hy + 60, hx + 85, hy + 60, rw=42, rh=24)
+    draw.arc([hx - 35, hy + 45, hx + 35, hy + 95], 10, 170, fill=DARK, width=14)
+    draw.rounded_rectangle([cx - 420, cy - 40, cx + 420, cy + 300], radius=50, fill=BLUE_SKY, outline=DARK, width=32)
+    draw.rounded_rectangle([cx - 420, cy - 40, cx + 420, cy + 60], radius=25, fill=GOLD, outline=DARK, width=20)
+    for (zx, zy, sz, col) in [(cx + 240, cy - 240, 60, PURPLE), (cx + 330, cy - 330, 85, ORANGE)]:
+        draw.text((zx, zy), "Z", fill=col)
+    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+# ── GROUP 5 (+ R, D, H, W) ───────────────────────────────────────────────────
+
+def draw_dog():
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    cx, cy = W/2, H/2
+    draw.ellipse([cx - 290, cy - 140, cx - 140, cy + 120], fill=HAIR_BROWN, outline=DARK, width=26)
+    draw.ellipse([cx + 140, cy - 140, cx + 290, cy + 120], fill=HAIR_BROWN, outline=DARK, width=26)
+    draw.ellipse([cx - 240, cy - 210, cx + 240, cy + 220], fill=GOLD, outline=DARK, width=28)
+    draw.ellipse([cx - 140, cy - 10, cx + 140, cy + 190], fill=CREAM, outline=DARK, width=18)
+    draw.ellipse([cx - 45, cy + 10, cx + 45, cy + 70], fill=DARK)
+    draw.arc([cx - 65, cy + 60, cx + 65, cy + 140], 10, 170, fill=DARK, width=16)
+    draw_glossy_eyes(draw, cx - 90, cy - 50, cx + 90, cy - 50, r=36)
+    draw_blush(draw, cx - 160, cy + 30, cx + 160, cy + 30, rw=42, rh=24)
+    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+def draw_hat():
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    cx, cy = W/2, H/2 + 30
+    draw.polygon([(cx, cy - 320), (cx + 220, cy + 180), (cx - 220, cy + 180)], fill=PURPLE, outline=DARK)
+    draw.line([(cx, cy - 320), (cx + 220, cy + 180)], fill=DARK, width=28)
+    draw.line([(cx + 220, cy + 180), (cx - 220, cy + 180)], fill=DARK, width=28)
+    draw.line([(cx - 220, cy + 180), (cx, cy - 320)], fill=DARK, width=28)
+    draw.polygon([(cx - 70, cy - 160), (cx + 70, cy - 160), (cx + 120, cy - 60), (cx - 120, cy - 60)], fill=GOLD)
+    draw.polygon([(cx - 160, cy + 40), (cx + 160, cy + 40), (cx + 210, cy + 160), (cx - 210, cy + 160)], fill=RED)
+    draw.ellipse([cx - 65, cy - 380, cx + 65, cy - 250], fill=GOLD, outline=DARK, width=22)
+    draw_glossy_eyes(draw, cx - 50, cy + 30, cx + 50, cy + 30, r=22)
+    draw.arc([cx - 40, cy + 50, cx + 40, cy + 100], 10, 170, fill=DARK, width=14)
+    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+def draw_hen():
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    cx, cy = W/2, H/2 + 20
+    draw.ellipse([cx - 260, cy - 170, cx + 220, cy + 210], fill=CREAM, outline=DARK, width=28)
+    draw.ellipse([cx - 160, cy - 280, cx - 60, cy - 150], fill=RED, outline=DARK, width=18)
+    draw.ellipse([cx - 90, cy - 310, cx + 10, cy - 170], fill=RED, outline=DARK, width=18)
+    draw.polygon([(cx - 240, cy - 80), (cx - 350, cy - 20), (cx - 230, cy + 20)], fill=GOLD, outline=DARK)
+    draw.ellipse([cx - 230, cy + 10, cx - 170, cy + 90], fill=RED, outline=DARK, width=14)
+    draw.ellipse([cx - 40, cy - 30, cx + 170, cy + 140], fill=ORANGE, outline=DARK, width=22)
+    draw_glossy_eyes(draw, cx - 140, cy - 70, cx - 140, cy - 70, r=24)
+    draw.ellipse([cx - 180, cy - 30, cx - 130, cy + 5], fill=PINK_BLUSH)
+    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+def draw_bed():
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    cx, cy = W/2, H/2 + 30
+    draw.rounded_rectangle([cx - 360, cy - 240, cx + 360, cy + 260], radius=50, fill=WOOD, outline=DARK, width=32)
+    draw.rounded_rectangle([cx - 280, cy - 200, cx + 280, cy - 20], radius=50, fill=WHITE, outline=DARK, width=24)
+    draw.rounded_rectangle([cx - 360, cy - 40, cx + 360, cy + 260], radius=45, fill=BLUE_SKY, outline=DARK, width=32)
+    draw.rounded_rectangle([cx - 360, cy - 40, cx + 360, cy + 40], radius=25, fill=GOLD, outline=DARK, width=20)
+    for (qx, qy) in [(-200, 120), (-50, 170), (100, 110), (240, 160)]:
+        draw.ellipse([cx + qx - 22, cy + qy - 22, cx + qx + 22, cy + qy + 22], fill=WHITE)
+    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+def draw_hand():
+    canvas = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    hand_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    hd = ImageDraw.Draw(hand_layer)
+    cx, cy = W/2, H/2 + 70
+    hd.rounded_rectangle([cx - 130, cy + 180, cx + 130, cy + 420], radius=50, fill=SKIN)
+    hd.ellipse([cx - 200, cy - 80, cx + 200, cy + 240], fill=SKIN)
+    fingers = [(-125, -170, 72, 230), (-45, -270, 78, 310), (45, -300, 80, 340), (130, -240, 78, 280)]
+    for (fx, fy, fw, fh) in fingers:
+        hd.rounded_rectangle([cx + fx - fw/2, cy + fy, cx + fx + fw/2, cy + fy + fh], radius=int(fw/2), fill=SKIN)
+    hd.rounded_rectangle([cx + 120, cy - 10, cx + 320, cy + 90], radius=45, fill=SKIN)
+    canvas.alpha_composite(stroke_layer(hand_layer, stroke_width=14, stroke_color=DARK))
+    draw = ImageDraw.Draw(canvas)
+    for fx in [-85, 0, 88]:
+        draw.line([(cx + fx, cy - 80), (cx + fx, cy - 30)], fill=DARK, width=12, joint="curve")
+    draw.arc([cx - 90, cy + 40, cx + 40, cy + 150], 20, 140, fill=PINK_BLUSH, width=18)
+    draw.arc([cx - 10, cy + 50, cx + 110, cy + 160], 30, 150, fill=PINK_BLUSH, width=18)
+    draw.arc([cx - 360, cy - 320, cx - 250, cy - 140], 120, 240, fill=BLUE_SKY, width=24)
+    draw.arc([cx + 270, cy - 320, cx + 380, cy - 140], 300, 60, fill=BLUE_SKY, width=24)
+    return canvas.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+# ── GROUP 6 (+ C, F, J, Ñ) ───────────────────────────────────────────────────
+
+def draw_cat():
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    cx, cy = W/2, H/2
+    draw.polygon([(cx - 240, cy - 80), (cx - 170, cy - 300), (cx - 50, cy - 180)], fill=ORANGE, outline=DARK)
+    draw.polygon([(cx - 210, cy - 90), (cx - 170, cy - 250), (cx - 80, cy - 170)], fill=PINK_BLUSH)
+    draw.polygon([(cx + 240, cy - 80), (cx + 170, cy - 300), (cx + 50, cy - 180)], fill=ORANGE, outline=DARK)
+    draw.polygon([(cx + 210, cy - 90), (cx + 170, cy - 250), (cx + 80, cy - 170)], fill=PINK_BLUSH)
+    draw.ellipse([cx - 270, cy - 230, cx + 270, cy + 240], fill=ORANGE, outline=DARK, width=28)
+    draw.ellipse([cx - 180, cy - 80, cx + 180, cy + 220], fill=CREAM)
+    draw_glossy_eyes(draw, cx - 90, cy - 30, cx + 90, cy - 30, r=36)
+    draw_blush(draw, cx - 160, cy + 40, cx + 160, cy + 40, rw=48, rh=28)
+    draw.polygon([(cx - 18, cy + 30), (cx + 18, cy + 30), (cx, cy + 50)], fill=DARK)
+    draw.arc([cx - 70, cy + 35, cx + 70, cy + 115], 10, 170, fill=DARK, width=16)
+    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+def draw_fan():
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    cx, cy = W/2, H/2 - 40
+    draw.ellipse([cx - 260, cy - 260, cx + 260, cy + 260], fill=WHITE, outline=DARK, width=26)
+    for a in [0, 90, 180, 270]:
+        rad = math.radians(a)
+        bx = cx + 120 * math.cos(rad)
+        by = cy + 120 * math.sin(rad)
+        draw.ellipse([bx - 60, by - 60, bx + 60, by + 60], fill=BLUE_SKY, outline=DARK, width=16)
+    draw.ellipse([cx - 80, cy - 80, cx + 80, cy + 80], fill=GOLD, outline=DARK, width=20)
+    draw_glossy_eyes(draw, cx - 28, cy - 10, cx + 28, cy - 10, r=10)
+    draw.arc([cx - 25, cy + 5, cx + 25, cy + 28], 10, 170, fill=DARK, width=8)
+    draw.rectangle([cx - 30, cy + 260, cx + 30, cy + 400], fill=DARK)
+    draw.rounded_rectangle([cx - 150, cy + 380, cx + 150, cy + 450], radius=30, fill=BLUE_SKY, outline=DARK, width=22)
+    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+def draw_cap():
+    canvas = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    cx, cy = W/2, H/2 + 30
+
+    cap_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    cd = ImageDraw.Draw(cap_layer)
+    cd.ellipse([cx - 240, cy - 240, cx + 240, cy + 100], fill=BLUE_SKY)
+    cd.rounded_rectangle([cx - 60, cy - 10, cx + 340, cy + 110], radius=50, fill=RED)
+    cd.ellipse([cx - 40, cy - 270, cx + 40, cy - 190], fill=GOLD)
+    canvas.alpha_composite(stroke_layer(cap_layer, stroke_width=14, stroke_color=DARK))
+
+    draw = ImageDraw.Draw(canvas)
+    draw_glossy_eyes(draw, cx - 110, cy - 60, cx + 10, cy - 60, r=26)
+    draw_blush(draw, cx - 160, cy - 20, cx + 60, cy - 20, rw=26, rh=16)
+    draw.arc([cx - 70, cy - 30, cx - 30, cy + 10], 10, 170, fill=DARK, width=14)
+    return canvas.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+def draw_cup():
+    canvas = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    cx, cy = W/2 - 40, H/2 + 20
+
+    cup_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    cd = ImageDraw.Draw(cup_layer)
+    cd.rounded_rectangle([cx + 120, cy - 80, cx + 320, cy + 160], radius=60, fill=GOLD)
+    cd.rounded_rectangle([cx + 140, cy - 40, cx + 270, cy + 120], radius=40, fill=(0, 0, 0, 0))
+    cd.rounded_rectangle([cx - 220, cy - 140, cx + 180, cy + 240], radius=60, fill=GOLD)
+    canvas.alpha_composite(stroke_layer(cup_layer, stroke_width=14, stroke_color=DARK))
+
+    draw = ImageDraw.Draw(canvas)
+    draw.arc([cx - 100, cy - 300, cx - 30, cy - 160], 30, 210, fill=BLUE_SKY, width=20)
+    draw.arc([cx + 10, cy - 320, cx + 80, cy - 170], 30, 210, fill=BLUE_SKY, width=20)
+    draw_glossy_eyes(draw, cx - 80, cy + 10, cx + 40, cy + 10, r=28)
+    draw_blush(draw, cx - 140, cy + 60, cx + 100, cy + 60, rw=35, rh=20)
+    draw.arc([cx - 45, cy + 45, cx + 15, cy + 115], 10, 170, fill=DARK, width=16)
+    return canvas.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+def draw_jam():
+    canvas = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    cx, cy = W/2, H/2 + 30
+
+    jar_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    jd = ImageDraw.Draw(jar_layer)
+    jd.rounded_rectangle([cx - 210, cy - 130, cx + 210, cy + 270], radius=65, fill=RED)
+    jd.rounded_rectangle([cx - 190, cy - 240, cx + 190, cy - 110], radius=35, fill=GOLD)
+    jd.rectangle([cx - 200, cy - 140, cx + 200, cy - 110], fill=ORANGE)
+    canvas.alpha_composite(stroke_layer(jar_layer, stroke_width=14, stroke_color=DARK))
+
+    draw = ImageDraw.Draw(canvas)
+    draw.rounded_rectangle([cx - 140, cy - 20, cx + 140, cy + 180], radius=35, fill=WHITE, outline=DARK, width=18)
+    draw.ellipse([cx - 45, cy + 30, cx + 45, cy + 120], fill=RED)
+    draw.polygon([(cx - 40, cy + 35), (cx, cy - 5), (cx + 40, cy + 35)], fill=GREEN)
+    draw_glossy_eyes(draw, cx - 20, cy + 65, cx + 20, cy + 65, r=8)
+    draw.arc([cx - 15, cy + 78, cx + 15, cy + 100], 10, 170, fill=DARK, width=6)
+    return canvas.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+# ── GROUP 7 (+ Q, V, X, Z) ───────────────────────────────────────────────────
 
 def draw_van():
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     cx, cy = W/2, H/2
-    draw.rounded_rectangle([cx-290, cy-160, cx+280, cy+130], radius=50, fill=SKY_BLUE, outline=DARK_OUTLINE, width=22)
-    draw.rounded_rectangle([cx+80, cy-130, cx+240, cy-20], radius=20, fill=WHITE, outline=DARK_OUTLINE, width=14)
-    draw.rounded_rectangle([cx-80, cy-130, cx+50, cy-20], radius=20, fill=WHITE, outline=DARK_OUTLINE, width=14)
-    for wx in [-170, 160]:
-        draw.ellipse([cx+wx-60, cy+80, cx+wx+60, cy+200], fill=DARK_OUTLINE)
-        draw.ellipse([cx+wx-30, cy+110, cx+wx+30, cy+170], fill=CREAM)
-    draw_face(draw, cx+160, cy+40, eye_spacing=45, eye_y_offset=0, eye_r=14, smile_w=35, smile_h=18)
+    draw.rounded_rectangle([cx - 340, cy - 180, cx + 330, cy + 150], radius=60, fill=BLUE_SKY, outline=DARK, width=28)
+    draw.rounded_rectangle([cx + 90, cy - 140, cx + 280, cy - 20], radius=24, fill=WHITE, outline=DARK, width=18)
+    draw.rounded_rectangle([cx - 90, cy - 140, cx + 60, cy - 20], radius=24, fill=WHITE, outline=DARK, width=18)
+    for wx in [-190, 180]:
+        draw.ellipse([cx + wx - 75, cy + 90, cx + wx + 75, cy + 240], fill=DARK)
+        draw.ellipse([cx + wx - 40, cy + 125, cx + wx + 40, cy + 205], fill=CREAM)
+    draw_glossy_eyes(draw, cx + 130, cy + 45, cx + 240, cy + 45, r=20)
+    draw.arc([cx + 160, cy + 60, cx + 210, cy + 100], 10, 170, fill=DARK, width=12)
     return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
 
-def draw_warm():
+def draw_box():
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    cx, cy = W/2, H/2 + 30
+    draw.rectangle([cx - 260, cy - 150, cx + 260, cy + 240], fill=GOLD, outline=DARK, width=28)
+    draw.rectangle([cx - 280, cy - 220, cx + 280, cy - 140], fill=ORANGE, outline=DARK, width=28)
+    draw.rectangle([cx - 40, cy - 150, cx + 40, cy + 240], fill=RED)
+    draw.rectangle([cx - 40, cy - 220, cx + 40, cy - 140], fill=RED)
+    draw.ellipse([cx - 100, cy - 300, cx - 10, cy - 200], fill=RED, outline=DARK, width=20)
+    draw.ellipse([cx + 10, cy - 300, cx + 100, cy - 200], fill=RED, outline=DARK, width=20)
+    draw_glossy_eyes(draw, cx - 80, cy + 50, cx + 80, cy + 50, r=26)
+    draw_blush(draw, cx - 140, cy + 85, cx + 140, cy + 85, rw=35, rh=20)
+    draw.arc([cx - 50, cy + 75, cx + 50, cy + 135], 10, 170, fill=DARK, width=16)
+    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
+
+def draw_fox():
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     cx, cy = W/2, H/2
-    draw.ellipse([cx-210, cy-210, cx+210, cy+210], fill=GOLD_SUN, outline=DARK_OUTLINE, width=22)
-    for i in range(12):
-        rad = math.radians(i * (360/12))
-        x1 = cx + 240 * math.cos(rad)
-        y1 = cy + 240 * math.sin(rad)
-        x2 = cx + 320 * math.cos(rad)
-        y2 = cy + 320 * math.sin(rad)
-        draw_thick_line(draw, (x1, y1), (x2, y2), MANGO, 22)
-    draw_face(draw, cx, cy, eye_spacing=75, eye_y_offset=-15, eye_r=26, smile_w=85, smile_h=45)
+    draw.polygon([(cx - 250, cy - 80), (cx - 180, cy - 320), (cx - 50, cy - 170)], fill=ORANGE, outline=DARK)
+    draw.polygon([(cx - 210, cy - 90), (cx - 170, cy - 270), (cx - 80, cy - 160)], fill=DARK)
+    draw.polygon([(cx + 250, cy - 80), (cx + 180, cy - 320), (cx + 50, cy - 180)], fill=ORANGE, outline=DARK)
+    draw.polygon([(cx + 210, cy - 90), (cx + 170, cy - 270), (cx + 80, cy - 160)], fill=DARK)
+    draw.ellipse([cx - 270, cy - 190, cx + 270, cy + 230], fill=ORANGE, outline=DARK, width=28)
+    draw.polygon([(cx, cy + 190), (cx - 240, cy + 20), (cx - 110, cy - 60), (cx, cy), (cx + 110, cy - 60), (cx + 240, cy + 20)], fill=WHITE, outline=DARK)
+    draw_glossy_eyes(draw, cx - 95, cy - 30, cx + 95, cy - 30, r=32)
+    draw_blush(draw, cx - 165, cy + 40, cx + 165, cy + 40, rw=42, rh=24)
+    draw.ellipse([cx - 25, cy + 145, cx + 25, cy + 185], fill=DARK)
     return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
 
 def draw_zoo():
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     cx, cy = W/2, H/2
-    draw.rounded_rectangle([cx-260, cy-180, cx+260, cy+220], radius=40, fill=WOOD_BROWN, outline=DARK_OUTLINE, width=22)
-    draw.rounded_rectangle([cx-160, cy-60, cx+160, cy+220], radius=40, fill=WHITE, outline=DARK_OUTLINE, width=18)
-    draw.rounded_rectangle([cx-220, cy-260, cx+220, cy-120], radius=25, fill=GOLD_SUN, outline=DARK_OUTLINE, width=18)
-    draw.ellipse([cx-80, cy+20, cx+80, cy+180], fill=MANGO, outline=DARK_OUTLINE, width=16)
-    draw_face(draw, cx, cy+100, eye_spacing=30, eye_y_offset=-8, eye_r=10, smile_w=28, smile_h=14)
+    draw.rounded_rectangle([cx - 290, cy - 200, cx + 290, cy + 250], radius=50, fill=WOOD, outline=DARK, width=28)
+    draw.rounded_rectangle([cx - 180, cy - 60, cx + 180, cy + 250], radius=50, fill=WHITE, outline=DARK, width=22)
+    draw.rounded_rectangle([cx - 240, cy - 290, cx + 240, cy - 130], radius=35, fill=GOLD, outline=DARK, width=22)
+    draw.ellipse([cx - 90, cy + 20, cx + 90, cy + 200], fill=ORANGE, outline=DARK, width=18)
+    draw_glossy_eyes(draw, cx - 35, cy + 90, cx + 35, cy + 90, r=14)
+    draw.arc([cx - 30, cy + 110, cx + 30, cy + 150], 10, 170, fill=DARK, width=10)
     return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
 
-# ── Generator Map ─────────────────────────────────────────────────────────────
+def draw_web():
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    cx, cy = W/2, H/2
+    for a in range(0, 360, 45):
+        rad = math.radians(a)
+        draw.line([(cx, cy), (cx + 340 * math.cos(rad), cy + 340 * math.sin(rad))], fill=BLUE_SKY, width=14)
+    for r in [100, 190, 280]:
+        draw.ellipse([cx - r, cy - r, cx + r, cy + r], outline=BLUE_SKY, width=12)
+    spx, spy = cx + 140, cy + 120
+    draw.ellipse([spx - 55, spy - 55, spx + 55, spy + 55], fill=DARK)
+    for sa in [-60, -20, 20, 60]:
+        srad = math.radians(sa)
+        draw.line([(spx, spy), (spx - 90 * math.cos(srad), spy + 90 * math.sin(srad))], fill=DARK, width=10)
+        draw.line([(spx, spy), (spx + 90 * math.cos(srad), spy + 90 * math.sin(srad))], fill=DARK, width=10)
+    draw_glossy_eyes(draw, spx - 18, spy - 10, spx + 18, spy - 10, r=10)
+    draw.arc([spx - 15, spy + 5, spx + 15, spy + 25], 10, 170, fill=WHITE, width=6)
+    return img.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
 
-GENERATORS = {
-    "blendword_aim": draw_aim,
-    "blendword_bam": draw_bam,
-    "blendword_bat": draw_bat,
-    "blendword_bird": draw_bird,
-    "blendword_box": draw_box,
-    "blendword_bus": draw_bus,
-    "blendword_cake": draw_cake,
-    "blendword_cat": draw_cat,
-    "blendword_draw": draw_draw,
-    "blendword_face": draw_face_asset,
-    "blendword_fan": draw_fan,
-    "blendword_fish": draw_fish,
-    "blendword_fox": draw_fox,
-    "blendword_gap": draw_gap,
-    "blendword_hand": draw_hand,
-    "blendword_kit": draw_kit,
-    "blendword_lit": draw_lit,
-    "blendword_mat": draw_mat,
-    "blendword_mob": draw_mob,
-    "blendword_nap": draw_nap,
-    "blendword_pan": draw_pan,
-    "blendword_pig": draw_pig,
-    "blendword_quiz": draw_quiz,
-    "blendword_road": draw_road,
+# ── Master Map ────────────────────────────────────────────────────────────────
+
+ALL_GENERATORS = {
+    # Group 1
     "blendword_sam": draw_sam,
     "blendword_sis": draw_sis,
-    "blendword_spin": draw_spin,
+    "blendword_aim": draw_aim,
+    # Group 2
+    "blendword_bus": draw_bus,
     "blendword_sub": draw_sub,
-    "blendword_sum": draw_sum,
+    "blendword_mom": draw_mom,
+    "blendword_bee": draw_bee,
+    "blendword_bib": draw_bib,
+    # Group 3
+    "blendword_bat": draw_bat,
+    "blendword_mat": draw_mat,
+    "blendword_kit": draw_kit,
+    "blendword_toy": draw_toy,
+    "blendword_boy": draw_boy,
+    # Group 4
+    "blendword_pig": draw_pig,
+    "blendword_pan": draw_pan,
+    "blendword_bug": draw_bug,
+    "blendword_pin": draw_pin,
+    "blendword_nap": draw_nap,
+    # Group 5
+    "blendword_dog": draw_dog,
+    "blendword_hat": draw_hat,
+    "blendword_hen": draw_hen,
+    "blendword_bed": draw_bed,
+    "blendword_hand": draw_hand,
+    # Group 6
+    "blendword_cat": draw_cat,
+    "blendword_fan": draw_fan,
+    "blendword_cap": draw_cap,
+    "blendword_cup": draw_cup,
+    "blendword_jam": draw_jam,
+    # Group 7
     "blendword_van": draw_van,
-    "blendword_warm": draw_warm,
+    "blendword_box": draw_box,
+    "blendword_fox": draw_fox,
     "blendword_zoo": draw_zoo,
+    "blendword_web": draw_web,
 }
 
 def main():
@@ -766,17 +742,17 @@ def main():
     os.makedirs(target_dir, exist_ok=True)
 
     print("=" * 80)
-    print("[*] Generating all 32 Blend It Word Illustrations (Human & Kid-Friendly)...")
+    print(f"[*] Generating Complete 33-Word Blend It Suite (4-Benchmark Vector Art)...")
     print("=" * 80)
 
-    for name, func in GENERATORS.items():
+    for name, func in ALL_GENERATORS.items():
         img = func()
         out_path = os.path.join(target_dir, f"{name}.png")
         img.save(out_path, "PNG", optimize=True)
         print(f"  [+] Generated: {name}.png ({os.path.getsize(out_path)} bytes)")
 
     print("=" * 80)
-    print("[*] All 32 Blend It word assets successfully updated!")
+    print("[*] All 33 Blend It illustrations successfully generated!")
 
 if __name__ == "__main__":
     main()

@@ -109,52 +109,52 @@ object DatabaseModule {
 
                     // Seed BlendIt Words (Constraint: Group 1 restricted to exactly 3 words: SAM, SIS, AIM)
                     val blendWordList = listOf(
-                        // Group 1 (3 words)
+                        // Group 1 (3 words: M, S, A, I)
                         BlendItWordEntity(1, 1, "SAM", "S-A-M", "audio/words/word_sam.mp3", "images/pictures/blendword_sam.png"),
                         BlendItWordEntity(2, 1, "SIS", "S-I-S", "audio/words/word_sis.mp3", "images/pictures/blendword_sis.png"),
                         BlendItWordEntity(3, 1, "AIM", "A-I-M", "audio/words/word_aim.mp3", "images/pictures/blendword_aim.png"),
 
-                        // Group 2 (5 words)
+                        // Group 2 (5 words: + O, B, E, U)
                         BlendItWordEntity(4, 2, "BUS", "B-U-S", "audio/words/word_bus.mp3", "images/pictures/blendword_bus.png"),
                         BlendItWordEntity(5, 2, "SUB", "S-U-B", "audio/words/word_sub.mp3", "images/pictures/blendword_sub.png"),
-                        BlendItWordEntity(6, 2, "SUM", "S-U-M", "audio/words/word_sum.mp3", "images/pictures/blendword_sum.png"),
-                        BlendItWordEntity(7, 2, "BAM", "B-A-M", "audio/words/word_bam.mp3", "images/pictures/blendword_bam.png"),
-                        BlendItWordEntity(8, 2, "MOB", "M-O-B", "audio/words/word_mob.mp3", "images/pictures/blendword_mob.png"),
+                        BlendItWordEntity(6, 2, "MOM", "M-O-M", "audio/words/word_mom.mp3", "images/pictures/blendword_mom.png"),
+                        BlendItWordEntity(7, 2, "BEE", "B-E-E", "audio/words/word_bee.mp3", "images/pictures/blendword_bee.png"),
+                        BlendItWordEntity(8, 2, "BIB", "B-I-B", "audio/words/word_bib.mp3", "images/pictures/blendword_bib.png"),
 
-                        // Group 3 (5 words)
+                        // Group 3 (5 words: + T, K, L, Y)
                         BlendItWordEntity(9, 3, "BAT", "B-A-T", "audio/words/word_bat.mp3", "images/pictures/blendword_bat.png"),
-                        BlendItWordEntity(10, 3, "CAT", "C-A-T", "audio/words/word_cat.mp3", "images/pictures/blendword_cat.png"),
-                        BlendItWordEntity(11, 3, "MAT", "M-A-T", "audio/words/word_mat.mp3", "images/pictures/blendword_mat.png"),
-                        BlendItWordEntity(12, 3, "KIT", "K-I-T", "audio/words/word_kit.mp3", "images/pictures/blendword_kit.png"),
-                        BlendItWordEntity(13, 3, "LIT", "L-I-T", "audio/words/word_lit.mp3", "images/pictures/blendword_lit.png"),
+                        BlendItWordEntity(10, 3, "MAT", "M-A-T", "audio/words/word_mat.mp3", "images/pictures/blendword_mat.png"),
+                        BlendItWordEntity(11, 3, "KIT", "K-I-T", "audio/words/word_kit.mp3", "images/pictures/blendword_kit.png"),
+                        BlendItWordEntity(12, 3, "TOY", "T-O-Y", "audio/words/word_toy.mp3", "images/pictures/blendword_toy.png"),
+                        BlendItWordEntity(13, 3, "BOY", "B-O-Y", "audio/words/word_boy.mp3", "images/pictures/blendword_boy.png"),
 
-                        // Group 4 (5 words)
+                        // Group 4 (5 words: + N, G, NG, P)
                         BlendItWordEntity(14, 4, "PIG", "P-I-G", "audio/words/word_pig.mp3", "images/pictures/blendword_pig.png"),
                         BlendItWordEntity(15, 4, "PAN", "P-A-N", "audio/words/word_pan.mp3", "images/pictures/blendword_pan.png"),
-                        BlendItWordEntity(16, 4, "GAP", "G-A-P", "audio/words/word_gap.mp3", "images/pictures/blendword_gap.png"),
-                        BlendItWordEntity(17, 4, "SPIN", "S-P-I-N", "audio/words/word_spin.mp3", "images/pictures/blendword_spin.png"),
+                        BlendItWordEntity(16, 4, "BUG", "B-U-G", "audio/words/word_bug.mp3", "images/pictures/blendword_bug.png"),
+                        BlendItWordEntity(17, 4, "PIN", "P-I-N", "audio/words/word_pin.mp3", "images/pictures/blendword_pin.png"),
                         BlendItWordEntity(18, 4, "NAP", "N-A-P", "audio/words/word_nap.mp3", "images/pictures/blendword_nap.png"),
 
-                        // Group 5 (5 words)
-                        BlendItWordEntity(19, 5, "BIRD", "B-I-R-D", "audio/words/word_bird.mp3", "images/pictures/blendword_bird.png"),
-                        BlendItWordEntity(20, 5, "HAND", "H-A-N-D", "audio/words/word_hand.mp3", "images/pictures/blendword_hand.png"),
-                        BlendItWordEntity(21, 5, "WARM", "W-A-R-M", "audio/words/word_warm.mp3", "images/pictures/blendword_warm.png"),
-                        BlendItWordEntity(22, 5, "ROAD", "R-O-A-D", "audio/words/word_road.mp3", "images/pictures/blendword_road.png"),
-                        BlendItWordEntity(23, 5, "DRAW", "D-R-A-W", "audio/words/word_draw.mp3", "images/pictures/blendword_draw.png"),
+                        // Group 5 (5 words: + R, D, H, W)
+                        BlendItWordEntity(19, 5, "DOG", "D-O-G", "audio/words/word_dog.mp3", "images/pictures/blendword_dog.png"),
+                        BlendItWordEntity(20, 5, "HAT", "H-A-T", "audio/words/word_hat.mp3", "images/pictures/blendword_hat.png"),
+                        BlendItWordEntity(21, 5, "HEN", "H-E-N", "audio/words/word_hen.mp3", "images/pictures/blendword_hen.png"),
+                        BlendItWordEntity(22, 5, "BED", "B-E-D", "audio/words/word_bed.mp3", "images/pictures/blendword_bed.png"),
+                        BlendItWordEntity(23, 5, "HAND", "H-A-N-D", "audio/words/word_hand.mp3", "images/pictures/blendword_hand.png"),
 
-                        // Group 6 (5 words)
-                        BlendItWordEntity(24, 6, "FACE", "F-A-C-E", "audio/words/word_face.mp3", "images/pictures/blendword_face.png"),
-                        BlendItWordEntity(25, 6, "CAKE", "C-A-K-E", "audio/words/word_cake.mp3", "images/pictures/blendword_cake.png"),
-                        BlendItWordEntity(26, 6, "FISH", "F-I-S-H", "audio/words/word_fish.mp3", "images/pictures/blendword_fish.png"),
-                        BlendItWordEntity(27, 6, "CAT", "C-A-T", "audio/words/word_cat.mp3", "images/pictures/blendword_cat.png"),
-                        BlendItWordEntity(28, 6, "FAN", "F-A-N", "audio/words/word_fan.mp3", "images/pictures/blendword_fan.png"),
+                        // Group 6 (5 words: + C, F, J, Ñ)
+                        BlendItWordEntity(24, 6, "CAT", "C-A-T", "audio/words/word_cat.mp3", "images/pictures/blendword_cat.png"),
+                        BlendItWordEntity(25, 6, "FAN", "F-A-N", "audio/words/word_fan.mp3", "images/pictures/blendword_fan.png"),
+                        BlendItWordEntity(26, 6, "CAP", "C-A-P", "audio/words/word_cap.mp3", "images/pictures/blendword_cap.png"),
+                        BlendItWordEntity(27, 6, "CUP", "C-U-P", "audio/words/word_cup.mp3", "images/pictures/blendword_cup.png"),
+                        BlendItWordEntity(28, 6, "JAM", "J-A-M", "audio/words/word_jam.mp3", "images/pictures/blendword_jam.png"),
 
-                        // Group 7 (5 words)
-                        BlendItWordEntity(29, 7, "ZOO", "Z-O-O", "audio/words/word_zoo.mp3", "images/pictures/blendword_zoo.png"),
-                        BlendItWordEntity(30, 7, "VAN", "V-A-N", "audio/words/word_van.mp3", "images/pictures/blendword_van.png"),
-                        BlendItWordEntity(31, 7, "BOX", "B-O-X", "audio/words/word_box.mp3", "images/pictures/blendword_box.png"),
-                        BlendItWordEntity(32, 7, "QUIZ", "Q-U-I-Z", "audio/words/word_quiz.mp3", "images/pictures/blendword_quiz.png"),
-                        BlendItWordEntity(33, 7, "FOX", "F-O-X", "audio/words/word_fox.mp3", "images/pictures/blendword_fox.png")
+                        // Group 7 (5 words: + Q, V, X, Z)
+                        BlendItWordEntity(29, 7, "VAN", "V-A-N", "audio/words/word_van.mp3", "images/pictures/blendword_van.png"),
+                        BlendItWordEntity(30, 7, "BOX", "B-O-X", "audio/words/word_box.mp3", "images/pictures/blendword_box.png"),
+                        BlendItWordEntity(31, 7, "FOX", "F-O-X", "audio/words/word_fox.mp3", "images/pictures/blendword_fox.png"),
+                        BlendItWordEntity(32, 7, "ZOO", "Z-O-O", "audio/words/word_zoo.mp3", "images/pictures/blendword_zoo.png"),
+                        BlendItWordEntity(33, 7, "WEB", "W-E-B", "audio/words/word_web.mp3", "images/pictures/blendword_web.png")
                     )
                     dbInstance.blendItWordDao().insertWords(blendWordList)
                 }
