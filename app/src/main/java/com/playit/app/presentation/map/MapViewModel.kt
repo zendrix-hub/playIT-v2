@@ -60,17 +60,8 @@ class MapViewModel @Inject constructor(
                 if (profileId != null) {
                     streakTracker.resetIfInactive(profileId)
                     streakTracker.recordActivity(profileId)
-                    triggerReturnWelcomeIfNeeded()
                 }
             }
-        }
-    }
-
-    private fun triggerReturnWelcomeIfNeeded() {
-        if (!sessionManager.hasPlayedReturnWelcome) {
-            sessionManager.markReturnWelcomePlayed()
-            val welcomeVo = audioResolver.getVoPath(VoContext.RETURN_WELCOME_01)
-            audioPlayer.playAssetAudio(welcomeVo)
         }
     }
 

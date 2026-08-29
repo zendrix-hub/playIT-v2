@@ -197,9 +197,15 @@ fun MapScreen(
                 )
             }
 
-            // ── Mascot Prompt Header ───────────────────────────────────────
+            // ── Mascot Prompt Header (Personalized Instant Greeting) ───────
+            val welcomeGreeting = if (userStats.profileName.isNotBlank()) {
+                "Welcome, ${userStats.profileName}! Tap a letter to start!"
+            } else {
+                "Welcome! Tap a letter to start!"
+            }
+
             MascotBubble(
-                message = "Tap a letter to start!",
+                message = welcomeGreeting,
                 mascotState = MascotState.ENCOURAGING,
                 onMascotTap = { viewModel.playMascotTapReaction() },
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)

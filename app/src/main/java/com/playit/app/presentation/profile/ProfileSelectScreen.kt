@@ -118,7 +118,7 @@ fun ProfileSelectScreen(
                         color = Ink
                     )
                     Text(
-                        text = "Pumili ng iyong profile",
+                        text = "Choose your profile",
                         fontFamily = LexendFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
