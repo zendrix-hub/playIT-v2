@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.sp
 import com.playit.app.domain.model.MapNode
 import com.playit.app.presentation.components.GummyBackButton
 import com.playit.app.presentation.components.GummyContainer
+import com.playit.app.presentation.components.GummyDialog
 import com.playit.app.presentation.components.MascotBubble
 import com.playit.app.presentation.components.MascotState
 import com.playit.app.presentation.components.breathingPulse
@@ -133,6 +134,7 @@ fun MapScreen(
 
     // Shake animation state for locked node taps
     var shakenNodeId by remember { mutableStateOf<String?>(null) }
+    var lockedBlendItDialogGroup by remember { mutableStateOf<String?>(null) }
     val shakeOffset = remember { Animatable(0f) }
 
     LaunchedEffect(shakenNodeId) {
@@ -359,6 +361,7 @@ fun MapScreen(
                                                 onNodeSelected(node.id)
                                             } else {
                                                 shakenNodeId = node.id
+                                                lockedBlendItDialogGroup = node.groupId
                                                 viewModel.onLockedNodeTapped()
                                             }
                                         }
@@ -413,6 +416,20 @@ fun MapScreen(
                     }
                 }
             }
+        }
+
+        // Locked Blend-It Informational Dialog
+        if (lockedBlendItDialogGroup != null) {
+            val group = lockedBlendItDialogGroup ?: "1"
+            GummyDialog(
+                title = "Pangkat $group • Naka-lock",
+                body = "Kailangan munang tapusin ang lahat ng mga titik sa Pangkat $group upang mabuksan ang Blend-It Word Challenge!\n\n(Complete all letters in Group $group to unlock the Blend-It Challenge!)",
+                confirmText = "Sige po! • OK",
+                onConfirm = { lockedBlendItDialogGroup = null },
+                onDismiss = { lockedBlendItDialogGroup = null },
+                confirmColor = Mango,
+                confirmShadowColor = MangoShadow
+            )
         }
     }
 }

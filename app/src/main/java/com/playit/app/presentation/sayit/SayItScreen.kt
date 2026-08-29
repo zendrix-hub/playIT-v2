@@ -263,6 +263,16 @@ fun SayItScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
+                Text(
+                    text = if (isListening) "Nakikinig... Sabihin ang tunog!" else "Pindutin para magsalita",
+                    fontFamily = LexendFontFamily,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isListening) Guava else InkSoft
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                     val maxAttempts = 3
                     for (i in 0 until maxAttempts) {

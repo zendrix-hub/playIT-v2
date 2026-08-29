@@ -121,31 +121,29 @@ class SayItViewModel @Inject constructor(
         val exampleWord = _phoneme.value?.exampleWord?.lowercase() ?: "mouse"
         voskRecognizer.setGrammar(listOf(target, exampleWord, "${target}uh", "${target}a", "em", "es", "bee", "cat", "dog"))
         
-        playQuietCheckBeforeListening {
-            _state.value = SayItState.Listening
-            _isNoisyEnvironment.value = false
-            var noisyFramesCount = 0
+        _state.value = SayItState.Listening
+        _isNoisyEnvironment.value = false
+        var noisyFramesCount = 0
 
-            viewModelScope.launch {
-                voskRecognizer.startListening(
-                    onResult = { transcript ->
-                        evaluateSpeech(transcript)
-                    },
-                    onAmplitude = { db, norm ->
-                        _audioAmplitude.value = norm
-                        if (db > 68f && _state.value is SayItState.Listening) {
-                            noisyFramesCount++
-                            if (noisyFramesCount == 12) {
-                                _isNoisyEnvironment.value = true
-                                playNoiseAlert()
-                            }
-                        } else if (db < 60f) {
-                            noisyFramesCount = 0
-                            _isNoisyEnvironment.value = false
+        viewModelScope.launch {
+            voskRecognizer.startListening(
+                onResult = { transcript ->
+                    evaluateSpeech(transcript)
+                },
+                onAmplitude = { db, norm ->
+                    _audioAmplitude.value = norm
+                    if (db > 68f && _state.value is SayItState.Listening) {
+                        noisyFramesCount++
+                        if (noisyFramesCount == 12) {
+                            _isNoisyEnvironment.value = true
+                            playNoiseAlert()
                         }
+                    } else if (db < 60f) {
+                        noisyFramesCount = 0
+                        _isNoisyEnvironment.value = false
                     }
-                )
-            }
+                }
+            )
         }
     }
 

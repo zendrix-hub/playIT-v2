@@ -169,7 +169,9 @@ fun ReportPreviewScreen(
                                     }
                                     context.startActivity(intent)
                                 } catch (e: ActivityNotFoundException) {
-                                    Toast.makeText(context, "No PDF viewer app found on device.", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(context, "No PDF viewer app installed. Please install Google Drive or PDF viewer.", Toast.LENGTH_LONG).show()
+                                } catch (e: Exception) {
+                                    Toast.makeText(context, "Unable to open PDF: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
                                 }
                             } else {
                                 Toast.makeText(context, "File does not exist.", Toast.LENGTH_SHORT).show()
@@ -204,7 +206,7 @@ fun ReportPreviewScreen(
                                     }
                                     context.startActivity(Intent.createChooser(shareIntent, "Share PDF Progress Report"))
                                 } catch (e: Exception) {
-                                    Toast.makeText(context, "Share failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Share failed: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
                                 }
                             }
                         },
