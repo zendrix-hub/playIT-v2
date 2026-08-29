@@ -39,6 +39,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,6 +47,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.boundsInParent
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Fill
@@ -227,8 +230,10 @@ fun MapScreen(
                 val bannerHeightPx = with(density) { BANNER_HEIGHT_ESTIMATE.toPx() }
                 val bannerSpacingPx = with(density) { BANNER_SPACING.toPx() }
 
-                // Calculate center coordinates for each node to draw the winding Bezier path
-                val nodeCenters = remember(mapNodes, widthPx) {
+                val measuredCenters = remember { mutableStateMapOf<Int, Offset>() }
+
+                // Fallback / initial estimated center coordinates
+                val fallbackNodeCenters = remember(mapNodes, widthPx) {
                     val centers = mutableListOf<Offset>()
                     var currentY = topPaddingPx
 
@@ -238,7 +243,7 @@ fun MapScreen(
                             currentY += bannerHeightPx + bannerSpacingPx
                         }
 
-                        val nodeHeightDp = if (node is MapNode.BlendItNode) BLEND_IT_NODE_SIZE else LETTER_NODE_SIZE
+                        val nodeHeightDp = if (node is MapNode.BlendItNode) 54.dp else LETTER_NODE_SIZE
                         val nodeHeightPx = with(density) { nodeHeightDp.toPx() }
                         val centerY = currentY + nodeHeightPx / 2f
                         val xOffsetPx = with(density) { calculateNodeXOffsetDp(index, PATH_AMPLITUDE_X).toPx() }
@@ -247,12 +252,19 @@ fun MapScreen(
                         centers.add(Offset(centerX, centerY))
 
                         val nextNode = mapNodes.getOrNull(index + 1)
-                        val nextNodeHeightDp = if (nextNode is MapNode.BlendItNode) BLEND_IT_NODE_SIZE else LETTER_NODE_SIZE
+                        val nextNodeHeightDp = if (nextNode is MapNode.BlendItNode) 54.dp else LETTER_NODE_SIZE
                         val nextNodeHeightPx = with(density) { nextNodeHeightDp.toPx() }
 
                         currentY += nodeHeightPx / 2f + spacingPx + nextNodeHeightPx / 2f
                     }
                     centers
+                }
+
+                // If all nodes have been measured by Compose layout, use exact pixel centers; else use fallback
+                val nodeCenters = if (measuredCenters.size >= mapNodes.size && mapNodes.isNotEmpty()) {
+                    (0 until mapNodes.size).mapNotNull { measuredCenters[it] }
+                } else {
+                    fallbackNodeCenters
                 }
 
                 // Auto-scroll to active node on map launch
@@ -342,7 +354,15 @@ fun MapScreen(
                         val shakeX = if (isShaking) shakeOffset.value.dp else 0.dp
 
                         Box(
-                            modifier = Modifier.offset(x = xOffsetDp + shakeX),
+                            modifier = Modifier
+                                .offset(x = xOffsetDp + shakeX)
+                                .onGloballyPositioned { coords ->
+                                    val boundsInCol = coords.boundsInParent()
+                                    measuredCenters[index] = Offset(
+                                        x = boundsInCol.center.x,
+                                        y = boundsInCol.center.y + topPaddingPx
+                                    )
+                                },
                             contentAlignment = Alignment.Center
                         ) {
                             when (node) {
