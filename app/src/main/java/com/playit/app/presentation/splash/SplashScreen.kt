@@ -151,7 +151,7 @@ fun SplashScreen(
                         .align(Alignment.BottomCenter)
                 ) {
                     GummyButton(
-                        text = "Simulan Natin • Start",
+                        text = "Start",
                         onClick = onStartClick,
                         modifier = Modifier
                             .fillMaxWidth()

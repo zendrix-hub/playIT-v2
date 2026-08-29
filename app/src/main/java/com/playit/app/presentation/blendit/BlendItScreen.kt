@@ -112,9 +112,9 @@ fun BlendItScreen(
             ) {
                 MascotSpeechHeader(
                     message = when (uiState) {
-                        is BlendItUiState.WordCorrect -> "Napakagaling! Nabuo mo ang salita! • Awesome! You blended the word!"
-                        is BlendItUiState.WordIncorrect -> "Hindi tugma ang mga tunog. Subukan muli! • Sounds don't match. Try again!"
-                        else -> "Bumuo ng salita gamit ang mga tunog! • Blend the sounds to make the word!"
+                        is BlendItUiState.WordCorrect -> "Awesome! You blended the word!"
+                        is BlendItUiState.WordIncorrect -> "Sounds don't match. Try again!"
+                        else -> "Blend the sounds to make the word!"
                     },
                     mascotState = when (uiState) {
                         is BlendItUiState.WordCorrect -> MascotState.CELEBRATING
@@ -128,7 +128,7 @@ fun BlendItScreen(
 
                 // Word progress pill (24sp child reading floor)
                 Text(
-                    text = "Salita: ${currentWordIndex + 1} / $totalWords • Word: ${currentWordIndex + 1} / $totalWords",
+                    text = "Word: ${currentWordIndex + 1} / $totalWords",
                     fontFamily = LexendFontFamily,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
@@ -259,7 +259,7 @@ fun BlendItScreen(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "Suriin ang Salita • Check Word",
+                            text = "Check Word",
                             fontFamily = LexendFontFamily,
                             fontSize = 24.sp,
                             fontWeight = FontWeight.ExtraBold,

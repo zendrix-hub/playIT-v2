@@ -155,9 +155,9 @@ fun HearItScreen(
                 // Mascot speech bubble prompt
                 MascotSpeechHeader(
                     message = if (playCount == 0) {
-                        "Makinig nang mabuti, pagkatapos ay pindutin ang play! • Listen closely, then tap play!"
+                        "Listen closely, then tap play!"
                     } else {
-                        "Magaling! Pindutin ang Susunod kapag handa ka na. • Nice! Tap Next when you're ready."
+                        "Nice! Tap Next when you're ready."
                     },
                     mascotState = if (isPlaying) MascotState.LISTENING else if (playCount > 0) MascotState.POINTING else MascotState.IDLE,
                     onMascotTap = { viewModel.playPhonemeSound() }
@@ -168,7 +168,7 @@ fun HearItScreen(
                 // 3D Bento Animated Letter Card with breathing pulse & 24sp floor
                 LetterCard(
                     letter = targetLetter,
-                    soundText = "Tunog • Sound: /${phoneme?.letter ?: "m"}/",
+                    soundText = "Sound: /${phoneme?.letter ?: "m"}/",
                     cardRotation = cardRotation,
                     wordOverride = phoneme?.exampleWord,
                     onTapReplay = { viewModel.playPhonemeSound() }
@@ -226,7 +226,7 @@ fun HearItScreen(
                                 .background(
                                     brush = Brush.radialGradient(
                                         colors = if (filled) {
-                                            listOf(Ube, UbeShadow)
+                                             listOf(Ube, UbeShadow)
                                         } else {
                                             listOf(UbeLight.copy(alpha = 0.35f), UbeLight.copy(alpha = 0.15f))
                                         }
@@ -252,7 +252,7 @@ fun HearItScreen(
                     .padding(horizontal = 24.dp, vertical = 12.dp)
             ) {
                 GummyButton(
-                    text = "Susunod: Bigkasin • Next: Say It",
+                    text = "Next: Say It",
                     onClick = {
                         if (isUnlocked) {
                             onNext(phoneme?.id?.toString() ?: "1")

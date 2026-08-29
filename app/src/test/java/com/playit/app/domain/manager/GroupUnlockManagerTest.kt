@@ -66,4 +66,65 @@ class GroupUnlockManagerTest {
             )
         )
     }
+
+    @Test
+    fun isBlendItUnlocked_lockedWhenGroupLettersNotCompleted() {
+        val groupMembers = listOf(
+            LetterGroupMember(groupId = 1, phonemeId = 1, position = 1),
+            LetterGroupMember(groupId = 1, phonemeId = 2, position = 2),
+            LetterGroupMember(groupId = 1, phonemeId = 3, position = 3),
+            LetterGroupMember(groupId = 1, phonemeId = 4, position = 4)
+        )
+
+        val emptyProgress = emptyList<LessonProgress>()
+
+        // BlendIt Group 1 is LOCKED by default if no letters completed
+        assertFalse(
+            groupUnlockManager.isBlendItUnlocked(
+                groupId = 1,
+                groupMembers = groupMembers,
+                lessonProgressList = emptyProgress
+            )
+        )
+
+        val partialProgress = listOf(
+            LessonProgress(profileId = 1L, phonemeId = 1, isCompleted = true),
+            LessonProgress(profileId = 1L, phonemeId = 2, isCompleted = true),
+            LessonProgress(profileId = 1L, phonemeId = 3, isCompleted = true),
+            LessonProgress(profileId = 1L, phonemeId = 4, isCompleted = false)
+        )
+
+        assertFalse(
+            groupUnlockManager.isBlendItUnlocked(
+                groupId = 1,
+                groupMembers = groupMembers,
+                lessonProgressList = partialProgress
+            )
+        )
+    }
+
+    @Test
+    fun isBlendItUnlocked_unlockedWhenAllGroupLettersCompleted() {
+        val groupMembers = listOf(
+            LetterGroupMember(groupId = 1, phonemeId = 1, position = 1),
+            LetterGroupMember(groupId = 1, phonemeId = 2, position = 2),
+            LetterGroupMember(groupId = 1, phonemeId = 3, position = 3),
+            LetterGroupMember(groupId = 1, phonemeId = 4, position = 4)
+        )
+
+        val fullProgress = listOf(
+            LessonProgress(profileId = 1L, phonemeId = 1, isCompleted = true),
+            LessonProgress(profileId = 1L, phonemeId = 2, isCompleted = true),
+            LessonProgress(profileId = 1L, phonemeId = 3, isCompleted = true),
+            LessonProgress(profileId = 1L, phonemeId = 4, isCompleted = true)
+        )
+
+        assertTrue(
+            groupUnlockManager.isBlendItUnlocked(
+                groupId = 1,
+                groupMembers = groupMembers,
+                lessonProgressList = fullProgress
+            )
+        )
+    }
 }

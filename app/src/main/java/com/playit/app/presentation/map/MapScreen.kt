@@ -199,7 +199,7 @@ fun MapScreen(
 
             // ── Mascot Prompt Header ───────────────────────────────────────
             MascotBubble(
-                message = "Tara na! Pumili ng titik para magsimula! • Tap a letter to start!",
+                message = "Tap a letter to start!",
                 mascotState = MascotState.ENCOURAGING,
                 onMascotTap = { viewModel.playMascotTapReaction() },
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
@@ -392,7 +392,7 @@ fun MapScreen(
                     ) {
                         // Mini Speech Dialogue Bubble above Mascot
                         MascotMapDialogueBubble(
-                            message = "Tara na! • Let's go!",
+                            message = "Let's Go!",
                             onClick = { viewModel.playMascotTapReaction() },
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
@@ -422,9 +422,9 @@ fun MapScreen(
         if (lockedBlendItDialogGroup != null) {
             val group = lockedBlendItDialogGroup ?: "1"
             GummyDialog(
-                title = "Pangkat $group • Naka-lock",
-                body = "Kailangan munang tapusin ang lahat ng mga titik sa Pangkat $group upang mabuksan ang Blend-It Word Challenge!\n\n(Complete all letters in Group $group to unlock the Blend-It Challenge!)",
-                confirmText = "Sige po! • OK",
+                title = "Group $group Locked",
+                body = "Complete all letters in Group $group to unlock the Blend-It Challenge!",
+                confirmText = "Got It",
                 onConfirm = { lockedBlendItDialogGroup = null },
                 onDismiss = { lockedBlendItDialogGroup = null },
                 confirmColor = Mango,
@@ -670,9 +670,9 @@ fun BlendItChallengeNodeCard(
     val borderColor = if (node.isUnlocked) DarkBrownOutline else DarkBrownOutline.copy(alpha = 0.65f)
 
     val accessibilityLabel = if (node.isUnlocked) {
-        "Blend-It Challenge Pangkat ${node.groupId}"
+        "Blend-It Challenge Group ${node.groupId}"
     } else {
-        "Blend-It Challenge Pangkat ${node.groupId}, locked"
+        "Blend-It Challenge Group ${node.groupId}, locked"
     }
 
     GummyContainer(
@@ -706,7 +706,7 @@ fun BlendItChallengeNodeCard(
                 modifier = Modifier.size(20.dp)
             )
             Text(
-                text = if (node.isUnlocked) " Blend ${node.groupId}" else " Naka-lock",
+                text = if (node.isUnlocked) " Blend ${node.groupId}" else " Locked",
                 fontFamily = LexendFontFamily,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.ExtraBold,

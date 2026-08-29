@@ -148,12 +148,12 @@ class MapViewModel @Inject constructor(
                 }
 
                 // Insert BlendIt Challenge Node after each group of letters
-                val isGroupUnlocked = groupUnlockManager.isGroupUnlocked(group.groupId, members, progressList)
+                val isBlendItUnlocked = groupUnlockManager.isBlendItUnlocked(group.groupId, members, progressList)
                 nodesList.add(
                     MapNode.BlendItNode(
                         id = "blend_${group.groupId}",
                         orderIndex = globalIndex++,
-                        isUnlocked = isGroupUnlocked,
+                        isUnlocked = isBlendItUnlocked,
                         groupNumber = group.groupNumber,
                         groupId = group.groupId.toString(),
                         starsEarned = 0

@@ -185,7 +185,7 @@ fun NamePromptScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             GummyButton(
-                text = if (uiState is ProfileUiState.Loading) "Creating..." else "Let's Play! • Simulan Na",
+                text = if (uiState is ProfileUiState.Loading) "Creating..." else "Let's Play",
                 onClick = { viewModel.createProfile(name.trim(), selectedAvatarId) },
                 backgroundColor = Leaf,
                 shadowColor = LeafShadow,

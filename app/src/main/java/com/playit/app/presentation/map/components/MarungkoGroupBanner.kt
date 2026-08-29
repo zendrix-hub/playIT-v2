@@ -137,7 +137,7 @@ fun MarungkoGroupBanner(
             .padding(horizontal = 20.dp)
             .fillMaxWidth()
             .semantics(mergeDescendants = true) {
-                contentDescription = "Pangkat $groupNumber: $biomeTitle, $statusBadgeText, Letters: $lettersSummary"
+                contentDescription = "Group $groupNumber: $biomeTitle, $statusBadgeText, Letters: $lettersSummary"
             }
     ) {
         Row(
@@ -181,7 +181,7 @@ fun MarungkoGroupBanner(
                 // Chapter Biome Title & Letters
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text(
-                        text = "Pangkat $groupNumber • $biomeTitle",
+                        text = "Group $groupNumber: $biomeTitle",
                         fontFamily = LexendFontFamily,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.ExtraBold,

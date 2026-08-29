@@ -168,12 +168,12 @@ fun SayItScreen(
             ) {
                 MascotSpeechHeader(
                     message = when {
-                        permissionDeniedMessage -> "Kailangan ng mikropono para marinig ka ni Lily! • Please allow microphone permission."
-                        isNoisyEnvironment -> "Medyo maingay! Humanap ng tahimik na lugar. • Find a quiet spot so Lily can hear you."
-                        state is SayItState.Listening -> "Nakikinig nang mabuti... Bigkasin ang /${phoneme?.letter ?: "m"}/! • Listening closely... Say /${phoneme?.letter ?: "m"}/!"
-                        state is SayItState.Correct -> "Napakagaling! Tama ang iyong pagbigkas! • Awesome pronunciation! You got it right!"
-                        state is SayItState.Incorrect -> "Magandang subok! Makinig muli at subukan pa. • Good try! Listen again and retry."
-                        else -> "Ikaw naman — bigkasin ang tunog /${phoneme?.letter ?: "m"}/! • Your turn — say the sound /${phoneme?.letter ?: "m"}/!"
+                        permissionDeniedMessage -> "Please allow microphone access so Lily can hear you."
+                        isNoisyEnvironment -> "It's noisy! Find a quiet spot so Lily can hear you."
+                        state is SayItState.Listening -> "Listening closely... Say /${phoneme?.letter ?: "m"}/!"
+                        state is SayItState.Correct -> "Awesome pronunciation! You got it right!"
+                        state is SayItState.Incorrect -> "Good try! Listen again and retry."
+                        else -> "Your turn — say the sound /${phoneme?.letter ?: "m"}/!"
                     },
                     mascotState = when {
                         permissionDeniedMessage -> MascotState.ENCOURAGING
@@ -207,7 +207,7 @@ fun SayItScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Bigkasin • Say: /${phoneme?.letter ?: "m"}/",
+                            text = "Say: /${phoneme?.letter ?: "m"}/",
                             fontFamily = LexendFontFamily,
                             fontSize = 24.sp,
                             fontWeight = FontWeight.ExtraBold,
@@ -235,8 +235,8 @@ fun SayItScreen(
                         val dynamicBoost = 1f + (audioAmplitude * 0.35f)
                         Box(
                             modifier = Modifier
-                                .size(MIC_CTA_SIZE)
-                                .scale(micPulseScale * dynamicBoost)
+                                .size(MIC_CTA_SIZE * dynamicBoost)
+                                .scale(micPulseScale)
                                 .clip(CircleShape)
                                 .background(Guava.copy(alpha = micPulseAlpha))
                         )
@@ -264,7 +264,7 @@ fun SayItScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = if (isListening) "Nakikinig... Sabihin ang tunog!" else "Pindutin para magsalita",
+                    text = if (isListening) "Listening... Say the sound!" else "Tap to speak",
                     fontFamily = LexendFontFamily,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
@@ -314,7 +314,7 @@ fun SayItScreen(
                     Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(if (isNoisyEnvironment) Kalamansi else Leaf))
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = if (isNoisyEnvironment) "Ingay sa Paligid: Mataas • Noise: High" else "Ingay sa Paligid: Maayos • Noise: Good",
+                        text = if (isNoisyEnvironment) "Noise: High" else "Noise: Good",
                         color = InkSoft,
                         fontSize = 11.5.sp,
                         fontFamily = LexendFontFamily,
@@ -353,7 +353,7 @@ fun SayItScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = if (isCorrect) "Napakagaling! • Awesome pronunciation!" else "Magandang subok! Subukan muli. • Good try! Let's try again.",
+                            text = if (isCorrect) "Awesome pronunciation!" else "Good try! Let's try again.",
                             color = if (isCorrect) Cloud else Ink,
                             fontWeight = FontWeight.ExtraBold,
                             fontFamily = LexendFontFamily,
@@ -367,7 +367,7 @@ fun SayItScreen(
 
             Box(modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 24.dp, vertical = 12.dp)) {
                 GummyButton(
-                    text = "Susunod: Hanapin • Next: Find It",
+                    text = "Next: Find It",
                     onClick = { if (state is SayItState.Correct) onNext(phoneme?.id?.toString() ?: "1") },
                     enabled = state is SayItState.Correct,
                     backgroundColor = Mango,

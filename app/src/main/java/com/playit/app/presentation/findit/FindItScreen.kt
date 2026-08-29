@@ -94,10 +94,10 @@ fun FindItScreen(
                 // Mascot speech bubble prompt
                 MascotSpeechHeader(
                     message = when (state) {
-                        is FindItState.GameOver -> "Naubusan ng puso! Subukan muli. • Out of hearts! Let's try again."
-                        is FindItState.Correct -> "Napakagaling! Nagsisimula sa /${targetPhoneme?.letter ?: "m"}/ ang larawan! • Great job! Starts with /${targetPhoneme?.letter ?: "m"}/!"
-                        is FindItState.Incorrect -> "Hindi nagsisimula sa /${targetPhoneme?.letter ?: "m"}/ ang larawan. Subukan muli! • Doesn't start with /${targetPhoneme?.letter ?: "m"}/. Try again!"
-                        else -> "Piliin ang larawang nagsisimula sa /${targetPhoneme?.letter ?: "m"}/! • Tap the picture that starts with /${targetPhoneme?.letter ?: "m"}/!"
+                        is FindItState.GameOver -> "Out of hearts! Let's try again."
+                        is FindItState.Correct -> "Great job! Starts with /${targetPhoneme?.letter ?: "m"}/!"
+                        is FindItState.Incorrect -> "Doesn't start with /${targetPhoneme?.letter ?: "m"}/. Try again!"
+                        else -> "Tap the picture that starts with /${targetPhoneme?.letter ?: "m"}/!"
                     },
                     mascotState = when (state) {
                         is FindItState.Correct -> MascotState.CELEBRATING
@@ -116,7 +116,7 @@ fun FindItScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (state is FindItState.Correct) "Nahanap: 1/1 • Found: 1/1" else "Hanapin • Find: /${targetPhoneme?.letter ?: "m"}/",
+                        text = if (state is FindItState.Correct) "Found: 1/1" else "Find: /${targetPhoneme?.letter ?: "m"}/",
                         fontFamily = LexendFontFamily,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
@@ -148,7 +148,7 @@ fun FindItScreen(
                                 modifier = Modifier.size(22.dp)
                             )
                             Text(
-                                text = "Pakinggan • Hear",
+                                text = "Hear",
                                 fontFamily = LexendFontFamily,
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
@@ -215,7 +215,7 @@ fun FindItScreen(
             ) {
                 if (state is FindItState.GameOver) {
                     GummyButton(
-                        text = "Subukan Muli • Try Again",
+                        text = "Try Again",
                         onClick = { viewModel.restartSession() },
                         backgroundColor = Kalamansi,
                         shadowColor = KalamansiShadow,
@@ -226,7 +226,7 @@ fun FindItScreen(
                     )
                 } else {
                     GummyButton(
-                        text = "Tapusin ang Aralin • Complete Lesson",
+                        text = "Complete Lesson",
                         onClick = {
                             if (state is FindItState.Correct) {
                                 onNext(targetPhoneme?.id?.toString() ?: "1")

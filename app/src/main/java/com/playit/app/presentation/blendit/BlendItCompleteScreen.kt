@@ -84,14 +84,14 @@ fun BlendItCompleteScreen(
         ) {
             // Docked Mascot Prompt
             DockedMascotWithBubble(
-                message = "Nakatapos ka sa Pangkat ${viewModel.groupId}! • Group ${viewModel.groupId} Mastered!",
+                message = "Group ${viewModel.groupId} Mastered!",
                 mascotState = MascotState.CELEBRATING
             )
 
             Spacer(modifier = Modifier.weight(1f))
 
             Text(
-                text = "PANGKAT ${viewModel.groupId} • GROUP ${viewModel.groupId}",
+                text = "GROUP ${viewModel.groupId}",
                 fontFamily = LexendFontFamily,
                 color = Cloud.copy(alpha = 0.85f),
                 fontSize = 18.sp,
@@ -102,7 +102,7 @@ fun BlendItCompleteScreen(
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "Tagumpay! • Challenge Mastered!",
+                text = "Challenge Mastered!",
                 fontFamily = LexendFontFamily,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.ExtraBold,
@@ -136,7 +136,7 @@ fun BlendItCompleteScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "$starsEarned ${if (starsEarned == 1) "Star" else "Stars"} • Streak Bonus Unlocked!",
+                        text = "$starsEarned ${if (starsEarned == 1) "Star" else "Stars"} • Bonus Unlocked!",
                         fontFamily = LexendFontFamily,
                         fontSize = 14.sp,
                         color = Cloud,
@@ -173,7 +173,7 @@ fun BlendItCompleteScreen(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "Bumalik sa Mapa • Continue to Map",
+                            text = "Continue to Map",
                             fontFamily = LexendFontFamily,
                             fontSize = 24.sp,
                             fontWeight = FontWeight.ExtraBold,
