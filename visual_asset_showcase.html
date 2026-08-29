@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PlayIT — 4-Benchmark Visual Asset Showcase</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1F3A3D;
+    --ink-soft: #506B6E;
+    --outline: #2D373E;
+    --mango: #FA7B28;
+    --mango-shadow: #D75F14;
+    --ube: #8B5FBF;
+    --leaf: #4CAF50;
+    --leaf-shadow: #2E7D32;
+    --cloud: #FFFFFF;
+    --bg-light: #F4F8FA;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Lexend', sans-serif;
+    background: var(--bg-light);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 30px 20px 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  header {
+    text-align: center;
+    max-width: 900px;
+    margin-bottom: 24px;
+  }
+  h1 {
+    font-size: 32px;
+    font-weight: 900;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  p.subtitle {
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+
+  /* Benchmark Badges Bar */
+  .benchmark-pills {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .b-pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 800;
+    border: 2px solid;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .b-duo { background: #E8F5E9; color: #2E7D32; border-color: #A5D6A7; }
+  .b-khan { background: #FFF8E1; color: #F57F17; border-color: #FFE082; }
+  .b-drops { background: #E0F2FE; color: #0284C7; border-color: #7DD3FC; }
+  .b-head { background: #F3E8FF; color: #7E22CE; border-color: #D8B4FE; }
+
+  /* Controls: Category Filter + Background Switch */
+  .controls-bar {
+    max-width: 1200px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+    background: #FFF;
+    padding: 14px 20px;
+    border-radius: 20px;
+    border: 3px solid var(--outline);
+    box-shadow: 0 6px 0 rgba(45, 55, 62, 0.1);
+  }
+  .filter-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    padding: 8px 16px;
+    border-radius: 12px;
+    border: 2px solid var(--outline);
+    background: #FFF;
+    color: var(--ink);
+    font-family: 'Lexend', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tab-btn:hover { background: #F0F4F8; }
+  .tab-btn.active {
+    background: var(--mango);
+    color: #FFF;
+    border-color: var(--outline);
+    box-shadow: 0 3px 0 var(--mango-shadow);
+    transform: translateY(-2px);
+  }
+  .bg-toggles {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+  .bg-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--outline);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .bg-dot:hover { transform: scale(1.15); }
+  .bg-dot.active { transform: scale(1.15); box-shadow: 0 0 0 2px var(--mango); }
+  .bg-checker { background: repeating-conic-gradient(#E0E0E0 0% 25%, #FFF 0% 50%) 50% / 12px 12px; }
+  .bg-white { background: #FFFFFF; }
+  .bg-dark { background: #2D373E; }
+  .bg-sky { background: linear-gradient(180deg, #CFE9FF 0%, #FFF5E6 100%); }
+
+  /* Gallery Grid */
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    width: 100%;
+  }
+  .asset-card {
+    background: #FFF;
+    border-radius: 22px;
+    border: 3px solid var(--outline);
+    box-shadow: 0 6px 0 rgba(45, 55, 62, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .asset-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 0 rgba(45, 55, 62, 0.15);
+  }
+  .asset-preview {
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    position: relative;
+    background: repeating-conic-gradient(#EEE 0% 25%, #FFF 0% 50%) 50% / 14px 14px;
+    transition: background 0.3s;
+  }
+  .asset-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.06));
+    transition: transform 0.2s;
+  }
+  .asset-card:hover .asset-preview img {
+    transform: scale(1.08);
+  }
+  .asset-meta {
+    padding: 12px 14px;
+    background: #FFF;
+    border-top: 2px solid #F0F0F0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .asset-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .asset-tag {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    display: flex;
+    justify-content: space-between;
+  }
+  .badge-tag {
+    background: #E8F0FE;
+    color: #1A73E8;
+    padding: 2px 6px;
+    border-radius: 6px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>PlayIT Asset Showcase</h1>
+  <p class="subtitle">122 verified production assets synthesized across <strong>Duolingo ABC</strong> (tactility), <strong>Khan Academy Kids</strong> (storybook warmth & rosy cheeks), <strong>Drops</strong> (single-focus outline clarity), and <strong>Headspace</strong> (organic calming shapes).</p>
+  
+  <div class="benchmark-pills">
+    <span class="b-pill b-duo">● Duolingo ABC : Tactile Silhouettes</span>
+    <span class="b-pill b-khan">● Khan Academy : Glossy Eyes & Blush</span>
+    <span class="b-pill b-drops">● Drops : Minimalist Outlines</span>
+    <span class="b-pill b-head">● Headspace : Organic Alpha Cutout</span>
+  </div>
+</header>
+
+<div class="controls-bar">
+  <div class="filter-tabs">
+    <button class="tab-btn active" onclick="filterCategory('all', this)">All (122)</button>
+    <button class="tab-btn" onclick="filterCategory('mascot', this)">Mascot (7)</button>
+    <button class="tab-btn" onclick="filterCategory('avatar', this)">Avatars (6)</button>
+    <button class="tab-btn" onclick="filterCategory('reward', this)">Rewards (4)</button>
+    <button class="tab-btn" onclick="filterCategory('picture', this)">Pictures (26)</button>
+    <button class="tab-btn" onclick="filterCategory('blend', this)">Blend Words (32)</button>
+    <button class="tab-btn" onclick="filterCategory('letter', this)">Letters (26)</button>
+    <button class="tab-btn" onclick="filterCategory('map', this)">Map Props (16)</button>
+  </div>
+
+  <div class="bg-toggles">
+    <span>Canvas:</span>
+    <div class="bg-dot bg-checker active" title="Checkerboard (Alpha check)" onclick="changeBg('checker', this)"></div>
+    <div class="bg-dot bg-white" title="Pure White" onclick="changeBg('white', this)"></div>
+    <div class="bg-dot bg-dark" title="Dark Slate" onclick="changeBg('dark', this)"></div>
+    <div class="bg-dot bg-sky" title="Bohol Sky" onclick="changeBg('sky', this)"></div>
+  </div>
+</div>
+
+<div class="gallery-grid" id="galleryGrid">
+
+  <!-- Mascot Suite (7) -->
+  <div class="asset-card" data-cat="mascot">
+    <div class="asset-preview"><img src="app/src/main/assets/images/mascot/lily_idle.png" alt="lily_idle"></div>
+    <div class="asset-meta"><div class="asset-title">lily_idle.png</div><div class="asset-tag"><span class="badge-tag">Mascot</span><span>512x512</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="mascot">
+    <div class="asset-preview"><img src="app/src/main/assets/images/mascot/lily_waving.png" alt="lily_waving"></div>
+    <div class="asset-meta"><div class="asset-title">lily_waving.png</div><div class="asset-tag"><span class="badge-tag">Mascot</span><span>512x512</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="mascot">
+    <div class="asset-preview"><img src="app/src/main/assets/images/mascot/lily_pointing.png" alt="lily_pointing"></div>
+    <div class="asset-meta"><div class="asset-title">lily_pointing.png</div><div class="asset-tag"><span class="badge-tag">Mascot</span><span>512x512</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="mascot">
+    <div class="asset-preview"><img src="app/src/main/assets/images/mascot/lily_celebrating.png" alt="lily_celebrating"></div>
+    <div class="asset-meta"><div class="asset-title">lily_celebrating.png</div><div class="asset-tag"><span class="badge-tag">Mascot</span><span>512x512</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="mascot">
+    <div class="asset-preview"><img src="app/src/main/assets/images/mascot/lily_encouraging.png" alt="lily_encouraging"></div>
+    <div class="asset-meta"><div class="asset-title">lily_encouraging.png</div><div class="asset-tag"><span class="badge-tag">Mascot</span><span>512x512</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="mascot">
+    <div class="asset-preview"><img src="app/src/main/assets/images/mascot/lily_thinking.png" alt="lily_thinking"></div>
+    <div class="asset-meta"><div class="asset-title">lily_thinking.png</div><div class="asset-tag"><span class="badge-tag">Mascot</span><span>512x512</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="mascot">
+    <div class="asset-preview"><img src="app/src/main/assets/images/mascot/lily_listening.png" alt="lily_listening"></div>
+    <div class="asset-meta"><div class="asset-title">lily_listening.png</div><div class="asset-tag"><span class="badge-tag">Mascot</span><span>512x512</span></div></div>
+  </div>
+
+  <!-- Avatars (6) -->
+  <div class="asset-card" data-cat="avatar">
+    <div class="asset-preview"><img src="app/src/main/assets/images/mascot/avatar_01.png" alt="avatar_01"></div>
+    <div class="asset-meta"><div class="asset-title">avatar_01 (Cat)</div><div class="asset-tag"><span class="badge-tag">Avatar</span><span>512x512</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="avatar">
+    <div class="asset-preview"><img src="app/src/main/assets/images/mascot/avatar_02.png" alt="avatar_02"></div>
+    <div class="asset-meta"><div class="asset-title">avatar_02 (Monkey)</div><div class="asset-tag"><span class="badge-tag">Avatar</span><span>512x512</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="avatar">
+    <div class="asset-preview"><img src="app/src/main/assets/images/mascot/avatar_03.png" alt="avatar_03"></div>
+    <div class="asset-meta"><div class="asset-title">avatar_03 (Bunny)</div><div class="asset-tag"><span class="badge-tag">Avatar</span><span>512x512</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="avatar">
+    <div class="asset-preview"><img src="app/src/main/assets/images/mascot/avatar_04.png" alt="avatar_04"></div>
+    <div class="asset-meta"><div class="asset-title">avatar_04 (Bear/Kodi)</div><div class="asset-tag"><span class="badge-tag">Avatar</span><span>512x512</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="avatar">
+    <div class="asset-preview"><img src="app/src/main/assets/images/mascot/avatar_05.png" alt="avatar_05"></div>
+    <div class="asset-meta"><div class="asset-title">avatar_05 (Frog)</div><div class="asset-tag"><span class="badge-tag">Avatar</span><span>512x512</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="avatar">
+    <div class="asset-preview"><img src="app/src/main/assets/images/mascot/avatar_06.png" alt="avatar_06"></div>
+    <div class="asset-meta"><div class="asset-title">avatar_06 (Owl/Peck)</div><div class="asset-tag"><span class="badge-tag">Avatar</span><span>512x512</span></div></div>
+  </div>
+
+  <!-- Rewards (4) -->
+  <div class="asset-card" data-cat="reward">
+    <div class="asset-preview"><img src="app/src/main/assets/images/rewards/reward_star.png" alt="reward_star"></div>
+    <div class="asset-meta"><div class="asset-title">reward_star.png</div><div class="asset-tag"><span class="badge-tag">Reward</span><span>512x512</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="reward">
+    <div class="asset-preview"><img src="app/src/main/assets/images/rewards/reward_heart.png" alt="reward_heart"></div>
+    <div class="asset-meta"><div class="asset-title">reward_heart.png</div><div class="asset-tag"><span class="badge-tag">Reward</span><span>512x512</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="reward">
+    <div class="asset-preview"><img src="app/src/main/assets/images/rewards/reward_streak.png" alt="reward_streak"></div>
+    <div class="asset-meta"><div class="asset-title">reward_streak.png</div><div class="asset-tag"><span class="badge-tag">Reward</span><span>512x512</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="reward">
+    <div class="asset-preview"><img src="app/src/main/assets/images/rewards/reward_confetti_burst.png" alt="reward_confetti_burst"></div>
+    <div class="asset-meta"><div class="asset-title">reward_confetti.png</div><div class="asset-tag"><span class="badge-tag">Reward</span><span>512x512</span></div></div>
+  </div>
+
+  <!-- Pictures (Targets) -->
+  <div class="asset-card" data-cat="picture">
+    <div class="asset-preview"><img src="app/src/main/assets/images/pictures/picture_apple.png" alt="picture_apple"></div>
+    <div class="asset-meta"><div class="asset-title">picture_apple.png</div><div class="asset-tag"><span class="badge-tag">Target</span><span>1024x1024</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="picture">
+    <div class="asset-preview"><img src="app/src/main/assets/images/pictures/picture_ball.png" alt="picture_ball"></div>
+    <div class="asset-meta"><div class="asset-title">picture_ball.png</div><div class="asset-tag"><span class="badge-tag">Target</span><span>1024x1024</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="picture">
+    <div class="asset-preview"><img src="app/src/main/assets/images/pictures/picture_cat.png" alt="picture_cat"></div>
+    <div class="asset-meta"><div class="asset-title">picture_cat.png</div><div class="asset-tag"><span class="badge-tag">Target</span><span>1024x1024</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="picture">
+    <div class="asset-preview"><img src="app/src/main/assets/images/pictures/picture_dog.png" alt="picture_dog"></div>
+    <div class="asset-meta"><div class="asset-title">picture_dog.png</div><div class="asset-tag"><span class="badge-tag">Target</span><span>1024x1024</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="picture">
+    <div class="asset-preview"><img src="app/src/main/assets/images/pictures/picture_elephant.png" alt="picture_elephant"></div>
+    <div class="asset-meta"><div class="asset-title">picture_elephant.png</div><div class="asset-tag"><span class="badge-tag">Target</span><span>1024x1024</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="picture">
+    <div class="asset-preview"><img src="app/src/main/assets/images/pictures/picture_fish.png" alt="picture_fish"></div>
+    <div class="asset-meta"><div class="asset-title">picture_fish.png</div><div class="asset-tag"><span class="badge-tag">Target</span><span>1024x1024</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="picture">
+    <div class="asset-preview"><img src="app/src/main/assets/images/pictures/picture_goat.png" alt="picture_goat"></div>
+    <div class="asset-meta"><div class="asset-title">picture_goat.png</div><div class="asset-tag"><span class="badge-tag">Target</span><span>1024x1024</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="picture">
+    <div class="asset-preview"><img src="app/src/main/assets/images/pictures/picture_hat.png" alt="picture_hat"></div>
+    <div class="asset-meta"><div class="asset-title">picture_hat.png</div><div class="asset-tag"><span class="badge-tag">Target</span><span>1024x1024</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="picture">
+    <div class="asset-preview"><img src="app/src/main/assets/images/pictures/picture_lion.png" alt="picture_lion"></div>
+    <div class="asset-meta"><div class="asset-title">picture_lion.png</div><div class="asset-tag"><span class="badge-tag">Target</span><span>1024x1024</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="picture">
+    <div class="asset-preview"><img src="app/src/main/assets/images/pictures/picture_mouse.png" alt="picture_mouse"></div>
+    <div class="asset-meta"><div class="asset-title">picture_mouse.png</div><div class="asset-tag"><span class="badge-tag">Target</span><span>1024x1024</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="picture">
+    <div class="asset-preview"><img src="app/src/main/assets/images/pictures/picture_sun.png" alt="picture_sun"></div>
+    <div class="asset-meta"><div class="asset-title">picture_sun.png</div><div class="asset-tag"><span class="badge-tag">Target</span><span>1024x1024</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="picture">
+    <div class="asset-preview"><img src="app/src/main/assets/images/pictures/picture_zebra.png" alt="picture_zebra"></div>
+    <div class="asset-meta"><div class="asset-title">picture_zebra.png</div><div class="asset-tag"><span class="badge-tag">Target</span><span>1024x1024</span></div></div>
+  </div>
+
+  <!-- Blend Words -->
+  <div class="asset-card" data-cat="blend">
+    <div class="asset-preview"><img src="app/src/main/assets/images/pictures/blendword_aim.png" alt="blendword_aim"></div>
+    <div class="asset-meta"><div class="asset-title">blendword_aim.png</div><div class="asset-tag"><span class="badge-tag">Blend It</span><span>512x512</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="blend">
+    <div class="asset-preview"><img src="app/src/main/assets/images/pictures/blendword_bat.png" alt="blendword_bat"></div>
+    <div class="asset-meta"><div class="asset-title">blendword_bat.png</div><div class="asset-tag"><span class="badge-tag">Blend It</span><span>512x512</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="blend">
+    <div class="asset-preview"><img src="app/src/main/assets/images/pictures/blendword_cake.png" alt="blendword_cake"></div>
+    <div class="asset-meta"><div class="asset-title">blendword_cake.png</div><div class="asset-tag"><span class="badge-tag">Blend It</span><span>512x512</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="blend">
+    <div class="asset-preview"><img src="app/src/main/assets/images/pictures/blendword_fish.png" alt="blendword_fish"></div>
+    <div class="asset-meta"><div class="asset-title">blendword_fish.png</div><div class="asset-tag"><span class="badge-tag">Blend It</span><span>512x512</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="blend">
+    <div class="asset-preview"><img src="app/src/main/assets/images/pictures/blendword_fox.png" alt="blendword_fox"></div>
+    <div class="asset-meta"><div class="asset-title">blendword_fox.png</div><div class="asset-tag"><span class="badge-tag">Blend It</span><span>512x512</span></div></div>
+  </div>
+
+  <!-- Map Props -->
+  <div class="asset-card" data-cat="map">
+    <div class="asset-preview"><img src="app/src/main/assets/images/backgrounds/mapprop_nipa_hut.png" alt="mapprop_nipa_hut"></div>
+    <div class="asset-meta"><div class="asset-title">mapprop_nipa_hut.png</div><div class="asset-tag"><span class="badge-tag">Map Prop</span><span>512x512</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="map">
+    <div class="asset-preview"><img src="app/src/main/assets/images/backgrounds/mapprop_palm_tree.png" alt="mapprop_palm_tree"></div>
+    <div class="asset-meta"><div class="asset-title">mapprop_palm_tree.png</div><div class="asset-tag"><span class="badge-tag">Map Prop</span><span>512x512</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="map">
+    <div class="asset-preview"><img src="app/src/main/assets/images/backgrounds/mapprop_crayon_bridge.png" alt="mapprop_crayon_bridge"></div>
+    <div class="asset-meta"><div class="asset-title">crayon_bridge.png</div><div class="asset-tag"><span class="badge-tag">Map Prop</span><span>400x400</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="map">
+    <div class="asset-preview"><img src="app/src/main/assets/images/backgrounds/mapprop_pencil_tower.png" alt="mapprop_pencil_tower"></div>
+    <div class="asset-meta"><div class="asset-title">pencil_tower.png</div><div class="asset-tag"><span class="badge-tag">Map Prop</span><span>400x400</span></div></div>
+  </div>
+
+  <!-- Letters -->
+  <div class="asset-card" data-cat="letter">
+    <div class="asset-preview"><img src="app/src/main/assets/images/letters/letter_m.png" alt="letter_m"></div>
+    <div class="asset-meta"><div class="asset-title">letter_m.png</div><div class="asset-tag"><span class="badge-tag">Letter</span><span>1024x1024</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="letter">
+    <div class="asset-preview"><img src="app/src/main/assets/images/letters/letter_s.png" alt="letter_s"></div>
+    <div class="asset-meta"><div class="asset-title">letter_s.png</div><div class="asset-tag"><span class="badge-tag">Letter</span><span>1024x1024</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="letter">
+    <div class="asset-preview"><img src="app/src/main/assets/images/letters/letter_a.png" alt="letter_a"></div>
+    <div class="asset-meta"><div class="asset-title">letter_a.png</div><div class="asset-tag"><span class="badge-tag">Letter</span><span>1024x1024</span></div></div>
+  </div>
+  <div class="asset-card" data-cat="letter">
+    <div class="asset-preview"><img src="app/src/main/assets/images/letters/letter_i.png" alt="letter_i"></div>
+    <div class="asset-meta"><div class="asset-title">letter_i.png</div><div class="asset-tag"><span class="badge-tag">Letter</span><span>1024x1024</span></div></div>
+  </div>
+
+</div>
+
+<script>
+function filterCategory(cat, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const cards = document.querySelectorAll('.asset-card');
+  cards.forEach(card => {
+    if (cat === 'all' || card.getAttribute('data-cat') === cat) {
+      card.style.display = 'flex';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+function changeBg(type, dot) {
+  document.querySelectorAll('.bg-dot').forEach(d => d.classList.remove('active'));
+  dot.classList.add('active');
+  const previews = document.querySelectorAll('.asset-preview');
+  previews.forEach(p => {
+    if (type === 'checker') {
+      p.style.background = 'repeating-conic-gradient(#EEE 0% 25%, #FFF 0% 50%) 50% / 14px 14px';
+    } else if (type === 'white') {
+      p.style.background = '#FFFFFF';
+    } else if (type === 'dark') {
+      p.style.background = '#2D373E';
+    } else if (type === 'sky') {
+      p.style.background = 'linear-gradient(180deg, #CFE9FF 0%, #FFF5E6 100%)';
+    }
+  });
+}
+</script>
+
+</body>
+</html>
