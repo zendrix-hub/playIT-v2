@@ -3,84 +3,59 @@ package com.playit.app.data.speech
 import android.content.Context
 import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONArray
 import org.json.JSONObject
 import org.vosk.Model
 import org.vosk.Recognizer
-import java.io.File
-import java.io.FileOutputStream
+import org.vosk.android.RecognitionListener
+import org.vosk.android.SpeechService
+import org.vosk.android.StorageService
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.resume
 
 private const val TAG = "VoskRecognizer"
 
 @Singleton
 class VoskRecognizer @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val audioCapture: AudioCapture
+    @ApplicationContext private val context: Context
 ) {
     private var model: Model? = null
-    private var recognizer: Recognizer? = null
-    private var isListening = false
+    private var speechService: SpeechService? = null
+    private var isReady = false
+    private var lastRecognizedText: String = ""
+    private var activeGrammarJson: String? = null
 
-    fun isModelReady(): Boolean = recognizer != null
+    fun isModelReady(): Boolean = isReady && model != null
 
-    suspend fun initModel(): Boolean = withContext(Dispatchers.IO) {
-        if (model != null && recognizer != null) return@withContext true
-        try {
-            val modelDir = File(context.filesDir, "model")
-            if (!modelDir.exists() || modelDir.list().isNullOrEmpty()) {
-                copyAssetFolder(context, "model", modelDir)
-            }
-
-            if (modelDir.exists() && !modelDir.list().isNullOrEmpty()) {
-                model = Model(modelDir.absolutePath)
-                recognizer = Recognizer(model, 16000.0f)
-                return@withContext true
-            }
-
-            val fallbackDir = File(context.filesDir, "vosk-model-small-en-us")
-            if (!fallbackDir.exists() || fallbackDir.list().isNullOrEmpty()) {
-                copyAssetFolder(context, "audio/vosk-model-small-en-us", fallbackDir)
-            }
-            if (fallbackDir.exists() && !fallbackDir.list().isNullOrEmpty()) {
-                model = Model(fallbackDir.absolutePath)
-                recognizer = Recognizer(model, 16000.0f)
-                return@withContext true
-            }
-
-            Log.w(TAG, "Vosk acoustic model not yet bundled in assets. Running in high-sensitivity acoustic mode.")
-            false
-        } catch (e: Exception) {
-            Log.e(TAG, "Error initializing Vosk model", e)
-            false
+    suspend fun initModel(): Boolean = suspendCancellableCoroutine { continuation ->
+        if (model != null && isReady) {
+            continuation.resume(true)
+            return@suspendCancellableCoroutine
         }
-    }
 
-    private fun copyAssetFolder(context: Context, srcName: String, dstDir: File): Boolean {
-        return try {
-            val fileList = context.assets.list(srcName) ?: return false
-            if (fileList.isEmpty()) return false
-            if (!dstDir.exists()) dstDir.mkdirs()
-            for (file in fileList) {
-                val srcPath = "$srcName/$file"
-                val dstFile = File(dstDir, file)
-                val subFiles = context.assets.list(srcPath)
-                if (!subFiles.isNullOrEmpty()) {
-                    copyAssetFolder(context, srcPath, dstFile)
-                } else {
-                    context.assets.open(srcPath).use { inStream ->
-                        FileOutputStream(dstFile).use { outStream ->
-                            inStream.copyTo(outStream)
-                        }
-                    }
+        try {
+            StorageService.unpack(
+                context,
+                "vosk-model",
+                "model",
+                { loadedModel ->
+                    model = loadedModel
+                    isReady = true
+                    Log.i(TAG, "Vosk acoustic model successfully unpacked and initialized")
+                    continuation.resume(true)
+                },
+                { exception ->
+                    Log.e(TAG, "Vosk model unpacking error: ${exception.message}", exception)
+                    isReady = false
+                    continuation.resume(false)
                 }
-            }
-            true
+            )
         } catch (e: Exception) {
-            false
+            Log.e(TAG, "Unexpected error unpacking Vosk model: ${e.message}", e)
+            isReady = false
+            continuation.resume(false)
         }
     }
 
@@ -91,86 +66,113 @@ class VoskRecognizer @Inject constructor(
     fun setGrammar(grammarTokens: List<String>) {
         try {
             val jsonArray = JSONArray()
-            grammarTokens.forEach { jsonArray.put(it) }
+            grammarTokens.forEach { jsonArray.put(it.lowercase().trim()) }
             jsonArray.put("[unk]")
-            recognizer?.setGrammar(jsonArray.toString())
+            activeGrammarJson = jsonArray.toString()
         } catch (e: Exception) {
-            Log.w(TAG, "Grammar restriction failed or unsupported on current model: ${e.message}")
+            Log.w(TAG, "Grammar formatting error: ${e.message}")
+            activeGrammarJson = null
         }
     }
 
-    suspend fun startListening(
-        onResult: (String) -> Unit,
-        onAmplitude: ((amplitudeDb: Float, normalizedLevel: Float) -> Unit)? = null
-    ) = withContext(Dispatchers.IO) {
-        isListening = true
-        audioCapture.startRecording(
-            onAudioData = { buffer: ByteArray, bytesRead: Int ->
-                if (!isListening) return@startRecording
-                recognizer?.let { rec ->
-                    if (rec.acceptWaveForm(buffer, bytesRead)) {
-                        val resultJson = rec.result
-                        val text = parseTextFromJson(resultJson)
-                        if (text.isNotBlank()) {
-                            onResult(text)
-                        }
-                    } else {
-                        // Live partial recognition for immediate child phoneme capture
-                        val partialJson = rec.partialResult
-                        val partialText = parsePartialFromJson(partialJson)
-                        if (partialText.isNotBlank()) {
-                            onResult(partialText)
-                        }
+    /**
+     * Starts listening using Android's native SpeechService with RecognitionListener callbacks.
+     */
+    fun startListening(
+        onResult: (String) -> Unit
+    ) {
+        val currentModel = model ?: run {
+            Log.w(TAG, "Cannot start listening: Vosk model not loaded yet")
+            return
+        }
+
+        try {
+            speechService?.stop()
+            speechService?.shutdown()
+            speechService = null
+            lastRecognizedText = ""
+
+            val recognizer = if (!activeGrammarJson.isNullOrBlank()) {
+                try {
+                    Recognizer(currentModel, 16000.0f, activeGrammarJson)
+                } catch (e: Exception) {
+                    Log.w(TAG, "Could not initialize with grammar, falling back to open vocabulary", e)
+                    Recognizer(currentModel, 16000.0f)
+                }
+            } else {
+                Recognizer(currentModel, 16000.0f)
+            }
+
+            val service = SpeechService(recognizer, 16000.0f)
+            speechService = service
+
+            service.startListening(object : RecognitionListener {
+                override fun onPartialResult(hypothesis: String?) {
+                    if (hypothesis == null) return
+                    val text = parseResult(hypothesis, "partial")
+                    if (text.isNotBlank()) {
+                        lastRecognizedText = text
+                        onResult(text)
                     }
                 }
-            },
-            onAmplitude = { db, norm ->
-                if (isListening) {
-                    onAmplitude?.invoke(db, norm)
-                }
-            }
-        )
-    }
 
-    suspend fun startListening(onResult: (String) -> Unit) {
-        startListening(onResult, null)
+                override fun onResult(hypothesis: String?) {
+                    if (hypothesis == null) return
+                    val text = parseResult(hypothesis, "text")
+                    if (text.isNotBlank()) {
+                        lastRecognizedText = text
+                        onResult(text)
+                    }
+                }
+
+                override fun onFinalResult(hypothesis: String?) {
+                    if (hypothesis == null) return
+                    val text = parseResult(hypothesis, "text")
+                    if (text.isNotBlank()) {
+                        lastRecognizedText = text
+                        onResult(text)
+                    }
+                }
+
+                override fun onError(exception: java.lang.Exception?) {
+                    Log.e(TAG, "Vosk recognition error: ${exception?.message}")
+                }
+
+                override fun onTimeout() {
+                    Log.d(TAG, "Vosk recognition timeout")
+                }
+            })
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start Vosk SpeechService: ${e.message}", e)
+        }
     }
 
     fun stopListening(): String {
-        isListening = false
-        audioCapture.stopRecording()
-        val finalResultJson = recognizer?.finalResult ?: ""
-        return parseTextFromJson(finalResultJson)
+        try {
+            speechService?.stop()
+        } catch (e: Exception) {
+            Log.w(TAG, "Error stopping SpeechService: ${e.message}")
+        }
+        val text = lastRecognizedText
+        lastRecognizedText = ""
+        return text
     }
 
     fun release() {
-        isListening = false
-        audioCapture.stopRecording()
         try {
-            recognizer?.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+            speechService?.shutdown()
+        } catch (_: Exception) {}
+        speechService = null
         try {
             model?.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        recognizer = null
+        } catch (_: Exception) {}
         model = null
+        isReady = false
     }
 
-    private fun parseTextFromJson(jsonStr: String): String {
+    private fun parseResult(jsonStr: String, key: String): String {
         return try {
-            JSONObject(jsonStr).optString("text", "")
-        } catch (e: Exception) {
-            ""
-        }
-    }
-
-    private fun parsePartialFromJson(jsonStr: String): String {
-        return try {
-            JSONObject(jsonStr).optString("partial", "")
+            JSONObject(jsonStr).optString(key, "").trim()
         } catch (e: Exception) {
             ""
         }

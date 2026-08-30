@@ -70,8 +70,6 @@ class SayItViewModel @Inject constructor(
     private val _loadError = MutableStateFlow(false)
     val loadError: StateFlow<Boolean> = _loadError.asStateFlow()
 
-    private var vocalFramesCount = 0
-    private var maxSpokenAmplitude = 0f
     private var autoStopJob: Job? = null
 
     init {
@@ -141,58 +139,27 @@ class SayItViewModel @Inject constructor(
         
         _state.value = SayItState.Listening
         _isNoisyEnvironment.value = false
-        vocalFramesCount = 0
-        maxSpokenAmplitude = 0f
-        var noisyFramesCount = 0
 
-        // Auto-timeout after 3.2s maximum window
+        // Auto-timeout after 3.8s maximum window if child hasn't finished speaking
         autoStopJob = viewModelScope.launch {
-            delay(3200L)
+            delay(3800L)
             if (_state.value is SayItState.Listening) {
                 stopListening()
             }
         }
 
-        viewModelScope.launch {
-            voskRecognizer.startListening(
-                onResult = { transcript ->
-                    if (transcript.isNotBlank() && speechValidator.validate(transcript, target)) {
+        voskRecognizer.startListening(
+            onResult = { transcript ->
+                if (transcript.isNotBlank() && _state.value is SayItState.Listening) {
+                    val isCorrect = speechValidator.validate(transcript, target)
+                    if (isCorrect) {
                         autoStopJob?.cancel()
                         voskRecognizer.stopListening()
                         evaluateSpeech(transcript)
                     }
-                },
-                onAmplitude = { db, norm ->
-                    _audioAmplitude.value = norm
-                    if (norm >= 0.08f) {
-                        vocalFramesCount++
-                        if (norm > maxSpokenAmplitude) {
-                            maxSpokenAmplitude = norm
-                        }
-                        // If voice was spoken and followed by a brief pause, automatically check and evaluate!
-                        if (vocalFramesCount >= 3) {
-                            autoStopJob?.cancel()
-                            autoStopJob = viewModelScope.launch {
-                                delay(650L)
-                                if (_state.value is SayItState.Listening) {
-                                    stopListening()
-                                }
-                            }
-                        }
-                    }
-                    if (db > 72f && _state.value is SayItState.Listening) {
-                        noisyFramesCount++
-                        if (noisyFramesCount == 16) {
-                            _isNoisyEnvironment.value = true
-                            playNoiseAlert()
-                        }
-                    } else if (db < 60f) {
-                        noisyFramesCount = 0
-                        _isNoisyEnvironment.value = false
-                    }
                 }
-            )
-        }
+            }
+        )
     }
 
     fun stopListening() {
