@@ -63,6 +63,7 @@ data class PlacedCompanion(
     val animal: CompanionAnimal,
     val offsetDp: Offset,
     val isExplorerLeader: Boolean = false,
+    val isUnlocked: Boolean = false,
     val cheerPhrase: String? = null
 )
 
@@ -103,6 +104,7 @@ fun generateCompanionPlacements(
                 animal = activeAnimal,
                 offsetDp = Offset(explorerX, explorerY),
                 isExplorerLeader = true,
+                isUnlocked = true,
                 cheerPhrase = "Let's Go!"
             )
         )
@@ -128,11 +130,14 @@ fun generateCompanionPlacements(
             }
             val compY = centerDpY - 30f
 
+            val isUnlocked = targetNodeIdx <= activeNodeIndex
+
             companions.add(
                 PlacedCompanion(
                     animal = animal,
                     offsetDp = Offset(compX, compY),
                     isExplorerLeader = false,
+                    isUnlocked = isUnlocked,
                     cheerPhrase = cheerPhrases.getOrNull(index)
                 )
             )
@@ -158,23 +163,25 @@ fun MapCompanionFriends(
     if (nodeCount <= 0 || nodeCenters.isEmpty()) return
 
     val isReducedMotion = LocalReducedMotion.current
-    val infiniteTransition = rememberInfiniteTransition(label = "CompanionAnimation")
+    var tappedCompanionId by remember { mutableStateOf<Int?>(null) }
 
-    // Headspace-style Breathing scale animation (matching SplashScreen.kt)
+    // Synchronized breathing animation matching Splash Screen physics
+    val infiniteTransition = rememberInfiniteTransition(label = "CompanionBreathe")
+
     val breatheScaleY by infiniteTransition.animateFloat(
         initialValue = 1.0f,
-        targetValue = 1.04f,
+        targetValue = 1.055f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 3200, easing = FastOutSlowInEasing),
+            animation = tween(durationMillis = 1100, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "CompanionBreatheY"
     )
     val breatheScaleX by infiniteTransition.animateFloat(
         initialValue = 1.0f,
-        targetValue = 1.02f,
+        targetValue = 0.965f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 3200, easing = FastOutSlowInEasing),
+            animation = tween(durationMillis = 1100, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "CompanionBreatheX"
@@ -208,6 +215,7 @@ fun MapCompanionFriends(
             val charWidth = if (companion.isExplorerLeader) 78.dp else 68.dp
             val charHeight = if (companion.isExplorerLeader) 78.dp else 68.dp
             val animY = if (isReducedMotion) 0f else floatOffset
+            val showBubble = (companion.isUnlocked || companion.isExplorerLeader || tappedCompanionId == companion.animal.id) && companion.cheerPhrase != null
 
             Box(
                 modifier = Modifier
@@ -219,8 +227,8 @@ fun MapCompanionFriends(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    // Speech cheer bubble (for Leader and cheering Friends)
-                    if (companion.cheerPhrase != null) {
+                    // Speech cheer bubble (Shown for reached/unlocked levels and when tapped)
+                    if (showBubble && companion.cheerPhrase != null) {
                         Box(
                             modifier = Modifier
                                 .background(Cloud, RoundedCornerShape(999.dp))
@@ -252,6 +260,7 @@ fun MapCompanionFriends(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null
                             ) {
+                                tappedCompanionId = companion.animal.id
                                 onCompanionTap?.invoke(companion.animal)
                             },
                         contentAlignment = Alignment.Center

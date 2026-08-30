@@ -86,7 +86,7 @@ private fun Color.toShadow(): Color {
  */
 @Composable
 fun GummyContainer(
-    onClick: () -> Unit,
+    onClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     faceColor: Color = LearningBlue,
@@ -107,7 +107,7 @@ fun GummyContainer(
 
     // Press translateY translation (0dp to depthHeight - 1dp)
     val pressOffsetY by animateFloatAsState(
-        targetValue = if (isPressed && enabled && !isReducedMotion) 4f else 0f,
+        targetValue = if (isPressed && enabled && !isReducedMotion && onClick != null) 4f else 0f,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessLow
@@ -133,18 +133,22 @@ fun GummyContainer(
         label = "gummySquashY"
     )
 
+    val clickableModifier = if (onClick != null) {
+        Modifier.clickable(
+            interactionSource = interactionSource,
+            indication = null,
+            enabled = enabled,
+            onClick = onClick
+        )
+    } else Modifier
+
     Box(
         modifier = modifier
             .graphicsLayer {
                 scaleX = squashScaleX
                 scaleY = squashScaleY
             }
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                enabled = enabled,
-                onClick = onClick
-            ),
+            .then(clickableModifier),
         contentAlignment = Alignment.Center
     ) {
         // Bottom depth band layer (shadow color)

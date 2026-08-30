@@ -189,7 +189,7 @@ fun SayItScreen(
                 Spacer(modifier = Modifier.height(10.dp))
 
                 GummyContainer(
-                    onClick = toggleListening,
+                    onClick = null,
                     faceColor = Cloud,
                     shadowColor = CloudShadow,
                     shape = RoundedCornerShape(24.dp),

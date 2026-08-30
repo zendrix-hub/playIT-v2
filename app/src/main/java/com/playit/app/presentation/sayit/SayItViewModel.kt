@@ -189,14 +189,7 @@ class SayItViewModel @Inject constructor(
         val transcript = voskRecognizer.stopListening()
         _audioAmplitude.value = 0f
         if (_state.value is SayItState.Listening) {
-            val targetLetter = _phoneme.value?.letter ?: "m"
-            if (speechValidator.validate(transcript, targetLetter)) {
-                evaluateSpeech(transcript)
-            } else if (vocalFramesCount >= 3 || maxSpokenAmplitude >= 0.12f) {
-                evaluateSpeech(targetLetter)
-            } else {
-                evaluateSpeech(transcript.ifBlank { "" })
-            }
+            evaluateSpeech(transcript)
         }
     }
 
@@ -204,7 +197,7 @@ class SayItViewModel @Inject constructor(
         autoStopJob?.cancel()
         _audioAmplitude.value = 0f
         val targetLetter = _phoneme.value?.letter ?: "m"
-        val isCorrect = speechValidator.validate(transcript, targetLetter) || (vocalFramesCount >= 3)
+        val isCorrect = speechValidator.validate(transcript, targetLetter)
         val profileId = sessionManager.activeProfileId.value ?: 1L
         val phonemeId = _phoneme.value?.id ?: 1
 
