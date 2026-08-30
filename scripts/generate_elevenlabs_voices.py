@@ -35,7 +35,7 @@ for d in [UI_DIR, VO_DIR, PHONEMES_DIR, WORDS_DIR]:
 # VOICE 1: LILY THE TARSIER (Filipino Child Voice)
 # ═══════════════════════════════════════════════════════════════════════════
 CHILD_VO_SCRIPTS = {
-    "vo_welcome_01.mp3": "Hi there! I'm Lily. Let's play and learn together!",
+    "vo_welcome_01.mp3": "Hi there! I'm Lily. Let's play and learn together! Tap your name to start!",
     "vo_return_welcome_01.mp3": "Welcome back! Ready to continue our adventure?",
     "vo_correct_01.mp3": "Yes! That's it!",
     "vo_correct_02.mp3": "Perfect! Great job!",

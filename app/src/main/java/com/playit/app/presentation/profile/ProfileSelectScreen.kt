@@ -140,12 +140,12 @@ fun ProfileSelectScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Companion Mascot Dialogue (Warm auto-greeting + visible speaker replay badge)
+            // Companion Mascot Dialogue (Warm auto-greeting + visible speaker replay badge with 100% verbatim text)
             MascotSpeechHeader(
                 message = if (profiles.isEmpty()) {
                     "Welcome to PlayIT! Tap '+ Add New Profile' below to begin your sound adventure!"
                 } else {
-                    "Who's ready to learn sounds today? Tap your name!"
+                    "Hi there! I'm Lily. Let's play and learn together! Tap your name to start!"
                 },
                 mascotState = if (profiles.isEmpty()) MascotState.POINTING else MascotState.WAVING,
                 isPlayingAudio = isPlayingGreeting,
