@@ -80,7 +80,9 @@ import com.playit.app.presentation.map.components.GroupBannerStatus
 import com.playit.app.presentation.map.components.MapCompanionFriends
 import com.playit.app.presentation.map.components.MapPathCanvas
 import com.playit.app.presentation.map.components.MarungkoGroupBanner
+import com.playit.app.presentation.map.components.NodeActionPopupDialog
 import com.playit.app.presentation.map.components.TopStatsBar
+import com.playit.app.presentation.map.components.UnitGuidebookDialog
 import com.playit.app.presentation.map.components.calculateNodeXOffsetDp
 import com.playit.app.presentation.theme.Cloud
 import com.playit.app.presentation.theme.DarkBrownOutline
@@ -150,6 +152,10 @@ fun MapScreen(
         val lastUnlocked = mapNodes.indexOfLast { it.isUnlocked }
         if (lastUnlocked != -1) lastUnlocked else 0
     }
+
+    // Dialog states for Duolingo Node Action Card & Unit Guidebook
+    var selectedNodeForAction by remember { mutableStateOf<MapNode?>(null) }
+    var selectedGuidebookUnit by remember { mutableStateOf<Int?>(null) }
 
     // Shake animation state for locked node taps
     var shakenNodeId by remember { mutableStateOf<String?>(null) }
@@ -376,6 +382,9 @@ fun MapScreen(
                             MarungkoGroupBanner(
                                 groupNumber = node.groupNumber,
                                 status = groupStatus,
+                                onGuidebookClick = {
+                                    selectedGuidebookUnit = node.groupNumber
+                                },
                                 modifier = Modifier.padding(bottom = 6.dp)
                             )
                         }
@@ -402,9 +411,10 @@ fun MapScreen(
                                         node = node,
                                         onClick = {
                                             if (node.isUnlocked) {
-                                                onNodeSelected(node.id)
+                                                selectedNodeForAction = node
                                             } else {
                                                 shakenNodeId = node.id
+                                                selectedNodeForAction = node
                                                 viewModel.onLockedNodeTapped()
                                             }
                                         }
@@ -415,10 +425,10 @@ fun MapScreen(
                                         node = node,
                                         onClick = {
                                             if (node.isUnlocked) {
-                                                onNodeSelected(node.id)
+                                                selectedNodeForAction = node
                                             } else {
                                                 shakenNodeId = node.id
-                                                lockedBlendItDialogGroup = node.groupId
+                                                selectedNodeForAction = node
                                                 viewModel.onLockedNodeTapped()
                                             }
                                         }
@@ -443,6 +453,26 @@ fun MapScreen(
                         .height(totalMapHeightDp)
                 )
             }
+        }
+
+        // Duolingo Signature Floating 3D Node Action Card
+        selectedNodeForAction?.let { targetNode ->
+            NodeActionPopupDialog(
+                node = targetNode,
+                onStartChallenge = { nodeId ->
+                    selectedNodeForAction = null
+                    onNodeSelected(nodeId)
+                },
+                onDismiss = { selectedNodeForAction = null }
+            )
+        }
+
+        // Duolingo Unit Phonics Guidebook Dialog
+        selectedGuidebookUnit?.let { unitNum ->
+            UnitGuidebookDialog(
+                unitNumber = unitNum,
+                onDismiss = { selectedGuidebookUnit = null }
+            )
         }
 
         // Locked Blend-It Informational Dialog
@@ -629,32 +659,56 @@ fun LetterMapNodeCard(
                         )
                     }
 
-                    // Inner Icon / Letter
-                    if (isCompleted) {
-                        // Mastered Golden Star (matching duoling_map_sample.jpg)
-                        Icon(
-                            imageVector = Icons.Rounded.Star,
-                            contentDescription = "Completed Phonics Star",
-                            tint = DuolingoGoldStar,
-                            modifier = Modifier.size(38.dp)
-                        )
-                    } else if (node.isUnlocked) {
-                        // Active Green Disc with Bold White Letter
-                        Text(
-                            text = node.symbol,
-                            fontFamily = LexendFontFamily,
-                            fontSize = 36.sp,
-                            fontWeight = FontWeight.Black,
-                            color = Color.White
-                        )
-                    } else {
-                        // Locked Slate Disc
-                        Icon(
-                            imageVector = Icons.Rounded.Lock,
-                            contentDescription = "Locked Letter",
-                            tint = DuolingoLockedIcon,
-                            modifier = Modifier.size(28.dp)
-                        )
+                    // Inner Letter Symbol (Always visible before, during, and after completion!)
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        if (isCompleted) {
+                            // Mastered Gold Disc with Bold White Letter (Always visible!)
+                            Text(
+                                text = node.symbol,
+                                fontFamily = LexendFontFamily,
+                                fontSize = 36.sp,
+                                fontWeight = FontWeight.Black,
+                                color = Color.White
+                            )
+                        } else if (node.isUnlocked) {
+                            // Active Green Disc with Bold White Letter
+                            Text(
+                                text = node.symbol,
+                                fontFamily = LexendFontFamily,
+                                fontSize = 36.sp,
+                                fontWeight = FontWeight.Black,
+                                color = Color.White
+                            )
+                        } else {
+                            // Locked Slate Disc — Letter symbol STILL VISIBLE in soft slate with subtle lock badge
+                            Text(
+                                text = node.symbol,
+                                fontFamily = LexendFontFamily,
+                                fontSize = 34.sp,
+                                fontWeight = FontWeight.Black,
+                                color = Color(0xFF94A3B8)
+                            )
+                            // Mini Lock indicator badge at bottom right
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.BottomEnd)
+                                    .offset(x = (-4).dp, y = (-4).dp)
+                                    .size(20.dp)
+                                    .background(Color(0xFF64748B), CircleShape)
+                                    .border(1.5.dp, Color.White, CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Lock,
+                                    contentDescription = "Locked Letter",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(12.dp)
+                                )
+                            }
+                        }
                     }
                 }
             }

@@ -1,6 +1,7 @@
 package com.playit.app.presentation.map.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -67,7 +68,8 @@ fun getMarungkoLettersForGroup(groupNumber: Int): String {
 fun MarungkoGroupBanner(
     groupNumber: Int,
     status: GroupBannerStatus,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onGuidebookClick: () -> Unit = {}
 ) {
     val theme = BiomeThemes.forSection(groupNumber)
 
@@ -152,17 +154,18 @@ fun MarungkoGroupBanner(
                         )
                     }
 
-                    // Guidebook notebook icon button on the right
+                    // Interactive Guidebook notebook icon button on the right
                     Box(
                         modifier = Modifier
                             .size(44.dp)
                             .clip(RoundedCornerShape(12.dp))
-                            .background(if (status == GroupBannerStatus.LOCKED) Color(0xFFCBD5E1) else theme.shelfColor),
+                            .background(if (status == GroupBannerStatus.LOCKED) Color(0xFFCBD5E1) else theme.shelfColor)
+                            .clickable { onGuidebookClick() },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Rounded.AutoStories,
-                            contentDescription = "Guidebook",
+                            contentDescription = "Guidebook for Unit $groupNumber",
                             tint = Color.White,
                             modifier = Modifier.size(24.dp)
                         )

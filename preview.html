@@ -581,10 +581,10 @@ body {
             </div>
 
             <!-- 3D Duolingo Nodes -->
-            <!-- Node M (Mastered Gold Star Disc with 3 Stars Below) -->
+            <!-- Node M (Mastered Gold Star Disc with Bold Letter M + 3 Stars Below) -->
             <div class="duo-node duo-gold" style="top:10px; left:60px;" onclick="switchScreen('hearit')">
               <div class="duo-node-shelf"></div>
-              <div class="duo-node-face">★</div>
+              <div class="duo-node-face">M</div>
               <div style="position:absolute; bottom:-16px; left:0; width:100%; text-align:center; font-size:10px; color:#F59E0B;">★ ★ ★</div>
             </div>
 
@@ -617,7 +617,7 @@ body {
               <div style="position:absolute; bottom:-14px; left:50%; transform:translateX(-50%); background:#78350F; color:white; font-size:8px; font-weight:900; padding:1px 6px; border-radius:999px; white-space:nowrap;">BLEND 1</div>
             </div>
 
-            <!-- Group 2 Banner -->
+            <!-- Group 2 Banner with Guidebook -->
             <div style="position:absolute; top:520px; width:100%; height:68px;">
               <div style="position:absolute; bottom:0; left:0; width:100%; height:62px; background:#CBD5E1; border-radius:18px;"></div>
               <div style="position:absolute; top:0; left:0; width:100%; height:62px; background:#E2E8F0; border-radius:18px; padding:10px 16px; display:flex; justify-content:space-between; align-items:center; box-sizing:border-box;">
@@ -625,14 +625,17 @@ body {
                   <div style="font-size:10px; font-weight:800; color:#64748B;">SECTION 1, UNIT 2</div>
                   <div style="font-size:15px; font-weight:900; color:#334155; margin-top:2px;">Loboc River Valley</div>
                 </div>
-                <div style="background:#CBD5E1; color:#475569; padding:3px 10px; border-radius:999px; font-size:10px; font-weight:800;">Locked</div>
+                <div style="background:#CBD5E1; color:#334155; width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; cursor:pointer;">📖</div>
               </div>
             </div>
 
-            <!-- Locked Group 2 Node O -->
+            <!-- Locked Group 2 Node B (Letter B Visible with subtle Lock Badge) -->
             <div class="duo-node duo-locked" style="top:600px; left:70px;" onclick="showLockedNodeToast()">
               <div class="duo-node-shelf"></div>
-              <div class="duo-node-face">🔒</div>
+              <div class="duo-node-face" style="color:#94A3B8; position:relative;">
+                B
+                <span style="position:absolute; bottom:4px; right:6px; font-size:11px; background:#64748B; border-radius:50%; width:16px; height:16px; display:flex; align-items:center; justify-content:center; color:white; border:1px solid white;">🔒</span>
+              </div>
             </div>
           </div>
         </div>
