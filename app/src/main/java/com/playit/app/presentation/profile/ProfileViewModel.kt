@@ -47,6 +47,9 @@ class ProfileViewModel @Inject constructor(
     private val _showArithmeticGuard = MutableStateFlow(false)
     val showArithmeticGuard: StateFlow<Boolean> = _showArithmeticGuard.asStateFlow()
 
+    private val _isPlayingGreeting = MutableStateFlow(false)
+    val isPlayingGreeting: StateFlow<Boolean> = _isPlayingGreeting.asStateFlow()
+
     fun requestParentAccess() { _showArithmeticGuard.value = true }
     fun dismissArithmeticGuard() { _showArithmeticGuard.value = false }
     fun onArithmeticGuardPassed() {
@@ -54,6 +57,8 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun selectProfile(profileId: Long) {
+        audioPlayer.stop()
+        _isPlayingGreeting.value = false
         sessionManager.setActiveProfile(profileId)
     }
 
@@ -70,7 +75,10 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun playWelcomeGreeting() {
-        audioPlayer.playAssetAudio(audioResolver.getVoPath(VoContext.WELCOME_01))
+        _isPlayingGreeting.value = true
+        audioPlayer.playAssetAudio(audioResolver.getVoPath(VoContext.WELCOME_01)) {
+            _isPlayingGreeting.value = false
+        }
     }
 
     fun playNamePromptIntro() {
@@ -79,6 +87,11 @@ class ProfileViewModel @Inject constructor(
 
     fun playParentGateAudio() {
         audioPlayer.playAssetAudio(audioResolver.getVoPath(VoContext.PARENT_GATE))
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        audioPlayer.stop()
     }
 
     fun createProfile(name: String, avatarResId: Int) {

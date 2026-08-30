@@ -34,7 +34,13 @@ fun ProfileSelectScreen(
 ) {
     val profiles by viewModel.profiles.collectAsState()
     val showArithmeticGuard by viewModel.showArithmeticGuard.collectAsState()
+    val isPlayingGreeting by viewModel.isPlayingGreeting.collectAsState()
     val scrollState = rememberScrollState()
+
+    // Snappy, warm auto-greeting on screen open
+    LaunchedEffect(Unit) {
+        viewModel.playWelcomeGreeting()
+    }
 
     if (showArithmeticGuard) {
         ArithmeticGuardDialog(
@@ -134,7 +140,7 @@ fun ProfileSelectScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Companion Mascot Dialogue (Interactive on user tap, no auto-play delay on load)
+            // Companion Mascot Dialogue (Warm auto-greeting + visible speaker replay badge)
             MascotSpeechHeader(
                 message = if (profiles.isEmpty()) {
                     "Welcome to PlayIT! Tap '+ Add New Profile' below to begin your sound adventure!"
@@ -142,6 +148,7 @@ fun ProfileSelectScreen(
                     "Who's ready to learn sounds today? Tap your name!"
                 },
                 mascotState = if (profiles.isEmpty()) MascotState.POINTING else MascotState.WAVING,
+                isPlayingAudio = isPlayingGreeting,
                 onMascotTap = { viewModel.playWelcomeGreeting() },
                 modifier = Modifier.padding(bottom = 12.dp)
             )

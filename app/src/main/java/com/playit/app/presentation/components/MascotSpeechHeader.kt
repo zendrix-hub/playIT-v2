@@ -23,6 +23,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.VolumeUp
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -46,6 +49,8 @@ import com.playit.app.presentation.theme.Ink
 import com.playit.app.presentation.theme.LexendFontFamily
 import com.playit.app.presentation.theme.LocalReducedMotion
 import com.playit.app.presentation.theme.SoftSky
+import com.playit.app.presentation.theme.Ube
+import com.playit.app.presentation.theme.UbeLight
 
 /**
  * Compact Mascot Prompt Speech Bubble header matching playit-mockup.html.
@@ -56,6 +61,7 @@ fun MascotSpeechHeader(
     message: String,
     modifier: Modifier = Modifier,
     mascotState: MascotState = MascotState.IDLE,
+    isPlayingAudio: Boolean = false,
     onMascotTap: (() -> Unit)? = null
 ) {
     var tapTrigger by remember { mutableStateOf(0) }
@@ -159,16 +165,50 @@ fun MascotSpeechHeader(
                         bottomStart = 6.dp
                     )
                 )
+                .then(
+                    if (onMascotTap != null) {
+                        Modifier.bounceClick {
+                            tapTrigger++
+                            onMascotTap()
+                        }
+                    } else Modifier
+                )
                 .padding(horizontal = 14.dp, vertical = 10.dp)
         ) {
-            Text(
-                text = message,
-                fontFamily = LexendFontFamily,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Ink,
-                lineHeight = 32.sp
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = message,
+                    fontFamily = LexendFontFamily,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Ink,
+                    lineHeight = 32.sp,
+                    modifier = Modifier.weight(1f)
+                )
+
+                if (onMascotTap != null) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(34.dp)
+                            .clip(CircleShape)
+                            .background(if (isPlayingAudio) Ube else UbeLight.copy(alpha = 0.4f))
+                            .border(1.5.dp, DarkBrownOutline, CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
+                            contentDescription = "Listen to Lily",
+                            tint = if (isPlayingAudio) CreamWhite else Ink,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+            }
         }
     }
 }
