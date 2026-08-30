@@ -68,37 +68,37 @@ TEACHER_VO_SCRIPTS = {
     "vo_unlock_01.mp3": "A new letter lesson is unlocked for you!"
 }
 
-# 28 Pure Phonic Sounds (Voice 2: Teacher) - Pure acoustic modeling per Marungko approach
+# 28 Crystal-Clear Phonics Sounds with Anchor Context (Clear, energetic, 100% understandable!)
 PURE_PHONEMES = {
-    "phoneme_m.mp3": "mmmm",
-    "phoneme_s.mp3": "ssss",
-    "phoneme_a.mp3": "ah",
-    "phoneme_i.mp3": "ee",
-    "phoneme_o.mp3": "oh",
-    "phoneme_b.mp3": "buh",
-    "phoneme_e.mp3": "eh",
-    "phoneme_u.mp3": "ooh",
-    "phoneme_t.mp3": "tuh",
-    "phoneme_k.mp3": "kuh",
-    "phoneme_l.mp3": "lll",
-    "phoneme_y.mp3": "yuh",
-    "phoneme_n.mp3": "nnn",
-    "phoneme_g.mp3": "guh",
-    "phoneme_ng.mp3": "ng",
-    "phoneme_p.mp3": "puh",
-    "phoneme_r.mp3": "rrr",
-    "phoneme_d.mp3": "duh",
-    "phoneme_h.mp3": "huh",
-    "phoneme_w.mp3": "wuh",
-    "phoneme_c.mp3": "kuh",
-    "phoneme_f.mp3": "fff",
-    "phoneme_j.mp3": "juh",
-    "phoneme_ñ.mp3": "nyah",
-    "phoneme_enye.mp3": "nyah",
-    "phoneme_q.mp3": "kwah",
-    "phoneme_v.mp3": "vuh",
-    "phoneme_x.mp3": "eks",
-    "phoneme_z.mp3": "zzz"
+    "phoneme_m.mp3": "m! /m/ as in Mouse!",
+    "phoneme_s.mp3": "s! /s/ as in Sun!",
+    "phoneme_a.mp3": "a! /a/ as in Apple!",
+    "phoneme_i.mp3": "i! /i/ as in Insect!",
+    "phoneme_o.mp3": "o! /o/ as in Orange!",
+    "phoneme_b.mp3": "b! /b/ as in Ball!",
+    "phoneme_e.mp3": "e! /e/ as in Elephant!",
+    "phoneme_u.mp3": "u! /u/ as in Umbrella!",
+    "phoneme_t.mp3": "t! /t/ as in Tiger!",
+    "phoneme_k.mp3": "k! /k/ as in Kite!",
+    "phoneme_l.mp3": "l! /l/ as in Lion!",
+    "phoneme_y.mp3": "y! /y/ as in Yoyo!",
+    "phoneme_n.mp3": "n! /n/ as in Nest!",
+    "phoneme_g.mp3": "g! /g/ as in Goat!",
+    "phoneme_ng.mp3": "ng! /ng/ as in Ring!",
+    "phoneme_p.mp3": "p! /p/ as in Pig!",
+    "phoneme_r.mp3": "r! /r/ as in Rabbit!",
+    "phoneme_d.mp3": "d! /d/ as in Dog!",
+    "phoneme_h.mp3": "h! /h/ as in Hat!",
+    "phoneme_w.mp3": "w! /w/ as in Watch!",
+    "phoneme_c.mp3": "c! /k/ as in Cat!",
+    "phoneme_f.mp3": "f! /f/ as in Fish!",
+    "phoneme_j.mp3": "j! /j/ as in Jug!",
+    "phoneme_ñ.mp3": "ñ! /ny/ as in Niñyo!",
+    "phoneme_enye.mp3": "ñ! /ny/ as in Niñyo!",
+    "phoneme_q.mp3": "q! /kw/ as in Queen!",
+    "phoneme_v.mp3": "v! /v/ as in Van!",
+    "phoneme_x.mp3": "x! /ks/ as in Box!",
+    "phoneme_z.mp3": "z! /z/ as in Zebra!"
 }
 
 # 33 Blend-It Target Words (Voice 2: Teacher)
@@ -177,7 +177,7 @@ async def run_pipeline(elevenlabs_api_key: str = None, elevenlabs_child_id: str 
         print("[*] Voice 2 (Female Teacher):     fil-PH-BlessicaNeural / en-PH-RosaNeural (DepEd-standard Filipino English)")
     print("=" * 80)
 
-    # 1. Synthesize Voice 1 (Child Mascot Lily)
+    # 1. Synthesize Voice 1 (Child Mascot Lily - High Energy & Playful)
     print("\n--- [1/4] Synthesizing Voice 1: Lily the Child Mascot (Cheers & Greetings) ---")
     for filename, script in CHILD_VO_SCRIPTS.items():
         out_ui = os.path.join(UI_DIR, filename)
@@ -187,15 +187,15 @@ async def run_pipeline(elevenlabs_api_key: str = None, elevenlabs_child_id: str 
             try:
                 synthesize_elevenlabs_voice(script, elevenlabs_child_id, elevenlabs_api_key, out_ui, stability=0.45, similarity=0.75)
             except Exception as e:
-                print(f"  [!] ElevenLabs error for {filename}: {e}, falling back to Philippine Neural Voice...")
-                await synthesize_edge_tts_voice(script, "en-PH-RosaNeural", out_ui, rate="+4%", pitch="+8Hz")
+                print(f"  [!] ElevenLabs error for {filename}: {e}, falling back to High-Clarity Energetic Neural Voice...")
+                await synthesize_edge_tts_voice(script, "en-US-AnaNeural", out_ui, rate="+5%", pitch="+8Hz")
         else:
-            await synthesize_edge_tts_voice(script, "en-PH-RosaNeural", out_ui, rate="+4%", pitch="+8Hz")
+            await synthesize_edge_tts_voice(script, "en-US-AnaNeural", out_ui, rate="+5%", pitch="+8Hz")
         
         shutil.copy2(out_ui, out_vo)
         print(f"  [+] Voice 1 (Child):   {filename:<26} -> \"{script}\"")
 
-    # 2. Synthesize Voice 2 (Teacher / Narrator Instructions)
+    # 2. Synthesize Voice 2 (Instructor - Bright, Energetic & Crystal-Clear)
     print("\n--- [2/4] Synthesizing Voice 2: Teacher / Educational Guide (Lesson Intros & Prompts) ---")
     for filename, script in TEACHER_VO_SCRIPTS.items():
         out_ui = os.path.join(UI_DIR, filename)
@@ -205,28 +205,28 @@ async def run_pipeline(elevenlabs_api_key: str = None, elevenlabs_child_id: str 
             try:
                 synthesize_elevenlabs_voice(script, elevenlabs_teacher_id, elevenlabs_api_key, out_ui, stability=0.65, similarity=0.75)
             except Exception as e:
-                print(f"  [!] ElevenLabs error for {filename}: {e}, falling back to Philippine Neural Voice...")
-                await synthesize_edge_tts_voice(script, "fil-PH-BlessicaNeural", out_ui, rate="-2%", pitch="+1Hz")
+                print(f"  [!] ElevenLabs error for {filename}: {e}, falling back to High-Clarity Energetic Neural Voice...")
+                await synthesize_edge_tts_voice(script, "en-US-AnaNeural", out_ui, rate="+2%", pitch="+2Hz")
         else:
-            await synthesize_edge_tts_voice(script, "fil-PH-BlessicaNeural", out_ui, rate="-2%", pitch="+1Hz")
+            await synthesize_edge_tts_voice(script, "en-US-AnaNeural", out_ui, rate="+2%", pitch="+2Hz")
         
         shutil.copy2(out_ui, out_vo)
         print(f"  [+] Voice 2 (Teacher): {filename:<26} -> \"{script}\"")
 
-    # 3. Synthesize Voice 2: 28 Pure Phonics Sounds
-    print("\n--- [3/4] Synthesizing Voice 2: 28 Pure Phonics Sounds (Marungko Acoustic Modeling) ---")
+    # 3. Synthesize Voice 2: 28 Crystal-Clear Phonics Sounds (Clear Letter + Sound + Word Context)
+    print("\n--- [3/4] Synthesizing Voice 2: 28 Pure Phonics Sounds (High-Clarity Pedagogical Enunciation) ---")
     for filename, sound in PURE_PHONEMES.items():
         out_path = os.path.join(PHONEMES_DIR, filename)
         if elevenlabs_api_key and elevenlabs_teacher_id:
             try:
-                synthesize_elevenlabs_voice(sound, elevenlabs_teacher_id, elevenlabs_api_key, out_path, stability=0.80, similarity=0.80)
+                synthesize_elevenlabs_voice(sound, elevenlabs_teacher_id, elevenlabs_api_key, out_path, stability=0.75, similarity=0.80)
             except Exception as e:
-                await synthesize_edge_tts_voice(sound, "fil-PH-BlessicaNeural", out_path, rate="-10%", pitch="+0Hz")
+                await synthesize_edge_tts_voice(sound, "en-US-AnaNeural", out_path, rate="+0%", pitch="+2Hz")
         else:
-            await synthesize_edge_tts_voice(sound, "fil-PH-BlessicaNeural", out_path, rate="-10%", pitch="+0Hz")
+            await synthesize_edge_tts_voice(sound, "en-US-AnaNeural", out_path, rate="+0%", pitch="+2Hz")
         print(f"  [+] Pure Phonic:       {filename:<26} -> \"{sound}\"")
 
-    # 4. Synthesize Voice 2: 33 Blend-It Words
+    # 4. Synthesize Voice 2: 33 Blend-It Words (Crystal-Clear Articulation)
     print("\n--- [4/4] Synthesizing Voice 2: 33 Blend-It Target Words ---")
     for filename, word in ALL_BLEND_WORDS.items():
         out_path = os.path.join(WORDS_DIR, filename)
@@ -234,9 +234,9 @@ async def run_pipeline(elevenlabs_api_key: str = None, elevenlabs_child_id: str 
             try:
                 synthesize_elevenlabs_voice(word, elevenlabs_teacher_id, elevenlabs_api_key, out_path, stability=0.70, similarity=0.75)
             except Exception as e:
-                await synthesize_edge_tts_voice(word, "en-PH-RosaNeural", out_path, rate="-4%", pitch="+0Hz")
+                await synthesize_edge_tts_voice(word, "en-US-AnaNeural", out_path, rate="+0%", pitch="+2Hz")
         else:
-            await synthesize_edge_tts_voice(word, "en-PH-RosaNeural", out_path, rate="-4%", pitch="+0Hz")
+            await synthesize_edge_tts_voice(word, "en-US-AnaNeural", out_path, rate="+0%", pitch="+2Hz")
         print(f"  [+] Blend Word:        {filename:<26} -> \"{word}\"")
 
     print("\n" + "=" * 80)
