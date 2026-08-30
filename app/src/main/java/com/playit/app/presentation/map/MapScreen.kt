@@ -1,6 +1,7 @@
 package com.playit.app.presentation.map
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
@@ -73,6 +74,7 @@ import com.playit.app.presentation.components.MascotState
 import com.playit.app.presentation.components.breathingPulse
 import com.playit.app.presentation.components.idleBounce
 import com.playit.app.presentation.components.rememberAssetPainter
+import com.playit.app.presentation.map.components.BiomeThemes
 import com.playit.app.presentation.map.components.ChocolateHillsBackground
 import com.playit.app.presentation.map.components.GroupBannerStatus
 import com.playit.app.presentation.map.components.MapCompanionFriends
@@ -182,7 +184,18 @@ fun MapScreen(
                 .statusBarsPadding()
                 .navigationBarsPadding()
         ) {
-            // ── Header: Floating Gummy Top Bar ──────────────────────────────
+            // Calculate currently visible Bohol biome section based on scroll offset
+            val currentVisibleSectionIndex = remember(scrollState.value, scrollState.maxValue) {
+                if (scrollState.maxValue <= 0) 1
+                else {
+                    val scrollFraction = (scrollState.value.toFloat() / scrollState.maxValue.toFloat()).coerceIn(0f, 1f)
+                    val approxGroup = (scrollFraction * 5.0f).toInt() + 1
+                    approxGroup.coerceIn(1, 6)
+                }
+            }
+            val activeBiomeTheme = BiomeThemes.forSection(currentVisibleSectionIndex)
+
+            // ── Header: Floating Gummy Top Bar (Dynamically Adapting to Biome) ─
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -201,20 +214,28 @@ fun MapScreen(
                     unlockedBadgesCount = userStats.unlockedBadgesCount,
                     lettersCompleted = mapNodes.count { it is MapNode.LetterNode && it.starsEarned > 0 },
                     profileName = userStats.profileName,
+                    biomeTheme = activeBiomeTheme,
                     modifier = Modifier.weight(1f)
                 )
             }
 
-            // ── Mascot Prompt Header (Personalized Instant Greeting) ───────
+            // ── Mascot Prompt Header (Personalized Instant Greeting & Biome Guidance) ─
             val welcomeGreeting = if (userStats.profileName.isNotBlank()) {
-                "Welcome, ${userStats.profileName}! Tap a letter to start!"
+                "${userStats.profileName}, ${activeBiomeTheme.mascotDialogue}"
             } else {
-                "Welcome! Tap a letter to start!"
+                activeBiomeTheme.mascotDialogue
             }
+
+            val animatedBubbleBg by animateColorAsState(
+                targetValue = activeBiomeTheme.backgroundTint.copy(alpha = 0.95f),
+                animationSpec = tween(durationMillis = 450, easing = FastOutSlowInEasing),
+                label = "bubbleBgAnim"
+            )
 
             MascotBubble(
                 message = welcomeGreeting,
                 mascotState = MascotState.ENCOURAGING,
+                backgroundColor = animatedBubbleBg,
                 onMascotTap = { viewModel.playMascotTapReaction() },
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
             )
@@ -646,8 +667,12 @@ fun LetterMapNodeCard(
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Blend It Challenge Node — 3D Wooden Treasure Chest (duoling_map_sample.jpg)
+// Blend It Challenge Node — Grand Golden Crown & Laurel 3D Boss Node
 // ═══════════════════════════════════════════════════════════════════════════
+
+private val BossGoldFace = Color(0xFFFFB703)
+private val BossGoldShelf = Color(0xFFD97706)
+private val BossFlameAura = Color(0xFFFF8800)
 
 @Composable
 fun BlendItChallengeNodeCard(
@@ -655,81 +680,155 @@ fun BlendItChallengeNodeCard(
     onClick: () -> Unit
 ) {
     val isUnlocked = node.isUnlocked
-    val chestWood = if (isUnlocked) Color(0xFFD97706) else Color(0xFFCBD5E1)
-    val chestShelf = if (isUnlocked) Color(0xFF92400E) else Color(0xFF94A3B8)
-    val chestTrim = if (isUnlocked) Color(0xFFFED7AA) else Color(0xFFE2E8F0)
-    val chestLock = if (isUnlocked) Color(0xFFFFFFFF) else Color(0xFF94A3B8)
+    val isReducedMotion = LocalReducedMotion.current
+
+    // Pulsing Fiery Boss Aura Transition
+    val infiniteTransition = rememberInfiniteTransition(label = "bossAura")
+    val auraScale by infiniteTransition.animateFloat(
+        initialValue = 1.0f,
+        targetValue = 1.28f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "bossAuraScale"
+    )
+    val auraAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.75f,
+        targetValue = 0.0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "bossAuraAlpha"
+    )
+
+    val faceColor = if (isUnlocked) BossGoldFace else DuolingoLockedFace
+    val shelfColor = if (isUnlocked) BossGoldShelf else DuolingoLockedShelf
 
     val accessibilityLabel = if (isUnlocked) {
-        "Blend-It Treasure Chest Challenge Group ${node.groupId}"
+        "Blend-It Boss Challenge Group ${node.groupId}"
     } else {
-        "Blend-It Treasure Chest Group ${node.groupId}, locked"
+        "Blend-It Boss Challenge Group ${node.groupId}, locked"
     }
 
-    Box(
-        modifier = Modifier
-            .size(width = 78.dp, height = 76.dp)
-            .clickable(
-                interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
-                indication = null,
-                onClick = onClick
-            )
-            .semantics(mergeDescendants = true) {
-                contentDescription = accessibilityLabel
-            },
-        contentAlignment = Alignment.Center
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.semantics(mergeDescendants = true) {
+            contentDescription = accessibilityLabel
+        }
     ) {
-        // 3D Bottom Base Shelf
         Box(
-            modifier = Modifier
-                .size(width = 72.dp, height = 58.dp)
-                .align(Alignment.BottomCenter)
-                .clip(RoundedCornerShape(14.dp))
-                .background(chestShelf)
-        )
-
-        // Chest Body
-        Box(
-            modifier = Modifier
-                .size(width = 72.dp, height = 56.dp)
-                .align(Alignment.TopCenter)
-                .clip(RoundedCornerShape(14.dp))
-                .background(chestWood)
-                .padding(horizontal = 6.dp, vertical = 6.dp)
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.size(width = 86.dp, height = 94.dp)
         ) {
-            // Horizontal Peach Wood Trim Band
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(14.dp)
-                    .align(Alignment.Center)
-                    .background(chestTrim, RoundedCornerShape(4.dp))
-            )
+            // Fiery Pulsing Boss Aura Ring
+            if (isUnlocked && !isReducedMotion) {
+                Box(
+                    modifier = Modifier
+                        .size(86.dp)
+                        .graphicsLayer {
+                            scaleX = auraScale
+                            scaleY = auraScale
+                            alpha = auraAlpha
+                        }
+                        .border(
+                            width = 4.dp,
+                            color = BossFlameAura,
+                            shape = CircleShape
+                        )
+                )
+            }
 
-            // Central Circular Latch
+            // 3D Boss Disc (Clickable)
             Box(
                 modifier = Modifier
-                    .size(20.dp)
-                    .align(Alignment.Center)
-                    .background(chestLock, CircleShape)
-                    .border(1.5.dp, Color(0xFF64748B), CircleShape),
-                contentAlignment = Alignment.Center
+                    .fillMaxSize()
+                    .clickable(
+                        interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                        indication = null,
+                        onClick = onClick
+                    )
             ) {
-                if (isUnlocked) {
-                    Box(
-                        modifier = Modifier
-                            .size(6.dp)
-                            .background(Color(0xFFB45309), CircleShape)
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Rounded.Lock,
-                        contentDescription = "Locked Chest",
-                        tint = Color(0xFF64748B),
-                        modifier = Modifier.size(11.dp)
-                    )
+                // 3D Extrusion Bottom Shelf (10dp extrusion)
+                Box(
+                    modifier = Modifier
+                        .size(82.dp)
+                        .align(Alignment.BottomCenter)
+                        .background(shelfColor, CircleShape)
+                )
+
+                // Top Disc Face
+                Box(
+                    modifier = Modifier
+                        .size(82.dp)
+                        .align(Alignment.TopCenter)
+                        .background(faceColor, CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    // Subtle Top-Left Crescent Gleam Highlight
+                    Canvas(modifier = Modifier.fillMaxSize()) {
+                        drawArc(
+                            color = Color(0x60FFFFFF),
+                            startAngle = 175f,
+                            sweepAngle = 90f,
+                            useCenter = false,
+                            topLeft = Offset(8.dp.toPx(), 6.dp.toPx()),
+                            size = androidx.compose.ui.geometry.Size(size.width - 16.dp.toPx(), size.height - 16.dp.toPx()),
+                            style = androidx.compose.ui.graphics.drawscope.Stroke(
+                                width = 5.dp.toPx(),
+                                cap = StrokeCap.Round
+                            )
+                        )
+                    }
+
+                    // Boss Crown / Laurels Insignia
+                    if (isUnlocked) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Star,
+                                contentDescription = "Boss Challenge",
+                                tint = Color(0xFF78350F),
+                                modifier = Modifier.size(32.dp)
+                            )
+                            Text(
+                                text = "CHALLENGE",
+                                fontFamily = LexendFontFamily,
+                                fontSize = 8.5.sp,
+                                fontWeight = FontWeight.Black,
+                                color = Color(0xFF78350F),
+                                letterSpacing = 0.5.sp
+                            )
+                        }
+                    } else {
+                        Icon(
+                            imageVector = Icons.Rounded.Lock,
+                            contentDescription = "Locked Boss Challenge",
+                            tint = DuolingoLockedIcon,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
                 }
             }
+        }
+
+        // Boss Node Badge Label below
+        Box(
+            modifier = Modifier
+                .offset(y = (-4).dp)
+                .background(if (isUnlocked) Color(0xFF78350F) else Color(0xFF94A3B8), RoundedCornerShape(999.dp))
+                .padding(horizontal = 8.dp, vertical = 2.dp)
+        ) {
+            Text(
+                text = "BLEND BOSS ${node.groupId}",
+                fontFamily = LexendFontFamily,
+                fontSize = 9.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = Color.White
+            )
         }
     }
 }

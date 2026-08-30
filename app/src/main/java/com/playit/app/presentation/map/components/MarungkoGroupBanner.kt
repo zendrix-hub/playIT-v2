@@ -1,7 +1,6 @@
 package com.playit.app.presentation.map.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,11 +10,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AutoStories
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -23,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,15 +36,8 @@ enum class GroupBannerStatus {
  * Returns canonical Marungko letters summary for each group number (1..6).
  */
 fun getMarungkoBiomeTitle(groupNumber: Int): Pair<String, String> {
-    return when (groupNumber) {
-        1 -> "Chocolate Hills Phonics" to "Practice sounds M, S, A, I"
-        2 -> "Loboc River Valley" to "Practice sounds O, B, E, U"
-        3 -> "Panglao Coral Shore" to "Practice sounds T, K, L, Y"
-        4 -> "Tarsier Forest Trail" to "Practice sounds N, G, NG, P"
-        5 -> "Bohol Mountain Summit" to "Practice sounds R, D, H, W"
-        6 -> "Baclayon Heritage" to "Practice sounds C, F, J, Ñ, Q, V, X, Z"
-        else -> "Marungko Trail" to "Practice Phonics"
-    }
+    val theme = BiomeThemes.forSection(groupNumber)
+    return theme.title to theme.lettersSummary
 }
 
 /**
@@ -68,7 +57,7 @@ fun getMarungkoLettersForGroup(groupNumber: Int): String {
 
 /**
  * Duolingo-style Section / Unit Header Banner (matching duoling_map_sample.jpg):
- * - Rich Golden Amber rounded container
+ * - Distinctive Bohol Biome palette (derived from tools/ images)
  * - "SECTION 1, UNIT X" label
  * - Bold unit title
  * - Right notebook / guidebook icon button
@@ -80,28 +69,28 @@ fun MarungkoGroupBanner(
     status: GroupBannerStatus,
     modifier: Modifier = Modifier
 ) {
-    val (biomeTitle, lettersSummary) = getMarungkoBiomeTitle(groupNumber)
+    val theme = BiomeThemes.forSection(groupNumber)
 
     val bannerBg = when (status) {
-        GroupBannerStatus.COMPLETED -> Color(0xFFFFC800) // Golden Yellow
-        GroupBannerStatus.IN_PROGRESS -> Color(0xFFFFC800) // Golden Yellow
-        GroupBannerStatus.LOCKED -> Color(0xFFE2E8F0) // Locked Slate
+        GroupBannerStatus.COMPLETED -> theme.primaryColor
+        GroupBannerStatus.IN_PROGRESS -> theme.primaryColor
+        GroupBannerStatus.LOCKED -> Color(0xFFE2E8F0)
     }
 
     val bannerShelf = when (status) {
-        GroupBannerStatus.COMPLETED -> Color(0xFFE5A500)
-        GroupBannerStatus.IN_PROGRESS -> Color(0xFFE5A500)
+        GroupBannerStatus.COMPLETED -> theme.shelfColor
+        GroupBannerStatus.IN_PROGRESS -> theme.shelfColor
         GroupBannerStatus.LOCKED -> Color(0xFFCBD5E1)
     }
 
     val headerColor = when (status) {
         GroupBannerStatus.LOCKED -> Color(0xFF64748B)
-        else -> Color(0xFF78350F)
+        else -> Color.White.copy(alpha = 0.90f)
     }
 
     val titleColor = when (status) {
         GroupBannerStatus.LOCKED -> Color(0xFF334155)
-        else -> Color(0xFF451A03)
+        else -> Color.White
     }
 
     Column(
@@ -155,7 +144,7 @@ fun MarungkoGroupBanner(
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            text = biomeTitle,
+                            text = theme.title,
                             fontFamily = LexendFontFamily,
                             fontSize = 17.sp,
                             fontWeight = FontWeight.Black,
@@ -168,7 +157,7 @@ fun MarungkoGroupBanner(
                         modifier = Modifier
                             .size(44.dp)
                             .clip(RoundedCornerShape(12.dp))
-                            .background(if (status == GroupBannerStatus.LOCKED) Color(0xFFCBD5E1) else Color(0xFFE5A500)),
+                            .background(if (status == GroupBannerStatus.LOCKED) Color(0xFFCBD5E1) else theme.shelfColor),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -198,7 +187,7 @@ fun MarungkoGroupBanner(
                 color = Color(0xFFE2E8F0)
             )
             Text(
-                text = "  $lettersSummary  ",
+                text = "  ${theme.lettersSummary}  ",
                 fontFamily = LexendFontFamily,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,

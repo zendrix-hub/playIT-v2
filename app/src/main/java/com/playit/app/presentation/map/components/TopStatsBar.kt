@@ -1,5 +1,8 @@
 package com.playit.app.presentation.map.components
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,16 +33,9 @@ import com.playit.app.presentation.components.rememberAssetPainter
 import com.playit.app.presentation.theme.Cloud
 import com.playit.app.presentation.theme.DarkBrownOutline
 import com.playit.app.presentation.theme.Ink
-import com.playit.app.presentation.theme.InkFaint
 import com.playit.app.presentation.theme.InkSoft
-import com.playit.app.presentation.theme.Leaf
-import com.playit.app.presentation.theme.LeafDark
-import com.playit.app.presentation.theme.Mango
-import com.playit.app.presentation.theme.SoftSky
-import com.playit.app.presentation.theme.TanDark
-import com.playit.app.presentation.theme.UbeDark
-import com.playit.app.presentation.theme.UbeLight
 import com.playit.app.presentation.theme.LexendFontFamily
+import com.playit.app.presentation.theme.SoftSky
 
 @Composable
 fun TopStatsBar(
@@ -46,19 +43,42 @@ fun TopStatsBar(
     currentStreak: Int,
     @Suppress("UNUSED_PARAMETER") unlockedBadgesCount: Int,
     lettersCompleted: Int = 0,
+    biomeTheme: BiomeTheme = BiomeThemes.SECTION_1,
     modifier: Modifier = Modifier,
     profileName: String = ""
 ) {
+    // Smooth color animation that adapts to the currently visible section on scroll
+    val animatedBg by animateColorAsState(
+        targetValue = biomeTheme.backgroundTint.copy(alpha = 0.95f),
+        animationSpec = tween(durationMillis = 450, easing = FastOutSlowInEasing),
+        label = "statsBgAnim"
+    )
+    val animatedBorder by animateColorAsState(
+        targetValue = biomeTheme.borderTint,
+        animationSpec = tween(durationMillis = 450, easing = FastOutSlowInEasing),
+        label = "statsBorderAnim"
+    )
+    val animatedPillBg by animateColorAsState(
+        targetValue = biomeTheme.pillBg,
+        animationSpec = tween(durationMillis = 450, easing = FastOutSlowInEasing),
+        label = "statsPillBgAnim"
+    )
+    val animatedProgressColor by animateColorAsState(
+        targetValue = biomeTheme.progressColor,
+        animationSpec = tween(durationMillis = 450, easing = FastOutSlowInEasing),
+        label = "statsProgressAnim"
+    )
+
     Column(
         modifier = modifier
             .fillMaxWidth()
             .background(
-                color = Cloud.copy(alpha = 0.88f),
+                color = animatedBg,
                 shape = RoundedCornerShape(20.dp)
             )
             .border(
-                width = 1.dp,
-                color = Color(0x0F1F3A3D),
+                width = 1.5.dp,
+                color = animatedBorder,
                 shape = RoundedCornerShape(20.dp)
             )
             .padding(horizontal = 16.dp, vertical = 10.dp),
@@ -109,16 +129,16 @@ fun TopStatsBar(
                 StatPill(
                     count = currentStreak,
                     assetPath = "images/rewards/reward_streak.png",
-                    backgroundColor = Mango,
-                    textColor = TanDark
+                    backgroundColor = animatedPillBg,
+                    textColor = biomeTheme.textSecondary
                 )
 
                 // Stars Pill
                 StatPill(
                     count = totalStars,
                     assetPath = "images/rewards/reward_star.png",
-                    backgroundColor = UbeLight,
-                    textColor = UbeDark
+                    backgroundColor = animatedPillBg,
+                    textColor = biomeTheme.textPrimary
                 )
             }
         }
@@ -140,7 +160,7 @@ fun TopStatsBar(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(9.dp)
-                    .background(UbeLight, RoundedCornerShape(999.dp))
+                    .background(Color(0xFFE2E8F0), RoundedCornerShape(999.dp))
                     .clip(RoundedCornerShape(999.dp))
             ) {
                 val progress = (lettersCompleted.toFloat() / 28f).coerceIn(0f, 1f)
@@ -149,7 +169,7 @@ fun TopStatsBar(
                         modifier = Modifier
                             .fillMaxWidth(fraction = progress)
                             .fillMaxHeight()
-                            .background(Leaf)
+                            .background(animatedProgressColor)
                     )
                 }
             }

@@ -339,52 +339,52 @@ body {
 .duo-locked .duo-node-shelf { background: #CECECE; }
 .duo-locked .duo-node-face { background: #E5E5E5; color: #AFAFAF; }
 
-.duo-chest {
+.duo-boss {
   position: absolute;
-  width: 76px;
-  height: 68px;
+  width: 84px;
+  height: 94px;
   cursor: pointer;
   transition: transform 0.15s;
 }
-.duo-chest:hover { transform: scale(1.06); }
-.duo-chest-shelf {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 76px;
-  height: 54px;
-  background: #92400E;
-  border-radius: 14px;
-}
-.duo-chest-body {
+.duo-boss:hover { transform: scale(1.06); }
+.duo-boss-aura {
   position: absolute;
   top: 0;
   left: 0;
-  width: 76px;
-  height: 54px;
-  background: #D97706;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.duo-chest-band {
-  position: absolute;
-  width: 100%;
-  height: 12px;
-  background: #FED7AA;
-}
-.duo-chest-lock {
-  position: relative;
-  z-index: 2;
-  width: 18px;
-  height: 18px;
-  background: white;
+  width: 84px;
+  height: 84px;
   border-radius: 50%;
-  border: 1.5px solid #64748B;
+  border: 3.5px solid #FF8800;
+  animation: bossPulse 1.4s ease-out infinite;
+}
+@keyframes bossPulse {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  100% { transform: scale(1.25); opacity: 0; }
+}
+.duo-boss-shelf {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 84px;
+  height: 84px;
+  background: #D97706;
+  border-radius: 50%;
+}
+.duo-boss-face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 84px;
+  height: 84px;
+  background: #FFB703;
+  border-radius: 50%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  box-shadow: inset 0 4px 0 rgba(255,255,255,0.5);
+  color: #78350F;
+  font-weight: 900;
 }
 
 @keyframes avatarBreathe {
@@ -606,15 +606,15 @@ body {
               <div class="duo-node-face">I</div>
             </div>
 
-            <!-- 3D Wooden Treasure Chest (Blend-It Challenge) -->
-            <div class="duo-chest" style="top:420px; left:50%; transform:translateX(-50%);" onclick="showBlendDialog()">
-              <div class="duo-chest-shelf"></div>
-              <div class="duo-chest-body">
-                <div class="duo-chest-band"></div>
-                <div class="duo-chest-lock">
-                  <div style="width:5px; height:5px; background:#B45309; border-radius:50%;"></div>
-                </div>
+            <!-- Grand Golden Crown 3D Boss Node (Blend-It Challenge) -->
+            <div class="duo-boss" style="top:416px; left:50%; transform:translateX(-50%);" onclick="showBlendDialog()">
+              <div class="duo-boss-aura"></div>
+              <div class="duo-boss-shelf"></div>
+              <div class="duo-boss-face">
+                <span style="font-size:26px;">👑</span>
+                <span style="font-size:8px; letter-spacing:0.5px; margin-top:-2px;">BOSS</span>
               </div>
+              <div style="position:absolute; bottom:-14px; left:50%; transform:translateX(-50%); background:#78350F; color:white; font-size:8px; font-weight:900; padding:1px 6px; border-radius:999px; white-space:nowrap;">BLEND BOSS 1</div>
             </div>
 
             <!-- Group 2 Banner -->
