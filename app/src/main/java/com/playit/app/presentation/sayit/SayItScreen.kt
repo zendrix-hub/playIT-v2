@@ -322,20 +322,7 @@ fun SayItScreen(
                     )
                 }
 
-                if (com.playit.app.BuildConfig.DEBUG) {
-                    Text(
-                        text = "Tap here to simulate correct voice (DEBUG)",
-                        fontFamily = LexendFontFamily,
-                        fontSize = 12.sp,
-                        color = InkSoft,
-                        textDecoration = TextDecoration.Underline,
-                        modifier = Modifier
-                            .clickable { viewModel.simulateCorrectForTesting() }
-                            .padding(top = 4.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 AnimatedVisibility(
                     visible = state is SayItState.Correct || state is SayItState.Incorrect,

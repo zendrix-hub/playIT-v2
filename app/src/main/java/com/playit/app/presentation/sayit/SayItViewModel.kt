@@ -15,6 +15,8 @@ import com.playit.app.domain.repository.PhonemeRepository
 import com.playit.app.domain.repository.SayItAttemptRepository
 import com.playit.app.navigation.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -70,6 +72,7 @@ class SayItViewModel @Inject constructor(
 
     private var vocalFramesCount = 0
     private var maxSpokenAmplitude = 0f
+    private var autoStopJob: Job? = null
 
     init {
         loadPhoneme()
@@ -120,6 +123,7 @@ class SayItViewModel @Inject constructor(
     fun startListening() {
         if (_state.value is SayItState.Listening) return
 
+        autoStopJob?.cancel()
         val target = _phoneme.value?.letter?.lowercase() ?: "m"
         val acceptedList = speechValidator.getAcceptedVariants(target)
         voskRecognizer.setGrammar(acceptedList + listOf("cat", "dog", "sun", "ball", "yes", "no"))
@@ -130,10 +134,19 @@ class SayItViewModel @Inject constructor(
         maxSpokenAmplitude = 0f
         var noisyFramesCount = 0
 
+        // Auto-timeout after 3.2s maximum window
+        autoStopJob = viewModelScope.launch {
+            delay(3200L)
+            if (_state.value is SayItState.Listening) {
+                stopListening()
+            }
+        }
+
         viewModelScope.launch {
             voskRecognizer.startListening(
                 onResult = { transcript ->
                     if (transcript.isNotBlank() && speechValidator.validate(transcript, target)) {
+                        autoStopJob?.cancel()
                         voskRecognizer.stopListening()
                         evaluateSpeech(transcript)
                     }
@@ -144,6 +157,16 @@ class SayItViewModel @Inject constructor(
                         vocalFramesCount++
                         if (norm > maxSpokenAmplitude) {
                             maxSpokenAmplitude = norm
+                        }
+                        // If voice was spoken and followed by a brief pause, automatically check and evaluate!
+                        if (vocalFramesCount >= 3) {
+                            autoStopJob?.cancel()
+                            autoStopJob = viewModelScope.launch {
+                                delay(650L)
+                                if (_state.value is SayItState.Listening) {
+                                    stopListening()
+                                }
+                            }
                         }
                     }
                     if (db > 72f && _state.value is SayItState.Listening) {
@@ -162,6 +185,7 @@ class SayItViewModel @Inject constructor(
     }
 
     fun stopListening() {
+        autoStopJob?.cancel()
         val transcript = voskRecognizer.stopListening()
         _audioAmplitude.value = 0f
         if (_state.value is SayItState.Listening) {
@@ -177,6 +201,7 @@ class SayItViewModel @Inject constructor(
     }
 
     fun evaluateSpeech(transcript: String) {
+        autoStopJob?.cancel()
         _audioAmplitude.value = 0f
         val targetLetter = _phoneme.value?.letter ?: "m"
         val isCorrect = speechValidator.validate(transcript, targetLetter) || (vocalFramesCount >= 3)
@@ -212,6 +237,7 @@ class SayItViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
+        autoStopJob?.cancel()
         voskRecognizer.stopListening()
         voskRecognizer.release()
         audioPlayer.stop()
