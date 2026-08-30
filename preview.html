@@ -322,6 +322,15 @@ body {
   position: absolute;
   pointer-events: none;
 }
+@keyframes avatarBreathe {
+  0% { transform: scale(1, 1) translateY(0); }
+  50% { transform: scale(1.025, 1.045) translateY(-3px); }
+  100% { transform: scale(1, 1) translateY(0); }
+}
+.map-avatar-anim {
+  animation: avatarBreathe 3.2s ease-in-out infinite;
+  transform-origin: bottom center;
+}
 
 /* 3. Phonics & Audio Gallery */
 .gallery-grid {
@@ -490,27 +499,45 @@ body {
               <circle cx="214" cy="374" r="4.5" fill="#FAF7F2" stroke="#2D373E" stroke-width="1.5" />
             </svg>
 
-            <!-- Full-Body Animal Avatar Companions on the Map Trail -->
+            <!-- Full-Body Animal Avatar Companions on the Map Trail (Animated with Splash-Style Breathing) -->
             <!-- Active Profile Explorer Leader (Miki the Cat) beside Node M -->
-            <div style="position:absolute; top:8px; left:135px; width:58px; z-index:10; text-align:center;">
-              <div style="background:white; border:1.5px solid var(--outline); border-radius:999px; padding:1px 6px; font-size:9px; font-weight:800; display:inline-block; margin-bottom:2px;">Let's Go!</div>
-              <img src="app/src/main/assets/images/characters/avatar_01_cat.png" style="width:52px; height:52px; object-fit:contain;" alt="Miki the Cat">
+            <div class="map-avatar-anim" style="position:absolute; top:4px; left:138px; width:58px; z-index:20; text-align:center;">
+              <div style="background:white; border:1.5px solid var(--outline); border-radius:999px; padding:1px 6px; font-size:9px; font-weight:800; display:inline-block; margin-bottom:2px; box-shadow:0 2px 4px rgba(0,0,0,0.1);">Let's Go!</div>
+              <div style="position:relative; width:54px; height:54px; margin:0 auto;">
+                <div style="position:absolute; bottom:-2px; left:50%; transform:translateX(-50%); width:36px; height:8px; background:rgba(31,58,61,0.22); border-radius:50%;"></div>
+                <img src="app/src/main/assets/images/characters/avatar_01_cat.png" style="width:100%; height:100%; object-fit:contain; position:relative; z-index:2;" alt="Miki the Cat">
+              </div>
             </div>
 
             <!-- Supporting Animal Friend 1 (Milo the Monkey) beside Node S -->
-            <img src="app/src/main/assets/images/characters/avatar_02_monkey.png" style="position:absolute; width:52px; height:52px; object-fit:contain; top:110px; left:150px; z-index:10;" alt="Milo the Monkey">
+            <div class="map-avatar-anim" style="position:absolute; top:102px; left:148px; width:54px; height:54px; z-index:20; animation-delay: 0.6s;">
+              <div style="position:absolute; bottom:-2px; left:50%; transform:translateX(-50%); width:34px; height:8px; background:rgba(31,58,61,0.22); border-radius:50%;"></div>
+              <img src="app/src/main/assets/images/characters/avatar_02_monkey.png" style="width:100%; height:100%; object-fit:contain; position:relative; z-index:2;" alt="Milo the Monkey">
+            </div>
 
             <!-- Supporting Animal Friend 2 (Bella the Bunny) beside Node A -->
-            <img src="app/src/main/assets/images/characters/avatar_03_bunny.png" style="position:absolute; width:52px; height:52px; object-fit:contain; top:200px; left:155px; z-index:10;" alt="Bella the Bunny">
+            <div class="map-avatar-anim" style="position:absolute; top:194px; left:152px; width:54px; height:54px; z-index:20; animation-delay: 1.2s;">
+              <div style="position:absolute; bottom:-2px; left:50%; transform:translateX(-50%); width:34px; height:8px; background:rgba(31,58,61,0.22); border-radius:50%;"></div>
+              <img src="app/src/main/assets/images/characters/avatar_03_bunny.png" style="width:100%; height:100%; object-fit:contain; position:relative; z-index:2;" alt="Bella the Bunny">
+            </div>
 
             <!-- Supporting Animal Friend 3 (Barnaby the Bear) beside Node I -->
-            <img src="app/src/main/assets/images/characters/avatar_04_bear.png" style="position:absolute; width:54px; height:54px; object-fit:contain; top:290px; left:150px; z-index:10;" alt="Barnaby the Bear">
+            <div class="map-avatar-anim" style="position:absolute; top:284px; left:148px; width:56px; height:56px; z-index:20; animation-delay: 1.8s;">
+              <div style="position:absolute; bottom:-2px; left:50%; transform:translateX(-50%); width:36px; height:8px; background:rgba(31,58,61,0.22); border-radius:50%;"></div>
+              <img src="app/src/main/assets/images/characters/avatar_04_bear.png" style="width:100%; height:100%; object-fit:contain; position:relative; z-index:2;" alt="Barnaby the Bear">
+            </div>
 
             <!-- Supporting Animal Friend 4 (Finley the Frog) cheering at Blend-It checkpoint -->
-            <img src="app/src/main/assets/images/characters/avatar_05_frog.png" style="position:absolute; width:50px; height:50px; object-fit:contain; top:395px; left:265px; z-index:10;" alt="Finley the Frog">
+            <div class="map-avatar-anim" style="position:absolute; top:390px; left:265px; width:50px; height:50px; z-index:20; animation-delay: 0.4s;">
+              <div style="position:absolute; bottom:-2px; left:50%; transform:translateX(-50%); width:32px; height:7px; background:rgba(31,58,61,0.22); border-radius:50%;"></div>
+              <img src="app/src/main/assets/images/characters/avatar_05_frog.png" style="width:100%; height:100%; object-fit:contain; position:relative; z-index:2;" alt="Finley the Frog">
+            </div>
 
             <!-- Supporting Animal Friend 5 (Ollie the Owl) welcoming to Group 2 -->
-            <img src="app/src/main/assets/images/characters/avatar_06_owl.png" style="position:absolute; width:50px; height:50px; object-fit:contain; top:540px; left:150px; z-index:10;" alt="Ollie the Owl">
+            <div class="map-avatar-anim" style="position:absolute; top:534px; left:148px; width:52px; height:52px; z-index:20; animation-delay: 1.0s;">
+              <div style="position:absolute; bottom:-2px; left:50%; transform:translateX(-50%); width:32px; height:7px; background:rgba(31,58,61,0.22); border-radius:50%;"></div>
+              <img src="app/src/main/assets/images/characters/avatar_06_owl.png" style="width:100%; height:100%; object-fit:contain; position:relative; z-index:2;" alt="Ollie the Owl">
+            </div>
 
             <!-- Letter Nodes (Exactly Centered on SVG Paths) -->
             <div class="map-node map-node-unlocked" style="top:20px; left:60px;" onclick="switchScreen('hearit')">M</div>

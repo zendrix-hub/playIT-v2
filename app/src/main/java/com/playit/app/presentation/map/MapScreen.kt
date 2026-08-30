@@ -299,21 +299,10 @@ fun MapScreen(
                     }
                 }
 
-                // Layer 0: Sky-to-sand gradient background with Chocolate Hills
+                // Layer 1: Sky-to-sand gradient background with Chocolate Hills
                 ChocolateHillsBackground(
                     totalHeight = totalMapHeightDp,
                     modifier = Modifier.fillMaxWidth()
-                )
-
-                // Layer 1: Full-body Animal Avatar Companions (Leader Avatar + Cheerful Friends)
-                MapCompanionFriends(
-                    nodeCount = mapNodes.size,
-                    nodeCenters = nodeCenters,
-                    activeNodeIndex = activeNodeIndex,
-                    activeAvatarId = userStats.avatarId,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(totalMapHeightDp)
                 )
 
                 // Layer 2: Continuous rope-colored dashed trail path
@@ -325,7 +314,7 @@ fun MapScreen(
                         .height(totalMapHeightDp)
                 )
 
-                // Layer 4: Interactive Map Nodes positioned along the winding path with Group Banners
+                // Layer 3: Interactive Map Nodes positioned along the winding path with Group Banners
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -399,49 +388,19 @@ fun MapScreen(
                     }
                 }
 
-                // Layer 5: Ambient Mascot Companion at the Active Node with dynamic left/right placement & mini dialogue bubble
-                if (nodeCenters.isNotEmpty() && activeNodeIndex in nodeCenters.indices) {
-                    val activeCenter = nodeCenters[activeNodeIndex]
-                    val activeXDp = with(density) { activeCenter.x.toDp() }
-                    val activeYDp = with(density) { activeCenter.y.toDp() }
-                    val activeNodeXOffset = calculateNodeXOffsetDp(activeNodeIndex, PATH_AMPLITUDE_X)
-
-                    // Dynamic placement: if node is shifted right of center, place mascot to the left; else to the right
-                    val mascotIsLeft = activeNodeXOffset >= 0.dp
-                    val mascotXOffsetDp = if (mascotIsLeft) (activeXDp - 88.dp) else (activeXDp + 46.dp)
-                    val mascotYOffsetDp = activeYDp - 48.dp
-
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .offset(x = mascotXOffsetDp, y = mascotYOffsetDp)
-                            .idleBounce(enabled = true)
-                    ) {
-                        // Mini Speech Dialogue Bubble above Mascot
-                        MascotMapDialogueBubble(
-                            message = "Let's Go!",
-                            onClick = { viewModel.playMascotTapReaction() },
-                            modifier = Modifier.padding(bottom = 4.dp)
-                        )
-
-                        // Mascot Avatar Button
-                        GummyContainer(
-                            onClick = { viewModel.playMascotTapReaction() },
-                            faceColor = Color.Transparent,
-                            shadowColor = Color.Transparent,
-                            shape = CircleShape,
-                            strokeWidth = 0.dp,
-                            depthHeight = 0.dp,
-                            modifier = Modifier.size(MASCOT_SIZE)
-                        ) {
-                            Image(
-                                painter = rememberAssetPainter(MascotState.IDLE.assetPath),
-                                contentDescription = "Lily Mascot Active Guide",
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
-                    }
-                }
+                // Layer 4: Full-body Animal Avatar Companions with Breathing Animation (Leader Avatar beside active node + Cheerful Friends)
+                MapCompanionFriends(
+                    nodeCount = mapNodes.size,
+                    nodeCenters = nodeCenters,
+                    activeNodeIndex = activeNodeIndex,
+                    activeAvatarId = userStats.avatarId,
+                    onCompanionTap = { animal ->
+                        viewModel.playMascotTapReaction()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(totalMapHeightDp)
+                )
             }
         }
 

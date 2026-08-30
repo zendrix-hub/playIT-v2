@@ -1,8 +1,14 @@
 package com.playit.app.presentation.components
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -28,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -65,6 +72,27 @@ fun MascotSpeechHeader(
         label = "mascotTapBounce"
     )
 
+    val isReducedMotion = LocalReducedMotion.current
+    val infiniteTransition = rememberInfiniteTransition(label = "mascotBreathe")
+    val breatheScaleY by infiniteTransition.animateFloat(
+        initialValue = 1.0f,
+        targetValue = 1.035f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 3600, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "mascotBreatheY"
+    )
+    val breatheScaleX by infiniteTransition.animateFloat(
+        initialValue = 1.0f,
+        targetValue = 1.018f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 3600, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "mascotBreatheX"
+    )
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -72,13 +100,16 @@ fun MascotSpeechHeader(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
-        // Full-Body Mascot Character (Duolingo ABC Co-Player scale)
+        // Full-Body Mascot Character with Gentle Splash-Style Breathing
         Box(
             modifier = Modifier
                 .size(width = 86.dp, height = 98.dp)
                 .graphicsLayer {
-                    scaleX = tapBounceScale
-                    scaleY = tapBounceScale
+                    val scaleXCombined: Float = if (isReducedMotion) tapBounceScale else (tapBounceScale * breatheScaleX)
+                    val scaleYCombined: Float = if (isReducedMotion) tapBounceScale else (tapBounceScale * breatheScaleY)
+                    scaleX = scaleXCombined
+                    scaleY = scaleYCombined
+                    transformOrigin = TransformOrigin(0.5f, 1f)
                 }
                 .bounceClick {
                     tapTrigger++
