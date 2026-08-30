@@ -18,8 +18,6 @@ fun Modifier.breathingPulse(
     enabled: Boolean = true
 ): Modifier = composed {
     val isReducedMotion = LocalReducedMotion.current
-    if (!enabled) return@composed this
-
     val infiniteTransition = rememberInfiniteTransition(label = "pulseTransition")
     val scale by infiniteTransition.animateFloat(
         initialValue = 1.0f,
@@ -31,6 +29,8 @@ fun Modifier.breathingPulse(
         label = "pulseScale"
     )
 
+    if (!enabled) return@composed this
+
     this.graphicsLayer {
         scaleX = scale
         scaleY = scale
@@ -41,8 +41,6 @@ fun Modifier.idleBounce(
     enabled: Boolean = true
 ): Modifier = composed {
     val isReducedMotion = LocalReducedMotion.current
-    if (!enabled || isReducedMotion) return@composed this
-
     val infiniteTransition = rememberInfiniteTransition(label = "idleBounceTransition")
     val translateY by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -53,6 +51,8 @@ fun Modifier.idleBounce(
         ),
         label = "idleBounceY"
     )
+
+    if (!enabled || isReducedMotion) return@composed this
 
     this.graphicsLayer {
         translationY = translateY.dp.toPx()

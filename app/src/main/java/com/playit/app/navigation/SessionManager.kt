@@ -12,13 +12,10 @@ import javax.inject.Singleton
 class SessionManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    private val prefs by lazy {
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-    }
-
+    private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     private val _activeProfileId = MutableStateFlow<Long?>(
-        if (context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).contains(KEY_ACTIVE_PROFILE_ID)) {
-            context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).getLong(KEY_ACTIVE_PROFILE_ID, -1L).takeIf { it != -1L }
+        if (prefs.contains(KEY_ACTIVE_PROFILE_ID)) {
+            prefs.getLong(KEY_ACTIVE_PROFILE_ID, -1L).takeIf { it != -1L }
         } else {
             null
         }

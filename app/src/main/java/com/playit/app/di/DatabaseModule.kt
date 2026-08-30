@@ -172,9 +172,7 @@ object DatabaseModule {
                 }
             }
         })
-        if (com.playit.app.BuildConfig.DEBUG) {
-            builder.fallbackToDestructiveMigration()
-        }
+        builder.fallbackToDestructiveMigration()
         return builder.build()
     }
 
