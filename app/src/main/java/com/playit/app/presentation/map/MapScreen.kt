@@ -70,8 +70,8 @@ import com.playit.app.presentation.components.idleBounce
 import com.playit.app.presentation.components.rememberAssetPainter
 import com.playit.app.presentation.map.components.ChocolateHillsBackground
 import com.playit.app.presentation.map.components.GroupBannerStatus
+import com.playit.app.presentation.map.components.MapCompanionFriends
 import com.playit.app.presentation.map.components.MapPathCanvas
-import com.playit.app.presentation.map.components.MapTerrainProps
 import com.playit.app.presentation.map.components.MarungkoGroupBanner
 import com.playit.app.presentation.map.components.TopStatsBar
 import com.playit.app.presentation.map.components.calculateNodeXOffsetDp
@@ -305,11 +305,12 @@ fun MapScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Layer 1: Scattered Filipino cultural terrain props (palm, hut, flowers)
-                MapTerrainProps(
+                // Layer 1: Full-body Animal Avatar Companions (Leader Avatar + Cheerful Friends)
+                MapCompanionFriends(
                     nodeCount = mapNodes.size,
-                    nodeVerticalSpacing = TERRAIN_PROPS_VERTICAL_SPACING,
-                    topPadding = topPaddingDp,
+                    nodeCenters = nodeCenters,
+                    activeNodeIndex = activeNodeIndex,
+                    activeAvatarId = userStats.avatarId,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(totalMapHeightDp)

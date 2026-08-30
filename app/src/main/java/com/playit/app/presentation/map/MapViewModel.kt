@@ -30,6 +30,7 @@ import javax.inject.Inject
 
 data class UserMapStats(
     val profileName: String = "",
+    val avatarId: Int = 1,
     val totalStars: Int = 0,
     val currentStreak: Int = 0,
     val unlockedBadgesCount: Int = 0
@@ -95,6 +96,7 @@ class MapViewModel @Inject constructor(
         ) { profile, unlockedAchievements ->
             UserMapStats(
                 profileName = profile?.name ?: "",
+                avatarId = profile?.avatarResId ?: 1,
                 totalStars = profile?.totalStars ?: 0,
                 currentStreak = profile?.currentStreak ?: 0,
                 unlockedBadgesCount = unlockedAchievements.size

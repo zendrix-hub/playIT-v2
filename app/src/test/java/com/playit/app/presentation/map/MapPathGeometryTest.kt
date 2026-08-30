@@ -62,6 +62,24 @@ class MapPathGeometryTest {
     }
 
     @Test
+    fun generateCompanionPlacements_placesExplorerLeaderAndFriends() {
+        val dummyCenters = (0 until 28).map { i -> Offset(200f + i * 2f, 100f + i * 80f) }
+        val placements = com.playit.app.presentation.map.components.generateCompanionPlacements(
+            nodeCount = 28,
+            nodeCenters = dummyCenters,
+            activeNodeIndex = 0,
+            activeAvatarId = 2, // Milo the Monkey
+            canvasWidthDp = 400f,
+            density = 2.0f
+        )
+
+        assertTrue("Should generate at least explorer leader plus supporting friends", placements.isNotEmpty())
+        val leader = placements.find { it.isExplorerLeader }
+        assertTrue("Leader must be present", leader != null)
+        assertEquals("Leader animal must match active avatar", com.playit.app.presentation.map.components.CompanionAnimal.MONKEY, leader?.animal)
+    }
+
+    @Test
     fun getMarungkoLettersForGroup_returnsExpectedLetters() {
         assertEquals("M • S • A • I • O", com.playit.app.presentation.map.components.getMarungkoLettersForGroup(1))
         assertEquals("B • U • T • K • L", com.playit.app.presentation.map.components.getMarungkoLettersForGroup(2))
