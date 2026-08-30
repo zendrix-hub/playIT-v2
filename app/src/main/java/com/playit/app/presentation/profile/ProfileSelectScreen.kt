@@ -2,9 +2,9 @@ package com.playit.app.presentation.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Text
@@ -34,15 +34,9 @@ fun ProfileSelectScreen(
 ) {
     val profiles by viewModel.profiles.collectAsState()
     val showArithmeticGuard by viewModel.showArithmeticGuard.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.playWelcomeGreeting()
-    }
+    val scrollState = rememberScrollState()
 
     if (showArithmeticGuard) {
-        LaunchedEffect(Unit) {
-            viewModel.playParentGateAudio()
-        }
         ArithmeticGuardDialog(
             onPass = {
                 viewModel.onArithmeticGuardPassed()
@@ -140,7 +134,7 @@ fun ProfileSelectScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Companion Mascot Dialogue
+            // Companion Mascot Dialogue (Interactive on user tap, no auto-play delay on load)
             MascotSpeechHeader(
                 message = if (profiles.isEmpty()) {
                     "Welcome to PlayIT! Tap '+ Add New Profile' below to begin your sound adventure!"
@@ -152,14 +146,15 @@ fun ProfileSelectScreen(
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
-            // Scrollable Profiles & Add Profile CTA
-            LazyColumn(
+            // Fast, High-Performance Scrollable Profile List
+            Column(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
-                items(profiles, key = { it.id }) { profile ->
+                profiles.forEach { profile ->
                     ProfileCard(
                         profile = profile,
                         onSelect = { id ->
@@ -170,16 +165,14 @@ fun ProfileSelectScreen(
                     )
                 }
 
-                item {
-                    AddProfileButton(
-                        enabled = viewModel.canAddProfile(),
-                        currentCount = profiles.size,
-                        maxCount = GameplayConstants.MAX_PROFILES,
-                        isPrimaryAction = profiles.isEmpty(),
-                        onClick = onAddProfileClick,
-                        modifier = Modifier.padding(bottom = 12.dp)
-                    )
-                }
+                AddProfileButton(
+                    enabled = viewModel.canAddProfile(),
+                    currentCount = profiles.size,
+                    maxCount = GameplayConstants.MAX_PROFILES,
+                    isPrimaryAction = profiles.isEmpty(),
+                    onClick = onAddProfileClick,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
             }
         }
     }

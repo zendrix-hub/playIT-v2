@@ -131,6 +131,15 @@ class AudioPlayer @Inject constructor(
             player.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
             afd.close()
 
+            player.setOnPreparedListener { mp ->
+                try {
+                    mp.start()
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error starting MediaPlayer onPrepared", e)
+                    onComplete?.invoke()
+                }
+            }
+
             player.setOnCompletionListener {
                 onComplete?.invoke()
             }
@@ -142,8 +151,7 @@ class AudioPlayer @Inject constructor(
                 true
             }
 
-            player.prepare()
-            player.start()
+            player.prepareAsync()
         } catch (e: Exception) {
             Log.e(TAG, "Failed to play audio asset: $targetPath", e)
             onComplete?.invoke()
