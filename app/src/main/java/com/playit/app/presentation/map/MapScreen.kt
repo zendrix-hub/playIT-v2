@@ -138,8 +138,17 @@ fun MapScreen(
 
     // Identify current active node for auto-scroll and companion mascot positioning
     val activeNodeIndex = remember(mapNodes) {
-        val idx = mapNodes.indexOfFirst { it.isUnlocked && (it is MapNode.LetterNode && it.starsEarned == 0) }
-        if (idx != -1) idx else mapNodes.indexOfLast { it.isUnlocked }.coerceAtLeast(0)
+        // 1. Earliest unstarted letter node
+        val firstUnstartedLetter = mapNodes.indexOfFirst { it.isUnlocked && it is MapNode.LetterNode && it.starsEarned == 0 }
+        if (firstUnstartedLetter != -1) return@remember firstUnstartedLetter
+
+        // 2. Earliest unlocked Blend-It milestone
+        val unlockedBlendIt = mapNodes.indexOfFirst { it.isUnlocked && it is MapNode.BlendItNode }
+        if (unlockedBlendIt != -1) return@remember unlockedBlendIt
+
+        // 3. Fallback to latest unlocked node
+        val lastUnlocked = mapNodes.indexOfLast { it.isUnlocked }
+        if (lastUnlocked != -1) lastUnlocked else 0
     }
 
     // Shake animation state for locked node taps
@@ -293,26 +302,32 @@ fun MapScreen(
                     fallbackNodeCenters
                 }
 
-                // Auto-scroll to active node on map launch
+                val viewportHeightPx = with(density) { maxHeight.toPx() }
+
+                // Auto-scroll to active node on map launch (reliably leads to current node when progress is far)
                 var hasAutoScrolled by remember { mutableStateOf(false) }
-                LaunchedEffect(activeNodeIndex, nodeCenters) {
+                LaunchedEffect(activeNodeIndex, nodeCenters, scrollState.maxValue) {
                     if (!hasAutoScrolled && nodeCenters.isNotEmpty() && activeNodeIndex in nodeCenters.indices) {
-                        val activeCenterY = nodeCenters[activeNodeIndex].y
-                        val viewportOffsetPx = with(density) { 260.dp.toPx() }
-                        val targetScrollPx = if (activeNodeIndex == 0) 0f else (activeCenterY - viewportOffsetPx).coerceAtLeast(0f)
-                        delay(250)
-                        if (isReducedMotion) {
-                            scrollState.scrollTo(targetScrollPx.toInt())
-                        } else {
-                            scrollState.animateScrollTo(
-                                value = targetScrollPx.toInt(),
-                                animationSpec = tween(
-                                    durationMillis = 750,
-                                    easing = FastOutSlowInEasing
-                                )
-                            )
+                        if (activeNodeIndex == 0) {
+                            hasAutoScrolled = true
+                            return@LaunchedEffect
                         }
-                        hasAutoScrolled = true
+                        if (scrollState.maxValue > 0) {
+                            val activeCenterY = nodeCenters[activeNodeIndex].y
+                            val targetScrollPx = (activeCenterY - viewportHeightPx / 2.2f).coerceIn(0f, scrollState.maxValue.toFloat())
+                            if (isReducedMotion) {
+                                scrollState.scrollTo(targetScrollPx.toInt())
+                            } else {
+                                scrollState.animateScrollTo(
+                                    value = targetScrollPx.toInt(),
+                                    animationSpec = tween(
+                                        durationMillis = 750,
+                                        easing = FastOutSlowInEasing
+                                    )
+                                )
+                            }
+                            hasAutoScrolled = true
+                        }
                     }
                 }
 

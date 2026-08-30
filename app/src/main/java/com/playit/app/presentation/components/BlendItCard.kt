@@ -68,7 +68,7 @@ fun BlendItCard(
                     )
                     GummyMotionAsset(
                         assetPath = assetPath,
-                        contentDescription = "Larawan ng salitang $cleanWord • Blend word illustration: $cleanWord",
+                        contentDescription = "Blend word illustration: $cleanWord",
                         isIdleFloating = true,
                         floatDistance = 4.dp,
                         celebrateTrigger = isCorrect,
