@@ -100,6 +100,13 @@ class SayItViewModel @Inject constructor(
     }
 
     fun playPhonemeSound() {
+        if (_state.value is SayItState.Listening) {
+            autoStopJob?.cancel()
+            voskRecognizer.stopListening()
+            _state.value = SayItState.Idle
+            _audioAmplitude.value = 0f
+        }
+        audioPlayer.stop()
         val letter = _phoneme.value?.letter ?: "m"
         val path = audioResolver.getPhonemePath(letter) ?: _phoneme.value?.audioPath ?: "audio/phonemes/phoneme_m.mp3"
         _isPlayingPhoneme.value = true
@@ -122,6 +129,10 @@ class SayItViewModel @Inject constructor(
 
     fun startListening() {
         if (_state.value is SayItState.Listening) return
+
+        // Instantly silence any voiceover or phoneme audio so it never bleeds into the mic
+        audioPlayer.stop()
+        _isPlayingPhoneme.value = false
 
         autoStopJob?.cancel()
         val target = _phoneme.value?.letter?.lowercase() ?: "m"
