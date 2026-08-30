@@ -20,9 +20,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -61,13 +61,13 @@ fun BlendItScreen(
     onSessionComplete: (Int) -> Unit,
     onBack: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-    val words by viewModel.words.collectAsState()
-    val currentWord by viewModel.currentWord.collectAsState()
-    val tileBank by viewModel.tileBank.collectAsState()
-    val placedTiles by viewModel.placedTiles.collectAsState()
-    val hearts by viewModel.hearts.collectAsState()
-    val currentWordIndex by viewModel.currentWordIndex.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val words by viewModel.words.collectAsStateWithLifecycle()
+    val currentWord by viewModel.currentWord.collectAsStateWithLifecycle()
+    val tileBank by viewModel.tileBank.collectAsStateWithLifecycle()
+    val placedTiles by viewModel.placedTiles.collectAsStateWithLifecycle()
+    val hearts by viewModel.hearts.collectAsStateWithLifecycle()
+    val currentWordIndex by viewModel.currentWordIndex.collectAsStateWithLifecycle()
     val totalWords = words.size.coerceAtLeast(1)
 
     // Fires onSessionComplete once all words are completed or SessionComplete is emitted

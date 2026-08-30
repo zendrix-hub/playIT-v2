@@ -44,11 +44,27 @@ class ProfileViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<ProfileUiState>(ProfileUiState.Idle)
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 
+    private val _nameInput = MutableStateFlow("")
+    val nameInput: StateFlow<String> = _nameInput.asStateFlow()
+
+    private val _selectedAvatarId = MutableStateFlow(1)
+    val selectedAvatarId: StateFlow<Int> = _selectedAvatarId.asStateFlow()
+
     private val _showArithmeticGuard = MutableStateFlow(false)
     val showArithmeticGuard: StateFlow<Boolean> = _showArithmeticGuard.asStateFlow()
 
     private val _isPlayingGreeting = MutableStateFlow(false)
     val isPlayingGreeting: StateFlow<Boolean> = _isPlayingGreeting.asStateFlow()
+
+    fun onNameChanged(name: String) { _nameInput.value = name }
+    fun onAvatarSelected(id: Int) {
+        _selectedAvatarId.value = id
+        audioPlayer.playAssetAudio(audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME))
+    }
+    fun resetForm() {
+        _nameInput.value = ""
+        _selectedAvatarId.value = 1
+    }
 
     fun requestParentAccess() { _showArithmeticGuard.value = true }
     fun dismissArithmeticGuard() { _showArithmeticGuard.value = false }

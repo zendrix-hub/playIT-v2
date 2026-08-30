@@ -18,18 +18,14 @@ class FindItAttemptRepositoryImpl @Inject constructor(
         selectedPhonemeId: Int,
         isCorrect: Boolean
     ) {
-        try {
-            findItAttemptDao.insertAttempt(
-                FindItAttemptEntity(
-                    profileId = profileId,
-                    phonemeId = phonemeId,
-                    selectedPhonemeId = selectedPhonemeId,
-                    isCorrect = isCorrect
-                )
+        findItAttemptDao.insertAttempt(
+            FindItAttemptEntity(
+                profileId = profileId,
+                phonemeId = phonemeId,
+                selectedPhonemeId = selectedPhonemeId,
+                isCorrect = isCorrect
             )
-        } catch (e: Exception) {
-            android.util.Log.e("FindItAttemptRepositoryImpl", "Failed to save data", e)
-        }
+        )
     }
 
     override suspend fun getAttemptsForProfile(profileId: Long): List<FindItAttempt> {

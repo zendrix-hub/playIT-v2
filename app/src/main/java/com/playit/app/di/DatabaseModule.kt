@@ -52,6 +52,14 @@ object DatabaseModule {
                     val dbInstance = databaseProvider.get()
 
                     // Seed 28 Phonemes
+                    // MARUNGKO SEQUENCE ADAPTATION NOTE:
+                    // The phoneme ordering below follows the project's adapted Marungko sequence
+                    // as established in 01_REQUIREMENTS_SUMMARY.md §7 (Conflict Resolution).
+                    // This ordering was optimized for CVC word availability in English phonics
+                    // while preserving the Marungko principle of cumulative letter introduction.
+                    // Group 1: m,s,a,i | Group 2: o,b,e,u | Group 3: t,k,l,y
+                    // Group 4: n,g,ng,p | Group 5: r,d,h,w | Group 6: c,f,j,ñ | Group 7: q,v,x,z
+                    // See thesis Chapter 3 §3.x for pedagogical justification.
                     val phonemeList = listOf(
                         PhonemeEntity(1, "m", "audio/phonemes/phoneme_m.mp3", "images/pictures/picture_mouse.png", "Mouse"),
                         PhonemeEntity(2, "s", "audio/phonemes/phoneme_s.mp3", "images/pictures/picture_sun.png", "Sun"),

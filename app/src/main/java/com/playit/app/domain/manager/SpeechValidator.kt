@@ -2,7 +2,6 @@ package com.playit.app.domain.manager
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.math.min
 
 /**
  * Validates speech recognition output against target phonemes.
@@ -83,8 +82,6 @@ class SpeechValidator @Inject constructor() {
         for (accepted in acceptedList) {
             if (cleanText == accepted) return true
             if (tokens.contains(accepted)) return true
-            // If the transcript contains the anchor word or letter name
-            if (cleanText.contains(accepted) && accepted.length >= 3) return true
         }
 
         // 4. Starting phonetic match (e.g. saying "muh" or "ma" for 'm')
@@ -92,40 +89,8 @@ class SpeechValidator @Inject constructor() {
             if (token.startsWith(cleanTarget) && token.length <= cleanTarget.length + 2) {
                 return true
             }
-            // 5. Fuzzy edit distance for slight acoustic transcription variances
-            for (accepted in acceptedList) {
-                if (accepted.length >= 3 && levenshteinDistance(token, accepted) <= 1) {
-                    return true
-                }
-            }
         }
 
         return false
-    }
-
-    /**
-     * Calculates the Levenshtein distance between two character sequences.
-     */
-    private fun levenshteinDistance(lhs: CharSequence, rhs: CharSequence): Int {
-        val lhsLength = lhs.length
-        val rhsLength = rhs.length
-
-        var cost = IntArray(lhsLength + 1) { it }
-        var newCost = IntArray(lhsLength + 1) { 0 }
-
-        for (i in 1..rhsLength) {
-            newCost[0] = i
-            for (j in 1..lhsLength) {
-                val match = if (lhs[j - 1] == rhs[i - 1]) 0 else 1
-                val costReplace = cost[j - 1] + match
-                val costInsert = cost[j] + 1
-                val costDelete = newCost[j - 1] + 1
-                newCost[j] = min(min(costInsert, costDelete), costReplace)
-            }
-            val swap = cost
-            cost = newCost
-            newCost = swap
-        }
-        return cost[lhsLength]
     }
 }

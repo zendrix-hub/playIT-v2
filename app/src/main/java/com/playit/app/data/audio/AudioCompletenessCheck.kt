@@ -27,15 +27,15 @@ class AudioCompletenessCheck @Inject constructor(
         "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
     )
 
-    // 32 unique Blend It words across 7 letter groups (per DatabaseModule seed data)
+    // 33 unique Blend It words across 7 letter groups (per DatabaseModule seed data)
     val requiredWords = listOf(
         "sam", "sis", "aim",
-        "bus", "sub", "sum", "bam", "mob",
-        "bat", "cat", "mat", "kit", "lit",
-        "pig", "pan", "gap", "spin", "nap",
-        "bird", "hand", "warm", "road", "draw",
-        "face", "cake", "fish", "fan",
-        "zoo", "van", "box", "quiz", "fox"
+        "bus", "sub", "mom", "bee", "bib",
+        "bat", "mat", "kit", "toy", "boy",
+        "pig", "pan", "bug", "pin", "nap",
+        "dog", "hat", "hen", "bed", "hand",
+        "cat", "fan", "cap", "cup", "jam",
+        "van", "box", "fox", "zoo", "web"
     )
 
     // 18 VO lines per 19 §2

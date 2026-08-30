@@ -21,11 +21,6 @@ class LetterGroupRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getGroupById(groupId: Int): LetterGroup? {
-        return try {
-            letterGroupDao.getGroupById(groupId)?.toDomain()
-        } catch (e: Exception) {
-            android.util.Log.e("LetterGroupRepositoryImpl", "Failed to read data", e)
-            null
-        }
+        return letterGroupDao.getGroupById(groupId)?.toDomain()
     }
 }

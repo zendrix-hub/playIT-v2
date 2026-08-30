@@ -17,11 +17,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -52,7 +52,7 @@ fun BlendItCompleteScreen(
     viewModel: BlendItCompleteViewModel,
     onReturnToMap: () -> Unit
 ) {
-    val starsEarned by viewModel.starsEarned.collectAsState()
+    val starsEarned by viewModel.starsEarned.collectAsStateWithLifecycle()
     
     var isPlaying by remember { mutableStateOf(true) }
 

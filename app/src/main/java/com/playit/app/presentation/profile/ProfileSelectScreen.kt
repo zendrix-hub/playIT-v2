@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,9 +33,9 @@ fun ProfileSelectScreen(
     onAddProfileClick: () -> Unit,
     onParentDashboardClick: () -> Unit
 ) {
-    val profiles by viewModel.profiles.collectAsState()
-    val showArithmeticGuard by viewModel.showArithmeticGuard.collectAsState()
-    val isPlayingGreeting by viewModel.isPlayingGreeting.collectAsState()
+    val profiles by viewModel.profiles.collectAsStateWithLifecycle()
+    val showArithmeticGuard by viewModel.showArithmeticGuard.collectAsStateWithLifecycle()
+    val isPlayingGreeting by viewModel.isPlayingGreeting.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
 
     // Snappy, warm auto-greeting on screen open

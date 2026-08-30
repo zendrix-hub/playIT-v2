@@ -41,11 +41,11 @@ import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.playit.app.presentation.components.AudioWaveformBar
+import com.playit.app.presentation.components.ErrorStateContent
 import com.playit.app.presentation.components.GummyButton
 import com.playit.app.presentation.components.GummyContainer
 import com.playit.app.presentation.components.LessonStep
@@ -92,16 +93,32 @@ fun SayItScreen(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
-    val phoneme by viewModel.phoneme.collectAsState()
-    val state by viewModel.state.collectAsState()
-    val hearts by viewModel.hearts.collectAsState()
-    val attempts by viewModel.attempts.collectAsState()
-    val audioAmplitude by viewModel.audioAmplitude.collectAsState()
-    val isNoisyEnvironment by viewModel.isNoisyEnvironment.collectAsState()
-    val isPlayingPhoneme by viewModel.isPlayingPhoneme.collectAsState()
+    val phoneme by viewModel.phoneme.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val hearts by viewModel.hearts.collectAsStateWithLifecycle()
+    val attempts by viewModel.attempts.collectAsStateWithLifecycle()
+    val audioAmplitude by viewModel.audioAmplitude.collectAsStateWithLifecycle()
+    val isNoisyEnvironment by viewModel.isNoisyEnvironment.collectAsStateWithLifecycle()
+    val isPlayingPhoneme by viewModel.isPlayingPhoneme.collectAsStateWithLifecycle()
+    val loadError by viewModel.loadError.collectAsStateWithLifecycle()
     val targetLetter = phoneme?.letter?.uppercase() ?: "M"
     val isListening = state is SayItState.Listening
     var permissionDeniedMessage by remember { mutableStateOf(false) }
+
+    if (loadError) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(brush = Brush.verticalGradient(colors = listOf(Sky, Sand))),
+            contentAlignment = Alignment.Center
+        ) {
+            ErrorStateContent(
+                message = "Oops! We couldn't load this lesson.",
+                onRetry = { viewModel.retry() }
+            )
+        }
+        return
+    }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -171,10 +188,10 @@ fun SayItScreen(
                     message = when {
                         permissionDeniedMessage -> "Please allow microphone access so Lily can hear you."
                         isNoisyEnvironment -> "It's noisy! Find a quiet spot so Lily can hear you."
-                        state is SayItState.Listening -> "Listening closely... Say /${phoneme?.letter ?: "m"}/!"
-                        state is SayItState.Correct -> "Awesome pronunciation! You got it right!"
-                        state is SayItState.Incorrect -> "Good try! Listen again and retry."
-                        else -> "Your turn — say the sound /${phoneme?.letter ?: "m"}/!"
+                        state is SayItState.Listening -> "Listening... Say /${phoneme?.letter ?: "m"}/!"
+                        state is SayItState.Correct -> "Awesome! You said /${phoneme?.letter ?: "m"}/!"
+                        state is SayItState.Incorrect -> "Good try! Tap to hear /${phoneme?.letter ?: "m"}/ again."
+                        else -> "Say: /${phoneme?.letter ?: "m"}/ (Tap to hear)"
                     },
                     mascotState = when {
                         permissionDeniedMessage -> MascotState.ENCOURAGING

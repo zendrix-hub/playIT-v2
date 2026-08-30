@@ -92,9 +92,15 @@ class SayItViewModel @Inject constructor(
                 _loadError.value = true
                 return@launch
             }
+            _loadError.value = false
             _phoneme.value = p
             voskRecognizer.initModel()
         }
+    }
+
+    fun retry() {
+        _loadError.value = false
+        loadPhoneme()
     }
 
     fun playPhonemeSound() {
@@ -210,7 +216,6 @@ class SayItViewModel @Inject constructor(
         super.onCleared()
         autoStopJob?.cancel()
         voskRecognizer.stopListening()
-        voskRecognizer.release()
         audioPlayer.stop()
     }
 }

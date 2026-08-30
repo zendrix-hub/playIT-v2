@@ -30,11 +30,11 @@ import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,6 +42,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import com.playit.app.presentation.components.ErrorStateContent
 import com.playit.app.presentation.components.GummyButton
 import com.playit.app.presentation.components.GummyContainer
 import com.playit.app.presentation.components.LessonStep
@@ -69,10 +70,26 @@ fun HearItScreen(
     onNext: (String) -> Unit,
     onBack: () -> Unit
 ) {
-    val phoneme by viewModel.phoneme.collectAsState()
-    val isPlaying by viewModel.isPlaying.collectAsState()
-    val playCount by viewModel.playCount.collectAsState()
+    val phoneme by viewModel.phoneme.collectAsStateWithLifecycle()
+    val isPlaying by viewModel.isPlaying.collectAsStateWithLifecycle()
+    val playCount by viewModel.playCount.collectAsStateWithLifecycle()
+    val loadError by viewModel.loadError.collectAsStateWithLifecycle()
     val targetLetter = phoneme?.letter?.uppercase() ?: "M"
+
+    if (loadError) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(brush = Brush.verticalGradient(colors = listOf(Sky, Sand))),
+            contentAlignment = Alignment.Center
+        ) {
+            ErrorStateContent(
+                message = "Oops! We couldn't load this sound.",
+                onRetry = { viewModel.retry() }
+            )
+        }
+        return
+    }
 
     val cardRotation = remember(phoneme?.id) {
         val seed = phoneme?.id ?: 0
@@ -155,9 +172,9 @@ fun HearItScreen(
                 // Mascot speech bubble prompt
                 MascotSpeechHeader(
                     message = if (playCount == 0) {
-                        "Listen closely, then tap play!"
+                        "Tap to hear: /${phoneme?.letter ?: "m"}/"
                     } else {
-                        "Nice! Tap Next when you're ready."
+                        "Sound: /${phoneme?.letter ?: "m"}/ (Tap to hear again)"
                     },
                     mascotState = if (isPlaying) MascotState.LISTENING else if (playCount > 0) MascotState.POINTING else MascotState.IDLE,
                     onMascotTap = { if (!isPlaying) viewModel.playPhonemeSound() }

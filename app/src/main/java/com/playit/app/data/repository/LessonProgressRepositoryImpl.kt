@@ -22,19 +22,10 @@ class LessonProgressRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getProgressForPhoneme(profileId: Long, phonemeId: Int): LessonProgress? {
-        return try {
-            lessonProgressDao.getProgressForPhoneme(profileId, phonemeId)?.toDomain()
-        } catch (e: Exception) {
-            android.util.Log.e("LessonProgressRepositoryImpl", "Failed to read data", e)
-            null
-        }
+        return lessonProgressDao.getProgressForPhoneme(profileId, phonemeId)?.toDomain()
     }
 
     override suspend fun saveProgress(progress: LessonProgress) {
-        try {
-            lessonProgressDao.saveProgress(progress.toEntity())
-        } catch (e: Exception) {
-            android.util.Log.e("LessonProgressRepositoryImpl", "Failed to save data", e)
-        }
+        lessonProgressDao.saveProgress(progress.toEntity())
     }
 }

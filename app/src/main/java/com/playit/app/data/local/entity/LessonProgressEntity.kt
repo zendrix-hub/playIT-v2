@@ -36,7 +36,8 @@ data class LessonProgressEntity(
     val starsEarned: Int = 0,
     val heartsLost: Int = 0,
     val isCompleted: Boolean = false,
-    val completedAt: Long = 0L
+    val completedAt: Long = 0L,
+    val timeSpentMs: Long = 0L
 )
 
 fun LessonProgressEntity.toDomain(): LessonProgress = LessonProgress(
@@ -46,7 +47,8 @@ fun LessonProgressEntity.toDomain(): LessonProgress = LessonProgress(
     starsEarned = starsEarned,
     heartsLost = heartsLost,
     isCompleted = isCompleted,
-    completedAt = completedAt
+    completedAt = completedAt,
+    timeSpentMs = timeSpentMs
 )
 
 fun LessonProgress.toEntity(): LessonProgressEntity = LessonProgressEntity(
@@ -56,5 +58,6 @@ fun LessonProgress.toEntity(): LessonProgressEntity = LessonProgressEntity(
     starsEarned = starsEarned,
     heartsLost = heartsLost,
     isCompleted = isCompleted,
-    completedAt = completedAt
+    completedAt = completedAt,
+    timeSpentMs = timeSpentMs
 )

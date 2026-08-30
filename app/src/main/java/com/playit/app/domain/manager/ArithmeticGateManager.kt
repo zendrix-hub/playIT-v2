@@ -24,8 +24,8 @@ class ArithmeticGateManager @Inject constructor() {
     fun generateProblem(): ArithmeticProblem {
         val isAddition = Random.nextBoolean()
         return if (isAddition) {
-            val a = Random.nextInt(5, 15)
-            val b = Random.nextInt(3, 12)
+            val a = Random.nextInt(12, 45)
+            val b = Random.nextInt(10, 30)
             ArithmeticProblem(
                 operand1 = a,
                 operand2 = b,
@@ -33,8 +33,8 @@ class ArithmeticGateManager @Inject constructor() {
                 expectedAnswer = a + b
             )
         } else {
-            val a = Random.nextInt(10, 20)
-            val b = Random.nextInt(2, 9)
+            val a = Random.nextInt(25, 50)
+            val b = Random.nextInt(5, 15)
             ArithmeticProblem(
                 operand1 = a,
                 operand2 = b,

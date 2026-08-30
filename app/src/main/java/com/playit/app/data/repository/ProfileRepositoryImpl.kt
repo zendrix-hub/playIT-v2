@@ -24,12 +24,7 @@ class ProfileRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getProfileById(id: Long): Profile? {
-        return try {
-            profileDao.getProfileById(id)?.toDomain()
-        } catch (e: Exception) {
-            android.util.Log.e("ProfileRepositoryImpl", "Failed to read data", e)
-            null
-        }
+        return profileDao.getProfileById(id)?.toDomain()
     }
 
     override suspend fun createProfile(name: String, avatarResId: Int): Result<Long> {
@@ -45,24 +40,15 @@ class ProfileRepositoryImpl @Inject constructor(
             val newId = profileDao.insertProfile(entity)
             Result.success(newId)
         } catch (e: Exception) {
-            android.util.Log.e("ProfileRepositoryImpl", "Failed to save data", e)
             Result.failure(e)
         }
     }
 
     override suspend fun updateProfile(profile: Profile) {
-        try {
-            profileDao.updateProfile(profile.toEntity())
-        } catch (e: Exception) {
-            android.util.Log.e("ProfileRepositoryImpl", "Failed to save data", e)
-        }
+        profileDao.updateProfile(profile.toEntity())
     }
 
     override suspend fun deleteProfile(profile: Profile) {
-        try {
-            profileDao.deleteProfile(profile.toEntity())
-        } catch (e: Exception) {
-            android.util.Log.e("ProfileRepositoryImpl", "Failed to save data", e)
-        }
+        profileDao.deleteProfile(profile.toEntity())
     }
 }

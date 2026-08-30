@@ -48,9 +48,15 @@ class HearItViewModel @Inject constructor(
                 _loadError.value = true
                 return@launch
             }
+            _loadError.value = false
             _phoneme.value = p
             playPhonemeSound()
         }
+    }
+
+    fun retry() {
+        _loadError.value = false
+        loadPhoneme()
     }
 
     fun playPhonemeSound() {

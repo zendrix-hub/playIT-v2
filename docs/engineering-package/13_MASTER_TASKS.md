@@ -185,3 +185,22 @@ Reference mockup: `playit-mockup.html` (root of workspace). Full analysis: conve
 - [x] **Learner Onboarding & Profile Flow**: 24sp name and star reading floors with grammar pluralization in `ProfileCard`, empty-state breathing pulse in `AddProfileButton`, dedicated `AvatarCircle` loading production companion animal assets, diacritic/letter emoji-defense input filter, error-aware mascot reactivity in `NamePromptScreen`, and 76dp spring-animated avatar selection in `AvatarPicker`.
 - [x] **Splash & Value Proposition**: 24sp/26sp reading floors, scrollable viewport layout preventing clipping on compact devices, and pinned 64dp primary CTA.
 
+## Phase 11 — Audit Fixes & Technical Hardening (2026-08-30)
+- [x] **CB-1: SpeechValidator False-Positive Matching**: Removed Levenshtein fuzzy distance matching (<5 chars) and broad substring matches in `SpeechValidator.kt` to eliminate minimal-pair phonics false passes.
+- [x] **CB-2: AudioCompletenessCheck Word List Desync**: Synchronized `requiredWords` in `AudioCompletenessCheck.kt` to match the exact 33 seeded BlendIt words in `DatabaseModule.kt`.
+- [x] **CB-3: Repository Error Propagation**: Removed generic try/catch error swallowing across all 11 repository implementations in `data/repository/`, allowing exceptions to propagate cleanly to ViewModels.
+- [x] **CB-4: Lifecycle-Aware Flow Collection**: Added `androidx.lifecycle:lifecycle-runtime-compose` and migrated all 10 screen composables from `collectAsState()` to `collectAsStateWithLifecycle()`.
+- [x] **CB-5: Vosk Model Memory Warm-Keep**: Removed `voskRecognizer.release()` from `SayItViewModel.onCleared()` to prevent multi-second 70MB model churn on screen transitions.
+- [x] **CB-6: Marungko Sequence Documentation**: Added explicit pedagogical adaptation notice in `DatabaseModule.kt` phoneme seed data with thesis Chapter 3 cross-referencing.
+- [x] **HP-1: Dual-Criteria Star Thresholds**: Updated `StarCalculator.kt` and `BlendItStarThresholds.kt` with accuracy percentage criteria alongside hearts lost.
+- [x] **HP-2: Zero-Emoji Compliance**: Replaced emoji glyphs in `PhonemeHeatmapSection.kt` with `Icons.Filled.Abc` and `Icons.Filled.Star` Vector Icons.
+- [x] **HP-3: Touch Target Accessibility**: Bumped `FindItScreen.kt` audio CTA container height from 44dp to 56dp.
+- [x] **HP-4: Audio-Visual Synchrony**: Synchronized mascot bubble text in `HearItScreen.kt` and `SayItScreen.kt` 1:1 verbatim with on-tap phoneme audio playback.
+- [x] **HP-5: StreakTracker UTC Documentation**: Clarified UTC calendar boundary in `StreakTracker.kt` while preserving pure Kotlin architecture.
+- [x] **HP-6: 2-Digit Arithmetic Gate**: Strengthened random operand ranges in `ArithmeticGateManager.kt` to guarantee strictly 2-digit adult math problems.
+- [x] **HP-7: Lesson Duration Tracking**: Added `timeSpentMs` field to `LessonProgress` domain model and `LessonProgressEntity`.
+- [x] **HP-8: Error State UI Handling**: Added `retry()` functions in `HearItViewModel`/`SayItViewModel` and integrated `ErrorStateContent` in `HearItScreen` and `SayItScreen`.
+- [x] **HP-9: Name Prompt State Hoisting**: Hoisted player name and avatar selection state from `NamePromptScreen` into `ProfileViewModel` with config change survival.
+- [x] **Build Verification**: Verified `compileDebugKotlin` and KSP processor passes cleanly with `BUILD SUCCESSFUL`.
+
+

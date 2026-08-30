@@ -25,8 +25,8 @@ import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -61,13 +61,13 @@ fun FindItScreen(
     onNext: (String) -> Unit,
     onBack: () -> Unit
 ) {
-    val targetPhoneme by viewModel.targetPhoneme.collectAsState()
-    val pictureGrid by viewModel.pictureGrid.collectAsState()
-    val foundItemIds by viewModel.foundItemIds.collectAsState()
-    val foundCount by viewModel.foundCount.collectAsState()
-    val state by viewModel.state.collectAsState()
-    val hearts by viewModel.hearts.collectAsState()
-    val isPlaying by viewModel.isPlaying.collectAsState()
+    val targetPhoneme by viewModel.targetPhoneme.collectAsStateWithLifecycle()
+    val pictureGrid by viewModel.pictureGrid.collectAsStateWithLifecycle()
+    val foundItemIds by viewModel.foundItemIds.collectAsStateWithLifecycle()
+    val foundCount by viewModel.foundCount.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val hearts by viewModel.hearts.collectAsStateWithLifecycle()
+    val isPlaying by viewModel.isPlaying.collectAsStateWithLifecycle()
 
     val targetLetter = targetPhoneme?.letter?.uppercase() ?: "M"
 
@@ -137,7 +137,7 @@ fun FindItScreen(
                         depthHeight = 2.dp,
                         modifier = Modifier
                             .wrapContentWidth()
-                            .heightIn(min = 44.dp)
+                            .heightIn(min = 56.dp)
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,

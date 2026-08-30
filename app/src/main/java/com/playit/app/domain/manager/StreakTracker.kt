@@ -49,6 +49,7 @@ class StreakTracker(
         val newStreak = if (lastPlayed == 0L) {
             1
         } else {
+            // NOTE: Uses UTC calendar days. Local-timezone handling deferred to post-MVP.
             val daysSince = (now / MILLIS_PER_DAY) - (lastPlayed / MILLIS_PER_DAY)
             when {
                 daysSince <= 0L -> profile.currentStreak.coerceAtLeast(1)

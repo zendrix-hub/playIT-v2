@@ -16,12 +16,7 @@ class BlendItProgressRepositoryImpl @Inject constructor(
 ) : BlendItProgressRepository {
 
     override suspend fun getProgressForGroup(profileId: Long, groupId: Int): BlendItProgress? {
-        return try {
-            blendItProgressDao.getProgressForGroup(profileId, groupId)?.toDomain()
-        } catch (e: Exception) {
-            android.util.Log.e("BlendItProgressRepositoryImpl", "Failed to read data", e)
-            null
-        }
+        return blendItProgressDao.getProgressForGroup(profileId, groupId)?.toDomain()
     }
 
     override fun getProgressForProfile(profileId: Long): Flow<List<BlendItProgress>> {
@@ -31,10 +26,6 @@ class BlendItProgressRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveProgress(progress: BlendItProgress) {
-        try {
-            blendItProgressDao.saveProgress(progress.toEntity())
-        } catch (e: Exception) {
-            android.util.Log.e("BlendItProgressRepositoryImpl", "Failed to save data", e)
-        }
+        blendItProgressDao.saveProgress(progress.toEntity())
     }
 }

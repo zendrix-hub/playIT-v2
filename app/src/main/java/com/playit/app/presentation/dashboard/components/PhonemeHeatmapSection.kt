@@ -15,10 +15,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Abc
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -68,11 +73,17 @@ fun PhonemeHeatmapSection(
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                Icon(
+                    imageVector = Icons.Filled.Abc,
+                    contentDescription = null,
+                    tint = Ink,
+                    modifier = Modifier.size(24.dp)
+                )
                 Text(
-                    text = "🔤 Phoneme Recognition Heatmap",
+                    text = "Phoneme Recognition Heatmap",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.ExtraBold,
                     fontFamily = LexendFontFamily,
@@ -133,12 +144,23 @@ fun PhonemeHeatmapSection(
                             fontSize = 14.sp,
                             color = Ink
                         )
-                        Text(
-                            text = "⭐ ${lp.starsEarned} Stars (${lp.totalAttempts} attempts)",
-                            fontFamily = LexendFontFamily,
-                            fontSize = 13.sp,
-                            color = InkSoft
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Star,
+                                contentDescription = null,
+                                tint = Mango,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Text(
+                                text = "${lp.starsEarned} Stars (${lp.totalAttempts} attempts)",
+                                fontFamily = LexendFontFamily,
+                                fontSize = 13.sp,
+                                color = InkSoft
+                            )
+                        }
                     }
                 }
             }
