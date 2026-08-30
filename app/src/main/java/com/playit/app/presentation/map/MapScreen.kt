@@ -667,12 +667,12 @@ fun LetterMapNodeCard(
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Blend It Challenge Node — Grand Golden Crown & Laurel 3D Boss Node
+// Blend It Challenge Node — Grand Golden Crown & Laurel 3D Challenge Disc
 // ═══════════════════════════════════════════════════════════════════════════
 
-private val BossGoldFace = Color(0xFFFFB703)
-private val BossGoldShelf = Color(0xFFD97706)
-private val BossFlameAura = Color(0xFFFF8800)
+private val BlendChallengeGoldFace = Color(0xFFFFB703)
+private val BlendChallengeGoldShelf = Color(0xFFD97706)
+private val BlendChallengeFlameAura = Color(0xFFFF8800)
 
 @Composable
 fun BlendItChallengeNodeCard(
@@ -682,8 +682,8 @@ fun BlendItChallengeNodeCard(
     val isUnlocked = node.isUnlocked
     val isReducedMotion = LocalReducedMotion.current
 
-    // Pulsing Fiery Boss Aura Transition
-    val infiniteTransition = rememberInfiniteTransition(label = "bossAura")
+    // Pulsing Fiery Challenge Aura Transition
+    val infiniteTransition = rememberInfiniteTransition(label = "challengeAura")
     val auraScale by infiniteTransition.animateFloat(
         initialValue = 1.0f,
         targetValue = 1.28f,
@@ -691,7 +691,7 @@ fun BlendItChallengeNodeCard(
             animation = tween(1200, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Restart
         ),
-        label = "bossAuraScale"
+        label = "challengeAuraScale"
     )
     val auraAlpha by infiniteTransition.animateFloat(
         initialValue = 0.75f,
@@ -700,16 +700,16 @@ fun BlendItChallengeNodeCard(
             animation = tween(1200, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Restart
         ),
-        label = "bossAuraAlpha"
+        label = "challengeAuraAlpha"
     )
 
-    val faceColor = if (isUnlocked) BossGoldFace else DuolingoLockedFace
-    val shelfColor = if (isUnlocked) BossGoldShelf else DuolingoLockedShelf
+    val faceColor = if (isUnlocked) BlendChallengeGoldFace else DuolingoLockedFace
+    val shelfColor = if (isUnlocked) BlendChallengeGoldShelf else DuolingoLockedShelf
 
     val accessibilityLabel = if (isUnlocked) {
-        "Blend-It Boss Challenge Group ${node.groupId}"
+        "Blend-It Challenge Group ${node.groupId}"
     } else {
-        "Blend-It Boss Challenge Group ${node.groupId}, locked"
+        "Blend-It Challenge Group ${node.groupId}, locked"
     }
 
     Column(
@@ -722,7 +722,7 @@ fun BlendItChallengeNodeCard(
             contentAlignment = Alignment.Center,
             modifier = Modifier.size(width = 86.dp, height = 94.dp)
         ) {
-            // Fiery Pulsing Boss Aura Ring
+            // Fiery Pulsing Challenge Aura Ring
             if (isUnlocked && !isReducedMotion) {
                 Box(
                     modifier = Modifier
@@ -734,13 +734,13 @@ fun BlendItChallengeNodeCard(
                         }
                         .border(
                             width = 4.dp,
-                            color = BossFlameAura,
+                            color = BlendChallengeFlameAura,
                             shape = CircleShape
                         )
                 )
             }
 
-            // 3D Boss Disc (Clickable)
+            // 3D Challenge Disc (Clickable)
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -782,7 +782,7 @@ fun BlendItChallengeNodeCard(
                         )
                     }
 
-                    // Boss Crown / Laurels Insignia
+                    // Royal Crown & Milestone Insignia
                     if (isUnlocked) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -790,7 +790,7 @@ fun BlendItChallengeNodeCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Rounded.Star,
-                                contentDescription = "Boss Challenge",
+                                contentDescription = "Blend Challenge",
                                 tint = Color(0xFF78350F),
                                 modifier = Modifier.size(32.dp)
                             )
@@ -806,7 +806,7 @@ fun BlendItChallengeNodeCard(
                     } else {
                         Icon(
                             imageVector = Icons.Rounded.Lock,
-                            contentDescription = "Locked Boss Challenge",
+                            contentDescription = "Locked Challenge",
                             tint = DuolingoLockedIcon,
                             modifier = Modifier.size(28.dp)
                         )
@@ -815,7 +815,7 @@ fun BlendItChallengeNodeCard(
             }
         }
 
-        // Boss Node Badge Label below
+        // Challenge Node Badge Label below (Clean without "Boss" word)
         Box(
             modifier = Modifier
                 .offset(y = (-4).dp)
@@ -823,7 +823,7 @@ fun BlendItChallengeNodeCard(
                 .padding(horizontal = 8.dp, vertical = 2.dp)
         ) {
             Text(
-                text = "BLEND BOSS ${node.groupId}",
+                text = "BLEND ${node.groupId}",
                 fontFamily = LexendFontFamily,
                 fontSize = 9.sp,
                 fontWeight = FontWeight.ExtraBold,
