@@ -99,12 +99,12 @@ class AudioCompletenessCheckTest {
     }
 
     @Test
-    fun verifyContentGapsAreAbsent() {
+    fun verifyAll28PhonemesArePresent() {
         val phonemesDir = File(assetsAudioDir, "phonemes")
         val ngFile = File(phonemesDir, "phoneme_ng.mp3")
-        val nTildeFile = File(phonemesDir, "phoneme_ñ.mp3")
+        val enyeFile = File(phonemesDir, "phoneme_enye.mp3")
 
-        assertTrue("phoneme_ng.mp3 must be absent pending SME sign-off", !ngFile.exists())
-        assertTrue("phoneme_ñ.mp3 must be absent pending SME sign-off", !nTildeFile.exists())
+        assertTrue("phoneme_ng.mp3 must be present", ngFile.exists())
+        assertTrue("phoneme_enye.mp3 must be present", enyeFile.exists())
     }
 }

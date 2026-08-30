@@ -23,10 +23,11 @@ class AudioResolverTest {
     }
 
     @Test
-    fun getPhonemePath_returnsNullForContentGappedLetters() {
-        assertNull("phoneme_ng must be null as content-gapped", audioResolver.getPhonemePath("ng"))
-        assertNull("phoneme_ñ must be null as content-gapped", audioResolver.getPhonemePath("ñ"))
-        assertNull("phoneme_NG must be case-insensitive null", audioResolver.getPhonemePath("NG"))
+    fun getPhonemePath_returnsCorrectPathForSpecialLetters() {
+        assertEquals("audio/phonemes/phoneme_ng.mp3", audioResolver.getPhonemePath("ng"))
+        assertEquals("audio/phonemes/phoneme_enye.mp3", audioResolver.getPhonemePath("ñ"))
+        assertEquals("audio/phonemes/phoneme_ng.mp3", audioResolver.getPhonemePath("NG"))
+        assertEquals("audio/phonemes/phoneme_enye.mp3", audioResolver.getPhonemePath("enye"))
     }
 
     @Test

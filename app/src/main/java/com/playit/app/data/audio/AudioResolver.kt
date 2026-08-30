@@ -54,18 +54,14 @@ class AudioResolver @Inject constructor() {
 
     /**
      * Resolves the asset path for a phoneme letter.
-     * Returns null for content-gapped letters ('ng', 'ñ') pending SME sign-off.
      */
-    fun getPhonemePath(letter: String): String? {
+    fun getPhonemePath(letter: String): String {
         val clean = letter.lowercase().trim()
-        if (clean == "ng" || clean == "ñ") {
-            Log.w(TAG, "Content-gapped letter attempted: '$clean'. Asset absent pending SME review (01 §5, 18 §6).")
-            return null
+        val key = when (clean) {
+            "ñ", "enye" -> "enye"
+            else -> clean
         }
-        if (clean == "x") {
-            Log.i(TAG, "Resolving phoneme_x.mp3 (DRAFT-not-final asset, 19 §1).")
-        }
-        return "audio/phonemes/phoneme_$clean.mp3"
+        return "audio/phonemes/phoneme_$key.mp3"
     }
 
     /**
