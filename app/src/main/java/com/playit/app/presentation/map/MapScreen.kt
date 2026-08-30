@@ -14,6 +14,8 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -33,6 +35,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Extension
 import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,12 +48,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
@@ -456,8 +461,19 @@ fun MascotMapDialogueBubble(
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Letter Map Node — Filipino palette & Duolingo ABC Polish
+// Letter Map Node — Authentic Duolingo 3D Stepping Stone Disc (duoling_map_sample.jpg)
 // ═══════════════════════════════════════════════════════════════════════════
+
+private val DuolingoGoldFace = Color(0xFFFFC800)
+private val DuolingoGoldShelf = Color(0xFFE5A500)
+private val DuolingoGoldStar = Color(0xFFB45309)
+
+private val DuolingoGreenFace = Color(0xFF58CC02)
+private val DuolingoGreenShelf = Color(0xFF46A302)
+
+private val DuolingoLockedFace = Color(0xFFE5E5E5)
+private val DuolingoLockedShelf = Color(0xFFCECECE)
+private val DuolingoLockedIcon = Color(0xFFAFAFAF)
 
 @Composable
 fun LetterMapNodeCard(
@@ -472,7 +488,7 @@ fun LetterMapNodeCard(
     val infiniteTransition = rememberInfiniteTransition(label = "activeNodeRing")
     val ringScale by infiniteTransition.animateFloat(
         initialValue = 1.0f,
-        targetValue = 1.22f,
+        targetValue = 1.25f,
         animationSpec = infiniteRepeatable(
             animation = tween(1400, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Restart
@@ -489,26 +505,16 @@ fun LetterMapNodeCard(
         label = "ringAlpha"
     )
 
-    // Filipino palette node colors
-    val bgColor = when {
-        isCompleted -> Leaf
-        node.isUnlocked -> Mango
-        else -> Cloud
+    val faceColor = when {
+        isCompleted -> DuolingoGoldFace
+        node.isUnlocked -> DuolingoGreenFace
+        else -> DuolingoLockedFace
     }
-    val shadowColor = when {
-        isCompleted -> LeafShadow
-        node.isUnlocked -> MangoShadow
-        else -> TanShadow.copy(alpha = 0.55f)
-    }
-    val textColor = when {
-        isCompleted -> Cloud
-        node.isUnlocked -> Ink
-        else -> InkSoft.copy(alpha = 0.65f)
-    }
-    val borderColor = when {
-        isCurrentActiveNode -> DarkBrownOutline
-        isCompleted -> DarkBrownOutline
-        else -> DarkBrownOutline.copy(alpha = 0.6f)
+
+    val shelfColor = when {
+        isCompleted -> DuolingoGoldShelf
+        node.isUnlocked -> DuolingoGreenShelf
+        else -> DuolingoLockedShelf
     }
 
     val accessibilityLabel = when {
@@ -517,122 +523,122 @@ fun LetterMapNodeCard(
         else -> "Letter ${node.symbol}, locked"
     }
 
-    Box(
-        contentAlignment = Alignment.Center,
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.semantics(mergeDescendants = true) {
             contentDescription = accessibilityLabel
         }
     ) {
-        // Active Pulsing Ring Focus Aura
-        if (isCurrentActiveNode && !isReducedMotion) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.size(width = 76.dp, height = 84.dp)
+        ) {
+            // Active Pulsing Ring Focus Aura
+            if (isCurrentActiveNode && !isReducedMotion) {
+                Box(
+                    modifier = Modifier
+                        .size(76.dp)
+                        .graphicsLayer {
+                            scaleX = ringScale
+                            scaleY = ringScale
+                            alpha = ringAlpha
+                        }
+                        .border(
+                            width = 3.5.dp,
+                            color = DuolingoGreenShelf,
+                            shape = CircleShape
+                        )
+                )
+            }
+
+            // 3D Duolingo Disc (Clickable)
             Box(
                 modifier = Modifier
-                    .size(LETTER_NODE_SIZE)
-                    .graphicsLayer {
-                        scaleX = ringScale
-                        scaleY = ringScale
-                        alpha = ringAlpha
-                    }
-                    .border(
-                        width = 3.dp,
-                        color = MangoDark,
-                        shape = CircleShape
+                    .fillMaxSize()
+                    .clickable(
+                        interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                        indication = null,
+                        onClick = onClick
                     )
-            )
-        }
-
-        Box(contentAlignment = Alignment.TopCenter) {
-            GummyContainer(
-                onClick = onClick,
-                enabled = true,
-                faceColor = bgColor,
-                shadowColor = shadowColor,
-                shape = CircleShape,
-                strokeWidth = if (isCurrentActiveNode) 3.5.dp else 3.dp,
-                strokeColor = borderColor,
-                depthHeight = if (node.isUnlocked) 5.dp else 3.dp,
-                modifier = Modifier
-                    .size(LETTER_NODE_SIZE)
-                    .idleBounce(enabled = isCurrentActiveNode)
-                    .breathingPulse(enabled = isCurrentActiveNode)
             ) {
+                // 3D Extrusion Bottom Shelf (8dp extrusion)
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .size(76.dp)
+                        .align(Alignment.BottomCenter)
+                        .background(shelfColor, CircleShape)
+                )
+
+                // Top Disc Face
+                Box(
+                    modifier = Modifier
+                        .size(76.dp)
+                        .align(Alignment.TopCenter)
+                        .background(faceColor, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (node.isUnlocked) {
+                    // Subtle Top-Left Crescent Gleam Highlight
+                    Canvas(modifier = Modifier.fillMaxSize()) {
+                        drawArc(
+                            color = Color(0x55FFFFFF),
+                            startAngle = 175f,
+                            sweepAngle = 90f,
+                            useCenter = false,
+                            topLeft = Offset(7.dp.toPx(), 5.dp.toPx()),
+                            size = androidx.compose.ui.geometry.Size(size.width - 14.dp.toPx(), size.height - 14.dp.toPx()),
+                            style = androidx.compose.ui.graphics.drawscope.Stroke(
+                                width = 4.5.dp.toPx(),
+                                cap = StrokeCap.Round
+                            )
+                        )
+                    }
+
+                    // Inner Icon / Letter
+                    if (isCompleted) {
+                        // Mastered Golden Star (matching duoling_map_sample.jpg)
+                        Icon(
+                            imageVector = Icons.Rounded.Star,
+                            contentDescription = "Completed Phonics Star",
+                            tint = DuolingoGoldStar,
+                            modifier = Modifier.size(38.dp)
+                        )
+                    } else if (node.isUnlocked) {
+                        // Active Green Disc with Bold White Letter
                         Text(
                             text = node.symbol,
                             fontFamily = LexendFontFamily,
-                            fontSize = 38.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = textColor
+                            fontSize = 36.sp,
+                            fontWeight = FontWeight.Black,
+                            color = Color.White
                         )
                     } else {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text(
-                                text = node.symbol,
-                                fontFamily = LexendFontFamily,
-                                fontSize = 34.sp,
-                                fontWeight = FontWeight.Black,
-                                color = InkSoft.copy(alpha = 0.22f)
-                            )
-                            Icon(
-                                imageVector = Icons.Rounded.Lock,
-                                contentDescription = "Locked Letter",
-                                tint = textColor,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Checkmark badge for completed nodes
-            if (isCompleted) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .offset(x = 4.dp, y = (-4).dp)
-                        .size(20.dp)
-                        .background(Cloud, CircleShape)
-                        .border(1.dp, LeafDark, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Check,
-                        contentDescription = "Completed",
-                        tint = LeafDark,
-                        modifier = Modifier.size(13.dp)
-                    )
-                }
-            }
-
-            // Floating 3-Star Crown Arch
-            if (isCompleted && node.starsEarned > 0) {
-                Row(
-                    modifier = Modifier.offset(y = (-14).dp),
-                    horizontalArrangement = Arrangement.spacedBy(1.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    repeat(node.starsEarned) { starIndex ->
-                        val starRotation = when (starIndex) {
-                            0 -> -15f
-                            2 -> 15f
-                            else -> 0f
-                        }
-                        val starSize = if (starIndex == 1) 22.dp else 18.dp
-                        val starYOffset = if (starIndex == 1) (-3).dp else 0.dp
-
-                        Image(
-                            painter = rememberAssetPainter("images/rewards/reward_star.png"),
-                            contentDescription = "Star ${starIndex + 1}",
-                            modifier = Modifier
-                                .offset(y = starYOffset)
-                                .size(starSize)
-                                .rotate(starRotation)
+                        // Locked Slate Disc
+                        Icon(
+                            imageVector = Icons.Rounded.Lock,
+                            contentDescription = "Locked Letter",
+                            tint = DuolingoLockedIcon,
+                            modifier = Modifier.size(28.dp)
                         )
                     }
+                }
+            }
+        }
+
+        // 3 Subtle Stars row under Mastered Nodes (matching duoling_map_sample.jpg)
+        if (isCompleted) {
+            Row(
+                modifier = Modifier.padding(top = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                repeat(3) { starIdx ->
+                    val isEarned = starIdx < node.starsEarned
+                    Icon(
+                        imageVector = Icons.Rounded.Star,
+                        contentDescription = "Star ${starIdx + 1}",
+                        tint = if (isEarned) Color(0xFFF59E0B) else Color(0xFFCBD5E1),
+                        modifier = Modifier.size(13.dp)
+                    )
                 }
             }
         }
@@ -640,7 +646,7 @@ fun LetterMapNodeCard(
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Blend It Challenge Node — Rattan Weave Pattern
+// Blend It Challenge Node — 3D Wooden Treasure Chest (duoling_map_sample.jpg)
 // ═══════════════════════════════════════════════════════════════════════════
 
 @Composable
@@ -648,56 +654,82 @@ fun BlendItChallengeNodeCard(
     node: MapNode.BlendItNode,
     onClick: () -> Unit
 ) {
-    val isCurrentActiveNode = node.isUnlocked
+    val isUnlocked = node.isUnlocked
+    val chestWood = if (isUnlocked) Color(0xFFD97706) else Color(0xFFCBD5E1)
+    val chestShelf = if (isUnlocked) Color(0xFF92400E) else Color(0xFF94A3B8)
+    val chestTrim = if (isUnlocked) Color(0xFFFED7AA) else Color(0xFFE2E8F0)
+    val chestLock = if (isUnlocked) Color(0xFFFFFFFF) else Color(0xFF94A3B8)
 
-    val bgColor = if (node.isUnlocked) Ube else Cloud
-    val shadowColor = if (node.isUnlocked) UbeShadow else TanShadow.copy(alpha = 0.55f)
-    val textColor = if (node.isUnlocked) Cloud else InkSoft.copy(alpha = 0.75f)
-    val borderColor = if (node.isUnlocked) DarkBrownOutline else DarkBrownOutline.copy(alpha = 0.65f)
-
-    val accessibilityLabel = if (node.isUnlocked) {
-        "Blend-It Challenge Group ${node.groupId}"
+    val accessibilityLabel = if (isUnlocked) {
+        "Blend-It Treasure Chest Challenge Group ${node.groupId}"
     } else {
-        "Blend-It Challenge Group ${node.groupId}, locked"
+        "Blend-It Treasure Chest Group ${node.groupId}, locked"
     }
 
-    GummyContainer(
-        onClick = onClick,
-        enabled = true,
-        faceColor = bgColor,
-        shadowColor = shadowColor,
-        shape = RoundedCornerShape(22.dp),
-        strokeWidth = 3.dp,
-        strokeColor = borderColor,
-        depthHeight = 5.dp,
+    Box(
         modifier = Modifier
+            .size(width = 78.dp, height = 76.dp)
+            .clickable(
+                interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                indication = null,
+                onClick = onClick
+            )
             .semantics(mergeDescendants = true) {
                 contentDescription = accessibilityLabel
-            }
-            .size(width = BLEND_IT_NODE_SIZE, height = 54.dp)
-            .idleBounce(enabled = isCurrentActiveNode)
-            .breathingPulse(enabled = isCurrentActiveNode)
+            },
+        contentAlignment = Alignment.Center
     ) {
-        Row(
+        // 3D Bottom Base Shelf
+        Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 12.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+                .size(width = 72.dp, height = 58.dp)
+                .align(Alignment.BottomCenter)
+                .clip(RoundedCornerShape(14.dp))
+                .background(chestShelf)
+        )
+
+        // Chest Body
+        Box(
+            modifier = Modifier
+                .size(width = 72.dp, height = 56.dp)
+                .align(Alignment.TopCenter)
+                .clip(RoundedCornerShape(14.dp))
+                .background(chestWood)
+                .padding(horizontal = 6.dp, vertical = 6.dp)
         ) {
-            Icon(
-                imageVector = if (node.isUnlocked) Icons.Rounded.Extension else Icons.Rounded.Lock,
-                contentDescription = if (node.isUnlocked) "Blend Challenge" else "Locked Challenge",
-                tint = textColor,
-                modifier = Modifier.size(20.dp)
+            // Horizontal Peach Wood Trim Band
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(14.dp)
+                    .align(Alignment.Center)
+                    .background(chestTrim, RoundedCornerShape(4.dp))
             )
-            Text(
-                text = if (node.isUnlocked) " Blend ${node.groupId}" else " Locked",
-                fontFamily = LexendFontFamily,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = textColor
-            )
+
+            // Central Circular Latch
+            Box(
+                modifier = Modifier
+                    .size(20.dp)
+                    .align(Alignment.Center)
+                    .background(chestLock, CircleShape)
+                    .border(1.5.dp, Color(0xFF64748B), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                if (isUnlocked) {
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .background(Color(0xFFB45309), CircleShape)
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Rounded.Lock,
+                        contentDescription = "Locked Chest",
+                        tint = Color(0xFF64748B),
+                        modifier = Modifier.size(11.dp)
+                    )
+                }
+            }
         }
     }
 }

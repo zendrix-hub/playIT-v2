@@ -300,28 +300,93 @@ body {
   height: 1400px;
   pointer-events: none;
 }
-.map-node {
-  width: 68px;
-  height: 68px;
+.duo-node {
+  width: 72px;
+  height: 80px;
+  position: absolute;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.duo-node:hover { transform: scale(1.06); }
+.duo-node-shelf {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
-  border: 3.5px solid var(--outline);
+}
+.duo-node-face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 32px;
   font-weight: 900;
+  box-shadow: inset 0 3px 0 rgba(255,255,255,0.45);
+}
+.duo-gold .duo-node-shelf { background: #E5A500; }
+.duo-gold .duo-node-face { background: #FFC800; color: #B45309; }
+
+.duo-green .duo-node-shelf { background: #46A302; }
+.duo-green .duo-node-face { background: #58CC02; color: #FFFFFF; }
+
+.duo-locked .duo-node-shelf { background: #CECECE; }
+.duo-locked .duo-node-face { background: #E5E5E5; color: #AFAFAF; }
+
+.duo-chest {
   position: absolute;
+  width: 76px;
+  height: 68px;
   cursor: pointer;
-  box-shadow: 0 5px 0 rgba(45, 55, 62, 0.35);
   transition: transform 0.15s;
 }
-.map-node:hover { transform: scale(1.08); }
-.map-node-unlocked { background: var(--mango); color: var(--ink); }
-.map-node-locked { background: #E2E8F0; color: #94A3B8; border-color: #94A3B8; }
-.map-prop-img {
+.duo-chest:hover { transform: scale(1.06); }
+.duo-chest-shelf {
   position: absolute;
-  pointer-events: none;
+  bottom: 0;
+  left: 0;
+  width: 76px;
+  height: 54px;
+  background: #92400E;
+  border-radius: 14px;
 }
+.duo-chest-body {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 76px;
+  height: 54px;
+  background: #D97706;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.duo-chest-band {
+  position: absolute;
+  width: 100%;
+  height: 12px;
+  background: #FED7AA;
+}
+.duo-chest-lock {
+  position: relative;
+  z-index: 2;
+  width: 18px;
+  height: 18px;
+  background: white;
+  border-radius: 50%;
+  border: 1.5px solid #64748B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 @keyframes avatarBreathe {
   0% { transform: scale(1, 1) translateY(0); }
   50% { transform: scale(1.025, 1.045) translateY(-3px); }
@@ -452,112 +517,123 @@ body {
             <span>Tap a letter to start!</span>
           </div>
         </div>
-        <!-- Winding Map Area -->
-        <div class="map-canvas">
-          <!-- Biome Banner 1 -->
-          <div style="background:white; border:2.5px solid var(--outline); border-radius:16px; padding:8px 12px; margin-bottom:14px; font-size:12px; font-weight:800; color:var(--ink); display:flex; justify-content:space-between; align-items:center;">
-            <span>Group 1: Chocolate Hills Trail</span>
-            <span style="background:var(--leaf); color:white; padding:2px 8px; border-radius:999px; font-size:10px;">In Progress</span>
+        <!-- Winding Map Area (Duolingo ABC Style matching duoling_map_sample.jpg) -->
+        <div class="map-canvas" style="background:#FAF9F6; padding:16px 12px 60px;">
+          <!-- Duolingo Unit 1 Golden Banner -->
+          <div style="position:relative; width:100%; height:76px; margin-bottom:14px;">
+            <div style="position:absolute; bottom:0; left:0; width:100%; height:70px; background:#E5A500; border-radius:18px;"></div>
+            <div style="position:absolute; top:0; left:0; width:100%; height:70px; background:#FFC800; border-radius:18px; padding:10px 16px; display:flex; justify-content:space-between; align-items:center; box-sizing:border-box;">
+              <div>
+                <div style="font-size:10px; font-weight:800; color:#78350F; letter-spacing:0.5px;">SECTION 1, UNIT 1</div>
+                <div style="font-size:16px; font-weight:900; color:#451A03; margin-top:2px;">Chocolate Hills Phonics</div>
+              </div>
+              <div style="width:40px; height:40px; background:#E5A500; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; color:white;">
+                📖
+              </div>
+            </div>
           </div>
 
-          <!-- Nodes Section with Realistic Multi-Layer Braided Trail -->
-          <div style="position:relative; height:640px;">
-            <!-- Realistic Braided Trail SVG Background -->
-            <svg style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;" viewBox="0 0 350 640">
-              <!-- Node Pedestals Underneath -->
-              <ellipse cx="94" cy="54" rx="36" ry="18" fill="rgba(30,41,59,0.18)" />
-              <ellipse cx="94" cy="51" rx="36" ry="18" fill="#EBD9A6" stroke="#2D373E" stroke-width="2" />
+          <!-- Subtitle Divider Line -->
+          <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:20px;">
+            <div style="flex:1; height:2px; background:#E2E8F0;"></div>
+            <span style="font-size:11px; font-weight:800; color:#64748B;">Practice sounds M, S, A, I</span>
+            <div style="flex:1; height:2px; background:#E2E8F0;"></div>
+          </div>
 
-              <ellipse cx="244" cy="144" rx="36" ry="18" fill="rgba(30,41,59,0.18)" />
-              <ellipse cx="244" cy="141" rx="36" ry="18" fill="#EBD9A6" stroke="#2D373E" stroke-width="2" />
-
-              <ellipse cx="114" cy="234" rx="36" ry="18" fill="rgba(30,41,59,0.18)" />
-              <ellipse cx="114" cy="231" rx="36" ry="18" fill="#EBD9A6" stroke="#2D373E" stroke-width="2" />
-
-              <ellipse cx="254" cy="324" rx="36" ry="18" fill="rgba(30,41,59,0.18)" />
-              <ellipse cx="254" cy="321" rx="36" ry="18" fill="#EBD9A6" stroke="#2D373E" stroke-width="2" />
-
-              <ellipse cx="175" cy="424" rx="54" ry="24" fill="rgba(30,41,59,0.18)" />
-              <ellipse cx="175" cy="421" rx="54" ry="24" fill="#F3E8FF" stroke="#2D373E" stroke-width="2" />
-
-              <!-- Layer 1: Soil Trench / Ambient Shadow -->
-              <path d="M 94 54 C 94 100, 244 98, 244 144 C 244 190, 114 188, 114 234 C 114 280, 254 278, 254 324 C 254 374, 175 374, 175 424" fill="none" stroke="rgba(31,58,61,0.22)" stroke-width="16" stroke-linecap="round" />
-
-              <!-- Layer 2: Compacted Sandy Trail Bed -->
-              <path d="M 94 54 C 94 100, 244 98, 244 144 C 244 190, 114 188, 114 234 C 114 280, 254 278, 254 324 C 254 374, 175 374, 175 424" fill="none" stroke="#EBD2A4" stroke-width="12" stroke-linecap="round" />
-
-              <!-- Layer 3: Realistic Coconut Husk Braided Rope -->
-              <path d="M 94 54 C 94 100, 244 98, 244 144 C 244 190, 114 188, 114 234 C 114 280, 254 278, 254 324 C 254 374, 175 374, 175 424" fill="none" stroke="#9E6334" stroke-width="5" stroke-dasharray="10 5" stroke-linecap="round" />
-
-              <!-- Layer 4: Shimmer Fiber Highlight -->
-              <path d="M 94 54 C 94 100, 244 98, 244 144 C 244 190, 114 188, 114 234 C 114 280, 254 278, 254 324 C 254 374, 175 374, 175 424" fill="none" stroke="#FFF9E6" stroke-width="2.5" stroke-dasharray="6 9" stroke-dashoffset="2" stroke-linecap="round" />
-
-              <!-- Stepping Stone Pavers -->
-              <circle cx="169" cy="99" r="4.5" fill="#FAF7F2" stroke="#2D373E" stroke-width="1.5" />
-              <circle cx="179" cy="189" r="4.5" fill="#FAF7F2" stroke="#2D373E" stroke-width="1.5" />
-              <circle cx="184" cy="279" r="4.5" fill="#FAF7F2" stroke="#2D373E" stroke-width="1.5" />
-              <circle cx="214" cy="374" r="4.5" fill="#FAF7F2" stroke="#2D373E" stroke-width="1.5" />
+          <!-- Nodes Section with Clean Trail and 3D Stepping Stones -->
+          <div style="position:relative; height:660px;">
+            <!-- Clean Dotted Guide Path SVG -->
+            <svg style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;" viewBox="0 0 350 660">
+              <path d="M 96 46 C 96 95, 246 95, 246 144 C 246 195, 106 195, 106 244 C 106 295, 246 295, 246 344 C 246 400, 175 400, 175 450" fill="none" stroke="#E2E8F0" stroke-width="3.5" stroke-dasharray="6 8" stroke-linecap="round" />
+              <!-- Subtle stepping stone dots -->
+              <circle cx="171" cy="95" r="3.5" fill="#CBD5E1" />
+              <circle cx="176" cy="195" r="3.5" fill="#CBD5E1" />
+              <circle cx="176" cy="295" r="3.5" fill="#CBD5E1" />
+              <circle cx="210" cy="397" r="3.5" fill="#CBD5E1" />
             </svg>
 
-            <!-- Full-Body Animal Avatar Companions on the Map Trail (Animated with Splash-Style Breathing) -->
-            <!-- Active Profile Explorer Leader (Miki the Cat) beside Node M -->
-            <div class="map-avatar-anim" style="position:absolute; top:4px; left:138px; width:58px; z-index:20; text-align:center;">
-              <div style="background:white; border:1.5px solid var(--outline); border-radius:999px; padding:1px 6px; font-size:9px; font-weight:800; display:inline-block; margin-bottom:2px; box-shadow:0 2px 4px rgba(0,0,0,0.1);">Let's Go!</div>
+            <!-- Full-Body Animal Avatar Companions on the Map Trail (Animated) -->
+            <!-- Active Profile Explorer Leader (Miki the Cat) standing beside Active Node S -->
+            <div class="map-avatar-anim" style="position:absolute; top:95px; left:65px; width:58px; z-index:20; text-align:center;">
+              <div style="background:white; border:1.5px solid #CBD5E1; border-radius:999px; padding:1px 6px; font-size:9px; font-weight:800; display:inline-block; margin-bottom:2px; box-shadow:0 2px 4px rgba(0,0,0,0.08); color:#58CC02;">Let's Go!</div>
               <div style="position:relative; width:54px; height:54px; margin:0 auto;">
-                <div style="position:absolute; bottom:-2px; left:50%; transform:translateX(-50%); width:36px; height:8px; background:rgba(31,58,61,0.22); border-radius:50%;"></div>
+                <div style="position:absolute; bottom:-2px; left:50%; transform:translateX(-50%); width:36px; height:8px; background:rgba(0,0,0,0.08); border-radius:50%;"></div>
                 <img src="app/src/main/assets/images/characters/avatar_01_cat.png" style="width:100%; height:100%; object-fit:contain; position:relative; z-index:2;" alt="Miki the Cat">
               </div>
             </div>
 
-            <!-- Supporting Animal Friend 1 (Milo the Monkey) beside Node S -->
-            <div class="map-avatar-anim" style="position:absolute; top:102px; left:148px; width:54px; height:54px; z-index:20; animation-delay: 0.6s;">
-              <div style="position:absolute; bottom:-2px; left:50%; transform:translateX(-50%); width:34px; height:8px; background:rgba(31,58,61,0.22); border-radius:50%;"></div>
+            <!-- Supporting Animal Friend 1 (Milo the Monkey) beside Node M -->
+            <div class="map-avatar-anim" style="position:absolute; top:6px; left:185px; width:54px; height:54px; z-index:20; animation-delay: 0.6s;">
+              <div style="position:absolute; bottom:-2px; left:50%; transform:translateX(-50%); width:34px; height:8px; background:rgba(0,0,0,0.08); border-radius:50%;"></div>
               <img src="app/src/main/assets/images/characters/avatar_02_monkey.png" style="width:100%; height:100%; object-fit:contain; position:relative; z-index:2;" alt="Milo the Monkey">
             </div>
 
             <!-- Supporting Animal Friend 2 (Bella the Bunny) beside Node A -->
-            <div class="map-avatar-anim" style="position:absolute; top:194px; left:152px; width:54px; height:54px; z-index:20; animation-delay: 1.2s;">
-              <div style="position:absolute; bottom:-2px; left:50%; transform:translateX(-50%); width:34px; height:8px; background:rgba(31,58,61,0.22); border-radius:50%;"></div>
+            <div class="map-avatar-anim" style="position:absolute; top:200px; left:190px; width:54px; height:54px; z-index:20; animation-delay: 1.2s;">
+              <div style="position:absolute; bottom:-2px; left:50%; transform:translateX(-50%); width:34px; height:8px; background:rgba(0,0,0,0.08); border-radius:50%;"></div>
               <img src="app/src/main/assets/images/characters/avatar_03_bunny.png" style="width:100%; height:100%; object-fit:contain; position:relative; z-index:2;" alt="Bella the Bunny">
             </div>
 
             <!-- Supporting Animal Friend 3 (Barnaby the Bear) beside Node I -->
-            <div class="map-avatar-anim" style="position:absolute; top:284px; left:148px; width:56px; height:56px; z-index:20; animation-delay: 1.8s;">
-              <div style="position:absolute; bottom:-2px; left:50%; transform:translateX(-50%); width:36px; height:8px; background:rgba(31,58,61,0.22); border-radius:50%;"></div>
+            <div class="map-avatar-anim" style="position:absolute; top:300px; left:75px; width:56px; height:56px; z-index:20; animation-delay: 1.8s;">
+              <div style="position:absolute; bottom:-2px; left:50%; transform:translateX(-50%); width:36px; height:8px; background:rgba(0,0,0,0.08); border-radius:50%;"></div>
               <img src="app/src/main/assets/images/characters/avatar_04_bear.png" style="width:100%; height:100%; object-fit:contain; position:relative; z-index:2;" alt="Barnaby the Bear">
             </div>
 
-            <!-- Supporting Animal Friend 4 (Finley the Frog) cheering at Blend-It checkpoint -->
-            <div class="map-avatar-anim" style="position:absolute; top:390px; left:265px; width:50px; height:50px; z-index:20; animation-delay: 0.4s;">
-              <div style="position:absolute; bottom:-2px; left:50%; transform:translateX(-50%); width:32px; height:7px; background:rgba(31,58,61,0.22); border-radius:50%;"></div>
-              <img src="app/src/main/assets/images/characters/avatar_05_frog.png" style="width:100%; height:100%; object-fit:contain; position:relative; z-index:2;" alt="Finley the Frog">
+            <!-- 3D Duolingo Nodes -->
+            <!-- Node M (Mastered Gold Star Disc with 3 Stars Below) -->
+            <div class="duo-node duo-gold" style="top:10px; left:60px;" onclick="switchScreen('hearit')">
+              <div class="duo-node-shelf"></div>
+              <div class="duo-node-face">★</div>
+              <div style="position:absolute; bottom:-16px; left:0; width:100%; text-align:center; font-size:10px; color:#F59E0B;">★ ★ ★</div>
             </div>
 
-            <!-- Supporting Animal Friend 5 (Ollie the Owl) welcoming to Group 2 -->
-            <div class="map-avatar-anim" style="position:absolute; top:534px; left:148px; width:52px; height:52px; z-index:20; animation-delay: 1.0s;">
-              <div style="position:absolute; bottom:-2px; left:50%; transform:translateX(-50%); width:32px; height:7px; background:rgba(31,58,61,0.22); border-radius:50%;"></div>
-              <img src="app/src/main/assets/images/characters/avatar_06_owl.png" style="width:100%; height:100%; object-fit:contain; position:relative; z-index:2;" alt="Ollie the Owl">
+            <!-- Node S (Active Lime Green 3D Disc) -->
+            <div class="duo-node duo-green" style="top:110px; left:210px;" onclick="switchScreen('hearit')">
+              <div class="duo-node-shelf"></div>
+              <div class="duo-node-face">S</div>
             </div>
 
-            <!-- Letter Nodes (Exactly Centered on SVG Paths) -->
-            <div class="map-node map-node-unlocked" style="top:20px; left:60px;" onclick="switchScreen('hearit')">M</div>
-            <div class="map-node map-node-unlocked" style="top:110px; left:210px;" onclick="switchScreen('hearit')">S</div>
-            <div class="map-node map-node-unlocked" style="top:200px; left:80px;" onclick="switchScreen('hearit')">A</div>
-            <div class="map-node map-node-unlocked" style="top:290px; left:220px;" onclick="switchScreen('hearit')">I</div>
+            <!-- Node A (Lime Green 3D Disc) -->
+            <div class="duo-node duo-green" style="top:210px; left:70px;" onclick="switchScreen('hearit')">
+              <div class="duo-node-shelf"></div>
+              <div class="duo-node-face">A</div>
+            </div>
 
-            <!-- Blend It Challenge Node -->
-            <div style="position:absolute; top:397px; left:50%; transform:translateX(-50%); width:150px; background:var(--ube); border:3px solid var(--outline); border-radius:20px; padding:10px 14px; text-align:center; color:white; font-weight:800; font-size:13px; cursor:pointer; box-shadow:0 4px 0 var(--ube-shadow);" onclick="showBlendDialog()">
-              🔒 Locked (Blend 1)
+            <!-- Node I (Lime Green 3D Disc) -->
+            <div class="duo-node duo-green" style="top:310px; left:210px;" onclick="switchScreen('hearit')">
+              <div class="duo-node-shelf"></div>
+              <div class="duo-node-face">I</div>
+            </div>
+
+            <!-- 3D Wooden Treasure Chest (Blend-It Challenge) -->
+            <div class="duo-chest" style="top:420px; left:50%; transform:translateX(-50%);" onclick="showBlendDialog()">
+              <div class="duo-chest-shelf"></div>
+              <div class="duo-chest-body">
+                <div class="duo-chest-band"></div>
+                <div class="duo-chest-lock">
+                  <div style="width:5px; height:5px; background:#B45309; border-radius:50%;"></div>
+                </div>
+              </div>
             </div>
 
             <!-- Group 2 Banner -->
-            <div style="position:absolute; top:485px; width:100%; background:white; border:2.5px solid var(--outline); border-radius:16px; padding:8px 12px; font-size:12px; font-weight:800; color:#94A3B8; display:flex; justify-content:space-between; align-items:center;">
-              <span>Group 2: Loboc River Valley</span>
-              <span style="background:#CBD5E1; color:#475569; padding:2px 8px; border-radius:999px; font-size:10px;">Locked</span>
+            <div style="position:absolute; top:520px; width:100%; height:68px;">
+              <div style="position:absolute; bottom:0; left:0; width:100%; height:62px; background:#CBD5E1; border-radius:18px;"></div>
+              <div style="position:absolute; top:0; left:0; width:100%; height:62px; background:#E2E8F0; border-radius:18px; padding:10px 16px; display:flex; justify-content:space-between; align-items:center; box-sizing:border-box;">
+                <div>
+                  <div style="font-size:10px; font-weight:800; color:#64748B;">SECTION 1, UNIT 2</div>
+                  <div style="font-size:15px; font-weight:900; color:#334155; margin-top:2px;">Loboc River Valley</div>
+                </div>
+                <div style="background:#CBD5E1; color:#475569; padding:3px 10px; border-radius:999px; font-size:10px; font-weight:800;">Locked</div>
+              </div>
             </div>
 
-            <!-- Locked Group 2 Node -->
-            <div class="map-node map-node-locked" style="top:545px; left:70px;" onclick="showLockedNodeToast()">O</div>
+            <!-- Locked Group 2 Node O -->
+            <div class="duo-node duo-locked" style="top:600px; left:70px;" onclick="showLockedNodeToast()">
+              <div class="duo-node-shelf"></div>
+              <div class="duo-node-face">🔒</div>
+            </div>
           </div>
         </div>
       </div>
