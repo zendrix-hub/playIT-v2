@@ -123,6 +123,10 @@ class FindItViewModel @Inject constructor(
         val target = _targetPhoneme.value ?: return
         val profileId = sessionManager.activeProfileId.value ?: 1L
 
+        // Silence any ongoing intro/prompt voiceover immediately on card tap
+        audioPlayer.stop()
+        _isPlaying.value = false
+
         viewModelScope.launch {
             findItAttemptRepository.saveAttempt(
                 profileId = profileId,

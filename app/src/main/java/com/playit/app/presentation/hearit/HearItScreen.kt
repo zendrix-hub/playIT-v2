@@ -160,7 +160,7 @@ fun HearItScreen(
                         "Nice! Tap Next when you're ready."
                     },
                     mascotState = if (isPlaying) MascotState.LISTENING else if (playCount > 0) MascotState.POINTING else MascotState.IDLE,
-                    onMascotTap = { viewModel.playPhonemeSound() }
+                    onMascotTap = { if (!isPlaying) viewModel.playPhonemeSound() }
                 )
 
                 Spacer(modifier = Modifier.height(14.dp))
@@ -171,7 +171,7 @@ fun HearItScreen(
                     soundText = "Sound: /${phoneme?.letter ?: "m"}/",
                     cardRotation = cardRotation,
                     wordOverride = phoneme?.exampleWord,
-                    onTapReplay = { viewModel.playPhonemeSound() }
+                    onTapReplay = { if (!isPlaying) viewModel.playPhonemeSound() }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -192,7 +192,8 @@ fun HearItScreen(
                     }
 
                     GummyContainer(
-                        onClick = { viewModel.playPhonemeSound() },
+                        onClick = if (isPlaying) null else ({ viewModel.playPhonemeSound() }),
+                        enabled = !isPlaying,
                         faceColor = Ube,
                         shadowColor = UbeShadow,
                         shape = CircleShape,

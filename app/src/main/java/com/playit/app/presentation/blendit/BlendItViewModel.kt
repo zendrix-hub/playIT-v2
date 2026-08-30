@@ -127,17 +127,20 @@ class BlendItViewModel @Inject constructor(
     }
 
     fun playTargetWordAudio() {
+        audioPlayer.stop()
         val targetObj = _words.value.getOrNull(_currentWordIndex.value) ?: return
         val path = audioResolver.getWordPath(targetObj.word)
         audioPlayer.playAssetAudio(path)
     }
 
     fun playHintAudio() {
+        audioPlayer.stop()
         val hintVo = audioResolver.getRotatingHintVo()
         audioPlayer.playAssetAudio(hintVo)
     }
 
     fun placeTile(letter: Char) {
+        audioPlayer.stop()
         val currentBank = _tileBank.value.toMutableList()
         val index = currentBank.indexOf(letter)
         if (index != -1) {

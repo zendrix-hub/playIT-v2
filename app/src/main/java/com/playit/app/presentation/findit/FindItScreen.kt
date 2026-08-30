@@ -107,7 +107,7 @@ fun FindItScreen(
                         is FindItState.Incorrect -> MascotState.ENCOURAGING
                         else -> MascotState.POINTING
                     },
-                    onMascotTap = { viewModel.playTargetSound() }
+                    onMascotTap = { if (!isPlaying) viewModel.playTargetSound() }
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -129,7 +129,8 @@ fun FindItScreen(
                     )
 
                     GummyContainer(
-                        onClick = { viewModel.playTargetSound() },
+                        onClick = if (isPlaying) null else ({ viewModel.playTargetSound() }),
+                        enabled = !isPlaying,
                         faceColor = UbeLight,
                         shadowColor = UbeShadow,
                         shape = RoundedCornerShape(999.dp),

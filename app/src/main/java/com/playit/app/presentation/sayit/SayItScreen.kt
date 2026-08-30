@@ -98,6 +98,7 @@ fun SayItScreen(
     val attempts by viewModel.attempts.collectAsState()
     val audioAmplitude by viewModel.audioAmplitude.collectAsState()
     val isNoisyEnvironment by viewModel.isNoisyEnvironment.collectAsState()
+    val isPlayingPhoneme by viewModel.isPlayingPhoneme.collectAsState()
     val targetLetter = phoneme?.letter?.uppercase() ?: "M"
     val isListening = state is SayItState.Listening
     var permissionDeniedMessage by remember { mutableStateOf(false) }
@@ -183,7 +184,7 @@ fun SayItScreen(
                         state is SayItState.Incorrect -> MascotState.ENCOURAGING
                         else -> MascotState.POINTING
                     },
-                    onMascotTap = { viewModel.playPhonemeSound() }
+                    onMascotTap = { if (!isPlayingPhoneme) viewModel.playPhonemeSound() }
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -243,7 +244,8 @@ fun SayItScreen(
                     }
 
                     GummyContainer(
-                        onClick = toggleListening,
+                        onClick = if (isPlayingPhoneme) null else toggleListening,
+                        enabled = !isPlayingPhoneme,
                         faceColor = if (isListening) Guava else Mango,
                         shadowColor = if (isListening) GuavaShadow else MangoShadow,
                         shape = CircleShape,
