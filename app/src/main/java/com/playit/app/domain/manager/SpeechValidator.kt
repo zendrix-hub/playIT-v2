@@ -53,6 +53,11 @@ class SpeechValidator @Inject constructor() {
         "z" to listOf("z", "zed", "zee", "zuh", "za", "zebra", "zoo", "zip")
     )
 
+    fun getAcceptedVariants(targetPhoneme: String): List<String> {
+        val clean = targetPhoneme.lowercase().trim()
+        return phonemeAcceptedVariants[clean] ?: listOf(clean)
+    }
+
     /**
      * Validates if the recognized speech transcript corresponds to the target phoneme.
      *

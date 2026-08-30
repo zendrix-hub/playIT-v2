@@ -4,14 +4,94 @@ import com.playit.app.domain.model.Phoneme
 import javax.inject.Inject
 import javax.inject.Singleton
 
+data class FindItPictureItem(
+    val id: String,
+    val phonemeLetter: String,
+    val word: String,
+    val imagePath: String,
+    val isCorrect: Boolean
+)
+
 @Singleton
 class GridGenerator @Inject constructor() {
+
+    private val pictureBank: Map<String, List<Pair<String, String>>> = mapOf(
+        "m" to listOf("Mouse" to "images/pictures/picture_mouse.png", "Mat" to "images/pictures/blendword_mat.png", "Map" to "images/pictures/picture_map.png"),
+        "s" to listOf("Sun" to "images/pictures/picture_sun.png", "Star" to "images/pictures/picture_star.png", "Snake" to "images/pictures/picture_snake.png"),
+        "a" to listOf("Apple" to "images/pictures/picture_apple.png", "Ant" to "images/pictures/picture_ant.png", "Axe" to "images/pictures/picture_axe.png"),
+        "i" to listOf("Insect" to "images/pictures/picture_insect.png", "Igloo" to "images/pictures/picture_igloo.png", "Ink" to "images/pictures/picture_ink.png"),
+        "o" to listOf("Orange" to "images/pictures/picture_orange.png", "Owl" to "images/characters/avatar_06_owl.png", "Ox" to "images/pictures/picture_box.png"),
+        "b" to listOf("Ball" to "images/pictures/picture_ball.png", "Bat" to "images/pictures/blendword_bat.png", "Bus" to "images/pictures/blendword_bus.png"),
+        "e" to listOf("Elephant" to "images/pictures/picture_elephant.png", "Egg" to "images/pictures/picture_egg.png", "Envelope" to "images/pictures/picture_envelope.png"),
+        "u" to listOf("Umbrella" to "images/pictures/picture_umbrella.png", "Up" to "images/pictures/blendword_sub.png", "Uncle" to "images/pictures/picture_umbrella.png"),
+        "t" to listOf("Tiger" to "images/pictures/picture_tiger.png", "Tree" to "images/backgrounds/map_prop_tree_small.png", "Top" to "images/pictures/picture_tiger.png"),
+        "k" to listOf("Kite" to "images/pictures/picture_kite.png", "Kit" to "images/pictures/blendword_kit.png", "Key" to "images/pictures/picture_kite.png"),
+        "l" to listOf("Lion" to "images/pictures/picture_lion.png", "Lit" to "images/pictures/blendword_lit.png", "Leaf" to "images/pictures/picture_lion.png"),
+        "y" to listOf("Yoyo" to "images/pictures/picture_yoyo.png", "Yak" to "images/pictures/picture_yoyo.png", "Yellow" to "images/pictures/picture_yoyo.png"),
+        "n" to listOf("Nest" to "images/pictures/picture_nest.png", "Nut" to "images/pictures/picture_nut.png", "Net" to "images/pictures/picture_net.png"),
+        "g" to listOf("Goat" to "images/pictures/picture_goat.png", "Gap" to "images/pictures/blendword_gap.png", "Girl" to "images/pictures/picture_goat.png"),
+        "ng" to listOf("Ring" to "images/pictures/picture_nest.png", "Wing" to "images/pictures/picture_nest.png", "Song" to "images/pictures/picture_nest.png"),
+        "p" to listOf("Pig" to "images/pictures/picture_pig.png", "Pan" to "images/pictures/blendword_pan.png", "Pin" to "images/pictures/blendword_pin.png"),
+        "r" to listOf("Rabbit" to "images/pictures/picture_rabbit.png", "Road" to "images/pictures/blendword_road.png", "Red" to "images/pictures/picture_rabbit.png"),
+        "d" to listOf("Dog" to "images/pictures/picture_dog.png", "Draw" to "images/pictures/blendword_draw.png", "Duck" to "images/pictures/picture_dog.png"),
+        "h" to listOf("Hat" to "images/pictures/picture_hat.png", "Hen" to "images/pictures/blendword_hen.png", "Hand" to "images/pictures/blendword_hand.png"),
+        "w" to listOf("Watch" to "images/pictures/picture_watch.png", "Web" to "images/pictures/blendword_web.png", "Warm" to "images/pictures/blendword_warm.png"),
+        "c" to listOf("Cat" to "images/pictures/picture_cat.png", "Cake" to "images/pictures/blendword_cake.png", "Cup" to "images/pictures/blendword_cup.png"),
+        "f" to listOf("Fish" to "images/pictures/picture_fish.png", "Fan" to "images/pictures/blendword_fan.png", "Fox" to "images/pictures/blendword_fox.png"),
+        "j" to listOf("Jug" to "images/pictures/picture_jug.png", "Jam" to "images/pictures/blendword_jam.png", "Jet" to "images/pictures/picture_jug.png"),
+        "ñ" to listOf("Piña" to "images/pictures/picture_apple.png", "Niño" to "images/pictures/picture_boy.png", "Baño" to "images/pictures/picture_apple.png"),
+        "q" to listOf("Queen" to "images/pictures/picture_queen.png", "Quiz" to "images/pictures/blendword_quiz.png", "Quilt" to "images/pictures/picture_queen.png"),
+        "v" to listOf("Van" to "images/pictures/picture_van.png", "Vase" to "images/pictures/picture_van.png", "Vest" to "images/pictures/picture_van.png"),
+        "x" to listOf("Box" to "images/pictures/picture_box.png", "Fox" to "images/pictures/blendword_fox.png", "Six" to "images/pictures/blendword_box.png"),
+        "z" to listOf("Zebra" to "images/pictures/picture_zebra.png", "Zoo" to "images/pictures/blendword_zoo.png", "Zip" to "images/pictures/picture_zebra.png")
+    )
+
+    /**
+     * Generates a 5-item grid with EXACTLY 3 correct target pictures and 2 distractors.
+     */
+    fun generate5ItemGrid(targetPhonemeLetter: String, availablePhonemes: List<Phoneme> = emptyList()): List<FindItPictureItem> {
+        val cleanTarget = targetPhonemeLetter.lowercase().trim()
+        val targetCandidates = pictureBank[cleanTarget] ?: listOf(
+            "Target 1" to "images/pictures/picture_mouse.png",
+            "Target 2" to "images/pictures/picture_sun.png",
+            "Target 3" to "images/pictures/picture_apple.png"
+        )
+
+        val correctItems = targetCandidates.take(3).mapIndexed { idx, (word, img) ->
+            FindItPictureItem(
+                id = "${cleanTarget}_correct_$idx",
+                phonemeLetter = cleanTarget,
+                word = word,
+                imagePath = img,
+                isCorrect = true
+            )
+        }
+
+        // Pick 2 distractors from other phonemes
+        val distractorLetters = pictureBank.keys.filter { it != cleanTarget }.shuffled()
+        val distractorItems = mutableListOf<FindItPictureItem>()
+        for (distLetter in distractorLetters) {
+            val distList = pictureBank[distLetter] ?: continue
+            val distPair = distList.firstOrNull() ?: continue
+            distractorItems.add(
+                FindItPictureItem(
+                    id = "${distLetter}_distractor_${distractorItems.size}",
+                    phonemeLetter = distLetter,
+                    word = distPair.first,
+                    imagePath = distPair.second,
+                    isCorrect = false
+                )
+            )
+            if (distractorItems.size == 2) break
+        }
+
+        return (correctItems + distractorItems).shuffled()
+    }
 
     fun generateGrid(targetPhonemeId: Int, availablePhonemes: List<Phoneme>): List<Phoneme> {
         val target = availablePhonemes.find { it.id == targetPhonemeId }
             ?: return availablePhonemes.take(4)
 
-        // If target is Letter 1 (Letter M) and no other phonemes exist yet, use fallback distractors
         val distractors = availablePhonemes.filter { it.id != targetPhonemeId }
         val gridItems = mutableListOf<Phoneme>()
         gridItems.add(target)
@@ -19,7 +99,6 @@ class GridGenerator @Inject constructor() {
         if (distractors.size >= 3) {
             gridItems.addAll(distractors.shuffled().take(3))
         } else {
-            // Fallback distractor items for Letter 1 edge case (01_REQUIREMENTS_SUMMARY.md §5)
             gridItems.addAll(distractors)
             val fallbackCandidates = listOf(
                 Phoneme(2, "s", "audio/phonemes/phoneme_s.mp3", "images/pictures/picture_sun.png", "Sun"),

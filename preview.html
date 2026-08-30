@@ -602,36 +602,45 @@ body {
       <div id="screen-findit" class="screen-view">
         <div style="padding:14px 16px; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--outline); background:white;">
           <span style="font-size:13px; font-weight:800; color:var(--ink);">Find It • Starts with /m/</span>
-          <span style="font-size:12px; font-weight:800; color:var(--guava);">❤️❤️❤️</span>
+          <span id="findit-counter" style="font-size:12px; font-weight:800; color:var(--ube); background:var(--ube-light); padding:2px 8px; border-radius:999px;">Found: 0 / 3</span>
         </div>
-        <div style="flex:1; padding:16px; display:flex; flex-direction:column; align-items:center; justify-content:space-between;">
+        <div style="flex:1; padding:12px; display:flex; flex-direction:column; align-items:center; justify-content:space-between;">
           <div class="mascot-bubble" style="width:100%;">
             <img src="app/src/main/assets/images/mascot/lily_idle.png" style="width:34px; height:34px;" alt="Lily">
-            <span>Tap the picture that starts with /m/!</span>
+            <span id="findit-bubble-msg">Find all 3 pictures that start with /m/!</span>
           </div>
 
-          <!-- 2x2 Choice Grid -->
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; width:100%; margin:10px 0;">
-            <div class="gummy-card" style="padding:14px; text-align:center; cursor:pointer;" onclick="selectFindIt(this, true)">
-              <img src="app/src/main/assets/images/pictures/pic_m_mouse.png" style="width:68px; height:68px; object-fit:contain;" alt="Mouse">
-              <div style="font-size:13px; font-weight:800; margin-top:4px;">Mouse</div>
+          <!-- 5-Card Choice Grid (Row 1: 2 cards, Row 2: 3 cards) -->
+          <div style="display:grid; grid-template-columns: repeat(6, 1fr); gap:8px; width:100%; margin:8px 0;">
+            <!-- Target 1: Mouse (Correct) -->
+            <div class="gummy-card findit-card" style="grid-column: span 3; padding:10px; text-align:center; cursor:pointer; position:relative;" onclick="select5FindIt(this, true)">
+              <img src="app/src/main/assets/images/pictures/picture_mouse.png" style="width:54px; height:54px; object-fit:contain;" alt="Mouse">
+              <div style="font-size:12px; font-weight:800; margin-top:2px;">Mouse</div>
             </div>
-            <div class="gummy-card" style="padding:14px; text-align:center; cursor:pointer;" onclick="selectFindIt(this, false)">
-              <img src="app/src/main/assets/images/pictures/pic_s_sun.png" style="width:68px; height:68px; object-fit:contain;" alt="Sun">
-              <div style="font-size:13px; font-weight:800; margin-top:4px;">Sun</div>
+            <!-- Target 2: Mat (Correct) -->
+            <div class="gummy-card findit-card" style="grid-column: span 3; padding:10px; text-align:center; cursor:pointer; position:relative;" onclick="select5FindIt(this, true)">
+              <img src="app/src/main/assets/images/pictures/blendword_mat.png" style="width:54px; height:54px; object-fit:contain;" alt="Mat">
+              <div style="font-size:12px; font-weight:800; margin-top:2px;">Mat</div>
             </div>
-            <div class="gummy-card" style="padding:14px; text-align:center; cursor:pointer;" onclick="selectFindIt(this, false)">
-              <img src="app/src/main/assets/images/pictures/pic_a_apple.png" style="width:68px; height:68px; object-fit:contain;" alt="Apple">
-              <div style="font-size:13px; font-weight:800; margin-top:4px;">Apple</div>
+            <!-- Target 3: Map (Correct) -->
+            <div class="gummy-card findit-card" style="grid-column: span 2; padding:10px; text-align:center; cursor:pointer; position:relative;" onclick="select5FindIt(this, true)">
+              <img src="app/src/main/assets/images/pictures/picture_map.png" style="width:48px; height:48px; object-fit:contain;" alt="Map">
+              <div style="font-size:11px; font-weight:800; margin-top:2px;">Map</div>
             </div>
-            <div class="gummy-card" style="padding:14px; text-align:center; cursor:pointer;" onclick="selectFindIt(this, false)">
-              <img src="app/src/main/assets/images/pictures/pic_i_insect.png" style="width:68px; height:68px; object-fit:contain;" alt="Insect">
-              <div style="font-size:13px; font-weight:800; margin-top:4px;">Insect</div>
+            <!-- Distractor 1: Sun (Incorrect) -->
+            <div class="gummy-card findit-card" style="grid-column: span 2; padding:10px; text-align:center; cursor:pointer; position:relative;" onclick="select5FindIt(this, false)">
+              <img src="app/src/main/assets/images/pictures/picture_sun.png" style="width:48px; height:48px; object-fit:contain;" alt="Sun">
+              <div style="font-size:11px; font-weight:800; margin-top:2px;">Sun</div>
+            </div>
+            <!-- Distractor 2: Apple (Incorrect) -->
+            <div class="gummy-card findit-card" style="grid-column: span 2; padding:10px; text-align:center; cursor:pointer; position:relative;" onclick="select5FindIt(this, false)">
+              <img src="app/src/main/assets/images/pictures/picture_apple.png" style="width:48px; height:48px; object-fit:contain;" alt="Apple">
+              <div style="font-size:11px; font-weight:800; margin-top:2px;">Apple</div>
             </div>
           </div>
 
           <div style="width:100%;">
-            <button class="gummy-btn gummy-btn-mango" style="width:100%; height:54px;" onclick="switchScreen('blendit')">Complete Lesson</button>
+            <button id="findit-continue-btn" class="gummy-btn gummy-btn-mango" style="width:100%; height:50px; opacity:0.5; pointer-events:none;" onclick="switchScreen('blendit')">Complete Lesson (0/3)</button>
           </div>
         </div>
       </div>
@@ -890,14 +899,49 @@ function toggleMic() {
   }
 }
 
-function selectFindIt(card, isCorrect) {
+let findItCorrectCount = 0;
+
+function select5FindIt(card, isCorrect) {
+  if (card.dataset.found === 'true') return;
+
   if (isCorrect) {
+    card.dataset.found = 'true';
     card.style.borderColor = 'var(--leaf)';
     card.style.background = '#EAF7EE';
+    card.style.boxShadow = '0 0 0 2px var(--leaf)';
+    findItCorrectCount++;
+
+    const counter = document.getElementById('findit-counter');
+    const bubble = document.getElementById('findit-bubble-msg');
+    const btn = document.getElementById('findit-continue-btn');
+
+    if (counter) counter.innerText = `Found: ${findItCorrectCount} / 3`;
+
+    if (findItCorrectCount >= 3) {
+      if (bubble) bubble.innerText = "You found all 3! Great job!";
+      if (btn) {
+        btn.innerText = "Complete Lesson (3/3) ✓";
+        btn.style.opacity = '1';
+        btn.style.pointerEvents = 'auto';
+      }
+    } else {
+      if (bubble) bubble.innerText = `Awesome! Find ${3 - findItCorrectCount} more!`;
+      if (btn) btn.innerText = `Complete Lesson (${findItCorrectCount}/3)`;
+    }
   } else {
     card.style.borderColor = 'var(--kalamansi)';
     card.style.background = '#FFF4E4';
+    const bubble = document.getElementById('findit-bubble-msg');
+    if (bubble) bubble.innerText = "Doesn't start with /m/. Try another!";
+    setTimeout(() => {
+      card.style.borderColor = 'var(--outline)';
+      card.style.background = 'white';
+    }, 1200);
   }
+}
+
+function selectFindIt(card, isCorrect) {
+  select5FindIt(card, isCorrect);
 }
 
 function playVoice(filename) {

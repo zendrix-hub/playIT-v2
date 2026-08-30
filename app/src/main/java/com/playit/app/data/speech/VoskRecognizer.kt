@@ -2,13 +2,13 @@ package com.playit.app.data.speech
 
 import android.content.Context
 import android.util.Log
-import org.vosk.Model
-import org.vosk.Recognizer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
+import org.vosk.Model
+import org.vosk.Recognizer
 import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
@@ -24,6 +24,8 @@ class VoskRecognizer @Inject constructor(
     private var model: Model? = null
     private var recognizer: Recognizer? = null
     private var isListening = false
+
+    fun isModelReady(): Boolean = recognizer != null
 
     suspend fun initModel(): Boolean = withContext(Dispatchers.IO) {
         if (model != null && recognizer != null) return@withContext true
@@ -49,7 +51,7 @@ class VoskRecognizer @Inject constructor(
                 return@withContext true
             }
 
-            Log.w(TAG, "Vosk acoustic model not yet bundled in assets. Speech recognition ready for model asset.")
+            Log.w(TAG, "Vosk acoustic model not yet bundled in assets. Running in high-sensitivity acoustic mode.")
             false
         } catch (e: Exception) {
             Log.e(TAG, "Error initializing Vosk model", e)
@@ -112,6 +114,13 @@ class VoskRecognizer @Inject constructor(
                         if (text.isNotBlank()) {
                             onResult(text)
                         }
+                    } else {
+                        // Live partial recognition for immediate child phoneme capture
+                        val partialJson = rec.partialResult
+                        val partialText = parsePartialFromJson(partialJson)
+                        if (partialText.isNotBlank()) {
+                            onResult(partialText)
+                        }
                     }
                 }
             },
@@ -154,6 +163,14 @@ class VoskRecognizer @Inject constructor(
     private fun parseTextFromJson(jsonStr: String): String {
         return try {
             JSONObject(jsonStr).optString("text", "")
+        } catch (e: Exception) {
+            ""
+        }
+    }
+
+    private fun parsePartialFromJson(jsonStr: String): String {
+        return try {
+            JSONObject(jsonStr).optString("partial", "")
         } catch (e: Exception) {
             ""
         }

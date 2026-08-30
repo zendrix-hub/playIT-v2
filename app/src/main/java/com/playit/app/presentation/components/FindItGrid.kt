@@ -1,6 +1,5 @@
 package com.playit.app.presentation.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,6 +11,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -19,23 +21,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.playit.app.domain.manager.FindItPictureItem
 import com.playit.app.domain.model.Phoneme
 import com.playit.app.presentation.theme.CreamWhite
 import com.playit.app.presentation.theme.CreamWhiteShadow
 import com.playit.app.presentation.theme.DarkBrownOutline
 import com.playit.app.presentation.theme.Ink
+import com.playit.app.presentation.theme.Leaf
 import com.playit.app.presentation.theme.LexendFontFamily
+import com.playit.app.presentation.theme.Sky
 
-/**
- * Grid choice card component rendering picture_<lowercase_word>.png assets from assets/images/pictures/.
- */
 @Composable
 fun FindItCard(
-    phoneme: Phoneme,
+    item: FindItPictureItem,
     borderColor: Color,
     faceColor: Color = CreamWhite,
     index: Int,
@@ -43,8 +44,6 @@ fun FindItCard(
     isIncorrect: Boolean = false,
     onClick: () -> Unit
 ) {
-    val word = phoneme.exampleWord.lowercase()
-    val assetPath = "images/pictures/picture_$word.png"
     val rotationAngle = remember(index) { ((index * 37) % 5 - 2).toFloat() }
 
     GummyContainer(
@@ -58,11 +57,11 @@ fun FindItCard(
         isSquashed = isCorrect,
         modifier = Modifier
             .fillMaxWidth()
-            .height(146.dp)
+            .height(138.dp)
             .graphicsLayer { rotationZ = rotationAngle }
             .shake(trigger = isIncorrect)
     ) {
-        androidx.compose.foundation.layout.Box(
+        Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
@@ -70,38 +69,89 @@ fun FindItCard(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                androidx.compose.foundation.layout.Box(
+                Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier.size(72.dp)
+                    modifier = Modifier.size(68.dp)
                 ) {
-                    // Soft circular ambient backing
-                    androidx.compose.foundation.layout.Box(
+                    // Ambient backing circle
+                    Box(
                         modifier = Modifier
-                            .size(64.dp)
+                            .size(60.dp)
                             .background(
-                                color = com.playit.app.presentation.theme.Sky.copy(alpha = 0.6f),
-                                shape = androidx.compose.foundation.shape.CircleShape
+                                color = Sky.copy(alpha = 0.6f),
+                                shape = CircleShape
                             )
                     )
 
                     GummyMotionAsset(
-                        assetPath = assetPath,
-                        contentDescription = phoneme.exampleWord,
-                        isIdleFloating = true,
+                        assetPath = item.imagePath,
+                        contentDescription = item.word,
+                        isIdleFloating = !isCorrect,
                         floatDistance = 3.dp,
                         celebrateTrigger = isCorrect,
-                        modifier = Modifier.size(64.dp)
+                        modifier = Modifier.size(58.dp)
                     )
                 }
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = phoneme.exampleWord,
+                    text = item.word,
                     fontFamily = LexendFontFamily,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
                     color = Ink
                 )
             }
+
+            // Green Checkmark Badge when Found
+            if (isCorrect) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .size(26.dp)
+                        .background(Leaf, CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Check,
+                        contentDescription = "Found",
+                        tint = Color.White,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
         }
     }
+}
+
+/**
+ * Legacy overload for backward compatibility with existing tests
+ */
+@Composable
+fun FindItCard(
+    phoneme: Phoneme,
+    borderColor: Color,
+    faceColor: Color = CreamWhite,
+    index: Int,
+    isCorrect: Boolean = false,
+    isIncorrect: Boolean = false,
+    onClick: () -> Unit
+) {
+    val word = phoneme.exampleWord.lowercase()
+    val assetPath = "images/pictures/picture_$word.png"
+    val item = FindItPictureItem(
+        id = phoneme.id.toString(),
+        phonemeLetter = phoneme.letter,
+        word = phoneme.exampleWord,
+        imagePath = assetPath,
+        isCorrect = isCorrect
+    )
+    FindItCard(
+        item = item,
+        borderColor = borderColor,
+        faceColor = faceColor,
+        index = index,
+        isCorrect = isCorrect,
+        isIncorrect = isIncorrect,
+        onClick = onClick
+    )
 }

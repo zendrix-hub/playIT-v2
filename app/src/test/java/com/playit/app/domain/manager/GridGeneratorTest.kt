@@ -40,4 +40,16 @@ class GridGeneratorTest {
         assertEquals(4, grid.size)
         assertTrue(grid.any { it.id == 1 })
     }
+
+    @Test
+    fun generate5ItemGrid_returnsExactly5ItemsWith3CorrectAnd2Distractors() {
+        val grid5 = gridGenerator.generate5ItemGrid("m")
+
+        assertEquals("Must generate exactly 5 cards", 5, grid5.size)
+        val correctCount = grid5.count { it.isCorrect }
+        val distractorCount = grid5.count { !it.isCorrect }
+
+        assertEquals("Must have exactly 3 correct target cards", 3, correctCount)
+        assertEquals("Must have exactly 2 distractor cards", 2, distractorCount)
+    }
 }

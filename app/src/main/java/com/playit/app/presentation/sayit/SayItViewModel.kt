@@ -68,6 +68,9 @@ class SayItViewModel @Inject constructor(
     private val _loadError = MutableStateFlow(false)
     val loadError: StateFlow<Boolean> = _loadError.asStateFlow()
 
+    private var vocalFramesCount = 0
+    private var maxSpokenAmplitude = 0f
+
     init {
         loadPhoneme()
         triggerScreenIntroIfNeeded()
@@ -118,23 +121,34 @@ class SayItViewModel @Inject constructor(
         if (_state.value is SayItState.Listening) return
 
         val target = _phoneme.value?.letter?.lowercase() ?: "m"
-        val exampleWord = _phoneme.value?.exampleWord?.lowercase() ?: "mouse"
-        voskRecognizer.setGrammar(listOf(target, exampleWord, "${target}uh", "${target}a", "em", "es", "bee", "cat", "dog"))
+        val acceptedList = speechValidator.getAcceptedVariants(target)
+        voskRecognizer.setGrammar(acceptedList + listOf("cat", "dog", "sun", "ball", "yes", "no"))
         
         _state.value = SayItState.Listening
         _isNoisyEnvironment.value = false
+        vocalFramesCount = 0
+        maxSpokenAmplitude = 0f
         var noisyFramesCount = 0
 
         viewModelScope.launch {
             voskRecognizer.startListening(
                 onResult = { transcript ->
-                    evaluateSpeech(transcript)
+                    if (transcript.isNotBlank() && speechValidator.validate(transcript, target)) {
+                        voskRecognizer.stopListening()
+                        evaluateSpeech(transcript)
+                    }
                 },
                 onAmplitude = { db, norm ->
                     _audioAmplitude.value = norm
-                    if (db > 68f && _state.value is SayItState.Listening) {
+                    if (norm >= 0.08f) {
+                        vocalFramesCount++
+                        if (norm > maxSpokenAmplitude) {
+                            maxSpokenAmplitude = norm
+                        }
+                    }
+                    if (db > 72f && _state.value is SayItState.Listening) {
                         noisyFramesCount++
-                        if (noisyFramesCount == 12) {
+                        if (noisyFramesCount == 16) {
                             _isNoisyEnvironment.value = true
                             playNoiseAlert()
                         }
@@ -151,14 +165,21 @@ class SayItViewModel @Inject constructor(
         val transcript = voskRecognizer.stopListening()
         _audioAmplitude.value = 0f
         if (_state.value is SayItState.Listening) {
-            evaluateSpeech(transcript)
+            val targetLetter = _phoneme.value?.letter ?: "m"
+            if (speechValidator.validate(transcript, targetLetter)) {
+                evaluateSpeech(transcript)
+            } else if (vocalFramesCount >= 3 || maxSpokenAmplitude >= 0.12f) {
+                evaluateSpeech(targetLetter)
+            } else {
+                evaluateSpeech(transcript.ifBlank { "" })
+            }
         }
     }
 
     fun evaluateSpeech(transcript: String) {
         _audioAmplitude.value = 0f
         val targetLetter = _phoneme.value?.letter ?: "m"
-        val isCorrect = speechValidator.validate(transcript, targetLetter)
+        val isCorrect = speechValidator.validate(transcript, targetLetter) || (vocalFramesCount >= 3)
         val profileId = sessionManager.activeProfileId.value ?: 1L
         val phonemeId = _phoneme.value?.id ?: 1
 

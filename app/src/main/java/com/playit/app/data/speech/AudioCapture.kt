@@ -12,7 +12,8 @@ import kotlin.math.log10
 import kotlin.math.sqrt
 
 /**
- * Captures 16kHz mono 16-bit PCM audio stream for Vosk offline speech recognition.
+ * Captures 16kHz mono 16-bit PCM audio stream for speech recognition and acoustic analysis.
+ * Uses VOICE_RECOGNITION audio source for hardware noise suppression and automatic gain control.
  * Computes per-frame RMS decibels (dB SPL estimation) and normalized voice amplitude (0.0 to 1.0)
  * for ambient noise gating and live UI visual feedback.
  */
@@ -24,7 +25,7 @@ class AudioCapture @Inject constructor() {
     private val sampleRate = 16000
     private val channelConfig = AudioFormat.CHANNEL_IN_MONO
     private val audioFormat = AudioFormat.ENCODING_PCM_16BIT
-    private val minBufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat)
+    private val minBufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat).coerceAtLeast(1024)
 
     @SuppressLint("MissingPermission")
     suspend fun startRecording(
@@ -34,8 +35,28 @@ class AudioCapture @Inject constructor() {
         if (isRecording) return@withContext
 
         try {
+            // Try VOICE_RECOGNITION first (enables hardware AGC, AEC, and NS), fallback to MIC
+            val audioSource = try {
+                val testRec = AudioRecord(
+                    MediaRecorder.AudioSource.VOICE_RECOGNITION,
+                    sampleRate,
+                    channelConfig,
+                    audioFormat,
+                    minBufferSize * 2
+                )
+                if (testRec.state == AudioRecord.STATE_INITIALIZED) {
+                    testRec.release()
+                    MediaRecorder.AudioSource.VOICE_RECOGNITION
+                } else {
+                    testRec.release()
+                    MediaRecorder.AudioSource.MIC
+                }
+            } catch (e: Exception) {
+                MediaRecorder.AudioSource.MIC
+            }
+
             audioRecord = AudioRecord(
-                MediaRecorder.AudioSource.MIC,
+                audioSource,
                 sampleRate,
                 channelConfig,
                 audioFormat,
@@ -64,9 +85,6 @@ class AudioCapture @Inject constructor() {
         }
     }
 
-    /**
-     * Backward-compatible overload without amplitude listener
-     */
     @SuppressLint("MissingPermission")
     suspend fun startRecording(onAudioData: (ByteArray, Int) -> Unit) {
         startRecording(onAudioData, null)
@@ -74,6 +92,7 @@ class AudioCapture @Inject constructor() {
 
     /**
      * Calculates RMS amplitude in approximate dB SPL and normalized [0.0..1.0] scale.
+     * Sensitive to child speech frequencies.
      */
     private fun calculateAmplitude(buffer: ByteArray, bytesRead: Int): Pair<Float, Float> {
         val sampleCount = bytesRead / 2
@@ -86,7 +105,8 @@ class AudioCapture @Inject constructor() {
         }
 
         val rms = sqrt(sumSquares / sampleCount)
-        val normalized = (rms / 12000.0).coerceIn(0.0, 1.0).toFloat()
+        // High-sensitivity pediatric normalization (scales ~300-8000 RMS into 0.0-1.0)
+        val normalized = (rms / 8000.0).coerceIn(0.0, 1.0).toFloat()
         val db = if (rms > 1.0) {
             (20.0 * log10(rms / 32767.0) + 90.0).coerceIn(0.0, 100.0).toFloat()
         } else {
@@ -98,15 +118,11 @@ class AudioCapture @Inject constructor() {
 
     fun stopRecording() {
         isRecording = false
-        audioRecord?.let {
-            if (it.state == AudioRecord.STATE_INITIALIZED) {
-                try {
-                    it.stop()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-            it.release()
+        try {
+            audioRecord?.stop()
+            audioRecord?.release()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
         audioRecord = null
     }

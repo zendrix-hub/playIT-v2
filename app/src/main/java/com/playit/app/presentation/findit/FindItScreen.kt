@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,17 +45,12 @@ import com.playit.app.presentation.components.MascotSpeechHeader
 import com.playit.app.presentation.components.MascotState
 import com.playit.app.presentation.theme.CreamWhite
 import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.Guava
 import com.playit.app.presentation.theme.Ink
 import com.playit.app.presentation.theme.Kalamansi
-import com.playit.app.presentation.theme.KalamansiShadow
 import com.playit.app.presentation.theme.Leaf
 import com.playit.app.presentation.theme.LexendFontFamily
-import com.playit.app.presentation.theme.Mango
-import com.playit.app.presentation.theme.MangoShadow
 import com.playit.app.presentation.theme.Sand
 import com.playit.app.presentation.theme.Sky
-import com.playit.app.presentation.theme.Ube
 import com.playit.app.presentation.theme.UbeDark
 import com.playit.app.presentation.theme.UbeLight
 import com.playit.app.presentation.theme.UbeShadow
@@ -66,10 +62,14 @@ fun FindItScreen(
     onBack: () -> Unit
 ) {
     val targetPhoneme by viewModel.targetPhoneme.collectAsState()
-    val gridItems by viewModel.gridItems.collectAsState()
+    val pictureGrid by viewModel.pictureGrid.collectAsState()
+    val foundItemIds by viewModel.foundItemIds.collectAsState()
+    val foundCount by viewModel.foundCount.collectAsState()
     val state by viewModel.state.collectAsState()
     val hearts by viewModel.hearts.collectAsState()
     val isPlaying by viewModel.isPlaying.collectAsState()
+
+    val targetLetter = targetPhoneme?.letter?.uppercase() ?: "M"
 
     Box(
         modifier = Modifier
@@ -88,19 +88,21 @@ fun FindItScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .padding(horizontal = 20.dp, vertical = 6.dp),
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Mascot speech bubble prompt
                 MascotSpeechHeader(
                     message = when (state) {
                         is FindItState.GameOver -> "Out of hearts! Let's try again."
-                        is FindItState.Correct -> "Great job! Starts with /${targetPhoneme?.letter ?: "m"}/!"
-                        is FindItState.Incorrect -> "Doesn't start with /${targetPhoneme?.letter ?: "m"}/. Try again!"
-                        else -> "Tap the picture that starts with /${targetPhoneme?.letter ?: "m"}/!"
+                        is FindItState.Completed -> "You found all 3 pictures for /$targetLetter/!"
+                        is FindItState.FoundOne -> "Great find! Find ${(3 - foundCount).coerceAtLeast(1)} more!"
+                        is FindItState.Incorrect -> "Doesn't start with /$targetLetter/. Try another!"
+                        else -> "Find all 3 pictures that start with /$targetLetter/!"
                     },
                     mascotState = when (state) {
-                        is FindItState.Correct -> MascotState.CELEBRATING
+                        is FindItState.Completed -> MascotState.CELEBRATING
+                        is FindItState.FoundOne -> MascotState.CELEBRATING
                         is FindItState.GameOver -> MascotState.THINKING
                         is FindItState.Incorrect -> MascotState.ENCOURAGING
                         else -> MascotState.POINTING
@@ -108,7 +110,7 @@ fun FindItScreen(
                     onMascotTap = { viewModel.playTargetSound() }
                 )
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 // Score pill + Sound Replay Pill
                 Row(
@@ -116,14 +118,14 @@ fun FindItScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (state is FindItState.Correct) "Found: 1/1" else "Find: /${targetPhoneme?.letter ?: "m"}/",
+                        text = "Found: $foundCount / 3",
                         fontFamily = LexendFontFamily,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.ExtraBold,
                         color = UbeDark,
                         modifier = Modifier
                             .background(color = UbeLight, shape = RoundedCornerShape(999.dp))
-                            .padding(horizontal = 14.dp, vertical = 6.dp)
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
                     )
 
                     GummyContainer(
@@ -134,23 +136,23 @@ fun FindItScreen(
                         depthHeight = 2.dp,
                         modifier = Modifier
                             .wrapContentWidth()
-                            .heightIn(min = 64.dp)
+                            .heightIn(min = 44.dp)
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(6.dp),
-                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
                         ) {
                             Icon(
                                 imageVector = if (isPlaying) Icons.AutoMirrored.Rounded.VolumeUp else Icons.Rounded.PlayArrow,
                                 contentDescription = if (isPlaying) "Playing" else "Hear Sound",
                                 tint = Ink,
-                                modifier = Modifier.size(22.dp)
+                                modifier = Modifier.size(20.dp)
                             )
                             Text(
-                                text = "Hear",
+                                text = "Hear Sound",
                                 fontFamily = LexendFontFamily,
-                                fontSize = 24.sp,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Ink
                             )
@@ -160,82 +162,65 @@ fun FindItScreen(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // 2x2 Picture Choice Grid
+                // 5-Card Grid: Row 1 has 2 items (span 3), Row 2 has 3 items (span 2)
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
+                    columns = GridCells.Fixed(6),
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f),
-                    horizontalArrangement = Arrangement.spacedBy(14.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp)
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    itemsIndexed(gridItems, key = { _, item -> item.id }) { index, item ->
-                        val isSelected = when (state) {
-                            is FindItState.Correct -> (state as FindItState.Correct).phoneme.id == item.id
-                            is FindItState.Incorrect -> (state as FindItState.Incorrect).selectedPhoneme.id == item.id
-                            else -> false
+                    itemsIndexed(
+                        items = pictureGrid,
+                        key = { _, item -> item.id },
+                        span = { index, _ ->
+                            if (index < 2) GridItemSpan(3) else GridItemSpan(2)
                         }
-                        val isCorrect = isSelected && state is FindItState.Correct
+                    ) { index, item ->
+                        val isFound = item.id in foundItemIds
+                        val isIncorrectSelection = state is FindItState.Incorrect &&
+                                (state as FindItState.Incorrect).selectedItem.id == item.id
+
                         val borderColor = when {
-                            isCorrect -> Leaf
-                            isSelected && state is FindItState.Incorrect -> Kalamansi
+                            isFound -> Leaf
+                            isIncorrectSelection -> Kalamansi
                             else -> DarkBrownOutline
                         }
                         val faceColor = when {
-                            isCorrect -> Color(0xFFEAF7EE)
-                            isSelected && state is FindItState.Incorrect -> Color(0xFFFFF4E4)
+                            isFound -> Color(0xFFEAF7EE)
+                            isIncorrectSelection -> Color(0xFFFFF4E4)
                             else -> CreamWhite
                         }
 
                         FindItCard(
-                            phoneme = item,
+                            item = item,
                             borderColor = borderColor,
                             faceColor = faceColor,
                             index = index,
-                            isCorrect = isCorrect,
-                            isIncorrect = isSelected && state is FindItState.Incorrect,
+                            isCorrect = isFound,
+                            isIncorrect = isIncorrectSelection,
                             onClick = {
-                                if (state !is FindItState.GameOver) {
-                                    viewModel.selectItem(item)
+                                if (state !is FindItState.GameOver && state !is FindItState.Completed) {
+                                    viewModel.selectPictureItem(item)
                                 }
                             }
                         )
                     }
                 }
-
-                Spacer(modifier = Modifier.height(8.dp))
             }
 
-            // Pinned Clean Bottom Action Bar (64dp floor)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .navigationBarsPadding()
-                    .padding(horizontal = 24.dp, vertical = 12.dp)
-            ) {
-                if (state is FindItState.GameOver) {
+            // Bottom Action / Continue Bar
+            if (state is FindItState.Completed) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 12.dp)
+                        .navigationBarsPadding()
+                ) {
                     GummyButton(
-                        text = "Try Again",
-                        onClick = { viewModel.restartSession() },
-                        backgroundColor = Kalamansi,
-                        shadowColor = KalamansiShadow,
-                        contentColor = Ink,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(64.dp)
-                    )
-                } else {
-                    GummyButton(
-                        text = "Complete Lesson",
-                        onClick = {
-                            if (state is FindItState.Correct) {
-                                onNext(targetPhoneme?.id?.toString() ?: "1")
-                            }
-                        },
-                        enabled = state is FindItState.Correct,
-                        backgroundColor = Mango,
-                        shadowColor = MangoShadow,
-                        contentColor = Ink,
+                        text = "Next Lesson",
+                        onClick = { onNext("sayit") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(64.dp)
@@ -244,10 +229,17 @@ fun FindItScreen(
             }
         }
 
+        // Celebration Confetti Overlay on Lesson Complete
         CelebrationOverlay(
             type = CelebrationType.CONFETTI,
-            isPlaying = state is FindItState.Correct,
-            colors = listOf(Ube, Mango, Guava, Leaf)
+            isPlaying = state is FindItState.Completed
+        )
+
+        // Game Over Overlay
+        CelebrationOverlay(
+            type = CelebrationType.STAR_BURST,
+            isPlaying = state is FindItState.GameOver,
+            onFinished = { viewModel.restartSession() }
         )
     }
 }
