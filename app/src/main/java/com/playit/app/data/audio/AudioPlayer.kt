@@ -63,8 +63,22 @@ class AudioPlayer @Inject constructor(
             sfxSoundIdCache[assetPath] = soundId
             soundId
         } catch (e: Exception) {
-            Log.e(TAG, "Error loading SFX into SoundPool: $assetPath", e)
-            null
+            try {
+                val tempFile = java.io.File(context.cacheDir, "sfx_${assetPath.hashCode()}.mp3")
+                if (!tempFile.exists()) {
+                    context.assets.open(assetPath).use { input ->
+                        tempFile.outputStream().use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+                }
+                val soundId = soundPool.load(tempFile.absolutePath, 1)
+                sfxSoundIdCache[assetPath] = soundId
+                soundId
+            } catch (ex: Exception) {
+                Log.e(TAG, "Error loading SFX into SoundPool: $assetPath", ex)
+                null
+            }
         }
     }
 
@@ -124,12 +138,25 @@ class AudioPlayer @Inject constructor(
         stopInternal()
 
         try {
-            val afd = context.assets.openFd(targetPath)
             val player = mediaPlayer ?: MediaPlayer().also { mediaPlayer = it }
-
             player.reset()
-            player.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
-            afd.close()
+
+            try {
+                val afd = context.assets.openFd(targetPath)
+                player.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                afd.close()
+            } catch (e: Exception) {
+                // If openFd fails (e.g. compressed asset), copy asset to cache temp file and play
+                Log.w(TAG, "openFd failed for $targetPath, falling back to cache file stream", e)
+                val tempFile = java.io.File(context.cacheDir, "temp_audio_${System.currentTimeMillis()}.mp3")
+                context.assets.open(targetPath).use { input ->
+                    tempFile.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                player.setDataSource(tempFile.absolutePath)
+                tempFile.deleteOnExit()
+            }
 
             player.setOnPreparedListener { mp ->
                 try {

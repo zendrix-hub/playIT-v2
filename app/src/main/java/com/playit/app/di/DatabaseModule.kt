@@ -49,7 +49,8 @@ object DatabaseModule {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 super.onCreate(db)
                 CoroutineScope(Dispatchers.IO).launch {
-                    val dbInstance = databaseProvider.get()
+                    try {
+                        val dbInstance = databaseProvider.get()
 
                     // Seed 28 Phonemes
                     // MARUNGKO SEQUENCE ADAPTATION NOTE:
@@ -164,7 +165,10 @@ object DatabaseModule {
                         BlendItWordEntity(32, 7, "ZOO", "Z-O-O", "audio/words/word_zoo.mp3", "images/pictures/blendword_zoo.png"),
                         BlendItWordEntity(33, 7, "WEB", "W-E-B", "audio/words/word_web.mp3", "images/pictures/blendword_web.png")
                     )
-                    dbInstance.blendItWordDao().insertWords(blendWordList)
+                        dbInstance.blendItWordDao().insertWords(blendWordList)
+                    } catch (e: Exception) {
+                        android.util.Log.e("DatabaseModule", "Failed to seed database in callback", e)
+                    }
                 }
             }
         })
