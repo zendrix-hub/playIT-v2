@@ -196,11 +196,29 @@ def main():
         "avatar_06": draw_owl_avatar(),
     }
 
+    animal_names = {
+        "avatar_01": "cat",
+        "avatar_02": "monkey",
+        "avatar_03": "bunny",
+        "avatar_04": "bear",
+        "avatar_05": "frog",
+        "avatar_06": "owl",
+    }
+
+    char_dir = os.path.join(base_dir, "app", "src", "main", "assets", "images", "characters")
+    os.makedirs(char_dir, exist_ok=True)
+
     print("[*] Generating all 6 animal avatars with Khan Academy Kids character charm...")
     for name, img in avatars.items():
+        animal = animal_names[name]
+        # Save to mascot/avatar_0X.png
         img.save(os.path.join(target_dir, f"{name}.png"), "PNG", optimize=True)
+        # Save to mascot/companion_avatar_0X_animal.png
+        img.save(os.path.join(target_dir, f"companion_{name}_{animal}.png"), "PNG", optimize=True)
+        # Save to characters/avatar_0X_animal.png
+        img.save(os.path.join(char_dir, f"{name}_{animal}.png"), "PNG", optimize=True)
         img.save(os.path.join(preview_dir, f"{name}.png"), "PNG", optimize=True)
-        print(f"  [+] Generated: {name}.png")
+        print(f"  [+] Generated & synced: {name}.png, companion_{name}_{animal}.png, {name}_{animal}.png")
 
     print("[*] Animal avatars successfully updated!")
 

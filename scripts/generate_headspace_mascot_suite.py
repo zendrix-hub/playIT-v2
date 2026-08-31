@@ -285,6 +285,7 @@ def main():
         "lily_encouraging": {"head_tilt": 0.3, "eyes_state": "wink", "eye_offset": (0, 0), "smile_type": "big", "hands_pose": "encouraging"},
         "lily_thinking": {"head_tilt": -0.4, "eyes_state": "open", "eye_offset": (0, -0.8), "smile_type": "normal", "hands_pose": "thinking"},
         "lily_listening": {"head_tilt": 0, "eyes_state": "closed_happy", "eye_offset": (0, 0), "smile_type": "normal", "hands_pose": "listening"},
+        "splash_tarsier_headspace": {"head_tilt": 0, "eyes_state": "open", "eye_offset": (0, 0), "smile_type": "big", "hands_pose": "waving"},
     }
 
     print("[*] Generating all 7 mascot poses with Khan Academy Kids character warmth...")
