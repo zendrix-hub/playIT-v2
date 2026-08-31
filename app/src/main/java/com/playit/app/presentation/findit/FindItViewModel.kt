@@ -70,16 +70,6 @@ class FindItViewModel @Inject constructor(
 
     init {
         loadGrid()
-        triggerScreenIntroIfNeeded()
-    }
-
-    private fun triggerScreenIntroIfNeeded() {
-        if (sessionManager.shouldPlayScreenIntro("findit")) {
-            val introVo = audioResolver.getVoPath(VoContext.FINDIT_INTRO_01)
-            audioPlayer.playAssetAudio(introVo) {
-                playTargetSound()
-            }
-        }
     }
 
     private fun loadGrid() {
@@ -96,10 +86,8 @@ class FindItViewModel @Inject constructor(
                 _foundCount.value = 0
                 _pictureGrid.value = gridGenerator.generate5ItemGrid(target.letter, allPhonemes)
 
-                // Play target phoneme sound if screen intro was already played
-                if (!sessionManager.shouldPlayScreenIntro("findit")) {
-                    playTargetSound()
-                }
+                // Automatically play "Can you find all..." prompt first, then seamlessly play the letter sound
+                playIntroThenTargetSound()
             }
         }
     }
@@ -107,14 +95,19 @@ class FindItViewModel @Inject constructor(
     private val _isPlayingPrompt = MutableStateFlow(false)
     val isPlayingPrompt: StateFlow<Boolean> = _isPlayingPrompt.asStateFlow()
 
-    fun playFindItIntroAudio() {
+    fun playIntroThenTargetSound() {
         audioPlayer.stop()
         _isPlaying.value = false
         _isPlayingPrompt.value = true
         val introVo = audioResolver.getVoPath(VoContext.FINDIT_INTRO_01)
         audioPlayer.playAssetAudio(introVo) {
             _isPlayingPrompt.value = false
+            playTargetSound()
         }
+    }
+
+    fun playFindItIntroAudio() {
+        playIntroThenTargetSound()
     }
 
     fun playTargetSound() {
