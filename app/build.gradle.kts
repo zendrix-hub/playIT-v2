@@ -21,29 +21,13 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-    }
-
-    aaptOptions {
-        noCompress("mp3", "wav", "ogg", "bin", "json")
-    }
-
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = false
-            isReturnDefaultValues = true
-            all { testTask ->
-                testTask.jvmArgs("-Djava.library.path=${buildDir.absolutePath}")
-            }
+        ndk {
+            abiFilters.addAll(listOf("arm64-v8a", "x86_64"))
         }
     }
 
-    splits {
-        abi {
-            isEnable = true
-            reset()
-            include("arm64-v8a")
-            isUniversalApk = false
-        }
+    androidResources {
+        noCompress += listOf("mp3", "wav", "ogg", "bin", "json")
     }
 
     buildTypes {

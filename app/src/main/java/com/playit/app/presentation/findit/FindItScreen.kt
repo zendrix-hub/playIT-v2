@@ -94,11 +94,11 @@ fun FindItScreen(
                 // Mascot speech bubble prompt
                 MascotSpeechHeader(
                     message = when (state) {
-                        is FindItState.GameOver -> "Out of hearts! Let's try again."
-                        is FindItState.Completed -> "You found all 3 pictures for /$targetLetter/!"
-                        is FindItState.FoundOne -> "Great find! Find ${(3 - foundCount).coerceAtLeast(1)} more!"
-                        is FindItState.Incorrect -> "Doesn't start with /$targetLetter/. Try another!"
-                        else -> "Find all 3 pictures that start with /$targetLetter/!"
+                        is FindItState.GameOver -> "Good try! Let's listen again."
+                        is FindItState.Completed -> "You did it! I'm so proud of you!"
+                        is FindItState.FoundOne -> "Perfect! Great job! Find ${(3 - foundCount).coerceAtLeast(1)} more!"
+                        is FindItState.Incorrect -> "Good try! Let's listen again."
+                        else -> "Can you find all three pictures that start with this sound?"
                     },
                     mascotState = when (state) {
                         is FindItState.Completed -> MascotState.CELEBRATING

@@ -97,8 +97,14 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    private val _isPlayingIntro = MutableStateFlow(false)
+    val isPlayingIntro: StateFlow<Boolean> = _isPlayingIntro.asStateFlow()
+
     fun playNamePromptIntro() {
-        audioPlayer.playAssetAudio(audioResolver.getVoPath(VoContext.NAMEPROMPT_INTRO))
+        _isPlayingIntro.value = true
+        audioPlayer.playAssetAudio(audioResolver.getVoPath(VoContext.NAMEPROMPT_INTRO)) {
+            _isPlayingIntro.value = false
+        }
     }
 
     fun playParentGateAudio() {

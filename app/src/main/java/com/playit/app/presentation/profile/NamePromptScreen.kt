@@ -32,6 +32,7 @@ fun NamePromptScreen(
     val name by viewModel.nameInput.collectAsStateWithLifecycle()
     val selectedAvatarId by viewModel.selectedAvatarId.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isPlayingIntro by viewModel.isPlayingIntro.collectAsStateWithLifecycle()
 
     val isNameValid = name.trim().isNotBlank()
     val mascotState = when {
@@ -130,8 +131,10 @@ fun NamePromptScreen(
 
             // Companion Mascot Dialogue
             MascotSpeechHeader(
-                message = "What's your name? Type your name and pick an animal friend!",
+                message = "What is your name? Let's choose your friendly animal avatar!",
                 mascotState = mascotState,
+                isPlayingAudio = isPlayingIntro,
+                onMascotTap = { viewModel.playNamePromptIntro() },
                 modifier = Modifier.fillMaxWidth()
             )
 

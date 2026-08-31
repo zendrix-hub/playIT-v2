@@ -112,9 +112,9 @@ fun BlendItScreen(
             ) {
                 MascotSpeechHeader(
                     message = when (uiState) {
-                        is BlendItUiState.WordCorrect -> "Awesome! You blended the word!"
-                        is BlendItUiState.WordIncorrect -> "Sounds don't match. Try again!"
-                        else -> "Blend the sounds to make the word!"
+                        is BlendItUiState.WordCorrect -> "Perfect! Great job!"
+                        is BlendItUiState.WordIncorrect -> "Good try! Let's listen again."
+                        else -> "Let's blend letter sounds together to build words!"
                     },
                     mascotState = when (uiState) {
                         is BlendItUiState.WordCorrect -> MascotState.CELEBRATING

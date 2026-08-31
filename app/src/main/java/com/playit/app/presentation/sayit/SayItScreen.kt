@@ -187,11 +187,11 @@ fun SayItScreen(
                 MascotSpeechHeader(
                     message = when {
                         permissionDeniedMessage -> "Please allow microphone access so Lily can hear you."
-                        isNoisyEnvironment -> "It's noisy! Find a quiet spot so Lily can hear you."
-                        state is SayItState.Listening -> "Listening... Say /${phoneme?.letter ?: "m"}/!"
-                        state is SayItState.Correct -> "Awesome! You said /${phoneme?.letter ?: "m"}/!"
-                        state is SayItState.Incorrect -> "Good try! Tap to hear /${phoneme?.letter ?: "m"}/ again."
-                        else -> "Say: /${phoneme?.letter ?: "m"}/ (Tap to hear)"
+                        isNoisyEnvironment -> "It's a little noisy right now. Let's find a quiet spot to practice!"
+                        state is SayItState.Listening -> "Listening... Say /${phoneme?.letter ?: "m"}/ into the microphone!"
+                        state is SayItState.Correct -> "Yes! That's it! Great job!"
+                        state is SayItState.Incorrect -> "Good try! Let's listen again."
+                        else -> "Now it's your turn. Say the sound clearly into the microphone!"
                     },
                     mascotState = when {
                         permissionDeniedMessage -> MascotState.ENCOURAGING

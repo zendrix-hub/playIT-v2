@@ -113,7 +113,7 @@ fun ArithmeticGuardDialog(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "Solve to enter: ${problem.displayExpression} = ?",
+                    text = "Grown-ups only. Solve: ${problem.displayExpression} = ?",
                     fontFamily = LexendFontFamily,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
