@@ -226,8 +226,8 @@ fun FindItScreen(
                         .navigationBarsPadding()
                 ) {
                     GummyButton(
-                        text = "Next Lesson",
-                        onClick = { onNext("sayit") },
+                        text = "Complete Lesson",
+                        onClick = { onNext(targetPhoneme?.id?.toString() ?: "1") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(64.dp)
