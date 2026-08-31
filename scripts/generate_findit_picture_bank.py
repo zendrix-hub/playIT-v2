@@ -14,9 +14,9 @@ from PIL import Image, ImageDraw, ImageFilter
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PICTURES_DIR = os.path.join(BASE_DIR, "app", "src", "main", "assets", "images", "pictures")
 
-OUTLINE = (45, 55, 62, 255)       # #2D373E
+OUTLINE = (74, 46, 24, 255)       # #4A2E18 DarkBrownOutline (Style Guide 16 §2.1)
 OUTLINE_WIDTH = 10
-PUPIL = (31, 58, 61, 255)         # #1F3A3D
+PUPIL = (60, 36, 21, 255)         # #3C2415
 WHITE = (255, 255, 255, 255)
 ROSY_CHEEK = (255, 170, 185, 255)
 

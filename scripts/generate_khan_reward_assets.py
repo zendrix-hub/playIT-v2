@@ -17,7 +17,7 @@ W = SIZE * SCALE
 H = SIZE * SCALE
 
 # Palette
-DARK_OUTLINE = (45, 55, 62, 255)       # #2D373E Slate Charcoal
+DARK_OUTLINE = (74, 46, 24, 255)       # #4A2E18 DarkBrownOutline (Style Guide 16 §2.1)
 GOLD_MAIN = (255, 204, 0, 255)         # Bright Sunny Gold
 GOLD_DARK = (245, 166, 35, 255)        # Shaded Gold
 GOLD_LIGHT = (255, 235, 115, 255)      # Top Highlight Gold

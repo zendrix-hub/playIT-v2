@@ -11,7 +11,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUTPUT_DIR = os.path.join(BASE_DIR, "app", "src", "main", "assets", "images", "backgrounds")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-OUTLINE = (45, 55, 62, 255)       # #2D373E
+OUTLINE = (74, 46, 24, 255)       # #4A2E18 DarkBrownOutline (Style Guide 16 §2.1)
 OUTLINE_WIDTH = 12
 
 # PlayIT Unified Palette

@@ -94,23 +94,9 @@ Requires `pip install google-genai --break-system-packages` and a
 for this Antigravity session — get one at aistudio.google.com/apikey if not
 already set).
 
-### 1c. Fallback (non-character assets only)
+### 1c. Asset Standards & Fallback
 
-For disposable, non-mascot art where consistency doesn't matter — background
-textures, generic decorative shapes — Pollinations' key-less endpoint is a
-legitimate free fallback:
-
-```bash
-curl -s "https://image.pollinations.ai/prompt/soft%20watercolor%20forest%20background%20texture?width=1024&height=1024&nologo=true&model=flux" \
-  -o ./assets/raw/bg_texture.png
-```
-
-Do **not** use this path for the mascot or any recurring character — it has
-no character-consistency mechanism and will drift between calls. The
-previous HuggingFace SDXL route has been dropped entirely: it depends on
-HuggingFace's legacy Serverless Inference API, which is increasingly
-unreliable (rate limits, cold starts, models being migrated to paid
-Inference Providers) — not worth building around.
+All assets are generated and conditioned via Nano Banana / Gemini image models with reference conditioning, and extracted via local `rembg`. No third-party public scrapers or unconditioned diffusion endpoints are permitted.
 
 ---
 

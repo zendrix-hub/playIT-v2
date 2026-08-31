@@ -14,7 +14,7 @@ W = SIZE * SCALE
 H = SIZE * SCALE
 
 # Palette
-DARK_OUTLINE = (45, 55, 62, 255)       # #2D373E Slate Charcoal Outline
+DARK_OUTLINE = (74, 46, 24, 255)       # #4A2E18 DarkBrownOutline (Style Guide 16 §2.1)
 CREAM = (255, 238, 215, 255)          # #FFEED7 Soft Cream
 WHITE = (255, 255, 255, 255)
 PINK_CHEEK = (255, 140, 140, 220)     # Khan Academy Kids Rosy Blush

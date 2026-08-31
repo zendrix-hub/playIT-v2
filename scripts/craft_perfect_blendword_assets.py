@@ -22,7 +22,7 @@ W = SIZE * SCALE
 H = SIZE * SCALE
 
 # Standard 4-Benchmark Palette
-DARK = (45, 55, 62, 255)            # #2D373E Slate Charcoal
+DARK = (74, 46, 24, 255)            # #4A2E18 DarkBrownOutline (Style Guide 16 §2.1)
 WHITE = (255, 255, 255, 255)
 PINK_BLUSH = (255, 145, 155, 230)   # Khan Academy Rosy Cheek
 SKIN = (255, 222, 192, 255)         # Warm Toddler Skin

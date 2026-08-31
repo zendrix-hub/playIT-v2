@@ -9,7 +9,7 @@ This document registers external developer catalogs, free developer tiers, publi
 | Category | Reference File | GitHub / Primary URL | Primary Role in PlayIT |
 |---|---|---|---|
 | **Public APIs** | `tools/api layer.png` | [public-apis/public-apis](https://github.com/public-apis/public-apis) | Programmatic validation of kindergarten phonics vocabulary, word definitions, and phonetic IPA dictionaries via Datamuse & Free Dictionary APIs. |
-| **Awesome MCP Servers** | `tools/mcp servers.png` | [punkpeye/awesome-mcp-servers](https://github.com/punkpeye/awesome-mcp-servers) | Equipping Antigravity AI agents with autonomous tools (Pollinations MCP, Context7 documentation search, Hugging Face models, Chrome DevTools testing). |
+| **Awesome MCP Servers** | `tools/mcp servers.png` | [punkpeye/awesome-mcp-servers](https://github.com/punkpeye/awesome-mcp-servers) | Equipping Antigravity AI agents with autonomous tools (NanoBanana MCP, Context7 documentation search, Hugging Face models, Chrome DevTools testing). |
 | **Free for Developers** | `tools/free-for-dev.png` | [ripienaar/free-for-dev](https://github.com/ripienaar/free-for-dev) | Zero-cost infrastructure for hosting Capstone MVP artifacts, Supabase telemetry databases, GitHub Actions CI/CD builds, and Cloudflare Pages downloads. |
 | **AI Generation Tools** | `tools/tool 1.png` | Various (ElevenLabs, Clipdrop, Magnific, Runway, Suno, etc.) | High-fidelity asset production suite for transparent mascot poses, neural voice acting, loopable nursery music, and talking tutorial animations. |
 

@@ -24,7 +24,7 @@ MANGO_DARK = (215, 95, 20, 255)      # Arm / Tail Shade
 CREAM = (255, 238, 215, 255)         # #FFEED7 Soft Storybook Cream
 PEACH_EAR = (255, 175, 125, 255)     # #FFAF7D Inner Ear Peach
 ROSY_CHEEK = (255, 140, 140, 220)    # Khan Academy Kids Cheerful Blush
-SLATE_DARK = (45, 55, 62, 255)       # #2D373E Warm Charcoal Line Art
+SLATE_DARK = (60, 36, 21, 255)       # #3C2415 DarkEspressoOutline (Style Guide 16 §2.1)
 WHITE = (255, 255, 255, 255)
 GOLD_STAR = (255, 193, 7, 255)       # Gold Celebration Sparkle
 
