@@ -104,7 +104,22 @@ class FindItViewModel @Inject constructor(
         }
     }
 
+    private val _isPlayingPrompt = MutableStateFlow(false)
+    val isPlayingPrompt: StateFlow<Boolean> = _isPlayingPrompt.asStateFlow()
+
+    fun playFindItIntroAudio() {
+        audioPlayer.stop()
+        _isPlaying.value = false
+        _isPlayingPrompt.value = true
+        val introVo = audioResolver.getVoPath(VoContext.FINDIT_INTRO_01)
+        audioPlayer.playAssetAudio(introVo) {
+            _isPlayingPrompt.value = false
+        }
+    }
+
     fun playTargetSound() {
+        audioPlayer.stop()
+        _isPlayingPrompt.value = false
         val target = _targetPhoneme.value ?: return
         val path = audioResolver.getPhonemePath(target.letter) ?: target.audioPath
         _isPlaying.value = true

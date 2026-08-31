@@ -103,6 +103,25 @@ class SayItViewModel @Inject constructor(
         loadPhoneme()
     }
 
+    private val _isPlayingPrompt = MutableStateFlow(false)
+    val isPlayingPrompt: StateFlow<Boolean> = _isPlayingPrompt.asStateFlow()
+
+    fun playSayItIntroAudio() {
+        if (_state.value is SayItState.Listening) {
+            autoStopJob?.cancel()
+            voskRecognizer.stopListening()
+            _state.value = SayItState.Idle
+            _audioAmplitude.value = 0f
+        }
+        audioPlayer.stop()
+        _isPlayingPhoneme.value = false
+        _isPlayingPrompt.value = true
+        val introVo = audioResolver.getVoPath(VoContext.SAYIT_INTRO_01)
+        audioPlayer.playAssetAudio(introVo) {
+            _isPlayingPrompt.value = false
+        }
+    }
+
     fun playPhonemeSound() {
         if (_state.value is SayItState.Listening) {
             autoStopJob?.cancel()
@@ -111,6 +130,7 @@ class SayItViewModel @Inject constructor(
             _audioAmplitude.value = 0f
         }
         audioPlayer.stop()
+        _isPlayingPrompt.value = false
         val letter = _phoneme.value?.letter ?: "m"
         val path = audioResolver.getPhonemePath(letter) ?: _phoneme.value?.audioPath ?: "audio/phonemes/phoneme_m.mp3"
         _isPlayingPhoneme.value = true

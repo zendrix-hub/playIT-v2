@@ -35,6 +35,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Mic
 import androidx.compose.material.icons.rounded.Stop
@@ -100,6 +101,7 @@ fun SayItScreen(
     val audioAmplitude by viewModel.audioAmplitude.collectAsStateWithLifecycle()
     val isNoisyEnvironment by viewModel.isNoisyEnvironment.collectAsStateWithLifecycle()
     val isPlayingPhoneme by viewModel.isPlayingPhoneme.collectAsStateWithLifecycle()
+    val isPlayingPrompt by viewModel.isPlayingPrompt.collectAsStateWithLifecycle()
     val loadError by viewModel.loadError.collectAsStateWithLifecycle()
     val targetLetter = phoneme?.letter?.uppercase() ?: "M"
     val isListening = state is SayItState.Listening
@@ -201,13 +203,15 @@ fun SayItScreen(
                         state is SayItState.Incorrect -> MascotState.ENCOURAGING
                         else -> MascotState.POINTING
                     },
-                    onMascotTap = { if (!isPlayingPhoneme) viewModel.playPhonemeSound() }
+                    isPlayingAudio = isPlayingPrompt,
+                    onMascotTap = { viewModel.playSayItIntroAudio() }
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
 
+                // Interactive Letter Sound Card (Tap to hear pure phoneme audio)
                 GummyContainer(
-                    onClick = null,
+                    onClick = if (isPlayingPhoneme) null else ({ viewModel.playPhonemeSound() }),
                     faceColor = Cloud,
                     shadowColor = CloudShadow,
                     shape = RoundedCornerShape(24.dp),
@@ -224,18 +228,29 @@ fun SayItScreen(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 14.dp, horizontal = 16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            text = "Say: /${phoneme?.letter ?: "m"}/",
-                            fontFamily = LexendFontFamily,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = UbeDark
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
+                                contentDescription = "Hear Sound",
+                                tint = if (isPlayingPhoneme) Mango else UbeDark,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(
+                                text = "Sound: /${phoneme?.letter ?: "m"}/",
+                                fontFamily = LexendFontFamily,
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = if (isPlayingPhoneme) Mango else UbeDark
+                            )
+                        }
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = targetLetter,
                             fontFamily = LexendFontFamily,
-                            fontSize = 50.sp,
+                            fontSize = 48.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = Ink
                         )

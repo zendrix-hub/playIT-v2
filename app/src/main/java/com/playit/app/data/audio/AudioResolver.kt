@@ -31,6 +31,7 @@ enum class VoContext(val filenameSuffix: String) {
     STREAK_01("streak_01"),
     COMPLETE_01("complete_01"),
     UNLOCK_01("unlock_01"),
+    HEARIT_INTRO_01("hearit_intro_01"),
     BLENDIT_INTRO_01("blendit_intro_01"),
     FINDIT_INTRO_01("findit_intro_01"),
     SAYIT_INTRO_01("sayit_intro_01"),

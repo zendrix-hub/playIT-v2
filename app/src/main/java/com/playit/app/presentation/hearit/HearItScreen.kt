@@ -72,6 +72,7 @@ fun HearItScreen(
 ) {
     val phoneme by viewModel.phoneme.collectAsStateWithLifecycle()
     val isPlaying by viewModel.isPlaying.collectAsStateWithLifecycle()
+    val isPlayingPrompt by viewModel.isPlayingPrompt.collectAsStateWithLifecycle()
     val playCount by viewModel.playCount.collectAsStateWithLifecycle()
     val loadError by viewModel.loadError.collectAsStateWithLifecycle()
     val targetLetter = phoneme?.letter?.uppercase() ?: "M"
@@ -169,15 +170,16 @@ fun HearItScreen(
                     .padding(horizontal = 20.dp, vertical = 6.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Mascot speech bubble prompt
+                // Mascot speech bubble prompt (Tapping Lily replays the lesson intro voiceover)
                 MascotSpeechHeader(
-                    message = if (playCount == 0) {
-                        "Tap to hear: /${phoneme?.letter ?: "m"}/"
+                    message = if (isPlaying) {
+                        "Sound: /${phoneme?.letter ?: "m"}/"
                     } else {
-                        "Sound: /${phoneme?.letter ?: "m"}/ (Tap to hear again)"
+                        "Listen closely to the sound of the letter, then tap play."
                     },
                     mascotState = if (isPlaying) MascotState.LISTENING else if (playCount > 0) MascotState.POINTING else MascotState.IDLE,
-                    onMascotTap = { if (!isPlaying) viewModel.playPhonemeSound() }
+                    isPlayingAudio = isPlayingPrompt,
+                    onMascotTap = { viewModel.playHearItIntroAudio() }
                 )
 
                 Spacer(modifier = Modifier.height(14.dp))

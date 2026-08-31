@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.playit.app.data.audio.AudioPlayer
 import com.playit.app.data.audio.AudioResolver
+import com.playit.app.data.audio.VoContext
 import com.playit.app.domain.model.Phoneme
 import com.playit.app.domain.repository.PhonemeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -59,7 +60,22 @@ class HearItViewModel @Inject constructor(
         loadPhoneme()
     }
 
+    private val _isPlayingPrompt = MutableStateFlow(false)
+    val isPlayingPrompt: StateFlow<Boolean> = _isPlayingPrompt.asStateFlow()
+
+    fun playHearItIntroAudio() {
+        audioPlayer.stop()
+        _isPlaying.value = false
+        _isPlayingPrompt.value = true
+        val introVo = audioResolver.getVoPath(VoContext.HEARIT_INTRO_01)
+        audioPlayer.playAssetAudio(introVo) {
+            _isPlayingPrompt.value = false
+        }
+    }
+
     fun playPhonemeSound() {
+        audioPlayer.stop()
+        _isPlayingPrompt.value = false
         val letter = _phoneme.value?.letter ?: "m"
         val path = audioResolver.getPhonemePath(letter) ?: _phoneme.value?.audioPath ?: "audio/phonemes/phoneme_m.mp3"
         _isPlaying.value = true

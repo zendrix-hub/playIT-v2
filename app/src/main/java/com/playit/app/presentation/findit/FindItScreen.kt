@@ -44,11 +44,15 @@ import com.playit.app.presentation.components.LessonTopBar
 import com.playit.app.presentation.components.MascotSpeechHeader
 import com.playit.app.presentation.components.MascotState
 import com.playit.app.presentation.theme.CreamWhite
+import com.playit.app.presentation.theme.Cloud
+import com.playit.app.presentation.theme.CloudShadow
 import com.playit.app.presentation.theme.DarkBrownOutline
 import com.playit.app.presentation.theme.Ink
 import com.playit.app.presentation.theme.Kalamansi
 import com.playit.app.presentation.theme.Leaf
 import com.playit.app.presentation.theme.LexendFontFamily
+import com.playit.app.presentation.theme.Mango
+import com.playit.app.presentation.theme.MangoShadow
 import com.playit.app.presentation.theme.Sand
 import com.playit.app.presentation.theme.Sky
 import com.playit.app.presentation.theme.UbeDark
@@ -68,6 +72,7 @@ fun FindItScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val hearts by viewModel.hearts.collectAsStateWithLifecycle()
     val isPlaying by viewModel.isPlaying.collectAsStateWithLifecycle()
+    val isPlayingPrompt by viewModel.isPlayingPrompt.collectAsStateWithLifecycle()
 
     val targetLetter = targetPhoneme?.letter?.uppercase() ?: "M"
 
@@ -91,7 +96,7 @@ fun FindItScreen(
                     .padding(horizontal = 16.dp, vertical = 4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Mascot speech bubble prompt
+                // Mascot speech bubble prompt (Tapping Lily replays the game rule voiceover)
                 MascotSpeechHeader(
                     message = when (state) {
                         is FindItState.GameOver -> "Good try! Let's listen again."
@@ -107,12 +112,13 @@ fun FindItScreen(
                         is FindItState.Incorrect -> MascotState.ENCOURAGING
                         else -> MascotState.POINTING
                     },
-                    onMascotTap = { if (!isPlaying) viewModel.playTargetSound() }
+                    isPlayingAudio = isPlayingPrompt,
+                    onMascotTap = { viewModel.playFindItIntroAudio() }
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Score pill + Sound Replay Pill
+                // Score pill + Dedicated Target Sound Replay Pill (Tapping replays the pure phoneme sound)
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -131,31 +137,31 @@ fun FindItScreen(
                     GummyContainer(
                         onClick = if (isPlaying) null else ({ viewModel.playTargetSound() }),
                         enabled = !isPlaying,
-                        faceColor = UbeLight,
-                        shadowColor = UbeShadow,
+                        faceColor = if (isPlaying) Mango else Cloud,
+                        shadowColor = if (isPlaying) MangoShadow else CloudShadow,
                         shape = RoundedCornerShape(999.dp),
-                        depthHeight = 2.dp,
+                        depthHeight = 3.dp,
                         modifier = Modifier
                             .wrapContentWidth()
                             .heightIn(min = 56.dp)
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp),
-                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                         ) {
                             Icon(
                                 imageVector = if (isPlaying) Icons.AutoMirrored.Rounded.VolumeUp else Icons.Rounded.PlayArrow,
                                 contentDescription = if (isPlaying) "Playing" else "Hear Sound",
-                                tint = Ink,
-                                modifier = Modifier.size(20.dp)
+                                tint = if (isPlaying) Ink else UbeDark,
+                                modifier = Modifier.size(22.dp)
                             )
                             Text(
-                                text = "Hear Sound",
+                                text = "Hear: /${targetPhoneme?.letter?.uppercase() ?: "M"}/",
                                 fontFamily = LexendFontFamily,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Ink
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = if (isPlaying) Ink else UbeDark
                             )
                         }
                     }
