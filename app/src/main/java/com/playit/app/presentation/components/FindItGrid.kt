@@ -53,11 +53,11 @@ fun FindItCard(
         shape = RoundedCornerShape(22.dp),
         strokeWidth = 2.5.dp,
         strokeColor = borderColor,
-        depthHeight = 5.dp,
+        depthHeight = 4.dp,
         isSquashed = isCorrect,
         modifier = Modifier
             .fillMaxWidth()
-            .height(138.dp)
+            .height(124.dp)
             .graphicsLayer { rotationZ = rotationAngle }
             .shake(trigger = isIncorrect)
     ) {
@@ -71,12 +71,12 @@ fun FindItCard(
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier.size(68.dp)
+                    modifier = Modifier.size(62.dp)
                 ) {
                     // Ambient backing circle
                     Box(
                         modifier = Modifier
-                            .size(60.dp)
+                            .size(54.dp)
                             .background(
                                 color = Sky.copy(alpha = 0.6f),
                                 shape = CircleShape
@@ -89,7 +89,7 @@ fun FindItCard(
                         isIdleFloating = !isCorrect,
                         floatDistance = 3.dp,
                         celebrateTrigger = isCorrect,
-                        modifier = Modifier.size(58.dp)
+                        modifier = Modifier.size(52.dp)
                     )
                 }
                 Spacer(modifier = Modifier.height(2.dp))

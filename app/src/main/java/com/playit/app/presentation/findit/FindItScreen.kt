@@ -14,11 +14,9 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -169,50 +167,136 @@ fun FindItScreen(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // 5-Card Grid: Row 1 has 2 items (span 3), Row 2 has 3 items (span 2)
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(6),
+                // 5-Card Uniform Grid: All boxes have the EXACT same dimensions
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    itemsIndexed(
-                        items = pictureGrid,
-                        key = { _, item -> item.id },
-                        span = { index, _ ->
-                            if (index < 2) GridItemSpan(3) else GridItemSpan(2)
-                        }
-                    ) { index, item ->
-                        val isFound = item.id in foundItemIds
-                        val isIncorrectSelection = state is FindItState.Incorrect &&
-                                (state as FindItState.Incorrect).selectedItem.id == item.id
-
-                        val borderColor = when {
-                            isFound -> Leaf
-                            isIncorrectSelection -> Kalamansi
-                            else -> DarkBrownOutline
-                        }
-                        val faceColor = when {
-                            isFound -> Color(0xFFEAF7EE)
-                            isIncorrectSelection -> Color(0xFFFFF4E4)
-                            else -> CreamWhite
-                        }
-
-                        FindItCard(
-                            item = item,
-                            borderColor = borderColor,
-                            faceColor = faceColor,
-                            index = index,
-                            isCorrect = isFound,
-                            isIncorrect = isIncorrectSelection,
-                            onClick = {
-                                if (state !is FindItState.GameOver && state !is FindItState.Completed) {
-                                    viewModel.selectPictureItem(item)
+                    // Row 1: 2 cards (Equal size)
+                    if (pictureGrid.isNotEmpty()) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            for (i in 0 until minOf(2, pictureGrid.size)) {
+                                val item = pictureGrid[i]
+                                val isFound = item.id in foundItemIds
+                                val isIncorrectSelection = state is FindItState.Incorrect &&
+                                        (state as FindItState.Incorrect).selectedItem.id == item.id
+                                val borderColor = when {
+                                    isFound -> Leaf
+                                    isIncorrectSelection -> Kalamansi
+                                    else -> DarkBrownOutline
+                                }
+                                val faceColor = when {
+                                    isFound -> Color(0xFFEAF7EE)
+                                    isIncorrectSelection -> Color(0xFFFFF4E4)
+                                    else -> CreamWhite
+                                }
+                                Box(modifier = Modifier.weight(1f)) {
+                                    FindItCard(
+                                        item = item,
+                                        borderColor = borderColor,
+                                        faceColor = faceColor,
+                                        index = i,
+                                        isCorrect = isFound,
+                                        isIncorrect = isIncorrectSelection,
+                                        onClick = {
+                                            if (state !is FindItState.GameOver && state !is FindItState.Completed) {
+                                                viewModel.selectPictureItem(item)
+                                            }
+                                        }
+                                    )
                                 }
                             }
-                        )
+                        }
+                    }
+
+                    // Row 2: 2 cards (Equal size)
+                    if (pictureGrid.size > 2) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            for (i in 2 until minOf(4, pictureGrid.size)) {
+                                val item = pictureGrid[i]
+                                val isFound = item.id in foundItemIds
+                                val isIncorrectSelection = state is FindItState.Incorrect &&
+                                        (state as FindItState.Incorrect).selectedItem.id == item.id
+                                val borderColor = when {
+                                    isFound -> Leaf
+                                    isIncorrectSelection -> Kalamansi
+                                    else -> DarkBrownOutline
+                                }
+                                val faceColor = when {
+                                    isFound -> Color(0xFFEAF7EE)
+                                    isIncorrectSelection -> Color(0xFFFFF4E4)
+                                    else -> CreamWhite
+                                }
+                                Box(modifier = Modifier.weight(1f)) {
+                                    FindItCard(
+                                        item = item,
+                                        borderColor = borderColor,
+                                        faceColor = faceColor,
+                                        index = i,
+                                        isCorrect = isFound,
+                                        isIncorrect = isIncorrectSelection,
+                                        onClick = {
+                                            if (state !is FindItState.GameOver && state !is FindItState.Completed) {
+                                                viewModel.selectPictureItem(item)
+                                            }
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // Row 3: 5th card (Centered, with identical width to Row 1 & 2 cards)
+                    if (pictureGrid.size > 4) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            val i = 4
+                            val item = pictureGrid[i]
+                            val isFound = item.id in foundItemIds
+                            val isIncorrectSelection = state is FindItState.Incorrect &&
+                                    (state as FindItState.Incorrect).selectedItem.id == item.id
+                            val borderColor = when {
+                                isFound -> Leaf
+                                isIncorrectSelection -> Kalamansi
+                                else -> DarkBrownOutline
+                            }
+                            val faceColor = when {
+                                isFound -> Color(0xFFEAF7EE)
+                                isIncorrectSelection -> Color(0xFFFFF4E4)
+                                else -> CreamWhite
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth(0.5f)
+                                    .padding(horizontal = 2.5.dp)
+                            ) {
+                                FindItCard(
+                                    item = item,
+                                    borderColor = borderColor,
+                                    faceColor = faceColor,
+                                    index = i,
+                                    isCorrect = isFound,
+                                    isIncorrect = isIncorrectSelection,
+                                    onClick = {
+                                        if (state !is FindItState.GameOver && state !is FindItState.Completed) {
+                                            viewModel.selectPictureItem(item)
+                                        }
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             }
