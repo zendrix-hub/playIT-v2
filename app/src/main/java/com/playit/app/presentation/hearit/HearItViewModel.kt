@@ -51,7 +51,7 @@ class HearItViewModel @Inject constructor(
             }
             _loadError.value = false
             _phoneme.value = p
-            playPhonemeSound()
+            playIntroThenPhonemeSound()
         }
     }
 
@@ -63,14 +63,19 @@ class HearItViewModel @Inject constructor(
     private val _isPlayingPrompt = MutableStateFlow(false)
     val isPlayingPrompt: StateFlow<Boolean> = _isPlayingPrompt.asStateFlow()
 
-    fun playHearItIntroAudio() {
+    fun playIntroThenPhonemeSound() {
         audioPlayer.stop()
         _isPlaying.value = false
         _isPlayingPrompt.value = true
         val introVo = audioResolver.getVoPath(VoContext.HEARIT_INTRO_01)
         audioPlayer.playAssetAudio(introVo) {
             _isPlayingPrompt.value = false
+            playPhonemeSound()
         }
+    }
+
+    fun playHearItIntroAudio() {
+        playIntroThenPhonemeSound()
     }
 
     fun playPhonemeSound() {

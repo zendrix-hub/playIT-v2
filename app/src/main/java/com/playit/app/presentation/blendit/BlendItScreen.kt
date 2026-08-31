@@ -68,6 +68,7 @@ fun BlendItScreen(
     val placedTiles by viewModel.placedTiles.collectAsStateWithLifecycle()
     val hearts by viewModel.hearts.collectAsStateWithLifecycle()
     val currentWordIndex by viewModel.currentWordIndex.collectAsStateWithLifecycle()
+    val isPlayingPrompt by viewModel.isPlayingPrompt.collectAsStateWithLifecycle()
     val totalWords = words.size.coerceAtLeast(1)
 
     // Fires onSessionComplete once all words are completed or SessionComplete is emitted
@@ -121,7 +122,8 @@ fun BlendItScreen(
                         is BlendItUiState.WordIncorrect -> MascotState.ENCOURAGING
                         else -> MascotState.POINTING
                     },
-                    onMascotTap = { viewModel.playTargetWordAudio() }
+                    isPlayingAudio = isPlayingPrompt,
+                    onMascotTap = { viewModel.playBlendItIntroAudio() }
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))

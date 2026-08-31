@@ -84,14 +84,6 @@ class BlendItViewModel @Inject constructor(
 
     init {
         loadSessionWords()
-        triggerScreenIntroIfNeeded()
-    }
-
-    private fun triggerScreenIntroIfNeeded() {
-        if (sessionManager.shouldPlayScreenIntro("blendit")) {
-            val introVo = audioResolver.getVoPath(VoContext.BLENDIT_INTRO_01)
-            audioPlayer.playAssetAudio(introVo)
-        }
     }
 
     private fun loadSessionWords() {
@@ -110,6 +102,9 @@ class BlendItViewModel @Inject constructor(
         }
     }
 
+    private val _isPlayingPrompt = MutableStateFlow(false)
+    val isPlayingPrompt: StateFlow<Boolean> = _isPlayingPrompt.asStateFlow()
+
     private fun setupWordAtIndex(index: Int) {
         val wordObj = _words.value.getOrNull(index) ?: return
         _currentWordIndex.value = index
@@ -122,12 +117,31 @@ class BlendItViewModel @Inject constructor(
         val letters = wordObj.word.toCharArray().toList().shuffled()
         _tileBank.value = letters
 
-        // Play current target word audio
-        playTargetWordAudio()
+        // Play prompt first on session start, or word audio directly on subsequent words
+        if (index == 0) {
+            playIntroThenWordAudio()
+        } else {
+            playTargetWordAudio()
+        }
+    }
+
+    fun playIntroThenWordAudio() {
+        audioPlayer.stop()
+        _isPlayingPrompt.value = true
+        val introVo = audioResolver.getVoPath(VoContext.BLENDIT_INTRO_01)
+        audioPlayer.playAssetAudio(introVo) {
+            _isPlayingPrompt.value = false
+            playTargetWordAudio()
+        }
+    }
+
+    fun playBlendItIntroAudio() {
+        playIntroThenWordAudio()
     }
 
     fun playTargetWordAudio() {
         audioPlayer.stop()
+        _isPlayingPrompt.value = false
         val targetObj = _words.value.getOrNull(_currentWordIndex.value) ?: return
         val path = audioResolver.getWordPath(targetObj.word)
         audioPlayer.playAssetAudio(path)
@@ -135,6 +149,7 @@ class BlendItViewModel @Inject constructor(
 
     fun playHintAudio() {
         audioPlayer.stop()
+        _isPlayingPrompt.value = false
         val hintVo = audioResolver.getRotatingHintVo()
         audioPlayer.playAssetAudio(hintVo)
     }

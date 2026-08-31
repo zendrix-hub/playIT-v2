@@ -74,14 +74,6 @@ class SayItViewModel @Inject constructor(
 
     init {
         loadPhoneme()
-        triggerScreenIntroIfNeeded()
-    }
-
-    private fun triggerScreenIntroIfNeeded() {
-        if (sessionManager.shouldPlayScreenIntro("sayit")) {
-            val introVo = audioResolver.getVoPath(VoContext.SAYIT_INTRO_01)
-            audioPlayer.playAssetAudio(introVo)
-        }
     }
 
     private fun loadPhoneme() {
@@ -95,6 +87,9 @@ class SayItViewModel @Inject constructor(
             _loadError.value = false
             _phoneme.value = p
             voskRecognizer.initModel()
+
+            // Automatically play speech bubble prompt first then the letter sound
+            playIntroThenPhonemeSound()
         }
     }
 
@@ -106,7 +101,7 @@ class SayItViewModel @Inject constructor(
     private val _isPlayingPrompt = MutableStateFlow(false)
     val isPlayingPrompt: StateFlow<Boolean> = _isPlayingPrompt.asStateFlow()
 
-    fun playSayItIntroAudio() {
+    fun playIntroThenPhonemeSound() {
         if (_state.value is SayItState.Listening) {
             autoStopJob?.cancel()
             voskRecognizer.stopListening()
@@ -119,7 +114,12 @@ class SayItViewModel @Inject constructor(
         val introVo = audioResolver.getVoPath(VoContext.SAYIT_INTRO_01)
         audioPlayer.playAssetAudio(introVo) {
             _isPlayingPrompt.value = false
+            playPhonemeSound()
         }
+    }
+
+    fun playSayItIntroAudio() {
+        playIntroThenPhonemeSound()
     }
 
     fun playPhonemeSound() {
