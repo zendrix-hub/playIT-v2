@@ -151,11 +151,11 @@ def synthesize_elevenlabs_voice(text: str, voice_id: str, api_key: str, output_p
     headers = {
         "Accept": "audio/mpeg",
         "Content-Type": "application/json",
-        "xi-api-key": api_key
+        "xi-api-key": api_key.strip()
     }
     data = {
         "text": text,
-        "model_id": "eleven_multilingual_v2",
+        "model_id": "eleven_turbo_v2_5",
         "voice_settings": {
             "stability": stability,
             "similarity_boost": similarity,
@@ -171,14 +171,18 @@ def synthesize_elevenlabs_voice(text: str, voice_id: str, api_key: str, output_p
 async def run_pipeline(elevenlabs_api_key: str = None, elevenlabs_child_id: str = None, elevenlabs_teacher_id: str = None):
     print("=" * 80)
     print("[*] PlayIT 2-Voice Expressive Pedagogical Voice-Over Generator")
-    if elevenlabs_api_key and elevenlabs_child_id and elevenlabs_teacher_id:
-        print("[*] Mode: ElevenLabs API (Eleven Multilingual v2 Expressive)")
-        print(f"[*] Voice 1 (Child Mascot Lily): {elevenlabs_child_id}")
-        print(f"[*] Voice 2 (Adult Teacher):     {elevenlabs_teacher_id}")
+    if elevenlabs_api_key:
+        teacher_voice = elevenlabs_teacher_id or "EXAVITQu4vr4xnSDxMaL"  # Bella / Warm Kindergarten Teacher
+        print("[*] Mode: ElevenLabs Studio Audio Engine (Eleven Turbo v2.5)")
+        print(f"[*] Voice 2 (Adult Teacher):     ElevenLabs Voice ID '{teacher_voice}'")
+        if elevenlabs_child_id:
+            print(f"[*] Voice 1 (Child Mascot Lily): ElevenLabs Voice ID '{elevenlabs_child_id}'")
+        else:
+            print("[*] Voice 1 (Child Mascot Lily): en-US-AnaNeural (Youthful Child Voice Pitch +8Hz)")
     else:
         print("[*] Mode: Neural TTS Engine (Clean Audio Mode)")
         print("[*] Voice 1 (Child Mascot Lily): en-US-AnaNeural (Youthful Child Voice Pitch +8Hz)")
-        print("[*] Voice 2 (Adult Teacher):     en-US-JennyNeural (Warm Teacher Voice Pitch +2Hz)")
+        print("[*] Voice 2 (Adult Teacher):     en-US-AvaNeural (Modern Conversational Educator Pitch +1Hz)")
     print("=" * 80)
 
     # 1. Synthesize Voice 1 (Child Mascot Lily - High Energy & Playful)
@@ -201,18 +205,19 @@ async def run_pipeline(elevenlabs_api_key: str = None, elevenlabs_child_id: str 
 
     # 2. Synthesize Voice 2 (Adult Teacher / Educational Guide - Lesson Intros & Prompts)
     print("\n--- [2/4] Synthesizing Voice 2: Teacher / Phonics Guide (Lesson Intros & Prompts) ---")
+    teacher_vid = elevenlabs_teacher_id or "EXAVITQu4vr4xnSDxMaL"
     for filename, script in TEACHER_VO_SCRIPTS.items():
         out_ui = os.path.join(UI_DIR, filename)
         out_vo = os.path.join(VO_DIR, filename)
         
-        if elevenlabs_api_key and elevenlabs_teacher_id:
+        if elevenlabs_api_key:
             try:
-                synthesize_elevenlabs_voice(script, elevenlabs_teacher_id, elevenlabs_api_key, out_ui, stability=0.65, similarity=0.75)
+                synthesize_elevenlabs_voice(script, teacher_vid, elevenlabs_api_key, out_ui, stability=0.65, similarity=0.75)
             except Exception as e:
-                print(f"  [!] ElevenLabs error for {filename}: {e}, falling back to Clean Teacher Neural Voice...")
-                await synthesize_edge_tts_clean(script, "en-US-JennyNeural", out_ui, rate="-2%", pitch="+2Hz")
+                print(f"  [!] ElevenLabs error for {filename}: {e}, falling back to Clean Teacher Neural Voice (Ava)...")
+                await synthesize_edge_tts_clean(script, "en-US-AvaNeural", out_ui, rate="-2%", pitch="+1Hz")
         else:
-            await synthesize_edge_tts_clean(script, "en-US-JennyNeural", out_ui, rate="-2%", pitch="+2Hz")
+            await synthesize_edge_tts_clean(script, "en-US-AvaNeural", out_ui, rate="-2%", pitch="+1Hz")
         
         shutil.copy2(out_ui, out_vo)
         print(f"  [+] Voice 2 (Adult Teacher):    {filename:<26} -> \"{script}\"")
@@ -221,26 +226,26 @@ async def run_pipeline(elevenlabs_api_key: str = None, elevenlabs_child_id: str 
     print("\n--- [3/4] Synthesizing Voice 2: 28 Pure Phonics Sounds (Adult Teacher - Multi-Sensory) ---")
     for filename, sound in PURE_PHONEMES.items():
         out_path = os.path.join(PHONEMES_DIR, filename)
-        if elevenlabs_api_key and elevenlabs_teacher_id:
+        if elevenlabs_api_key:
             try:
-                synthesize_elevenlabs_voice(sound, elevenlabs_teacher_id, elevenlabs_api_key, out_path, stability=0.75, similarity=0.80)
+                synthesize_elevenlabs_voice(sound, teacher_vid, elevenlabs_api_key, out_path, stability=0.75, similarity=0.80)
             except Exception as e:
-                await synthesize_edge_tts_clean(sound, "en-US-JennyNeural", out_path, rate="-2%", pitch="+2Hz")
+                await synthesize_edge_tts_clean(sound, "en-US-AvaNeural", out_path, rate="-2%", pitch="+1Hz")
         else:
-            await synthesize_edge_tts_clean(sound, "en-US-JennyNeural", out_path, rate="-2%", pitch="+2Hz")
+            await synthesize_edge_tts_clean(sound, "en-US-AvaNeural", out_path, rate="-2%", pitch="+1Hz")
         print(f"  [+] Pure Phonic (Teacher):      {filename:<26} -> \"{sound}\"")
 
     # 4. Synthesize Voice 2: 33 Blend-It Words (Crystal-Clear Articulation)
     print("\n--- [4/4] Synthesizing Voice 2: 33 Blend-It Target Words (Adult Teacher) ---")
     for filename, word in ALL_BLEND_WORDS.items():
         out_path = os.path.join(WORDS_DIR, filename)
-        if elevenlabs_api_key and elevenlabs_teacher_id:
+        if elevenlabs_api_key:
             try:
-                synthesize_elevenlabs_voice(word, elevenlabs_teacher_id, elevenlabs_api_key, out_path, stability=0.70, similarity=0.75)
+                synthesize_elevenlabs_voice(word, teacher_vid, elevenlabs_api_key, out_path, stability=0.70, similarity=0.75)
             except Exception as e:
-                await synthesize_edge_tts_clean(word, "en-US-JennyNeural", out_path, rate="-2%", pitch="+0Hz")
+                await synthesize_edge_tts_clean(word, "en-US-AvaNeural", out_path, rate="-2%", pitch="+0Hz")
         else:
-            await synthesize_edge_tts_clean(word, "en-US-JennyNeural", out_path, rate="-2%", pitch="+0Hz")
+            await synthesize_edge_tts_clean(word, "en-US-AvaNeural", out_path, rate="-2%", pitch="+0Hz")
         print(f"  [+] Blend Word (Teacher):       {filename:<26} -> \"{word}\"")
 
     print("\n" + "=" * 80)

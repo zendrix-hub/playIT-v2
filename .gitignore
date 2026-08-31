@@ -43,4 +43,8 @@ google-services.json
 
 # Agent and MCP local configs (may contain personal credentials)
 .agents/
+.env
+*.env
+voice_*.mp3
+test_*.mp3
 
