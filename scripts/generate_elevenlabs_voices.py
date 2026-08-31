@@ -71,35 +71,35 @@ TEACHER_VO_SCRIPTS = {
 
 # 28 Crystal-Clear Phonics Sounds with Multi-Sensory Action & Anchor Context (Grade 1 Jolly/Marungko Pedagogy)
 PURE_PHONEMES = {
-    "phoneme_m.mp3": "Mmm! Yummy! /m/... Mouse!",
-    "phoneme_s.mp3": "Sssss! Like a snake! /s/... Sun!",
-    "phoneme_a.mp3": "Ah! Open wide! /ah/... Apple!",
-    "phoneme_i.mp3": "Ih! Wiggle like an insect! /i/... Insect!",
-    "phoneme_o.mp3": "Oh! Round like an orange! /o/... Orange!",
-    "phoneme_b.mp3": "Buh! Bounce the ball! /b/... Ball!",
-    "phoneme_e.mp3": "Eh! Big like an elephant! /eh/... Elephant!",
-    "phoneme_u.mp3": "Uh! Up goes the umbrella! /uh/... Umbrella!",
-    "phoneme_t.mp3": "Tuh-tuh! Tap your toes! /t/... Tiger!",
-    "phoneme_k.mp3": "Kuh! Fly the kite! /k/... Kite!",
-    "phoneme_l.mp3": "Lll! Lick a lollipop! /l/... Lion!",
-    "phoneme_y.mp3": "Yuh-yuh! Spin the yoyo! /y/... Yoyo!",
-    "phoneme_n.mp3": "Nnn! High in the nest! /n/... Nest!",
-    "phoneme_g.mp3": "Guh! Gulp like a goat! /g/... Goat!",
-    "phoneme_ng.mp3": "Ng! Ring the bell! /ng/... Ring!",
-    "phoneme_p.mp3": "Puh! Puff the popcorn! /p/... Pig!",
-    "phoneme_r.mp3": "Rrr! Roar like a rabbit! /r/... Rabbit!",
-    "phoneme_d.mp3": "Duh! Beat the drum! /d/... Dog!",
-    "phoneme_h.mp3": "Huh! Hop in a hat! /h/... Hat!",
-    "phoneme_w.mp3": "Wuh! Wind the watch! /w/... Watch!",
-    "phoneme_c.mp3": "Kuh! Quick like a cat! /k/... Cat!",
-    "phoneme_f.mp3": "Fff! Swim like a fish! /f/... Fish!",
-    "phoneme_j.mp3": "Juh! Jump for the jug! /j/... Jug!",
-    "phoneme_ñ.mp3": "Nyuh! Play with the niño! /ny/... Niño!",
-    "phoneme_enye.mp3": "Nyuh! Play with the niño! /ny/... Niño!",
-    "phoneme_q.mp3": "Kwuh! Bow to the queen! /kw/... Queen!",
-    "phoneme_v.mp3": "Vvv! Drive the van! /v/... Van!",
-    "phoneme_x.mp3": "Ks! Pack in the box! /ks/... Box!",
-    "phoneme_z.mp3": "Zzz! Zoom like a zebra! /z/... Zebra!"
+    "phoneme_m.mp3": "Mmm! Yummy! Mmm... Mouse!",
+    "phoneme_s.mp3": "Sssss! Like a snake! Sss... Sun!",
+    "phoneme_a.mp3": "Ah! Open wide! Ah... Apple!",
+    "phoneme_i.mp3": "Ih! Wiggle like an insect! Ih... Insect!",
+    "phoneme_o.mp3": "Oh! Round like an orange! Oh... Orange!",
+    "phoneme_b.mp3": "Buh! Bounce the ball! Buh... Ball!",
+    "phoneme_e.mp3": "Eh! Big like an elephant! Eh... Elephant!",
+    "phoneme_u.mp3": "Uh! Up goes the umbrella! Uh... Umbrella!",
+    "phoneme_t.mp3": "Tuh-tuh! Tap your toes! Tuh... Tiger!",
+    "phoneme_k.mp3": "Kuh! Fly the kite! Kuh... Kite!",
+    "phoneme_l.mp3": "Lll! Lick a lollipop! Lll... Lion!",
+    "phoneme_y.mp3": "Yuh-yuh! Spin the yoyo! Yuh... Yoyo!",
+    "phoneme_n.mp3": "Nnn! High in the nest! Nnn... Nest!",
+    "phoneme_g.mp3": "Guh! Gulp like a goat! Guh... Goat!",
+    "phoneme_ng.mp3": "Ng! Ring the bell! Ng... Ring!",
+    "phoneme_p.mp3": "Puh! Puff the popcorn! Puh... Pig!",
+    "phoneme_r.mp3": "Rrr! Run like a rabbit! Rrr... Rabbit!",
+    "phoneme_d.mp3": "Duh! Beat the drum! Duh... Dog!",
+    "phoneme_h.mp3": "Huh! Hop in a hat! Huh... Hat!",
+    "phoneme_w.mp3": "Wuh! Wind the watch! Wuh... Watch!",
+    "phoneme_c.mp3": "Kuh! Quick like a cat! Kuh... Cat!",
+    "phoneme_f.mp3": "Fff! Swim like a fish! Fff... Fish!",
+    "phoneme_j.mp3": "Juh! Jump for the jug! Juh... Jug!",
+    "phoneme_ñ.mp3": "Nyuh! Play with the niño! Nyuh... Niño!",
+    "phoneme_enye.mp3": "Nyuh! Play with the niño! Nyuh... Niño!",
+    "phoneme_q.mp3": "Kwuh! Bow to the queen! Kwuh... Queen!",
+    "phoneme_v.mp3": "Vvv! Drive the van! Vvv... Van!",
+    "phoneme_x.mp3": "Ks! Pack in the box! Ks... Box!",
+    "phoneme_z.mp3": "Zzz! Zoom like a zebra! Zzz... Zebra!"
 }
 
 # 33 Blend-It Target Words (Voice 2: Teacher)
@@ -139,25 +139,12 @@ ALL_BLEND_WORDS = {
     "word_web.mp3": "Web"
 }
 
-async def synthesize_edge_tts_expressive(text: str, voice_name: str, output_path: str, style: str = "cheerful", rate: str = "+0%", pitch: str = "+0Hz", style_degree: str = "2"):
+async def synthesize_edge_tts_clean(text: str, voice_name: str, output_path: str, rate: str = "+0%", pitch: str = "+0Hz"):
     """
-    Synthesizes speech with Microsoft Neural SSML express-as emotional styles.
+    Synthesizes speech using edge_tts without any XML tags to ensure pure speech output.
     """
-    ssml = f"""<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="en-US">
-  <voice name="{voice_name}">
-    <mstts:express-as style="{style}" styledegree="{style_degree}">
-      <prosody pitch="{pitch}" rate="{rate}">
-        {text}
-      </prosody>
-    </mstts:express-as>
-  </voice>
-</speak>"""
-    try:
-        communicate = edge_tts.Communicate(ssml, voice_name)
-        await communicate.save(output_path)
-    except Exception:
-        communicate = edge_tts.Communicate(text, voice_name, rate=rate, pitch=pitch)
-        await communicate.save(output_path)
+    communicate = edge_tts.Communicate(text=text, voice=voice_name, rate=rate, pitch=pitch)
+    await communicate.save(output_path)
 
 def synthesize_elevenlabs_voice(text: str, voice_id: str, api_key: str, output_path: str, stability: float = 0.65, similarity: float = 0.75):
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
@@ -189,9 +176,9 @@ async def run_pipeline(elevenlabs_api_key: str = None, elevenlabs_child_id: str 
         print(f"[*] Voice 1 (Child Mascot Lily): {elevenlabs_child_id}")
         print(f"[*] Voice 2 (Adult Teacher):     {elevenlabs_teacher_id}")
     else:
-        print("[*] Mode: Microsoft Neural SSML Expressive Pedagogical Engine")
-        print("[*] Voice 1 (Child Mascot Lily): en-US-AnaNeural (Youthful Child Prosody +10% Pitch)")
-        print("[*] Voice 2 (Adult Teacher):     en-US-JennyNeural (Expressive Cheerful Teacher Style)")
+        print("[*] Mode: Neural TTS Engine (Clean Audio Mode)")
+        print("[*] Voice 1 (Child Mascot Lily): en-US-AnaNeural (Youthful Child Voice Pitch +8Hz)")
+        print("[*] Voice 2 (Adult Teacher):     en-US-JennyNeural (Warm Teacher Voice Pitch +2Hz)")
     print("=" * 80)
 
     # 1. Synthesize Voice 1 (Child Mascot Lily - High Energy & Playful)
@@ -204,10 +191,10 @@ async def run_pipeline(elevenlabs_api_key: str = None, elevenlabs_child_id: str 
             try:
                 synthesize_elevenlabs_voice(script, elevenlabs_child_id, elevenlabs_api_key, out_ui, stability=0.45, similarity=0.75)
             except Exception as e:
-                print(f"  [!] ElevenLabs error for {filename}: {e}, falling back to Expressive Child Neural Voice...")
-                await synthesize_edge_tts_expressive(script, "en-US-AnaNeural", out_ui, style="cheerful", rate="+5%", pitch="+10%")
+                print(f"  [!] ElevenLabs error for {filename}: {e}, falling back to Clean Child Neural Voice...")
+                await synthesize_edge_tts_clean(script, "en-US-AnaNeural", out_ui, rate="+5%", pitch="+8Hz")
         else:
-            await synthesize_edge_tts_expressive(script, "en-US-AnaNeural", out_ui, style="cheerful", rate="+5%", pitch="+10%")
+            await synthesize_edge_tts_clean(script, "en-US-AnaNeural", out_ui, rate="+5%", pitch="+8Hz")
         
         shutil.copy2(out_ui, out_vo)
         print(f"  [+] Voice 1 (Child Mascot Lily): {filename:<26} -> \"{script}\"")
@@ -222,10 +209,10 @@ async def run_pipeline(elevenlabs_api_key: str = None, elevenlabs_child_id: str 
             try:
                 synthesize_elevenlabs_voice(script, elevenlabs_teacher_id, elevenlabs_api_key, out_ui, stability=0.65, similarity=0.75)
             except Exception as e:
-                print(f"  [!] ElevenLabs error for {filename}: {e}, falling back to Expressive Teacher Neural Voice...")
-                await synthesize_edge_tts_expressive(script, "en-US-JennyNeural", out_ui, style="cheerful", rate="-2%", pitch="+4%")
+                print(f"  [!] ElevenLabs error for {filename}: {e}, falling back to Clean Teacher Neural Voice...")
+                await synthesize_edge_tts_clean(script, "en-US-JennyNeural", out_ui, rate="-2%", pitch="+2Hz")
         else:
-            await synthesize_edge_tts_expressive(script, "en-US-JennyNeural", out_ui, style="cheerful", rate="-2%", pitch="+4%")
+            await synthesize_edge_tts_clean(script, "en-US-JennyNeural", out_ui, rate="-2%", pitch="+2Hz")
         
         shutil.copy2(out_ui, out_vo)
         print(f"  [+] Voice 2 (Adult Teacher):    {filename:<26} -> \"{script}\"")
@@ -238,9 +225,9 @@ async def run_pipeline(elevenlabs_api_key: str = None, elevenlabs_child_id: str 
             try:
                 synthesize_elevenlabs_voice(sound, elevenlabs_teacher_id, elevenlabs_api_key, out_path, stability=0.75, similarity=0.80)
             except Exception as e:
-                await synthesize_edge_tts_expressive(sound, "en-US-JennyNeural", out_path, style="cheerful", rate="-3%", pitch="+3%")
+                await synthesize_edge_tts_clean(sound, "en-US-JennyNeural", out_path, rate="-2%", pitch="+2Hz")
         else:
-            await synthesize_edge_tts_expressive(sound, "en-US-JennyNeural", out_path, style="cheerful", rate="-3%", pitch="+3%")
+            await synthesize_edge_tts_clean(sound, "en-US-JennyNeural", out_path, rate="-2%", pitch="+2Hz")
         print(f"  [+] Pure Phonic (Teacher):      {filename:<26} -> \"{sound}\"")
 
     # 4. Synthesize Voice 2: 33 Blend-It Words (Crystal-Clear Articulation)
@@ -251,9 +238,9 @@ async def run_pipeline(elevenlabs_api_key: str = None, elevenlabs_child_id: str 
             try:
                 synthesize_elevenlabs_voice(word, elevenlabs_teacher_id, elevenlabs_api_key, out_path, stability=0.70, similarity=0.75)
             except Exception as e:
-                await synthesize_edge_tts_expressive(word, "en-US-JennyNeural", out_path, style="friendly", rate="-2%", pitch="+2%")
+                await synthesize_edge_tts_clean(word, "en-US-JennyNeural", out_path, rate="-2%", pitch="+0Hz")
         else:
-            await synthesize_edge_tts_expressive(word, "en-US-JennyNeural", out_path, style="friendly", rate="-2%", pitch="+2%")
+            await synthesize_edge_tts_clean(word, "en-US-JennyNeural", out_path, rate="-2%", pitch="+0Hz")
         print(f"  [+] Blend Word (Teacher):       {filename:<26} -> \"{word}\"")
 
     print("\n" + "=" * 80)
