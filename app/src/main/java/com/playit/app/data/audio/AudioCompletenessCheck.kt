@@ -38,7 +38,7 @@ class AudioCompletenessCheck @Inject constructor(
         "van", "box", "fox", "zoo", "web"
     )
 
-    // 18 VO lines per 19 §2
+    // 19 VO lines per 19 §2
     val requiredVoLines = listOf(
         "vo_welcome_01.mp3",
         "vo_encourage_01.mp3",
@@ -55,6 +55,7 @@ class AudioCompletenessCheck @Inject constructor(
         "vo_blendit_intro_01.mp3",
         "vo_findit_intro_01.mp3",
         "vo_sayit_intro_01.mp3",
+        "vo_sayit_word_intro_01.mp3",
         "vo_quiet_check_01.mp3",
         "vo_return_welcome_01.mp3",
         "vo_noise_alert_01.mp3"

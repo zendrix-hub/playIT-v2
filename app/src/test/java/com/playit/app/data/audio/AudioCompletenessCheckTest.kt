@@ -40,6 +40,7 @@ class AudioCompletenessCheckTest {
         "vo_blendit_intro_01.mp3",
         "vo_findit_intro_01.mp3",
         "vo_sayit_intro_01.mp3",
+        "vo_sayit_word_intro_01.mp3",
         "vo_quiet_check_01.mp3",
         "vo_return_welcome_01.mp3",
         "vo_noise_alert_01.mp3"
@@ -60,7 +61,7 @@ class AudioCompletenessCheckTest {
     fun verifyRequiredAssetCounts() {
         assertEquals(26, requiredPhonemeLetters.size)
         assertEquals(32, requiredWords.size)
-        assertEquals(18, requiredVoLines.size)
+        assertEquals(19, requiredVoLines.size)
         assertEquals(8, requiredSfxFiles.size)
     }
 
