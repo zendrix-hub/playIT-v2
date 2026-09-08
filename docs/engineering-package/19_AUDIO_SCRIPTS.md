@@ -37,7 +37,7 @@ Production-ready scripts only — no audio generated here. Format matches `18_AU
 | `phoneme_x.mp3` | **DRAFT, PENDING SME CONFIRMATION** — "/ks/... X, like boX." | Word-initial X is rare in English; this uses an ending-sound example, breaking the pattern used by every other letter — confirm acceptable before recording (`01 §5`) |
 | `phoneme_z.mp3` | "/zzz/... Z, like Zebra." | |
 
-## 2. Mascot Voice-Over Lines (UI, ~18 lines)
+## 2. Mascot Voice-Over Lines (UI, ~19 lines)
 
 **Shared spec:** Speaker = mascot's dedicated voice talent (can be the same talent as phonemes, or a distinct warmer/higher-energy voice — recommend distinct, since the phoneme voice needs to stay neutral/reference-grade while the mascot voice should have more personality); Speaking speed = natural, upbeat but unhurried; Target duration = 1.5–3.0s each.
 
@@ -58,6 +58,9 @@ Production-ready scripts only — no audio generated here. Format matches `18_AU
 | `vo_blendit_intro_01.mp3` | "Let's build some words together!" | Encouraging |
 | `vo_findit_intro_01.mp3` | "Can you find the pictures that match the sound?" | Encouraging |
 | `vo_sayit_intro_01.mp3` | "Now it's your turn — say the sound into the microphone!" | Encouraging |
+| `vo_sayit_word_intro_01.mp3` | "Now it's your turn! Say the whole word clearly into the microphone!" | Encouraging |
+
+> Note: `vo_sayit_intro_01.mp3` remains the prompt for SME-pending letters (`ng`/`ñ`) that still run Say It in legacy letter-sound mode. `vo_sayit_word_intro_01.mp3` is the word-mode prompt (all 26 real letters) added in Phase 12; on-screen bubble text matches it verbatim.
 | `vo_quiet_check_01.mp3` | "Let's be as quiet as a mouse before we start listening!" | Encouraging |
 | `vo_return_welcome_01.mp3` | "Welcome back! Ready to keep learning?" | Happy |
 | `vo_noise_alert_01.mp3` | "It's a little noisy right now — let's find a quiet spot!" | Encouraging |

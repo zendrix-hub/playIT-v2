@@ -204,4 +204,15 @@ Reference mockup: `playit-mockup.html` (root of workspace). Full analysis: conve
 - [x] **HP-9: Name Prompt State Hoisting**: Hoisted player name and avatar selection state from `NamePromptScreen` into `ProfileViewModel` with config change survival.
 - [x] **Build Verification**: Verified `compileDebugKotlin` and KSP processor passes cleanly with `BUILD SUCCESSFUL`.
 
+## Phase 12 — Say It Word Mode (added 2026-09-08)
+
+Change: Say It now asks the child to utter the letter's example WORD (m → "Mouse", s → "Sun") instead of the bare letter sound; prompt card shows the word's picture + word with the initial letter emphasized; whole-word acceptance only (CB-1 strict, no prefix/fuzzy tolerance). SME-pending letters (`ng`/`ñ`) keep the legacy letter-sound mode. Stakeholder decisions: reuse the 26 seeded `exampleWord` values; picture + word card UI; one new teacher VO line + word audio prompt.
+
+- [x] Word-mode validator in `SpeechValidator.kt`: `wordAcceptedVariants` (26 seeded words), `getAcceptedWordVariants()`, `validateWord()` — whole-word-only (FR-02, FR-03)
+- [x] `SayItViewModel`: `targetWord` flow + `resolveWordTarget()` (ng/ñ + PENDING_SME_REVIEW → null legacy), word-grammar scoping, word prompt sequence (HP-4)
+- [x] `SayItScreen`: word-mode prompt card via `LetterCard(promptMode = true)` ("Say the word Mouse" instruction + shared Hear It picture), word-mode copy, legacy letter card preserved for ng/ñ
+- [x] `vo_sayit_word_intro_01.mp3` synthesized (Ava neural teacher voice) + `VoContext.SAYIT_WORD_INTRO_01` + completeness mirrors (18 → 19)
+- [x] Test rework: stale `fuzzyTolerance_handlesMinorVoskVariances` replaced with post-CB-1 negative; word-mode unit tests added (validator + ViewModel)
+- [x] Docs: `19_AUDIO_SCRIPTS.md` §2 row added; `01_REQUIREMENTS_SUMMARY.md` Module 2 word-mode note
+
 
