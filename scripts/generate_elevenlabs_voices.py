@@ -59,6 +59,7 @@ CHILD_VO_SCRIPTS = {
 TEACHER_VO_SCRIPTS = {
     "vo_hearit_intro_01.mp3": "Listen closely to the sound of the letter, then tap play to hear it again!",
     "vo_sayit_intro_01.mp3": "Now it's your turn! Say the sound clearly into the microphone!",
+    "vo_sayit_word_intro_01.mp3": "Now it's your turn! Say the whole word clearly into the microphone!",
     "vo_findit_intro_01.mp3": "Can you find all three pictures that start with this sound?",
     "vo_blendit_intro_01.mp3": "Let's blend letter sounds together to build words!",
     "vo_hint_01.mp3": "Listen to the beginning sound of the word.",
