@@ -47,6 +47,13 @@ class SayItViewModel @Inject constructor(
     private val _phoneme = MutableStateFlow<Phoneme?>(null)
     val phoneme: StateFlow<Phoneme?> = _phoneme.asStateFlow()
 
+    /**
+     * The example word the child must utter (lowercased), e.g. "mouse" for letter M.
+     * null = legacy letter-sound mode, kept for SME-pending letters (ng/ñ).
+     */
+    private val _targetWord = MutableStateFlow<String?>(null)
+    val targetWord: StateFlow<String?> = _targetWord.asStateFlow()
+
     private val _state = MutableStateFlow<SayItState>(SayItState.Idle)
     val state: StateFlow<SayItState> = _state.asStateFlow()
 
@@ -86,12 +93,29 @@ class SayItViewModel @Inject constructor(
             }
             _loadError.value = false
             _phoneme.value = p
+            _targetWord.value = resolveWordTarget(p)
             voskRecognizer.initModel()
 
-            // Automatically play speech bubble prompt first then the letter sound
-            playIntroThenPhonemeSound()
+            // Automatically play the intro prompt, then the model audio (word or letter sound)
+            playIntroThenPromptAudio()
         }
     }
+
+    /**
+     * Word mode = the child utters the phoneme's seeded example word (e.g. "Mouse").
+     * SME-pending letters (ng/ñ) have no approved example content, so they stay in the
+     * legacy letter-sound mode (null target word).
+     */
+    private fun resolveWordTarget(p: Phoneme): String? {
+        val letter = p.letter.lowercase().trim()
+        if (letter == "ng" || letter == "ñ") return null
+        val word = p.exampleWord.trim()
+        if (word.isEmpty() || word.equals("PENDING_SME_REVIEW", ignoreCase = true)) return null
+        return word.lowercase()
+    }
+
+    private val isWordMode: Boolean
+        get() = _targetWord.value != null
 
     fun retry() {
         _loadError.value = false
@@ -101,7 +125,16 @@ class SayItViewModel @Inject constructor(
     private val _isPlayingPrompt = MutableStateFlow(false)
     val isPlayingPrompt: StateFlow<Boolean> = _isPlayingPrompt.asStateFlow()
 
-    fun playIntroThenPhonemeSound() {
+    fun playSayItIntroAudio() {
+        playIntroThenPromptAudio()
+    }
+
+    /**
+     * Plays the spoken intro prompt (word-mode VO in word mode, letter-sound VO in legacy
+     * mode), then the model audio the child must imitate — the example word or the pure
+     * phoneme. Matches the on-screen speech bubble 1:1 (HP-4).
+     */
+    private fun playIntroThenPromptAudio() {
         if (_state.value is SayItState.Listening) {
             autoStopJob?.cancel()
             voskRecognizer.stopListening()
@@ -111,15 +144,38 @@ class SayItViewModel @Inject constructor(
         audioPlayer.stop()
         _isPlayingPhoneme.value = false
         _isPlayingPrompt.value = true
-        val introVo = audioResolver.getVoPath(VoContext.SAYIT_INTRO_01)
+        val introVo = audioResolver.getVoPath(
+            if (isWordMode) VoContext.SAYIT_WORD_INTRO_01 else VoContext.SAYIT_INTRO_01
+        )
         audioPlayer.playAssetAudio(introVo) {
             _isPlayingPrompt.value = false
-            playPhonemeSound()
+            if (isWordMode) playWordAudio() else playPhonemeSound()
         }
     }
 
-    fun playSayItIntroAudio() {
-        playIntroThenPhonemeSound()
+    /**
+     * Plays the target example-word audio (e.g. audio/words/word_mouse.mp3) as the model
+     * utterance. Falls back to the pure phoneme sound in legacy (letter-sound) mode.
+     */
+    fun playWordAudio() {
+        val target = _targetWord.value
+        if (target == null) {
+            playPhonemeSound()
+            return
+        }
+        if (_state.value is SayItState.Listening) {
+            autoStopJob?.cancel()
+            voskRecognizer.stopListening()
+            _state.value = SayItState.Idle
+            _audioAmplitude.value = 0f
+        }
+        audioPlayer.stop()
+        _isPlayingPrompt.value = false
+        val path = audioResolver.getWordPath(target)
+        _isPlayingPhoneme.value = true
+        audioPlayer.playAssetAudio(path) {
+            _isPlayingPhoneme.value = false
+        }
     }
 
     fun playPhonemeSound() {
@@ -159,10 +215,17 @@ class SayItViewModel @Inject constructor(
         _isPlayingPhoneme.value = false
 
         autoStopJob?.cancel()
-        val target = _phoneme.value?.letter?.lowercase() ?: "m"
-        val acceptedList = speechValidator.getAcceptedVariants(target)
-        voskRecognizer.setGrammar(acceptedList + listOf("cat", "dog", "sun", "ball", "yes", "no"))
-        
+        // Word mode: target = the example word to say (e.g. "mouse"). Legacy mode: the
+        // letter sound. Grammar is scoped to the accepted variants + generic decoy words.
+        val targetWord = _targetWord.value
+        val target = targetWord ?: _phoneme.value?.letter?.lowercase() ?: "m"
+        val acceptedList = if (targetWord != null) {
+            speechValidator.getAcceptedWordVariants(targetWord)
+        } else {
+            speechValidator.getAcceptedVariants(target)
+        }
+        voskRecognizer.setGrammar((acceptedList + listOf("cat", "dog", "sun", "ball", "yes", "no")).distinct())
+
         _state.value = SayItState.Listening
         _isNoisyEnvironment.value = false
 
@@ -177,7 +240,11 @@ class SayItViewModel @Inject constructor(
         voskRecognizer.startListening(
             onResult = { transcript ->
                 if (transcript.isNotBlank() && _state.value is SayItState.Listening) {
-                    val isCorrect = speechValidator.validate(transcript, target)
+                    val isCorrect = if (targetWord != null) {
+                        speechValidator.validateWord(transcript, targetWord)
+                    } else {
+                        speechValidator.validate(transcript, target)
+                    }
                     if (isCorrect) {
                         autoStopJob?.cancel()
                         voskRecognizer.stopListening()
@@ -200,8 +267,13 @@ class SayItViewModel @Inject constructor(
     fun evaluateSpeech(transcript: String) {
         autoStopJob?.cancel()
         _audioAmplitude.value = 0f
+        val targetWord = _targetWord.value
         val targetLetter = _phoneme.value?.letter ?: "m"
-        val isCorrect = speechValidator.validate(transcript, targetLetter)
+        val isCorrect = if (targetWord != null) {
+            speechValidator.validateWord(transcript, targetWord)
+        } else {
+            speechValidator.validate(transcript, targetLetter)
+        }
         val profileId = sessionManager.activeProfileId.value ?: 1L
         val phonemeId = _phoneme.value?.id ?: 1
 
@@ -212,7 +284,7 @@ class SayItViewModel @Inject constructor(
         }
 
         if (isCorrect) {
-            _state.value = SayItState.Correct(transcript.ifBlank { targetLetter })
+            _state.value = SayItState.Correct(transcript.ifBlank { targetWord ?: targetLetter })
             val sfx = audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME)
             val vo = audioResolver.getRotatingCorrectVo()
             audioPlayer.playSequence(listOf(sfx, vo))
@@ -229,7 +301,7 @@ class SayItViewModel @Inject constructor(
     }
 
     fun simulateCorrectForTesting() {
-        evaluateSpeech(_phoneme.value?.letter ?: "m")
+        evaluateSpeech(_targetWord.value ?: _phoneme.value?.letter ?: "m")
     }
 
     override fun onCleared() {

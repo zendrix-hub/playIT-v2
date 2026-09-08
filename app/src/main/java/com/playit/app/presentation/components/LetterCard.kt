@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.presentation.theme.AndikaFontFamily
@@ -44,7 +45,8 @@ fun LetterCard(
     modifier: Modifier = Modifier,
     cardRotation: Float = 0f,
     wordOverride: String? = null,
-    onTapReplay: () -> Unit = {}
+    onTapReplay: () -> Unit = {},
+    promptMode: Boolean = false
 ) {
     val letterMap = mapOf(
         "a" to "apple", "b" to "ball", "c" to "cat", "d" to "dog",
@@ -59,7 +61,13 @@ fun LetterCard(
 
     val word = wordOverride ?: letterMap[letter.lowercase()] ?: "apple"
     val displayLetter = if (letter.length == 1) "${letter.uppercase()}${letter.lowercase()}" else letter.uppercase()
-    val displayWord = if (word.contains("is for", ignoreCase = true)) word else "${letter.uppercase()} is for ${word.replaceFirstChar { it.uppercase() }}"
+    val displayWord = if (promptMode) {
+        word.replaceFirstChar { it.uppercase() }
+    } else if (word.contains("is for", ignoreCase = true)) {
+        word
+    } else {
+        "${letter.uppercase()} is for ${word.replaceFirstChar { it.uppercase() }}"
+    }
 
     GummyContainer(
         onClick = onTapReplay,
@@ -124,7 +132,7 @@ fun LetterCard(
                 val pictureAsset = "images/pictures/picture_${word.lowercase()}.png"
                 GummyMotionAsset(
                     assetPath = pictureAsset,
-                    contentDescription = displayWord,
+                    contentDescription = if (promptMode) "Say the word $displayWord" else displayWord,
                     isIdleFloating = true,
                     floatDistance = 5.dp,
                     modifier = Modifier.size(92.dp)
@@ -132,33 +140,48 @@ fun LetterCard(
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                Text(
-                    text = displayLetter,
-                    fontFamily = LexendFontFamily,
-                    fontSize = 58.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = UbeDark
-                )
+                if (promptMode) {
+                    // Word-prompt mode (Say It): no big-letter/letter-name block —
+                    // the card asks the child to say the whole word instead.
+                    Text(
+                        text = soundText,
+                        fontFamily = LexendFontFamily,
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = UbeDark,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                    Spacer(modifier = Modifier.height(18.dp))
+                } else {
+                    Text(
+                        text = displayLetter,
+                        fontFamily = LexendFontFamily,
+                        fontSize = 58.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = UbeDark
+                    )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
 
-                Text(
-                    text = displayWord,
-                    fontFamily = LexendFontFamily,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = InkSoft
-                )
+                    Text(
+                        text = displayWord,
+                        fontFamily = LexendFontFamily,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = InkSoft
+                    )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
 
-                Text(
-                    text = soundText,
-                    fontFamily = AndikaFontFamily,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Ube
-                )
+                    Text(
+                        text = soundText,
+                        fontFamily = AndikaFontFamily,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Ube
+                    )
+                }
             }
         }
     }

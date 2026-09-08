@@ -31,22 +31,25 @@ class SayItViewModelTest {
     private val audioResolver: AudioResolver = mockk()
     private val sessionManager: SessionManager = mockk()
     private val savedStateHandle: SavedStateHandle = mockk()
-    
+
     private val testDispatcher = StandardTestDispatcher()
 
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        
+
         coEvery { phonemeRepository.getPhonemeById(any()) } returns null
         every { savedStateHandle.get<String>("phonemeId") } returns "1"
         every { sessionManager.shouldPlayScreenIntro(any()) } returns false
         every { sessionManager.activeProfileId } returns MutableStateFlow(1L)
         every { audioResolver.getPhonemePath(any()) } returns "test_path"
+        every { audioResolver.getWordPath(any()) } returns "word_path"
+        every { audioResolver.getVoPath(any()) } returns "vo_path"
         every { audioResolver.getSfxPath(any()) } returns "sfx_path"
         every { audioResolver.getRotatingCorrectVo() } returns "correct_vo"
         every { audioResolver.getRotatingEncourageVo() } returns "encourage_vo"
         every { speechValidator.validate(any(), any()) } returns false
+        every { speechValidator.validateWord(any(), any()) } returns false
     }
 
     @After
@@ -54,18 +57,27 @@ class SayItViewModelTest {
         Dispatchers.resetMain()
     }
 
-    @Test
-    fun loadPhoneme_validId_loadsPhoneme() = runTest {
-        val fakePhoneme = Phoneme(id = 1, letter = "m", audioPath = "path", imagePath = "path", exampleWord = "mouse")
-        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme
+    private fun fakePhoneme(
+        id: Int = 1,
+        letter: String = "m",
+        exampleWord: String = "mouse"
+    ) = Phoneme(id = id, letter = letter, audioPath = "path", imagePath = "path", exampleWord = exampleWord)
 
+    private fun createViewModel() {
         viewModel = SayItViewModel(
             phonemeRepository, sayItAttemptRepository, speechValidator,
             voskRecognizer, audioPlayer, audioResolver, sessionManager, savedStateHandle
         )
+    }
+
+    @Test
+    fun loadPhoneme_validId_loadsPhoneme() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+
+        createViewModel()
         advanceUntilIdle()
 
-        assertEquals(fakePhoneme, viewModel.phoneme.value)
+        assertEquals(fakePhoneme(), viewModel.phoneme.value)
         assertFalse(viewModel.loadError.value)
         coVerify { voskRecognizer.initModel() }
     }
@@ -74,10 +86,7 @@ class SayItViewModelTest {
     fun loadPhoneme_invalidId_setsLoadError() = runTest {
         coEvery { phonemeRepository.getPhonemeById(1) } returns null
 
-        viewModel = SayItViewModel(
-            phonemeRepository, sayItAttemptRepository, speechValidator,
-            voskRecognizer, audioPlayer, audioResolver, sessionManager, savedStateHandle
-        )
+        createViewModel()
         advanceUntilIdle()
 
         assertNull(viewModel.phoneme.value)
@@ -85,40 +94,61 @@ class SayItViewModelTest {
     }
 
     @Test
-    fun evaluateSpeech_correctTranscript_setsCorrectState() = runTest {
-        val fakePhoneme = Phoneme(id = 1, letter = "m", audioPath = "path", imagePath = "path", exampleWord = "mouse")
-        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme
-        every { speechValidator.validate("m", "m") } returns true
+    fun loadPhoneme_wordMode_exposesNormalizedTargetWord() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme(exampleWord = "Mouse")
 
-        viewModel = SayItViewModel(
-            phonemeRepository, sayItAttemptRepository, speechValidator,
-            voskRecognizer, audioPlayer, audioResolver, sessionManager, savedStateHandle
-        )
+        createViewModel()
         advanceUntilIdle()
 
-        viewModel.evaluateSpeech("m")
+        assertEquals("mouse", viewModel.targetWord.value)
+    }
+
+    @Test
+    fun loadPhoneme_smePendingLetter_usesLegacyLetterMode() = runTest {
+        // ng/ñ have no approved example word — they must stay in letter-sound mode
+        // (targetWord == null) and still pass via the phoneme validator.
+        coEvery { phonemeRepository.getPhonemeById(1) } returns
+            fakePhoneme(letter = "ng", exampleWord = "PENDING_SME_REVIEW")
+        every { speechValidator.validate("ng", "ng") } returns true
+
+        createViewModel()
+        advanceUntilIdle()
+
+        assertNull(viewModel.targetWord.value)
+        viewModel.evaluateSpeech("ng")
+        advanceUntilIdle()
+
+        assertTrue(viewModel.state.value is SayItState.Correct)
+        coVerify { sayItAttemptRepository.saveAttempt(1L, 1, true) }
+    }
+
+    @Test
+    fun evaluateSpeech_correctTranscript_setsCorrectState() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        every { speechValidator.validateWord("mouse", "mouse") } returns true
+
+        createViewModel()
+        advanceUntilIdle()
+
+        viewModel.evaluateSpeech("mouse")
         advanceUntilIdle()
 
         val state = viewModel.state.value
         assertTrue(state is SayItState.Correct)
-        assertEquals("m", (state as SayItState.Correct).transcript)
+        assertEquals("mouse", (state as SayItState.Correct).transcript)
         coVerify { sayItAttemptRepository.saveAttempt(1L, 1, true) }
     }
 
     @Test
     fun evaluateSpeech_incorrectTranscript_deductsHeart() = runTest {
-        val fakePhoneme = Phoneme(id = 1, letter = "m", audioPath = "path", imagePath = "path", exampleWord = "mouse")
-        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme
-        every { speechValidator.validate("s", "m") } returns false
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        every { speechValidator.validateWord("cat", "mouse") } returns false
 
-        viewModel = SayItViewModel(
-            phonemeRepository, sayItAttemptRepository, speechValidator,
-            voskRecognizer, audioPlayer, audioResolver, sessionManager, savedStateHandle
-        )
+        createViewModel()
         advanceUntilIdle()
 
         val initialHearts = viewModel.hearts.value
-        viewModel.evaluateSpeech("s")
+        viewModel.evaluateSpeech("cat")
         advanceUntilIdle()
 
         assertEquals(initialHearts - 1, viewModel.hearts.value)
@@ -127,42 +157,93 @@ class SayItViewModelTest {
 
     @Test
     fun evaluateSpeech_incorrectTranscript_setsIncorrectState() = runTest {
-        val fakePhoneme = Phoneme(id = 1, letter = "m", audioPath = "path", imagePath = "path", exampleWord = "mouse")
-        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme
-        every { speechValidator.validate("s", "m") } returns false
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
 
-        viewModel = SayItViewModel(
-            phonemeRepository, sayItAttemptRepository, speechValidator,
-            voskRecognizer, audioPlayer, audioResolver, sessionManager, savedStateHandle
-        )
+        createViewModel()
         advanceUntilIdle()
 
-        viewModel.evaluateSpeech("s")
+        viewModel.evaluateSpeech("sub")
         advanceUntilIdle()
 
         val state = viewModel.state.value
         assertTrue(state is SayItState.Incorrect)
-        assertEquals("s", (state as SayItState.Incorrect).transcript)
+        assertEquals("sub", (state as SayItState.Incorrect).transcript)
         assertEquals(listOf(false), viewModel.attempts.value)
     }
 
     @Test
     fun evaluateSpeech_recordsMultipleAttemptsInList() = runTest {
-        val fakePhoneme = Phoneme(id = 1, letter = "m", audioPath = "path", imagePath = "path", exampleWord = "mouse")
-        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme
-        every { speechValidator.validate("s", "m") } returns false
-        every { speechValidator.validate("m", "m") } returns true
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        every { speechValidator.validateWord("cat", "mouse") } returns false
+        every { speechValidator.validateWord("mouse", "mouse") } returns true
 
-        viewModel = SayItViewModel(
-            phonemeRepository, sayItAttemptRepository, speechValidator,
-            voskRecognizer, audioPlayer, audioResolver, sessionManager, savedStateHandle
-        )
+        createViewModel()
         advanceUntilIdle()
 
-        viewModel.evaluateSpeech("s")
-        viewModel.evaluateSpeech("m")
+        viewModel.evaluateSpeech("cat")
+        viewModel.evaluateSpeech("mouse")
         advanceUntilIdle()
 
         assertEquals(listOf(false, true), viewModel.attempts.value)
+    }
+
+    @Test
+    fun wordMode_letterSoundTranscript_isIncorrect() = runTest {
+        // Whole word required — saying only the letter sound must not pass in word mode.
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        every { speechValidator.validateWord("m", "mouse") } returns false
+
+        createViewModel()
+        advanceUntilIdle()
+
+        viewModel.evaluateSpeech("m")
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertTrue(state is SayItState.Incorrect)
+        coVerify { sayItAttemptRepository.saveAttempt(1L, 1, false) }
+    }
+
+    @Test
+    fun wordMode_promptPlaysIntroVoThenWordAudio() = runTest {
+        // Auto prompt on load: word-mode intro VO, then the example-word audio.
+        val playedPaths = mutableListOf<String>()
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        every { audioResolver.getVoPath(any()) } returns "vo_word_intro"
+        every { audioResolver.getWordPath("mouse") } returns "audio/words/word_mouse.mp3"
+        every { audioPlayer.playAssetAudio(any(), any()) } answers {
+            playedPaths.add(firstArg())
+            secondArg<(() -> Unit)?>()?.invoke()
+        }
+
+        createViewModel()
+        advanceUntilIdle()
+
+        assertEquals(listOf("vo_word_intro", "audio/words/word_mouse.mp3"), playedPaths)
+    }
+
+    @Test
+    fun wordMode_startListening_grammarIsWordVariantsPlusDecoys() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        every { speechValidator.getAcceptedWordVariants("mouse") } returns listOf("mouse")
+
+        createViewModel()
+        advanceUntilIdle()
+
+        val grammarSlot = slot<List<String>>()
+        every { voskRecognizer.setGrammar(capture(grammarSlot)) } just Runs
+
+        viewModel.startListening()
+
+        assertTrue(grammarSlot.isCaptured)
+        val grammar = grammarSlot.captured
+        assertTrue(grammar.contains("mouse"))
+        assertTrue(grammar.containsAll(listOf("cat", "dog", "sun", "ball", "yes", "no")))
+        assertFalse(grammar.contains("m"))
+        assertFalse(grammar.contains("em"))
+        assertFalse(grammar.contains("muh"))
+
+        // Drain the 3.8s auto-stop timer so runTest has no pending coroutines.
+        advanceUntilIdle()
     }
 }
