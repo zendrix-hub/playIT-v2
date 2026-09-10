@@ -62,6 +62,7 @@ fun MascotSpeechHeader(
     modifier: Modifier = Modifier,
     mascotState: MascotState = MascotState.IDLE,
     isPlayingAudio: Boolean = false,
+    amplitude: Float = 0f,
     onMascotTap: (() -> Unit)? = null
 ) {
     var tapTrigger by remember { mutableStateOf(0) }
@@ -106,13 +107,15 @@ fun MascotSpeechHeader(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
-        // Full-Body Mascot Character with Gentle Splash-Style Breathing
+        // Full-Body Mascot Character with Real-Time Mic Amplitude & Breathing
         Box(
             modifier = Modifier
                 .size(width = 86.dp, height = 98.dp)
                 .graphicsLayer {
-                    val scaleXCombined: Float = if (isReducedMotion) tapBounceScale else (tapBounceScale * breatheScaleX)
-                    val scaleYCombined: Float = if (isReducedMotion) tapBounceScale else (tapBounceScale * breatheScaleY)
+                    val ampSquashY = 1.0f + (amplitude.coerceIn(0f, 1f) * 0.25f)
+                    val ampSquashX = 1.0f - (amplitude.coerceIn(0f, 1f) * 0.12f)
+                    val scaleXCombined: Float = if (isReducedMotion) tapBounceScale else (tapBounceScale * breatheScaleX * ampSquashX)
+                    val scaleYCombined: Float = if (isReducedMotion) tapBounceScale else (tapBounceScale * breatheScaleY * ampSquashY)
                     scaleX = scaleXCombined
                     scaleY = scaleYCombined
                     transformOrigin = TransformOrigin(0.5f, 1f)

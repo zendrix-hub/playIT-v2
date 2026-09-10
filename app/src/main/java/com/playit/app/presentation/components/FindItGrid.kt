@@ -27,12 +27,12 @@ import androidx.compose.ui.unit.sp
 import com.playit.app.domain.manager.FindItPictureItem
 import com.playit.app.domain.model.Phoneme
 import com.playit.app.presentation.theme.CreamWhite
-import com.playit.app.presentation.theme.CreamWhiteShadow
 import com.playit.app.presentation.theme.DarkBrownOutline
 import com.playit.app.presentation.theme.Ink
 import com.playit.app.presentation.theme.Leaf
 import com.playit.app.presentation.theme.LexendFontFamily
 import com.playit.app.presentation.theme.Sky
+import com.playit.app.presentation.theme.deriveShadow
 
 @Composable
 fun FindItCard(
@@ -49,7 +49,7 @@ fun FindItCard(
     GummyContainer(
         onClick = onClick,
         faceColor = faceColor,
-        shadowColor = CreamWhiteShadow,
+        shadowColor = faceColor.deriveShadow(),
         shape = RoundedCornerShape(22.dp),
         strokeWidth = 2.5.dp,
         strokeColor = borderColor,

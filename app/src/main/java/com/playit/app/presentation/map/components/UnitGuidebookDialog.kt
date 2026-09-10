@@ -111,15 +111,42 @@ object GuidebookRepository {
                 ),
                 blendWords = listOf("ZEBRA", "JELLY", "FIESTA", "XRAY", "QUOTA")
             )
-            else -> GuidebookUnitData(
+            6 -> GuidebookUnitData(
                 unitNumber = 6,
                 title = "Baclayon Heritage Phonics",
                 biomeName = "Baclayon Heritage Trail",
                 letters = listOf(
-                    GuidebookLetter("Ñ", "/ɲ/", "Niño", "Palatal nasal sound"),
-                    GuidebookLetter("NG", "/ŋ/", "Ngipin", "Velar nasal sound")
+                    GuidebookLetter("C", "/k/", "Carrot", "Hard velar consonant"),
+                    GuidebookLetter("F", "/f/", "Fork", "Voiceless labiodental fricative"),
+                    GuidebookLetter("J", "/dʒ/", "Jacket", "Voiced postalveolar affricate"),
+                    GuidebookLetter("Ñ", "/ɲ/", "Niño", "Palatal nasal sound")
                 ),
-                blendWords = listOf("NGIPIN", "NGALAN", "PIÑA", "BUNGA", "SANGA")
+                blendWords = listOf("CAT", "FAN", "JAM", "PIÑA")
+            )
+            7 -> GuidebookUnitData(
+                unitNumber = 7,
+                title = "Mount Pulag Summit Phonics",
+                biomeName = "Mount Pulag Summit",
+                letters = listOf(
+                    GuidebookLetter("Q", "/kw/", "Queen", "Velar stop with glide"),
+                    GuidebookLetter("V", "/v/", "Van", "Voiced labiodental fricative"),
+                    GuidebookLetter("X", "/ks/", "Xylophone", "Consonant blend sound"),
+                    GuidebookLetter("Z", "/z/", "Zebra", "Voiced alveolar fricative")
+                ),
+                blendWords = listOf("QUIZ", "VAN", "BOX", "ZOO")
+            )
+            else -> GuidebookUnitData(
+                unitNumber = 1,
+                title = "Chocolate Hills Phonics",
+                biomeName = "Chocolate Hills, Bohol",
+                letters = listOf(
+                    GuidebookLetter("M", "/m/", "Mais", "Continuous humming sound"),
+                    GuidebookLetter("S", "/s/", "Saging", "Hissing continuous sound"),
+                    GuidebookLetter("A", "/a/", "Aso", "Open vowel sound"),
+                    GuidebookLetter("I", "/i/", "Ibon", "Front high vowel sound"),
+                    GuidebookLetter("O", "/o/", "Orasan", "Round back vowel sound")
+                ),
+                blendWords = listOf("AMA", "MAMA", "MASA", "SAMA", "AAMI")
             )
         }
     }

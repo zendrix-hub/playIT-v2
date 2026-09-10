@@ -36,6 +36,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -43,43 +45,6 @@ import androidx.compose.ui.unit.sp
 import com.playit.app.presentation.theme.*
 import kotlin.math.roundToInt
 
-// Resolve the depth-band shadow color for any known face color.
-// Filipino-themed palette entries come first; legacy entries follow.
-private fun Color.toShadow(): Color {
-    return when (this) {
-        // Filipino-themed palette (Phase 10)
-        Mango -> MangoShadow
-        MangoDark -> Color(0xFFBF8300)
-        Ube -> UbeShadow
-        UbeDark -> Color(0xFF583282)
-        UbeLight -> Color(0xFFBEB6C6)
-        Guava -> GuavaShadow
-        GuavaDark -> Color(0xFFB43D5A)
-        Leaf -> LeafShadow
-        LeafDark -> Color(0xFF256E41)
-        Kalamansi -> KalamansiShadow
-        KalamansiDark -> Color(0xFFB87700)
-        Tan -> TanShadow
-        TanDark -> Color(0xFF6E5535)
-        Rope -> RopeShadow
-        Sand -> SandShadow
-        Sky -> SkyShadow               // also matches SoftSky (alias)
-        SkyDeep -> Color(0xFFA6BACC)
-        Cloud -> CloudShadow
-        // Legacy / non-aliased colors
-        LearningBlue -> LearningBlueShadow
-        GrowthGreen -> GrowthGreenShadow
-        AchievementGold -> AchievementGoldShadow
-        GentleCorrectionOrange -> GentleCorrectionOrangeShadow
-        FriendlyPurple -> FriendlyPurpleShadow
-        EnergyOrange -> EnergyOrangeShadow
-        DestructiveRed -> DestructiveRedShadow
-        CreamWhite -> CreamWhiteShadow
-        DisabledColor -> DisabledColorShadow
-        // Fallback: compute -20% per-channel
-        else -> this.copy(red = red * 0.8f, green = green * 0.8f, blue = blue * 0.8f)
-    }
-}
 /**
  * Reusable Duolingo ABC-inspired Gummy Box with 3D depth-band bottom shadow,
  * 3dp DarkBrownOutline outline, and press-into-depth motion on tap.
@@ -90,7 +55,7 @@ fun GummyContainer(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     faceColor: Color = LearningBlue,
-    shadowColor: Color = LearningBlueShadow,
+    shadowColor: Color = faceColor.deriveShadow(),
     shape: Shape = RoundedCornerShape(32.dp),
     strokeWidth: Dp = 3.dp,
     strokeColor: Color = com.playit.app.presentation.theme.DarkBrownOutline,
@@ -101,13 +66,16 @@ fun GummyContainer(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val isReducedMotion = LocalReducedMotion.current
+    val haptic = LocalHapticFeedback.current
 
     val effectiveFace = if (enabled) faceColor else DisabledColor
     val effectiveShadow = if (enabled) shadowColor else DisabledColorShadow
 
     // Press translateY translation (0dp to depthHeight - 1dp)
     val pressOffsetY by animateFloatAsState(
-        targetValue = if (isPressed && enabled && !isReducedMotion && onClick != null) 4f else 0f,
+        targetValue = if (isPressed && enabled && !isReducedMotion && onClick != null) {
+            (depthHeight.value - 1f).coerceAtLeast(0f)
+        } else 0f,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessLow
@@ -138,7 +106,10 @@ fun GummyContainer(
             interactionSource = interactionSource,
             indication = null,
             enabled = enabled,
-            onClick = onClick
+            onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onClick()
+            }
         )
     } else Modifier
 
@@ -189,7 +160,7 @@ fun GummyButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     backgroundColor: Color = LearningBlue,
-    shadowColor: Color = backgroundColor.toShadow(),
+    shadowColor: Color = backgroundColor.deriveShadow(),
     contentColor: Color = CreamWhite,
     enabled: Boolean = true,
     icon: ImageVector? = null,
@@ -239,17 +210,81 @@ fun GummyButton(
 /**
  * Icon-only circular sibling of GummyButton — same tactile contract (GummyContainer,
  * DarkBrownOutline stroke, depth band, press-into-depth spring) but shaped for a single
- * glyph instead of a text label. GummyButton itself can't serve this role: it hardcodes
- * a 32dp-rounded-rect shape and forces fillMaxWidth, which is wrong for a standalone
- * circular control like a record/mic button. Enforces the same >=64dp touch-target floor.
+ * glyph or vector icon instead of a text label. Enforces >=64dp touch-target floor.
  */
+@Composable
+fun GummyIconButton(
+    icon: ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    contentDescription: String? = null,
+    backgroundColor: Color = LearningBlue,
+    shadowColor: Color = backgroundColor.deriveShadow(),
+    tint: Color = CreamWhite,
+    size: Dp = 64.dp,
+    iconSize: Dp = 32.dp,
+    depthHeight: Dp = 6.dp,
+    enabled: Boolean = true,
+    isSquashed: Boolean = false
+) {
+    GummyContainer(
+        onClick = onClick,
+        enabled = enabled,
+        faceColor = backgroundColor,
+        shadowColor = shadowColor,
+        shape = CircleShape,
+        strokeWidth = 3.dp,
+        depthHeight = depthHeight,
+        isSquashed = isSquashed,
+        modifier = modifier
+            .defaultMinSize(minWidth = 64.dp, minHeight = 64.dp)
+            .size(size)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = contentDescription,
+            tint = if (enabled) tint else TextPrimary.copy(alpha = 0.4f),
+            modifier = Modifier.size(iconSize)
+        )
+    }
+}
+
+@Composable
+fun GummyIconButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = LearningBlue,
+    shadowColor: Color = backgroundColor.deriveShadow(),
+    size: Dp = 64.dp,
+    depthHeight: Dp = 6.dp,
+    enabled: Boolean = true,
+    isSquashed: Boolean = false,
+    content: @Composable () -> Unit
+) {
+    GummyContainer(
+        onClick = onClick,
+        enabled = enabled,
+        faceColor = backgroundColor,
+        shadowColor = shadowColor,
+        shape = CircleShape,
+        strokeWidth = 3.dp,
+        depthHeight = depthHeight,
+        isSquashed = isSquashed,
+        modifier = modifier
+            .defaultMinSize(minWidth = 64.dp, minHeight = 64.dp)
+            .size(size),
+        content = content
+    )
+}
+
+@Deprecated("Migrate to ImageVector or Composable content overload per Zero-Emoji Policy")
 @Composable
 fun GummyIconButton(
     icon: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     backgroundColor: Color = LearningBlue,
-    shadowColor: Color = LearningBlueShadow,
+    shadowColor: Color = backgroundColor.deriveShadow(),
     size: Dp = 96.dp,
     fontSize: Int = 40,
     depthHeight: Dp = 6.dp,
@@ -275,6 +310,7 @@ fun GummyIconButton(
         )
     }
 }
+
 
 /**
  * Static (non-pressable) sibling of GummyContainer — same embossed depth-band look

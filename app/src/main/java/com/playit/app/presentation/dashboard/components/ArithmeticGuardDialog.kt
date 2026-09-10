@@ -19,9 +19,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.automirrored.filled.Backspace
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -79,11 +81,27 @@ fun ArithmeticGuardDialog(
                 .padding(16.dp)
                 .offset(x = shakeOffset.value.dp)
         ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Header Lock Icon
+            Box(modifier = Modifier.fillMaxWidth()) {
+                IconButton(
+                    onClick = onDismiss,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                        .size(44.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = "Close",
+                        tint = InkSoft,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Header Lock Icon
                 Box(
                     modifier = Modifier
                         .size(56.dp)
@@ -145,12 +163,12 @@ fun ArithmeticGuardDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // 3x3 + 1 Keypad Grid
+                // 3x4 Keypad Grid
                 val keys = listOf(
                     listOf("1", "2", "3"),
                     listOf("4", "5", "6"),
                     listOf("7", "8", "9"),
-                    listOf("", "0", "DEL")
+                    listOf("C", "0", "DEL")
                 )
 
                 Column(
@@ -163,29 +181,39 @@ fun ArithmeticGuardDialog(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             row.forEach { key ->
-                                if (key.isEmpty()) {
-                                    Spacer(modifier = Modifier.weight(1f))
-                                } else if (key == "DEL") {
-                                    KeypadDeleteButton(
-                                        onClick = {
-                                            if (answerInput.isNotEmpty()) {
-                                                answerInput = answerInput.dropLast(1)
+                                when (key) {
+                                    "C" -> {
+                                        KeypadClearButton(
+                                            onClick = {
+                                                answerInput = ""
                                                 isError = false
-                                            }
-                                        },
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                } else {
-                                    KeypadNumberButton(
-                                        number = key,
-                                        onClick = {
-                                            if (answerInput.length < 4) {
-                                                answerInput += key
-                                                isError = false
-                                            }
-                                        },
-                                        modifier = Modifier.weight(1f)
-                                    )
+                                            },
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                    }
+                                    "DEL" -> {
+                                        KeypadDeleteButton(
+                                            onClick = {
+                                                if (answerInput.isNotEmpty()) {
+                                                    answerInput = answerInput.dropLast(1)
+                                                    isError = false
+                                                }
+                                            },
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                    }
+                                    else -> {
+                                        KeypadNumberButton(
+                                            number = key,
+                                            onClick = {
+                                                if (answerInput.length < 4) {
+                                                    answerInput += key
+                                                    isError = false
+                                                }
+                                            },
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -239,6 +267,7 @@ fun ArithmeticGuardDialog(
         }
     }
 }
+}
 
 @Composable
 private fun KeypadNumberButton(
@@ -273,7 +302,6 @@ private fun KeypadDeleteButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Neutral Sky treatment rather than permanent Kalamansi amber
     GummyContainer(
         onClick = onClick,
         faceColor = Sky,
@@ -286,10 +314,37 @@ private fun KeypadDeleteButton(
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Icon(
-                imageVector = Icons.Filled.Clear,
+                imageVector = Icons.AutoMirrored.Filled.Backspace,
                 contentDescription = "Delete",
                 tint = Ink,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(22.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun KeypadClearButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    GummyContainer(
+        onClick = onClick,
+        faceColor = Sky,
+        shadowColor = SkyShadow,
+        shape = RoundedCornerShape(14.dp),
+        strokeWidth = 2.dp,
+        strokeColor = DarkBrownOutline,
+        depthHeight = 4.dp,
+        modifier = modifier.height(52.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(
+                text = "C",
+                fontFamily = LexendFontFamily,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = InkSoft
             )
         }
     }

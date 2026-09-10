@@ -213,6 +213,7 @@ fun SayItScreen(
                         else -> MascotState.POINTING
                     },
                     isPlayingAudio = isPlayingPrompt,
+                    amplitude = audioAmplitude,
                     onMascotTap = { viewModel.playSayItIntroAudio() }
                 )
 

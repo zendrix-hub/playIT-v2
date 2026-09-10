@@ -60,6 +60,7 @@ import com.playit.app.presentation.theme.LexendFontFamily
 import com.playit.app.presentation.theme.SoftSky
 import com.playit.app.presentation.theme.SoftSkyShadow
 import com.playit.app.presentation.theme.TextPrimary
+import com.playit.app.presentation.theme.deriveShadow
 
 /**
  * Playful Mascot Prompt Speech Bubble rendering Lily the Tarsier with 3D Gummy containers and tap response.
@@ -88,7 +89,7 @@ fun MascotBubble(
     GummyStaticContainer(
         modifier = modifier.fillMaxWidth(),
         faceColor = backgroundColor,
-        shadowColor = if (backgroundColor == CreamWhite) CreamWhiteShadow else backgroundColor,
+        shadowColor = backgroundColor.deriveShadow(),
         shape = RoundedCornerShape(22.dp),
         depthHeight = 4.dp
     ) {
@@ -232,7 +233,7 @@ fun DockedMascotWithBubble(
         GummyStaticContainer(
             modifier = Modifier.weight(1f),
             faceColor = backgroundColor,
-            shadowColor = if (backgroundColor == CreamWhite) CreamWhiteShadow else backgroundColor,
+            shadowColor = backgroundColor.deriveShadow(),
             shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp, bottomEnd = 24.dp, bottomStart = 4.dp),
             depthHeight = 4.dp
         ) {

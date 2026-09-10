@@ -232,4 +232,14 @@ Change: Say It now asks the child to utter the letter's example WORD (m → "Mou
 - [x] **Zero Duplicate Hashes / Stubs**: Confirmed 0 placeholder tone beeps and 0 unwanted duplicate hashes across the entire audio asset library.
 - [x] **Test & Build Verification**: Full test suite passed (`./gradlew testDebugUnitTest`), and debug APK assembled cleanly (`./gradlew assembleDebug`, 97 MB).
 
+## Phase 15 — UI Overhaul & Tactile Redesign (2026-09-10)
+- [x] **Dedicated Branch Setup**: Implemented on isolated branch `feat/ui-rework` branching from clean `main`.
+- [x] **Tactile Gummy Suite & Haptic Depress (Phase 1)**: Added `Color.deriveShadow()` dynamic shadow computation, `LocalHapticFeedback` tick on press, dynamic `translateY` depress `(depthHeight - 1.dp)` in `GummyButton.kt`, and vectorized `GummyIconButton`.
+- [x] **Richer Gamified Biomes & 3D Treasure Chests (Phase 2)**: Added 7th Marungko Chapter biome (Mount Pulag Summit, Ube/Midnight), updated `BiomeTheme.kt` and `MarungkoGroupBanner.kt`, expanded `UnitGuidebookDialog.kt` with Units 6 & 7, and transformed milestone challenge node into an authentic 3D Gummy Treasure Chest with gold lid trim, star keyhole clasp, and radiant aura.
+- [x] **Dynamic Coaching Companion (Phase 3)**: Added mic audio amplitude reactive listener to `MascotSpeechHeader.kt` (`ampSquashY`, `ampSquashX`) so mascot Lily bounces and squashes in real-time with the child's voice in `SayItScreen.kt`.
+- [x] **Sequential Phoneme Sound-Out Engine (Phase 4)**: Implemented step-by-step sound-out loop in `BlendItViewModel.kt` highlighting slots 1 -> 2 -> 3 with spring scale pops and phoneme audio playback every 400ms, whole word blending audio, and victory chimes in `BlendItScreen.kt`. Added dynamic shadow rendering in `FindItGrid.kt`.
+- [x] **Integrated Numeric Keypad Parent Gate (Phase 5)**: Embedded custom on-screen 3x4 numeric keypad (1-9, C, 0, DEL with `Icons.AutoMirrored.Filled.Backspace`) and explicit top-right close button (`Icons.Filled.Close`) in `ArithmeticGuardDialog.kt` to eliminate Android soft keyboard layout jumps and IME clipping.
+- [x] **Full Verification & Zero-Emoji Audit (Phase 6)**: All 132/132 unit tests green (100% pass rate). Verified strict adherence to zero-emoji policy, 64dp minimum touch target floor, and 100% pure Kotlin in `domain/`. Built updated debug APK (`playit-debug.apk`).
+
+
 

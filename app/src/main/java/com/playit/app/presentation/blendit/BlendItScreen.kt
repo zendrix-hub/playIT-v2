@@ -1,6 +1,9 @@
 package com.playit.app.presentation.blendit
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -43,6 +46,7 @@ import com.playit.app.presentation.theme.DarkBrownOutline
 import com.playit.app.presentation.theme.Ink
 import com.playit.app.presentation.theme.InkSoft
 import com.playit.app.presentation.theme.Kalamansi
+import com.playit.app.presentation.theme.KalamansiShadow
 import com.playit.app.presentation.theme.Leaf
 import com.playit.app.presentation.theme.LeafShadow
 import com.playit.app.presentation.theme.LexendFontFamily
@@ -69,13 +73,13 @@ fun BlendItScreen(
     val hearts by viewModel.hearts.collectAsStateWithLifecycle()
     val currentWordIndex by viewModel.currentWordIndex.collectAsStateWithLifecycle()
     val isPlayingPrompt by viewModel.isPlayingPrompt.collectAsStateWithLifecycle()
+    val highlightedSlotIndex by viewModel.highlightedSlotIndex.collectAsStateWithLifecycle()
     val totalWords = words.size.coerceAtLeast(1)
 
-    // Fires onSessionComplete once all words are completed or SessionComplete is emitted
-    LaunchedEffect(uiState, currentWordIndex) {
-        if (uiState is BlendItUiState.SessionComplete || 
-            (uiState is BlendItUiState.WordCorrect && currentWordIndex >= totalWords - 1)) {
-            delay(1200L) // allow completion chime and celebration animation to play
+    // Fires onSessionComplete once SessionComplete is emitted
+    LaunchedEffect(uiState) {
+        if (uiState is BlendItUiState.SessionComplete) {
+            delay(800L) // allow completion chime and celebration animation to play
             onSessionComplete(viewModel.groupId)
         }
     }
@@ -153,7 +157,7 @@ fun BlendItScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Target Letter Slots (Target Drop Area) with gentle wobble on incorrect
+                // Target Letter Slots (Target Drop Area) with gentle wobble on incorrect and sequential sound-out bounce
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -162,19 +166,48 @@ fun BlendItScreen(
                     val wordLength = currentWord?.word?.length ?: 3
                     for (i in 0 until wordLength) {
                         val tile = placedTiles.getOrNull(i)
+                        val isHighlighted = highlightedSlotIndex == i
+                        val slotScale by animateFloatAsState(
+                            targetValue = if (isHighlighted) 1.14f else 1f,
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            ),
+                            label = "slotScale_$i"
+                        )
                         GummyContainer(
-                            onClick = { if (tile != null) viewModel.removeTile(i) },
-                            faceColor = if (tile != null) Cloud else Sand.copy(alpha = 0.5f),
-                            shadowColor = if (tile != null) CloudShadow else SandShadow,
+                            onClick = {
+                                if (tile != null && uiState !is BlendItUiState.WordCorrect) {
+                                    viewModel.removeTile(i)
+                                }
+                            },
+                            faceColor = when {
+                                isHighlighted -> Kalamansi
+                                tile != null && uiState is BlendItUiState.WordCorrect -> Leaf
+                                tile != null -> Cloud
+                                else -> Sand.copy(alpha = 0.5f)
+                            },
+                            shadowColor = when {
+                                isHighlighted -> KalamansiShadow
+                                tile != null && uiState is BlendItUiState.WordCorrect -> LeafShadow
+                                tile != null -> CloudShadow
+                                else -> SandShadow
+                            },
                             shape = RoundedCornerShape(16.dp),
-                            strokeWidth = 2.5.dp,
-                            strokeColor = when (uiState) {
-                                is BlendItUiState.WordCorrect -> Leaf
-                                is BlendItUiState.WordIncorrect -> Kalamansi
+                            strokeWidth = if (isHighlighted) 3.5.dp else 2.5.dp,
+                            strokeColor = when {
+                                isHighlighted -> Leaf
+                                uiState is BlendItUiState.WordCorrect -> Leaf
+                                uiState is BlendItUiState.WordIncorrect -> Kalamansi
                                 else -> DarkBrownOutline
                             },
-                            depthHeight = 4.dp,
-                            modifier = Modifier.size(68.dp)
+                            depthHeight = if (isHighlighted) 6.dp else 4.dp,
+                            modifier = Modifier
+                                .size(68.dp)
+                                .graphicsLayer {
+                                    scaleX = slotScale
+                                    scaleY = slotScale
+                                }
                         ) {
                             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                                 Text(
@@ -182,7 +215,12 @@ fun BlendItScreen(
                                     fontFamily = LexendFontFamily,
                                     fontSize = 32.sp,
                                     fontWeight = FontWeight.ExtraBold,
-                                    color = if (tile != null) Ink else InkSoft.copy(alpha = 0.4f)
+                                    color = when {
+                                        isHighlighted -> Ink
+                                        tile != null && uiState is BlendItUiState.WordCorrect -> Cloud
+                                        tile != null -> Ink
+                                        else -> InkSoft.copy(alpha = 0.4f)
+                                    }
                                 )
                             }
                         }
@@ -199,7 +237,9 @@ fun BlendItScreen(
                     tileBank.forEachIndexed { _, tileLetter ->
                         GummyContainer(
                             onClick = {
-                                viewModel.placeTile(tileLetter)
+                                if (uiState !is BlendItUiState.WordCorrect) {
+                                    viewModel.placeTile(tileLetter)
+                                }
                             },
                             faceColor = Mango,
                             shadowColor = MangoShadow,
@@ -235,19 +275,20 @@ fun BlendItScreen(
                     .padding(horizontal = 24.dp, vertical = 12.dp)
             ) {
                 val isReady = placedTiles.size == (currentWord?.word?.length ?: 3)
+                val isWordCorrect = uiState is BlendItUiState.WordCorrect
                 GummyContainer(
                     onClick = {
-                        if (isReady) {
+                        if (isReady && !isWordCorrect) {
                             viewModel.submitWord()
                         }
                     },
-                    faceColor = if (uiState is BlendItUiState.WordCorrect) Leaf else Mango,
-                    shadowColor = if (uiState is BlendItUiState.WordCorrect) LeafShadow else MangoShadow,
+                    faceColor = if (isWordCorrect) Leaf else Mango,
+                    shadowColor = if (isWordCorrect) LeafShadow else MangoShadow,
                     shape = RoundedCornerShape(18.dp),
                     strokeWidth = 3.dp,
                     strokeColor = DarkBrownOutline,
                     depthHeight = 5.dp,
-                    isSquashed = uiState is BlendItUiState.WordCorrect,
+                    isSquashed = isWordCorrect,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(64.dp)
@@ -261,11 +302,11 @@ fun BlendItScreen(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "Check Word",
+                            text = if (isWordCorrect) "Blending..." else "Check Word",
                             fontFamily = LexendFontFamily,
                             fontSize = 24.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            color = if (uiState is BlendItUiState.WordCorrect) Cloud else Ink
+                            color = if (isWordCorrect) Cloud else Ink
                         )
                     }
                 }

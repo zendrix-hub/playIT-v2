@@ -52,6 +52,7 @@ fun getMarungkoLettersForGroup(groupNumber: Int): String {
         4 -> "D • H • W • C • V"
         5 -> "Z • J • F • X • Q"
         6 -> "Ñ • NG"
+        7 -> "Q • V • X • Z"
         else -> ""
     }
 }

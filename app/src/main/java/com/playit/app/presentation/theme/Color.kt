@@ -161,3 +161,47 @@ val HeartRed = Guava                         // remapped: warm pink, NOT red
 val HeartRedShadow = GuavaShadow
 val InkBlue = Color(0xFF023E8A)
 val SoftSurface = Color(0xFFF8F9FA)
+
+/**
+ * Derives a -20% luminance shadow companion for gummy 3D depth-bands.
+ * Maps known semantic tokens directly to their tuned shadow counterpart,
+ * and falls back to mathematical 80% RGB attenuation.
+ */
+fun Color.deriveShadow(): Color {
+    return when (this) {
+        Mango -> MangoShadow
+        MangoDark -> Color(0xFFBF8300)
+        Ube -> UbeShadow
+        UbeDark -> Color(0xFF583282)
+        UbeLight -> Color(0xFFBEB6C6)
+        Guava -> GuavaShadow
+        GuavaDark -> Color(0xFFB43D5A)
+        Leaf -> LeafShadow
+        LeafDark -> Color(0xFF256E41)
+        Kalamansi -> KalamansiShadow
+        KalamansiDark -> Color(0xFFB87700)
+        Tan -> TanShadow
+        TanDark -> Color(0xFF6E5535)
+        Rope -> RopeShadow
+        Sand -> SandShadow
+        Sky -> SkyShadow
+        SkyDeep -> Color(0xFFA6BACC)
+        Cloud -> CloudShadow
+        LearningBlue -> LearningBlueShadow
+        GrowthGreen -> GrowthGreenShadow
+        AchievementGold -> AchievementGoldShadow
+        GentleCorrectionOrange -> GentleCorrectionOrangeShadow
+        FriendlyPurple -> FriendlyPurpleShadow
+        EnergyOrange -> EnergyOrangeShadow
+        DestructiveRed -> DestructiveRedShadow
+        CreamWhite -> CreamWhiteShadow
+        DisabledColor -> DisabledColorShadow
+        StreakFire -> StreakFireShadow
+        BadgePurple -> BadgePurpleShadow
+        SunnyYellow -> SunnyYellowShadow
+        FriendlyBlue -> FriendlyBlueShadow
+        SoftGreen -> SoftGreenShadow
+        SuccessJoy -> SuccessJoyShadow
+        else -> this.copy(red = red * 0.8f, green = green * 0.8f, blue = blue * 0.8f)
+    }
+}

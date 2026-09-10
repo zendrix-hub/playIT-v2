@@ -80,6 +80,11 @@ class BlendItViewModel @Inject constructor(
     private val _lockedHintCount = MutableStateFlow(0)
     val lockedHintCount: StateFlow<Int> = _lockedHintCount.asStateFlow()
 
+    private var soundOutJob: kotlinx.coroutines.Job? = null
+
+    private val _highlightedSlotIndex = MutableStateFlow<Int?>(null)
+    val highlightedSlotIndex: StateFlow<Int?> = _highlightedSlotIndex.asStateFlow()
+
     private val _uiState = MutableStateFlow<BlendItUiState>(BlendItUiState.Idle)
     val uiState: StateFlow<BlendItUiState> = _uiState.asStateFlow()
 
@@ -107,11 +112,13 @@ class BlendItViewModel @Inject constructor(
 
     private fun setupWordAtIndex(index: Int) {
         val wordObj = _words.value.getOrNull(index) ?: return
+        soundOutJob?.cancel()
         _currentWordIndex.value = index
         _placedTiles.value = emptyList()
         _wrongAttemptsForCurrentWord.value = 0
         _isHintApplied.value = false
         _lockedHintCount.value = 0
+        _highlightedSlotIndex.value = null
         _uiState.value = BlendItUiState.Idle
 
         val letters = wordObj.word.toCharArray().toList().shuffled()
@@ -203,12 +210,31 @@ class BlendItViewModel @Inject constructor(
 
         if (isCorrect) {
             _uiState.value = BlendItUiState.WordCorrect
-            val sfx = audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME)
-            val vo = audioResolver.getRotatingCorrectVo()
-            audioPlayer.playSequence(listOf(sfx, vo))
+            soundOutJob?.cancel()
+            soundOutJob = viewModelScope.launch {
+                // Sequential phoneme sound-out loop
+                for (i in targetWord.indices) {
+                    _highlightedSlotIndex.value = i
+                    val letter = targetWord[i].toString()
+                    val phonemeAudio = audioResolver.getPhonemePath(letter)
+                    if (phonemeAudio != null) {
+                        audioPlayer.playAssetAudio(phonemeAudio)
+                    }
+                    kotlinx.coroutines.delay(400)
+                }
+                _highlightedSlotIndex.value = null
 
-            viewModelScope.launch {
-                kotlinx.coroutines.delay(1200)
+                // Whole word audio
+                val wordAudio = audioResolver.getWordPath(targetWord)
+                audioPlayer.playAssetAudio(wordAudio)
+                kotlinx.coroutines.delay(600)
+
+                // Celebration chime and VO
+                val sfx = audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME)
+                val vo = audioResolver.getRotatingCorrectVo()
+                audioPlayer.playSequence(listOf(sfx, vo))
+
+                kotlinx.coroutines.delay(1000)
                 if (_currentWordIndex.value + 1 < _words.value.size) {
                     setupWordAtIndex(_currentWordIndex.value + 1)
                 } else {

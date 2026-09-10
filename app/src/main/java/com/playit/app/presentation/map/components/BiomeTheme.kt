@@ -105,8 +105,8 @@ object BiomeThemes {
     val SECTION_6 = BiomeTheme(
         sectionNumber = 6,
         title = "Baclayon Heritage",
-        lettersSummary = "Practice sounds C, F, J, Ñ, Q, V, X, Z",
-        mascotDialogue = "At historic Baclayon Heritage! Complete the final adventure!",
+        lettersSummary = "Practice sounds C, F, J, Ñ",
+        mascotDialogue = "At historic Baclayon Heritage! Discover wonderful new sounds!",
         primaryColor = Color(0xFFEA580C),
         shelfColor = Color(0xFFC2410C),
         backgroundTint = Color(0xFFFFFBEB),
@@ -117,6 +117,21 @@ object BiomeThemes {
         progressColor = Color(0xFFF59E0B)
     )
 
+    val SECTION_7 = BiomeTheme(
+        sectionNumber = 7,
+        title = "Mount Pulag Summit",
+        lettersSummary = "Practice sounds Q, V, X, Z",
+        mascotDialogue = "At the majestic Mount Pulag Summit! Complete the final phonics journey!",
+        primaryColor = Color(0xFF8B5FBF),
+        shelfColor = Color(0xFF6E3FA3),
+        backgroundTint = Color(0xFFFAF5FF),
+        borderTint = Color(0xFFE9D5FF),
+        textPrimary = Color(0xFF3B0764),
+        textSecondary = Color(0xFF581C87),
+        pillBg = Color(0xFFF3E8FF),
+        progressColor = Color(0xFF9333EA)
+    )
+
     fun forSection(groupNumber: Int): BiomeTheme {
         return when (groupNumber) {
             1 -> SECTION_1
@@ -125,7 +140,9 @@ object BiomeThemes {
             4 -> SECTION_4
             5 -> SECTION_5
             6 -> SECTION_6
+            7 -> SECTION_7
             else -> SECTION_1
         }
     }
 }
+

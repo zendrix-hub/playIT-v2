@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -204,8 +205,8 @@ fun MapScreen(
                 if (scrollState.maxValue <= 0) 1
                 else {
                     val scrollFraction = (scrollState.value.toFloat() / scrollState.maxValue.toFloat()).coerceIn(0f, 1f)
-                    val approxGroup = (scrollFraction * 5.0f).toInt() + 1
-                    approxGroup.coerceIn(1, 6)
+                    val approxGroup = (scrollFraction * 6.0f).toInt() + 1
+                    approxGroup.coerceIn(1, 7)
                 }
             }
             val activeBiomeTheme = BiomeThemes.forSection(currentVisibleSectionIndex)
@@ -751,34 +752,36 @@ fun BlendItChallengeNodeCard(
     val isUnlocked = node.isUnlocked
     val isReducedMotion = LocalReducedMotion.current
 
-    // Pulsing Fiery Challenge Aura Transition
-    val infiniteTransition = rememberInfiniteTransition(label = "challengeAura")
+    // Pulsing Fiery Treasure Aura Transition
+    val infiniteTransition = rememberInfiniteTransition(label = "chestAura")
     val auraScale by infiniteTransition.animateFloat(
         initialValue = 1.0f,
-        targetValue = 1.28f,
+        targetValue = 1.30f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1200, easing = FastOutSlowInEasing),
+            animation = tween(1300, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Restart
         ),
-        label = "challengeAuraScale"
+        label = "chestAuraScale"
     )
     val auraAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.75f,
+        initialValue = 0.70f,
         targetValue = 0.0f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1200, easing = FastOutSlowInEasing),
+            animation = tween(1300, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Restart
         ),
-        label = "challengeAuraAlpha"
+        label = "chestAuraAlpha"
     )
 
-    val faceColor = if (isUnlocked) BlendChallengeGoldFace else DuolingoLockedFace
-    val shelfColor = if (isUnlocked) BlendChallengeGoldShelf else DuolingoLockedShelf
+    val chestFace = if (isUnlocked) Color(0xFFD97706) else Color(0xFFE2E8F0)
+    val chestShelf = if (isUnlocked) Color(0xFF92400E) else Color(0xFF94A3B8)
+    val trimGold = if (isUnlocked) Color(0xFFFFC93C) else Color(0xFFCBD5E1)
+    val lockBadgeColor = if (isUnlocked) Color(0xFFFFD54F) else Color(0xFF64748B)
 
     val accessibilityLabel = if (isUnlocked) {
-        "Blend-It Challenge Group ${node.groupId}"
+        "Blend-It Treasure Chest Milestone, Unit ${node.groupId}, unlocked"
     } else {
-        "Blend-It Challenge Group ${node.groupId}, locked"
+        "Blend-It Treasure Chest Milestone, Unit ${node.groupId}, locked"
     }
 
     Column(
@@ -789,13 +792,13 @@ fun BlendItChallengeNodeCard(
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.size(width = 86.dp, height = 94.dp)
+            modifier = Modifier.size(width = 100.dp, height = 98.dp)
         ) {
-            // Fiery Pulsing Challenge Aura Ring
+            // Radiant Treasure Aura Ring when unlocked
             if (isUnlocked && !isReducedMotion) {
                 Box(
                     modifier = Modifier
-                        .size(86.dp)
+                        .size(96.dp)
                         .graphicsLayer {
                             scaleX = auraScale
                             scaleY = auraScale
@@ -803,101 +806,111 @@ fun BlendItChallengeNodeCard(
                         }
                         .border(
                             width = 4.dp,
-                            color = BlendChallengeFlameAura,
-                            shape = CircleShape
+                            color = Color(0xFFFFB703),
+                            shape = RoundedCornerShape(26.dp)
                         )
                 )
             }
 
-            // 3D Challenge Disc (Clickable)
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clickable(
-                        interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
-                        indication = null,
-                        onClick = onClick
-                    )
+            // 3D Treasure Chest Shape (Clickable via GummyContainer)
+            GummyContainer(
+                onClick = onClick,
+                enabled = true,
+                faceColor = chestFace,
+                shadowColor = chestShelf,
+                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp, bottomStart = 16.dp, bottomEnd = 16.dp),
+                strokeWidth = 3.dp,
+                depthHeight = 8.dp,
+                modifier = Modifier.size(width = 90.dp, height = 76.dp)
             ) {
-                // 3D Extrusion Bottom Shelf (10dp extrusion)
                 Box(
-                    modifier = Modifier
-                        .size(82.dp)
-                        .align(Alignment.BottomCenter)
-                        .background(shelfColor, CircleShape)
-                )
-
-                // Top Disc Face
-                Box(
-                    modifier = Modifier
-                        .size(82.dp)
-                        .align(Alignment.TopCenter)
-                        .background(faceColor, CircleShape),
+                    modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    // Subtle Top-Left Crescent Gleam Highlight
-                    Canvas(modifier = Modifier.fillMaxSize()) {
-                        drawArc(
-                            color = Color(0x60FFFFFF),
-                            startAngle = 175f,
-                            sweepAngle = 90f,
-                            useCenter = false,
-                            topLeft = Offset(8.dp.toPx(), 6.dp.toPx()),
-                            size = androidx.compose.ui.geometry.Size(size.width - 16.dp.toPx(), size.height - 16.dp.toPx()),
-                            style = androidx.compose.ui.graphics.drawscope.Stroke(
-                                width = 5.dp.toPx(),
-                                cap = StrokeCap.Round
-                            )
+                    // Chest Lid Division & Gold Trim Band
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        // Top Lid Trim
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(14.dp)
+                                .background(
+                                    trimGold,
+                                    RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+                                )
+                                .border(1.5.dp, DarkBrownOutline, RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        // Lower Base Rim
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(8.dp)
+                                .background(
+                                    trimGold,
+                                    RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
+                                )
                         )
                     }
 
-                    // Royal Crown & Milestone Insignia
-                    if (isUnlocked) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
+                    // Center Clasp / Star Keyhole
+                    Box(
+                        modifier = Modifier
+                            .size(34.dp)
+                            .background(lockBadgeColor, RoundedCornerShape(10.dp))
+                            .border(2.dp, DarkBrownOutline, RoundedCornerShape(10.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (isUnlocked) {
                             Icon(
                                 imageVector = Icons.Rounded.Star,
-                                contentDescription = "Blend Challenge",
+                                contentDescription = "Milestone Star",
                                 tint = Color(0xFF78350F),
-                                modifier = Modifier.size(32.dp)
+                                modifier = Modifier.size(20.dp)
                             )
-                            Text(
-                                text = "CHALLENGE",
-                                fontFamily = LexendFontFamily,
-                                fontSize = 8.5.sp,
-                                fontWeight = FontWeight.Black,
-                                color = Color(0xFF78350F),
-                                letterSpacing = 0.5.sp
+                        } else {
+                            Icon(
+                                imageVector = Icons.Rounded.Lock,
+                                contentDescription = "Locked Chest",
+                                tint = Color.White,
+                                modifier = Modifier.size(16.dp)
                             )
                         }
-                    } else {
-                        Icon(
-                            imageVector = Icons.Rounded.Lock,
-                            contentDescription = "Locked Challenge",
-                            tint = DuolingoLockedIcon,
-                            modifier = Modifier.size(28.dp)
-                        )
                     }
                 }
             }
         }
 
-        // Challenge Node Badge Label below (Clean without "Boss" word)
+        // Chest Node Badge Label below
         Box(
             modifier = Modifier
                 .offset(y = (-4).dp)
-                .background(if (isUnlocked) Color(0xFF78350F) else Color(0xFF94A3B8), RoundedCornerShape(999.dp))
-                .padding(horizontal = 8.dp, vertical = 2.dp)
+                .background(if (isUnlocked) Color(0xFF78350F) else Color(0xFF64748B), RoundedCornerShape(999.dp))
+                .border(1.5.dp, if (isUnlocked) Color(0xFFFFC93C) else Color(0xFF94A3B8), RoundedCornerShape(999.dp))
+                .padding(horizontal = 10.dp, vertical = 3.dp)
         ) {
-            Text(
-                text = "BLEND ${node.groupId}",
-                fontFamily = LexendFontFamily,
-                fontSize = 9.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color.White
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Extension,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(11.dp)
+                )
+                Text(
+                    text = "BLEND ${node.groupId}",
+                    fontFamily = LexendFontFamily,
+                    fontSize = 9.5.sp,
+                    fontWeight = FontWeight.Black,
+                    color = Color.White,
+                    letterSpacing = 0.5.sp
+                )
+            }
         }
     }
 }
