@@ -64,6 +64,7 @@ import com.playit.app.presentation.components.ErrorStateContent
 import com.playit.app.presentation.components.GummyButton
 import com.playit.app.presentation.components.GummyContainer
 import com.playit.app.presentation.components.LessonStep
+import com.playit.app.presentation.components.LetterCard
 import com.playit.app.presentation.components.LessonTopBar
 import com.playit.app.presentation.components.MascotSpeechHeader
 import com.playit.app.presentation.components.MascotState
@@ -96,6 +97,7 @@ fun SayItScreen(
     val context = LocalContext.current
     val phoneme by viewModel.phoneme.collectAsStateWithLifecycle()
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val isModelInitializing by viewModel.isModelInitializing.collectAsStateWithLifecycle()
     val hearts by viewModel.hearts.collectAsStateWithLifecycle()
     val attempts by viewModel.attempts.collectAsStateWithLifecycle()
     val audioAmplitude by viewModel.audioAmplitude.collectAsStateWithLifecycle()
@@ -104,6 +106,9 @@ fun SayItScreen(
     val isPlayingPrompt by viewModel.isPlayingPrompt.collectAsStateWithLifecycle()
     val loadError by viewModel.loadError.collectAsStateWithLifecycle()
     val targetLetter = phoneme?.letter?.uppercase() ?: "M"
+    val targetWord by viewModel.targetWord.collectAsStateWithLifecycle()
+    val wordMode = targetWord != null
+    val displayWord = targetWord?.replaceFirstChar { it.uppercase() }
     val isListening = state is SayItState.Listening
     var permissionDeniedMessage by remember { mutableStateOf(false) }
 
@@ -189,14 +194,18 @@ fun SayItScreen(
                 MascotSpeechHeader(
                     message = when {
                         permissionDeniedMessage -> "Please allow microphone access so Lily can hear you."
+                        isModelInitializing -> "Lily is getting ready..."
                         isNoisyEnvironment -> "It's a little noisy right now. Let's find a quiet spot to practice!"
-                        state is SayItState.Listening -> "Listening... Say /${phoneme?.letter ?: "m"}/ into the microphone!"
+                        state is SayItState.Listening ->
+                            if (wordMode) "Listening... Say $displayWord!" else "Listening... Say /${phoneme?.letter ?: "m"}/ into the microphone!"
                         state is SayItState.Correct -> "Yes! That's it! Great job!"
                         state is SayItState.Incorrect -> "Good try! Let's listen again."
+                        wordMode -> "Now it's your turn! Say the whole word clearly into the microphone!"
                         else -> "Now it's your turn. Say the sound clearly into the microphone!"
                     },
                     mascotState = when {
                         permissionDeniedMessage -> MascotState.ENCOURAGING
+                        isModelInitializing -> MascotState.THINKING
                         isNoisyEnvironment -> MascotState.THINKING
                         state is SayItState.Listening -> MascotState.LISTENING
                         state is SayItState.Correct -> MascotState.CELEBRATING
@@ -209,51 +218,68 @@ fun SayItScreen(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // Interactive Letter Sound Card (Tap to hear pure phoneme audio)
-                GummyContainer(
-                    onClick = if (isPlayingPhoneme) null else ({ viewModel.playPhonemeSound() }),
-                    faceColor = Cloud,
-                    shadowColor = CloudShadow,
-                    shape = RoundedCornerShape(24.dp),
-                    strokeWidth = 3.dp,
-                    strokeColor = DarkBrownOutline,
-                    depthHeight = 5.dp,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(116.dp)
-                        .padding(horizontal = 16.dp)
-                        .shake(trigger = state is SayItState.Incorrect)
-                ) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 14.dp, horizontal = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                if (wordMode) {
+                    // Word prompt card — reuses the exact Hear It LetterCard (same
+                    // picture_<word>.png illustration, same gummy rendering), so the
+                    // image that shows in Hear It shows here too. Tap replays the word
+                    // audio.
+                    LetterCard(
+                        letter = targetLetter,
+                        soundText = "Say the word $displayWord",
+                        wordOverride = displayWord,
+                        promptMode = true,
+                        showSpeakerIcon = true,
+                        isPlaying = isPlayingPhoneme,
+                        modifier = Modifier.shake(trigger = state is SayItState.Incorrect),
+                        onTapReplay = { viewModel.playWordAudio() }
+                    )
+                } else {
+                    // Legacy letter-sound card (ng/ñ SME-pending letters) — pure phoneme audio
+                    GummyContainer(
+                        onClick = { viewModel.playPhonemeSound() },
+                        faceColor = Cloud,
+                        shadowColor = CloudShadow,
+                        shape = RoundedCornerShape(24.dp),
+                        strokeWidth = 3.dp,
+                        strokeColor = DarkBrownOutline,
+                        depthHeight = 5.dp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(116.dp)
+                            .padding(horizontal = 16.dp)
+                            .shake(trigger = state is SayItState.Incorrect)
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 14.dp, horizontal = 16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
-                                contentDescription = "Hear Sound",
-                                tint = if (isPlayingPhoneme) Mango else UbeDark,
-                                modifier = Modifier.size(24.dp)
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
+                                    contentDescription = "Hear Sound",
+                                    tint = if (isPlayingPhoneme) Mango else UbeDark,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text(
+                                    text = "Sound: /${phoneme?.letter ?: "m"}/",
+                                    fontFamily = LexendFontFamily,
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = if (isPlayingPhoneme) Mango else UbeDark
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(2.dp))
                             Text(
-                                text = "Sound: /${phoneme?.letter ?: "m"}/",
+                                text = targetLetter,
                                 fontFamily = LexendFontFamily,
-                                fontSize = 24.sp,
+                                fontSize = 48.sp,
                                 fontWeight = FontWeight.ExtraBold,
-                                color = if (isPlayingPhoneme) Mango else UbeDark
+                                color = Ink
                             )
                         }
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = targetLetter,
-                            fontFamily = LexendFontFamily,
-                            fontSize = 48.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Ink
-                        )
                     }
                 }
 
@@ -276,10 +302,18 @@ fun SayItScreen(
                     }
 
                     GummyContainer(
-                        onClick = if (isPlayingPhoneme) null else toggleListening,
-                        enabled = !isPlayingPhoneme,
-                        faceColor = if (isListening) Guava else Mango,
-                        shadowColor = if (isListening) GuavaShadow else MangoShadow,
+                        onClick = if (isPlayingPhoneme || isModelInitializing) null else toggleListening,
+                        enabled = !isPlayingPhoneme && !isModelInitializing,
+                        faceColor = when {
+                            isModelInitializing -> Cloud
+                            isListening -> Guava
+                            else -> Mango
+                        },
+                        shadowColor = when {
+                            isModelInitializing -> CloudShadow
+                            isListening -> GuavaShadow
+                            else -> MangoShadow
+                        },
                         shape = CircleShape,
                         strokeWidth = 3.dp,
                         strokeColor = DarkBrownOutline,
@@ -289,7 +323,7 @@ fun SayItScreen(
                         Icon(
                             imageVector = if (isListening) Icons.Rounded.Stop else Icons.Rounded.Mic,
                             contentDescription = if (isListening) "Stop Listening" else "Record Voice",
-                            tint = Cloud,
+                            tint = if (isModelInitializing) InkSoft else Cloud,
                             modifier = Modifier.size(44.dp)
                         )
                     }
@@ -298,11 +332,18 @@ fun SayItScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = if (isListening) "Listening... Say the sound!" else "Tap to speak",
+                    text = when {
+                        isModelInitializing -> "Lily is getting ready..."
+                        isListening -> if (wordMode) "Listening... Say $displayWord!" else "Listening... Say the sound!"
+                        else -> "Tap to speak"
+                    },
                     fontFamily = LexendFontFamily,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isListening) Guava else InkSoft
+                    color = when {
+                        isListening -> Guava
+                        else -> InkSoft
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))

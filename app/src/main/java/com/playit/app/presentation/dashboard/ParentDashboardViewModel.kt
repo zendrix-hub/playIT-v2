@@ -48,15 +48,22 @@ class ParentDashboardViewModel @Inject constructor(
 
     private fun loadProfiles() {
         viewModelScope.launch {
-            profileRepository.getAllProfiles().collectLatest { profiles ->
-                val currentSelected = _uiState.value.selectedProfile ?: profiles.firstOrNull()
-                _uiState.value = _uiState.value.copy(
-                    profiles = profiles,
-                    selectedProfile = currentSelected
-                )
-                currentSelected?.let { selectProfile(it) } ?: run {
-                    _uiState.value = _uiState.value.copy(isLoading = false)
+            try {
+                profileRepository.getAllProfiles().collectLatest { profiles ->
+                    val currentSelected = _uiState.value.selectedProfile ?: profiles.firstOrNull()
+                    _uiState.value = _uiState.value.copy(
+                        profiles = profiles,
+                        selectedProfile = currentSelected
+                    )
+                    currentSelected?.let { selectProfile(it) } ?: run {
+                        _uiState.value = _uiState.value.copy(isLoading = false)
+                    }
                 }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    exportStatus = ExportStatus.Error(e.message ?: "Failed to load profiles")
+                )
             }
         }
     }
@@ -64,11 +71,18 @@ class ParentDashboardViewModel @Inject constructor(
     fun selectProfile(profile: Profile) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(selectedProfile = profile, isLoading = true)
-            val data = reportGenerator.generateDashboardData(profile.id)
-            _uiState.value = _uiState.value.copy(
-                dashboardData = data,
-                isLoading = false
-            )
+            try {
+                val data = reportGenerator.generateDashboardData(profile.id)
+                _uiState.value = _uiState.value.copy(
+                    dashboardData = data,
+                    isLoading = false
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    exportStatus = ExportStatus.Error(e.message ?: "Failed to generate dashboard data")
+                )
+            }
         }
     }
 

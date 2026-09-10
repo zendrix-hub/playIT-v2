@@ -35,6 +35,7 @@ enum class VoContext(val filenameSuffix: String) {
     BLENDIT_INTRO_01("blendit_intro_01"),
     FINDIT_INTRO_01("findit_intro_01"),
     SAYIT_INTRO_01("sayit_intro_01"),
+    SAYIT_WORD_INTRO_01("sayit_word_intro_01"),
     QUIET_CHECK_01("quiet_check_01"),
     RETURN_WELCOME_01("return_welcome_01"),
     NOISE_ALERT_01("noise_alert_01"),

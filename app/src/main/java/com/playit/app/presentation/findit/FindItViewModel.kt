@@ -18,6 +18,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -75,12 +76,14 @@ class FindItViewModel @Inject constructor(
     private fun loadGrid() {
         val id = phonemeIdArg?.toIntOrNull() ?: 1
         viewModelScope.launch {
-            phonemeRepository.getAllPhonemes().collect { allPhonemes ->
+            try {
+                val allPhonemes = phonemeRepository.getAllPhonemes().first()
                 val target = allPhonemes.find { it.id == id }
                 if (target == null) {
                     _loadError.value = true
-                    return@collect
+                    return@launch
                 }
+                _loadError.value = false
                 _targetPhoneme.value = target
                 _foundItemIds.value = emptySet()
                 _foundCount.value = 0
@@ -88,6 +91,8 @@ class FindItViewModel @Inject constructor(
 
                 // Automatically play "Can you find all..." prompt first, then seamlessly play the letter sound
                 playIntroThenTargetSound()
+            } catch (e: Exception) {
+                _loadError.value = true
             }
         }
     }

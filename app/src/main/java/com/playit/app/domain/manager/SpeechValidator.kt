@@ -58,6 +58,93 @@ class SpeechValidator @Inject constructor() {
     }
 
     /**
+     * Word-mode accepted variants, keyed by the lowercase example word seeded per phoneme
+     * (di/DatabaseModule.kt `exampleWord` column — 26 letters; ng/ñ are SME-pending).
+     *
+     * Calibration policy (same spirit as CB-1 strictness — no fuzzy/prefix tolerance):
+     * - Entries must be whole-word renderings of the SAME target word only. Never letter
+     *   names ("m", "muh", "em"), prefixes, syllable fragments, Tagalog words, or other
+     *   curriculum words (BlendIt words, other letters' example words).
+     * - Additions require an observed on-device Vosk transcript or SME input, backed by a
+     *   unit test each.
+     * Exceptions: "yoyo" also accepts "yo-yo" (the transcript tokenizer splits on '-', so
+     * the exact-match branch needs the hyphenated spelling to accept the natural utterance).
+     */
+    private val wordAcceptedVariants: Map<String, List<String>> = mapOf(
+        "apple" to listOf("apple"),
+        "ball" to listOf("ball"),
+        "box" to listOf("box"),
+        "cat" to listOf("cat"),
+        "dog" to listOf("dog"),
+        "elephant" to listOf("elephant"),
+        "fish" to listOf("fish"),
+        "goat" to listOf("goat"),
+        "hat" to listOf("hat"),
+        "insect" to listOf("insect"),
+        "jug" to listOf("jug"),
+        "kite" to listOf("kite"),
+        "lion" to listOf("lion"),
+        "mouse" to listOf("mouse"),
+        "nest" to listOf("nest"),
+        "orange" to listOf("orange"),
+        "pig" to listOf("pig"),
+        "queen" to listOf("queen"),
+        "rabbit" to listOf("rabbit"),
+        "sun" to listOf("sun"),
+        "tiger" to listOf("tiger"),
+        "umbrella" to listOf("umbrella"),
+        "van" to listOf("van"),
+        "watch" to listOf("watch"),
+        "yoyo" to listOf("yoyo", "yo-yo"),
+        "zebra" to listOf("zebra")
+    )
+
+    /**
+     * Returns the accepted whole-word variants for a target example word (lowercased).
+     * Unknown words fall back to the canonical word itself so the grammar stays scoped.
+     */
+    fun getAcceptedWordVariants(targetWord: String): List<String> {
+        val clean = targetWord.lowercase().trim()
+        return wordAcceptedVariants[clean] ?: listOf(clean)
+    }
+
+    /**
+     * Validates whether the recognized speech transcript is the target example WORD.
+     *
+     * Whole-word mode (Say It word lessons): the transcript must be the target word or a
+     * curated variant of it. Letter sounds alone ("m", "muh", "em"), prefixes, misspellings,
+     * and other words do NOT pass — there is deliberately no prefix/length/Levenshtein
+     * tolerance here (per CB-1), so "s" can never satisfy "sun".
+     *
+     * @param recognizedText Raw text output from speech recognition.
+     * @param targetWord Target example word identifier (e.g. "mouse", "sun", "elephant").
+     * @return true if the transcript is the target word (or a curated variant of it).
+     */
+    fun validateWord(recognizedText: String?, targetWord: String): Boolean {
+        if (recognizedText.isNullOrBlank()) return false
+
+        val cleanText = recognizedText.lowercase().trim()
+        val cleanTarget = targetWord.lowercase().trim()
+
+        // 1. Exact match
+        if (cleanText == cleanTarget) return true
+
+        val acceptedList = getAcceptedWordVariants(cleanTarget)
+
+        // 2. Tokenize transcript into individual words and clean tokens
+        val tokens = cleanText.split(Regex("[\\s,.-]+")).filter { it.isNotBlank() }
+
+        // 3. Direct match against accepted whole-word variants
+        for (accepted in acceptedList) {
+            if (cleanText == accepted) return true
+            if (tokens.contains(accepted)) return true
+        }
+
+        // 4. No fuzzy/prefix/partial tolerance — whole word required
+        return false
+    }
+
+    /**
      * Validates if the recognized speech transcript corresponds to the target phoneme.
      *
      * @param recognizedText Raw text output from speech recognition.

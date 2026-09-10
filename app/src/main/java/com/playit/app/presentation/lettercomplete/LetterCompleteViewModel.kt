@@ -33,6 +33,7 @@ class LetterCompleteViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val phonemeIdArg: String? = savedStateHandle["phonemeId"]
+    private val heartsLostArg: String? = savedStateHandle["heartsLost"]
 
     private val _phoneme = MutableStateFlow<Phoneme?>(null)
     val phoneme: StateFlow<Phoneme?> = _phoneme.asStateFlow()
@@ -40,25 +41,33 @@ class LetterCompleteViewModel @Inject constructor(
     private val _starsEarned = MutableStateFlow(3)
     val starsEarned: StateFlow<Int> = _starsEarned.asStateFlow()
 
+    private val _loadError = MutableStateFlow(false)
+    val loadError: StateFlow<Boolean> = _loadError.asStateFlow()
+
     init {
+        completeLesson()
+    }
+
+    fun retry() {
+        _loadError.value = false
         completeLesson()
     }
 
     private fun completeLesson() {
         val phonemeId = phonemeIdArg?.toIntOrNull() ?: 1
+        val heartsLost = heartsLostArg?.toIntOrNull()?.coerceIn(0, 2) ?: 0
         val profileId = sessionManager.activeProfileId.value ?: 1L
 
         viewModelScope.launch {
-            val p = phonemeRepository.getPhonemeById(phonemeId) ?: Phoneme(
-                id = 1,
-                letter = "m",
-                audioPath = "audio/phonemes/phoneme_m.mp3",
-                imagePath = "images/pictures/word_mouse.png",
-                exampleWord = "Mouse"
-            )
+            val p = phonemeRepository.getPhonemeById(phonemeId)
+            if (p == null) {
+                _loadError.value = true
+                return@launch
+            }
+            _loadError.value = false
             _phoneme.value = p
 
-            val stars = StarCalculator.calculateStars(heartsLost = 0)
+            val stars = StarCalculator.calculateStars(heartsLost = heartsLost)
             _starsEarned.value = stars
 
             // Save lesson completion and record streak activity
@@ -67,7 +76,7 @@ class LetterCompleteViewModel @Inject constructor(
                     profileId = profileId,
                     phonemeId = phonemeId,
                     starsEarned = stars,
-                    heartsLost = 0,
+                    heartsLost = heartsLost,
                     isCompleted = true,
                     completedAt = System.currentTimeMillis()
                 )

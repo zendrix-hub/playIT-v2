@@ -13,7 +13,7 @@ Condensed from SRS v2.0. Where the SRS is ambiguous, silent, or internally incon
 
 ### Module 2 — "Say It" (Speech Production)
 - Pre-condition: Hear It complete for this letter; starts with **5 hearts**.
-- Child speaks into the mic; Vosk transcribes locally; compared against the target phoneme's accepted-word list.
+- Child speaks into the mic; Vosk transcribes locally; transcript is compared against the letter's **example word** (Say It word mode, added Phase 12): the whole word is required — the letter sound alone does not pass. SME-pending letters (`ng`/`ñ`) retain the original letter-sound pass condition.
 - **Exactly 1 correct production passes** — this is not "best of N," it's "first success wins."
 - Incorrect attempt: red highlight, corrective audio (e.g., "/m/"), **-1 heart**, retry (max 5 attempts before pool exhausts).
 - **Heart depletion (0 hearts):** sub-level restarts, pool reinitializes at **3 hearts** (not 5).

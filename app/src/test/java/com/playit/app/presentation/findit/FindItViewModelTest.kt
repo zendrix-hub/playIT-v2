@@ -59,6 +59,7 @@ class FindItViewModelTest {
         every { audioResolver.getSfxPath(any()) } returns "sfx_path"
         every { audioResolver.getRotatingCorrectVo() } returns "correct_vo"
         every { audioResolver.getRotatingEncourageVo() } returns "encourage_vo"
+        every { audioResolver.getVoPath(any()) } returns "vo_path.mp3"
     }
 
     @After

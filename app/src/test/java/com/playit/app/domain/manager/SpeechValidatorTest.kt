@@ -108,10 +108,102 @@ class SpeechValidatorTest {
     }
 
     @Test
-    fun fuzzyTolerance_handlesMinorVoskVariances() {
-        // "elphant" (1 char missing from elephant) should match 'e'
-        assertTrue(speechValidator.validate("elphant", "e"))
-        // "rabit" (1 char missing from rabbit) should match 'r'
-        assertTrue(speechValidator.validate("rabit", "r"))
+    fun phonemeMode_rejectsMisspelledAnchorWords_afterCB1() {
+        // Post-CB-1 strictness: no Levenshtein/substring tolerance — misspelled
+        // anchor words must NOT pass phoneme mode (replaces the stale fuzzy test).
+        assertFalse(speechValidator.validate("elphant", "e"))
+        assertFalse(speechValidator.validate("rabit", "r"))
+    }
+
+    // ────────────────────────────────────────────────────────────────────────
+    // Word mode (Say It word lessons — child utters the letter's example word)
+    // ────────────────────────────────────────────────────────────────────────
+
+    private val seededExampleWords = listOf(
+        "apple", "ball", "box", "cat", "dog", "elephant", "fish", "goat", "hat",
+        "insect", "jug", "kite", "lion", "mouse", "nest", "orange", "pig", "queen",
+        "rabbit", "sun", "tiger", "umbrella", "van", "watch", "yoyo", "zebra"
+    )
+
+    @Test
+    fun wordExactMatch_returnsTrue_forAll26ExampleWords() {
+        // Guards against desync between wordAcceptedVariants and the seeded
+        // exampleWord values in di/DatabaseModule.kt.
+        seededExampleWords.forEach { word ->
+            assertTrue(
+                "validateWord(\"$word\", \"$word\") should pass",
+                speechValidator.validateWord(word, word)
+            )
+        }
+    }
+
+    @Test
+    fun wordAcceptedVariants_hasEntryForEverySeededExampleWord() {
+        seededExampleWords.forEach { word ->
+            val variants = speechValidator.getAcceptedWordVariants(word)
+            assertTrue("Missing variant entry for '$word'", variants.isNotEmpty())
+            assertTrue("Variant entry for '$word' must include the canonical word", variants.contains(word))
+        }
+    }
+
+    @Test
+    fun wordMode_caseAndWhitespaceInsensitive() {
+        assertTrue(speechValidator.validateWord("  Mouse ", "mouse"))
+        assertTrue(speechValidator.validateWord("MOUSE", "mouse"))
+        assertTrue(speechValidator.validateWord("mouse.", "mouse"))
+        assertTrue(speechValidator.validateWord("Sun", "sun"))
+    }
+
+    @Test
+    fun wordMode_hyphenatedYoyoVariant_returnsTrue() {
+        // The transcript tokenizer splits on '-', so the curated "yo-yo" spelling
+        // must pass via the exact-match branch.
+        assertTrue(speechValidator.validateWord("yo-yo", "yoyo"))
+    }
+
+    @Test
+    fun wordMode_rejectsLetterSoundOnly() {
+        // Whole word required — letter names, phonic sounds, and onomatopoeias fail.
+        assertFalse(speechValidator.validateWord("m", "mouse"))
+        assertFalse(speechValidator.validateWord("muh", "mouse"))
+        assertFalse(speechValidator.validateWord("em", "mouse"))
+        assertFalse(speechValidator.validateWord("mmm", "mouse"))
+        assertFalse(speechValidator.validateWord("s", "sun"))
+        assertFalse(speechValidator.validateWord("sss", "sun"))
+        assertFalse(speechValidator.validateWord("e", "elephant"))
+        assertFalse(speechValidator.validateWord("kuh", "cat"))
+    }
+
+    @Test
+    fun wordMode_rejectsPartialOrMisspelledWords() {
+        // No prefix/length/Levenshtein tolerance in word mode (CB-1 consistent).
+        assertFalse(speechValidator.validateWord("elphant", "elephant"))
+        assertFalse(speechValidator.validateWord("rabit", "rabbit"))
+        assertFalse(speechValidator.validateWord("mous", "mouse"))
+        assertFalse(speechValidator.validateWord("sunny", "sun"))
+        assertFalse(speechValidator.validateWord("appl", "apple"))
+    }
+
+    @Test
+    fun wordMode_rejectsOtherWordsAndMinimalPairs() {
+        assertFalse(speechValidator.validateWord("sub", "sun"))
+        assertFalse(speechValidator.validateWord("cat", "mouse"))
+        assertFalse(speechValidator.validateWord("ball", "hat"))
+        assertFalse(speechValidator.validateWord("box", "fox"))
+        assertFalse(speechValidator.validateWord("queen", "zebra"))
+    }
+
+    @Test
+    fun wordMode_unknownTargetWord_fallsBackToCanonicalOnly() {
+        // Unknown target falls back to listOf(clean) — exact canonical match only.
+        assertTrue(speechValidator.validateWord("aardvark", "aardvark"))
+        assertFalse(speechValidator.validateWord("anything", "aardvark"))
+    }
+
+    @Test
+    fun wordMode_nullOrBlankTranscript_returnsFalse() {
+        assertFalse(speechValidator.validateWord(null, "mouse"))
+        assertFalse(speechValidator.validateWord("", "mouse"))
+        assertFalse(speechValidator.validateWord("   ", "mouse"))
     }
 }
