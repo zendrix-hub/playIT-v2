@@ -108,4 +108,22 @@ class AudioCompletenessCheckTest {
         assertTrue("phoneme_ng.mp3 must be present", ngFile.exists())
         assertTrue("phoneme_enye.mp3 must be present", enyeFile.exists())
     }
+
+    @Test
+    fun verifyAllSayItWordPromptsExistOnDisk() {
+        val sayItWords = listOf(
+            "mouse", "sun", "apple", "insect", "orange", "ball", "elephant", "umbrella",
+            "tiger", "kite", "lion", "yoyo", "nest", "goat", "pig", "rabbit",
+            "dog", "hat", "watch", "cat", "fish", "jug", "queen", "van", "box", "zebra"
+        )
+        val wordsDir = File(assetsAudioDir, "words")
+        val missing = mutableListOf<String>()
+        sayItWords.forEach { word ->
+            val f = File(wordsDir, "word_$word.mp3")
+            if (!f.exists() || f.length() == 0L) {
+                missing.add(f.path)
+            }
+        }
+        assertTrue("Missing Say It word audio: $missing", missing.isEmpty())
+    }
 }

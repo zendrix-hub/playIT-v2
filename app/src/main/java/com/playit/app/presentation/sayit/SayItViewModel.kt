@@ -77,6 +77,9 @@ class SayItViewModel @Inject constructor(
     private val _loadError = MutableStateFlow(false)
     val loadError: StateFlow<Boolean> = _loadError.asStateFlow()
 
+    private val _isModelInitializing = MutableStateFlow(false)
+    val isModelInitializing: StateFlow<Boolean> = _isModelInitializing.asStateFlow()
+
     private var autoStopJob: Job? = null
 
     init {
@@ -94,7 +97,9 @@ class SayItViewModel @Inject constructor(
             _loadError.value = false
             _phoneme.value = p
             _targetWord.value = resolveWordTarget(p)
+            _isModelInitializing.value = !voskRecognizer.isModelReady()
             voskRecognizer.initModel()
+            _isModelInitializing.value = false
 
             // Automatically play the intro prompt, then the model audio (word or letter sound)
             playIntroThenPromptAudio()
@@ -149,18 +154,28 @@ class SayItViewModel @Inject constructor(
         )
         audioPlayer.playAssetAudio(introVo) {
             _isPlayingPrompt.value = false
-            if (isWordMode) playWordAudio() else playPhonemeSound()
+            if (isWordMode) playWordAudio(force = true) else playPhonemeSound(force = true)
         }
     }
+
+    private var lastAudioPlayTime: Long = 0L
+    private val AUDIO_DEBOUNCE_MS = 500L
 
     /**
      * Plays the target example-word audio (e.g. audio/words/word_mouse.mp3) as the model
      * utterance. Falls back to the pure phoneme sound in legacy (letter-sound) mode.
+     * Includes debouncing guard against rapid repeated taps.
      */
-    fun playWordAudio() {
+    fun playWordAudio(force: Boolean = false) {
+        val now = System.currentTimeMillis()
+        if (!force && (now - lastAudioPlayTime < AUDIO_DEBOUNCE_MS || _isPlayingPhoneme.value)) {
+            return
+        }
+        lastAudioPlayTime = now
+
         val target = _targetWord.value
         if (target == null) {
-            playPhonemeSound()
+            playPhonemeSound(force = true)
             return
         }
         if (_state.value is SayItState.Listening) {
@@ -178,7 +193,13 @@ class SayItViewModel @Inject constructor(
         }
     }
 
-    fun playPhonemeSound() {
+    fun playPhonemeSound(force: Boolean = false) {
+        val now = System.currentTimeMillis()
+        if (!force && (now - lastAudioPlayTime < AUDIO_DEBOUNCE_MS || _isPlayingPhoneme.value)) {
+            return
+        }
+        lastAudioPlayTime = now
+
         if (_state.value is SayItState.Listening) {
             autoStopJob?.cancel()
             voskRecognizer.stopListening()

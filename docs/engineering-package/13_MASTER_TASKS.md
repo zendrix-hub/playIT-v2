@@ -215,4 +215,21 @@ Change: Say It now asks the child to utter the letter's example WORD (m → "Mou
 - [x] Test rework: stale `fuzzyTolerance_handlesMinorVoskVariances` replaced with post-CB-1 negative; word-mode unit tests added (validator + ViewModel)
 - [x] Docs: `19_AUDIO_SCRIPTS.md` §2 row added; `01_REQUIREMENTS_SUMMARY.md` Module 2 word-mode note
 
+## Phase 13 — Say It Tap-to-Rehear & Audio Polish (2026-09-09)
+- [x] **Word Audio Audit**: Audited `assets/audio/words/` against all 26 Say It prompts, Find It words, and vocabulary banks; identified 23 placeholder dummy beeps and 37 missing vocabulary audio files.
+- [x] **High-Quality Neural Audio Generation**: Synthesized 71 high-fidelity child-friendly audio files using Edge-TTS (`en-US-AnaNeural` and `fil-PH-BlessicaNeural`) via `scripts/generate_missing_word_audio.py`.
+- [x] **Say It Tap-to-Rehear UI**: Added top-right speaker badge and animated "Tap to listen" / "Playing..." bottom pill on `LetterCard.kt` with zero-emoji compliance.
+- [x] **Audio Debounce & Guard**: Implemented 500ms `AUDIO_DEBOUNCE_MS` timestamp check and active playback guard in `SayItViewModel.kt` preventing overlapping audio and `MediaPlayer` crashes.
+- [x] **Comprehensive Test Suite**: Added `SayItViewModelTest.playWordAudio_rapidTaps_debounced`, `AudioCompletenessCheckTest.verifyAllSayItWordPromptsExistOnDisk`, and full ViewModel coverage for `ParentDashboardViewModelTest`, `LetterCompleteViewModelTest`, `ProfileViewModelTest`, and `MapViewModelTest` (132/132 unit tests green).
+- [x] **Debug APK Build**: Built debug-signed APK (`app/build/outputs/apk/debug/app-debug.apk`) and copied to workspace root `playit-debug.apk` (97 MB).
+
+## Phase 14 — Neural Audio Upgrade & Loudness Normalization (2026-09-09)
+- [x] **Audit & Preservation**: Preserved 100% of the 71 newly created word audio files from recent sessions and `vo_sayit_word_intro_01.mp3`.
+- [x] **Phoneme Suite Upgrade**: Synthesized and normalized all 30 phoneme sound files (`phoneme_a.mp3` through `phoneme_z.mp3`, `phoneme_ng.mp3`, `phoneme_enye.mp3`, `phoneme_ñ.mp3`) with `rate="-10%"` for crisp articulation using `en-US-AnaNeural` and `fil-PH-BlessicaNeural`.
+- [x] **Remaining Vocabulary Upgrade**: Upgraded all remaining 44 legacy/robotic vocabulary files (e.g., `word_base.mp3`, `word_cake.mp3`, `word_aim.mp3`, `word_zoo.mp3`) to natural, child-friendly conversational pacing using `en-US-AnaNeural`.
+- [x] **Voice-Over Suite Upgrade**: Upgraded all 25 voice-over tracks across UI and instructional gameplay loops (`vo_hearit_intro_01.mp3`, `vo_sayit_intro_01.mp3`, `vo_findit_intro_01.mp3`, `vo_welcome_01.mp3`, etc.) mirrored cleanly in both `audio/vo/` and `audio/ui/`.
+- [x] **Loudness Normalization**: Normalized 100% of newly generated audio assets to standard broadcast target (-15 LUFS, 24kHz, 48kbps MP3) via ffmpeg `loudnorm` filter.
+- [x] **Zero Duplicate Hashes / Stubs**: Confirmed 0 placeholder tone beeps and 0 unwanted duplicate hashes across the entire audio asset library.
+- [x] **Test & Build Verification**: Full test suite passed (`./gradlew testDebugUnitTest`), and debug APK assembled cleanly (`./gradlew assembleDebug`, 97 MB).
+
 

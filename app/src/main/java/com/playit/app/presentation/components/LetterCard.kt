@@ -1,16 +1,27 @@
 package com.playit.app.presentation.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.VolumeUp
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -20,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.presentation.theme.AndikaFontFamily
+import com.playit.app.presentation.theme.Cloud
 import com.playit.app.presentation.theme.DarkBrownOutline
 import com.playit.app.presentation.theme.Guava
 import com.playit.app.presentation.theme.InkSoft
@@ -46,7 +58,9 @@ fun LetterCard(
     cardRotation: Float = 0f,
     wordOverride: String? = null,
     onTapReplay: () -> Unit = {},
-    promptMode: Boolean = false
+    promptMode: Boolean = false,
+    showSpeakerIcon: Boolean = false,
+    isPlaying: Boolean = false
 ) {
     val letterMap = mapOf(
         "a" to "apple", "b" to "ball", "c" to "cat", "d" to "dog",
@@ -125,6 +139,31 @@ fun LetterCard(
                 )
             }
 
+            // Floating speaker badge in top corner
+            if (showSpeakerIcon) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 2.dp, end = 2.dp)
+                        .size(34.dp)
+                        .background(Cloud, CircleShape)
+                        .border(1.5.dp, DarkBrownOutline.copy(alpha = 0.25f), CircleShape)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = onTapReplay
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
+                        contentDescription = "Tap to listen",
+                        tint = if (isPlaying) Mango else UbeDark,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
+
             // Dynamic Content layer with Illustration & Lexend/Andika Typography
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -135,7 +174,8 @@ fun LetterCard(
                     contentDescription = if (promptMode) "Say the word $displayWord" else displayWord,
                     isIdleFloating = true,
                     floatDistance = 5.dp,
-                    modifier = Modifier.size(92.dp)
+                    modifier = Modifier.size(92.dp),
+                    onClick = onTapReplay
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -146,13 +186,44 @@ fun LetterCard(
                     Text(
                         text = soundText,
                         fontFamily = LexendFontFamily,
-                        fontSize = 28.sp,
+                        fontSize = 26.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = UbeDark,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(horizontal = 16.dp)
+                        modifier = Modifier.padding(horizontal = 12.dp)
                     )
-                    Spacer(modifier = Modifier.height(18.dp))
+
+                    if (showSpeakerIcon) {
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            modifier = Modifier
+                                .background(Cloud, RoundedCornerShape(16.dp))
+                                .border(1.5.dp, DarkBrownOutline.copy(alpha = 0.2f), RoundedCornerShape(16.dp))
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null,
+                                    onClick = onTapReplay
+                                )
+                                .padding(horizontal = 12.dp, vertical = 4.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
+                                contentDescription = null,
+                                tint = if (isPlaying) Mango else UbeDark,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Text(
+                                text = if (isPlaying) "Playing..." else "Tap to listen",
+                                fontFamily = LexendFontFamily,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (isPlaying) Mango else InkSoft
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
                 } else {
                     Text(
                         text = displayLetter,

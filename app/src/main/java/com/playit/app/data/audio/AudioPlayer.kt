@@ -22,6 +22,8 @@ class AudioPlayer @Inject constructor(
 
     private var mediaPlayer: MediaPlayer? = null
     private var isSequencePlaying = false
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private var activeTempFile: java.io.File? = null
 
     private val soundPool: SoundPool by lazy {
         val audioAttributes = AudioAttributes.Builder()
@@ -154,8 +156,8 @@ class AudioPlayer @Inject constructor(
                         input.copyTo(output)
                     }
                 }
+                activeTempFile = tempFile
                 player.setDataSource(tempFile.absolutePath)
-                tempFile.deleteOnExit()
             }
 
             player.setOnPreparedListener { mp ->
@@ -163,16 +165,19 @@ class AudioPlayer @Inject constructor(
                     mp.start()
                 } catch (e: Exception) {
                     Log.e(TAG, "Error starting MediaPlayer onPrepared", e)
+                    cleanupActiveTempFile()
                     onComplete?.invoke()
                 }
             }
 
             player.setOnCompletionListener {
+                cleanupActiveTempFile()
                 onComplete?.invoke()
             }
 
             player.setOnErrorListener { mp, what, extra ->
                 Log.e(TAG, "MediaPlayer error occurred for asset $targetPath: what=$what extra=$extra")
+                cleanupActiveTempFile()
                 mp.reset()
                 onComplete?.invoke()
                 true
@@ -181,7 +186,17 @@ class AudioPlayer @Inject constructor(
             player.prepareAsync()
         } catch (e: Exception) {
             Log.e(TAG, "Failed to play audio asset: $targetPath", e)
+            cleanupActiveTempFile()
             onComplete?.invoke()
+        }
+    }
+
+    private fun cleanupActiveTempFile() {
+        activeTempFile?.let { file ->
+            try {
+                if (file.exists()) file.delete()
+            } catch (_: Exception) {}
+            activeTempFile = null
         }
     }
 
@@ -222,7 +237,7 @@ class AudioPlayer @Inject constructor(
 
         if (isSfx && index + 1 < paths.size) {
             playSfxInternal(currentPath)
-            Handler(Looper.getMainLooper()).postDelayed({
+            mainHandler.postDelayed({
                 if (isSequencePlaying) {
                     playNextInSequence(paths, index + 1, onComplete)
                 }
@@ -240,7 +255,9 @@ class AudioPlayer @Inject constructor(
     @Synchronized
     fun stop() {
         isSequencePlaying = false
+        mainHandler.removeCallbacksAndMessages(null)
         stopInternal()
+        cleanupActiveTempFile()
     }
 
     private fun stopInternal() {
@@ -262,7 +279,9 @@ class AudioPlayer @Inject constructor(
 
     @Synchronized
     fun release() {
+        mainHandler.removeCallbacksAndMessages(null)
         stopInternal()
+        cleanupActiveTempFile()
         try {
             mediaPlayer?.release()
         } catch (_: Exception) {}

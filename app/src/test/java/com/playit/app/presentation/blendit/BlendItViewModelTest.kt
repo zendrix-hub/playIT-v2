@@ -54,6 +54,7 @@ class BlendItViewModelTest {
         every { audioResolver.getRotatingCorrectVo() } returns "correct_vo.mp3"
         every { audioResolver.getRotatingEncourageVo() } returns "encourage_vo.mp3"
         every { audioResolver.getRotatingHintVo() } returns "hint_vo.mp3"
+        every { audioResolver.getVoPath(any()) } returns "vo_path.mp3"
     }
 
     @After

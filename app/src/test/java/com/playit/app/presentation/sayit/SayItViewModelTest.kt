@@ -246,4 +246,41 @@ class SayItViewModelTest {
         // Drain the 3.8s auto-stop timer so runTest has no pending coroutines.
         advanceUntilIdle()
     }
+
+    @Test
+    fun playWordAudio_whenListening_stopsListeningAndPlaysAudio() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        every { speechValidator.getAcceptedWordVariants("mouse") } returns listOf("mouse")
+        every { audioResolver.getWordPath("mouse") } returns "audio/words/word_mouse.mp3"
+
+        createViewModel()
+        advanceUntilIdle()
+
+        viewModel.startListening()
+        assertTrue(viewModel.state.value is SayItState.Listening)
+
+        viewModel.playWordAudio()
+        assertEquals(SayItState.Idle, viewModel.state.value)
+        verify { voskRecognizer.stopListening() }
+        verify { audioPlayer.playAssetAudio("audio/words/word_mouse.mp3", any()) }
+    }
+
+    @Test
+    fun playWordAudio_rapidTaps_debounced() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        every { audioResolver.getWordPath("mouse") } returns "audio/words/word_mouse.mp3"
+
+        createViewModel()
+        advanceUntilIdle()
+
+        clearMocks(audioPlayer, answers = false)
+
+        // Rapid taps
+        viewModel.playWordAudio()
+        viewModel.playWordAudio()
+        viewModel.playWordAudio()
+
+        // Only the first tap within debounce window should trigger playAssetAudio
+        verify(exactly = 1) { audioPlayer.playAssetAudio("audio/words/word_mouse.mp3", any()) }
+    }
 }

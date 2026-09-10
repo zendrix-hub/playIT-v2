@@ -7,12 +7,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.playit.app.data.audio.AudioPlayer
+import com.playit.app.data.speech.VoskRecognizer
 import com.playit.app.navigation.NavGraph
 import com.playit.app.presentation.theme.PlayItTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var audioPlayer: AudioPlayer
+
+    @Inject
+    lateinit var voskRecognizer: VoskRecognizer
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -25,5 +35,12 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Instantly silence audio and stop speech recognition when app is backgrounded
+        audioPlayer.stop()
+        voskRecognizer.stopListening()
     }
 }

@@ -22,7 +22,7 @@ android {
             useSupportLibrary = true
         }
         ndk {
-            abiFilters.addAll(listOf("arm64-v8a", "x86_64"))
+            abiFilters.addAll(listOf("arm64-v8a", "armeabi-v7a", "x86_64"))
         }
     }
 
@@ -30,7 +30,25 @@ android {
         noCompress += listOf("mp3", "wav", "ogg", "bin", "json")
     }
 
+    signingConfigs {
+        getByName("debug") {
+            val keystoreFile = file("${System.getProperty("user.home")}/.android/debug.keystore")
+            if (keystoreFile.exists()) {
+                storeFile = keystoreFile
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
+            enableV1Signing = true
+            enableV2Signing = true
+        }
+    }
+
     buildTypes {
+        getByName("debug") {
+            isDebuggable = true
+            signingConfig = signingConfigs.getByName("debug")
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true

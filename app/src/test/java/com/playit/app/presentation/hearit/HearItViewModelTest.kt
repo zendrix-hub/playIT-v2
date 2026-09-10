@@ -32,6 +32,10 @@ class HearItViewModelTest {
         coEvery { phonemeRepository.getPhonemeById(any()) } returns null
         every { savedStateHandle.get<String>("phonemeId") } returns "1"
         every { audioResolver.getPhonemePath(any()) } returns "test_path"
+        every { audioResolver.getVoPath(any()) } returns "test_vo_path"
+        every { audioPlayer.playAssetAudio(any(), any()) } answers {
+            secondArg<(() -> Unit)?>()?.invoke()
+        }
     }
 
     @After

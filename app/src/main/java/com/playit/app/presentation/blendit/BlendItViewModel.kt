@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -88,17 +89,16 @@ class BlendItViewModel @Inject constructor(
 
     private fun loadSessionWords() {
         viewModelScope.launch {
-            blendItWordRepository.getWordsForGroup(groupId).collect { availableWords ->
-                val selected = blendItWordSelector.selectWordsForSession(groupId, availableWords)
-                _words.value = selected.ifEmpty {
-                    listOf(
-                        BlendItWord(1, 1, "SAM", "S-A-M", "audio/words/word_sam.mp3", "images/pictures/blendword_sam.png"),
-                        BlendItWord(2, 1, "SIS", "S-I-S", "audio/words/word_sis.mp3", "images/pictures/blendword_sis.png"),
-                        BlendItWord(3, 1, "AIM", "A-I-M", "audio/words/word_aim.mp3", "images/pictures/blendword_aim.png")
-                    )
-                }
-                setupWordAtIndex(0)
+            val availableWords = blendItWordRepository.getWordsForGroup(groupId).first()
+            val selected = blendItWordSelector.selectWordsForSession(groupId, availableWords)
+            _words.value = selected.ifEmpty {
+                listOf(
+                    BlendItWord(1, 1, "SAM", "S-A-M", "audio/words/word_sam.mp3", "images/pictures/blendword_sam.png"),
+                    BlendItWord(2, 1, "SIS", "S-I-S", "audio/words/word_sis.mp3", "images/pictures/blendword_sis.png"),
+                    BlendItWord(3, 1, "AIM", "A-I-M", "audio/words/word_aim.mp3", "images/pictures/blendword_aim.png")
+                )
             }
+            setupWordAtIndex(0)
         }
     }
 
