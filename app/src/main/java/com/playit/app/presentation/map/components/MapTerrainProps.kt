@@ -98,7 +98,7 @@ fun generateTerrainProps(
                 else -> TerrainPropType.GLOBE
             }
             // Group 4: Tarsier Rainforest Sanctuary (Small Trees, Bushes, Huts, Magnifying Glass)
-            i < 28 -> when (i % 5) {
+            i < 26 -> when (i % 5) {
                 0 -> TerrainPropType.TREE_SMALL
                 1 -> TerrainPropType.BUSH
                 2 -> TerrainPropType.NIPA_HUT

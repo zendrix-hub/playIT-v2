@@ -38,7 +38,7 @@ class ParentDashboardViewModelTest {
         retentionScore = 0.85f,
         overallAccuracy = 0.90f,
         completedLettersCount = 8,
-        totalLettersCount = 28,
+        totalLettersCount = 26,
         letterPerformances = emptyList(),
         blendItCompletedCount = 2,
         blendItTotalCount = 7,

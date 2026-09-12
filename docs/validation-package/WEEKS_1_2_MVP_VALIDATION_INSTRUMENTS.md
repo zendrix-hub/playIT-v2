@@ -1,4 +1,7 @@
 # PlayIT — MVP Validation Instrument Package (Weeks 1–2 Deliverables)
+> [!NOTE]
+> **SUPERSEDED DOCUMENT:** This initial draft instrument is superseded by [`01_VALIDATION_FRAMEWORK_AND_SMART_MAPPING.md`](file:///mnt/c/Users/Zendrix/Desktop/thesis/playIT-v2-workspace/docs/validation-package/01_VALIDATION_FRAMEWORK_AND_SMART_MAPPING.md) (authoritative framework) and [`02_GOOGLE_FORM_INSTRUMENT_SPECIFICATION.md`](file:///mnt/c/Users/Zendrix/Desktop/thesis/playIT-v2-workspace/docs/validation-package/02_GOOGLE_FORM_INSTRUMENT_SPECIFICATION.md) (canonical 26-letter Google Form instrument).
+
 **Course:** IT411 Capstone Project | Semester 1, AY 2026–2027  
 **Project Title:** PlayIT: An Offline-First Gamified Early Literacy Mobile Application Using the DepEd Marungko Approach  
 **Theoretical Frameworks:** ISO/IEC 25010 Software Quality Model, Technology Acceptance Model (TAM), and DepEd Phono-Syllabic Phonics Framework.

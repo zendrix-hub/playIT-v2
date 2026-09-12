@@ -40,7 +40,7 @@ import com.playit.app.data.local.entity.AchievementEntity
         BlendItAttemptEntity::class,
         AchievementEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class PlayItDatabase : RoomDatabase() {

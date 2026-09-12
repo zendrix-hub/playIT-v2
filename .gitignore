@@ -48,3 +48,7 @@ google-services.json
 voice_*.mp3
 test_*.mp3
 
+# Python cache
+__pycache__/
+*.pyc
+

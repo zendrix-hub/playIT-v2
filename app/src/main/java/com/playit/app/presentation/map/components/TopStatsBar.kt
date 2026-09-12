@@ -144,7 +144,7 @@ fun TopStatsBar(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = "$lettersCompleted of 28 letters",
+                text = "$lettersCompleted of 26 letters",
                 fontSize = 12.sp,
                 fontFamily = LexendFontFamily,
                 fontWeight = FontWeight.Bold,
@@ -158,7 +158,7 @@ fun TopStatsBar(
                     .background(Color(0xFFE2E8F0), RoundedCornerShape(999.dp))
                     .clip(RoundedCornerShape(999.dp))
             ) {
-                val progress = (lettersCompleted.toFloat() / 28f).coerceIn(0f, 1f)
+                val progress = (lettersCompleted.toFloat() / 26f).coerceIn(0f, 1f)
                 if (progress > 0f) {
                     Box(
                         modifier = Modifier

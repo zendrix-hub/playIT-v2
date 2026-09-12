@@ -99,7 +99,7 @@ class PdfExporter @Inject constructor(
             paint.color = Color.parseColor("#4C68D7")
             paint.textSize = 11.5f
             paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            canvas.drawText("28-Letter Phonics Mastery Matrix", 24f, yPos + 12f, paint)
+            canvas.drawText("26-Letter Phonics Mastery Matrix", 24f, yPos + 12f, paint)
 
             yPos += 18f
             paint.color = Color.parseColor("#E4EBF5")
@@ -117,11 +117,11 @@ class PdfExporter @Inject constructor(
 
             yPos += 18f
 
-            // 5. Letter Matrix Table Rows (All 28 Phonemes)
+            // 5. Letter Matrix Table Rows (All 26 Phonemes)
             paint.typeface = Typeface.DEFAULT
             val rowHeight = 17f
 
-            reportData.letterPerformances.take(28).forEachIndexed { index, lp ->
+            reportData.letterPerformances.take(26).forEachIndexed { index, lp ->
                 if (yPos + rowHeight > pageHeight - 30) return@forEachIndexed
 
                 if (index % 2 == 1) {

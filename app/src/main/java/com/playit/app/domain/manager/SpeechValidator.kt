@@ -18,7 +18,7 @@ import javax.inject.Singleton
 class SpeechValidator @Inject constructor() {
 
     /**
-     * Map of each of the 28 Marungko phonemes to their accepted phonetic transcriptions,
+     * Map of each of the 26 Marungko phonemes (with legacy fallback support) to their accepted phonetic transcriptions,
      * letter names, phonetic sounds (onomatopoeias), and anchor curriculum words.
      */
     private val phonemeAcceptedVariants: Map<String, List<String>> = mapOf(
