@@ -147,8 +147,9 @@ fun HearItScreen(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Sky,
-                        Sand
+                        androidx.compose.ui.graphics.Color(0xFFE8F0FE),
+                        androidx.compose.ui.graphics.Color(0xFFF3E8FF),
+                        androidx.compose.ui.graphics.Color(0xFFFEF3C7)
                     )
                 )
             )
@@ -195,7 +196,7 @@ fun HearItScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Pulsating 88dp Ube Speaker Replay Button
+                // Pulsating 88dp PrimaryJoy Speaker Replay Button
                 Box(
                     modifier = Modifier.size(AUDIO_CTA_RING_BOUNDS),
                     contentAlignment = Alignment.Center
@@ -206,25 +207,25 @@ fun HearItScreen(
                                 .size(AUDIO_CTA_SIZE)
                                 .scale(pulseScale)
                                 .clip(CircleShape)
-                                .background(UbeLight.copy(alpha = pulseAlpha))
+                                .background(com.playit.app.presentation.theme.PrimaryJoyLight.copy(alpha = pulseAlpha))
                         )
                     }
 
                     GummyContainer(
                         onClick = if (isPlaying) null else ({ viewModel.playPhonemeSound() }),
                         enabled = !isPlaying,
-                        faceColor = Ube,
-                        shadowColor = UbeShadow,
+                        faceColor = com.playit.app.presentation.theme.PrimaryJoy,
+                        shadowColor = com.playit.app.presentation.theme.PrimaryJoyDark,
                         shape = CircleShape,
-                        strokeWidth = 3.dp,
-                        strokeColor = DarkBrownOutline,
-                        depthHeight = 5.dp,
+                        strokeWidth = 2.5.dp,
+                        strokeColor = com.playit.app.presentation.theme.ModernBorder,
+                        depthHeight = 6.dp,
                         modifier = Modifier.size(AUDIO_CTA_SIZE)
                     ) {
                         Icon(
                             imageVector = if (isPlaying) Icons.AutoMirrored.Rounded.VolumeUp else Icons.Rounded.PlayArrow,
                             contentDescription = if (isPlaying) "Playing" else "Play Sound",
-                            tint = CreamWhite,
+                            tint = androidx.compose.ui.graphics.Color.White,
                             modifier = Modifier.size(44.dp)
                         )
                     }
@@ -246,15 +247,15 @@ fun HearItScreen(
                                 .background(
                                     brush = Brush.radialGradient(
                                         colors = if (filled) {
-                                             listOf(Ube, UbeShadow)
+                                             listOf(com.playit.app.presentation.theme.PrimaryJoy, com.playit.app.presentation.theme.PrimaryJoyDark)
                                         } else {
-                                            listOf(UbeLight.copy(alpha = 0.35f), UbeLight.copy(alpha = 0.15f))
+                                            listOf(com.playit.app.presentation.theme.PrimaryJoyLight.copy(alpha = 0.35f), com.playit.app.presentation.theme.PrimaryJoyLight.copy(alpha = 0.15f))
                                         }
                                     )
                                 )
                                 .border(
                                     width = 1.dp,
-                                    color = DarkBrownOutline.copy(alpha = if (filled) 0.4f else 0.15f),
+                                    color = com.playit.app.presentation.theme.ModernBorder.copy(alpha = if (filled) 0.4f else 0.15f),
                                     shape = CircleShape
                                 )
                         )
@@ -279,9 +280,9 @@ fun HearItScreen(
                         }
                     },
                     enabled = isUnlocked,
-                    backgroundColor = Mango,
-                    shadowColor = MangoShadow,
-                    contentColor = Ink,
+                    backgroundColor = com.playit.app.presentation.theme.SunnyGold,
+                    shadowColor = com.playit.app.presentation.theme.SunnyGoldShadow,
+                    contentColor = com.playit.app.presentation.theme.TextMidnight,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(64.dp)

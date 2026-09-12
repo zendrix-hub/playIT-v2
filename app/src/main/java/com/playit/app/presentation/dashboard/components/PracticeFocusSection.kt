@@ -30,12 +30,12 @@ fun PracticeFocusSection(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Cloud),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        border = BorderStroke(3.dp, DarkBrownOutline)
+        shape = CardShape,
+        colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = BorderStroke(2.5.dp, ModernBorder)
     ) {
-        Column(modifier = Modifier.padding(18.dp)) {
+        Column(modifier = Modifier.padding(20.dp)) {
             // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -43,18 +43,16 @@ fun PracticeFocusSection(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(36.dp)
                         .clip(CircleShape)
-                        // Kalamansi, not Mango: this section IS the non-punitive framing
-                        // objective, and Mango is reserved for primary-action, not retry/practice.
-                        .background(Kalamansi.copy(alpha = 0.2f))
-                        .border(2.dp, Kalamansi, CircleShape),
+                        .background(ApricotGlowLight)
+                        .border(2.dp, ApricotGlow, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Lightbulb,
                         contentDescription = "Practice Focus",
-                        tint = DarkBrownOutline,
+                        tint = ApricotGlowDark,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -65,29 +63,29 @@ fun PracticeFocusSection(
                     Text(
                         text = "Practice & Focus Sounds",
                         fontFamily = LexendFontFamily,
-                        fontSize = 16.sp,
+                        fontSize = 17.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = Ink
+                        color = TextMidnight
                     )
                     Text(
                         text = "Pedagogical recommendations for today",
                         fontFamily = LexendFontFamily,
-                        fontSize = 14.sp,
+                        fontSize = 13.sp,
                         fontWeight = FontWeight.Medium,
-                        color = InkSoft
+                        color = TextMuted
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             if (atRiskLetters.isEmpty()) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(Leaf.copy(alpha = 0.1f))
-                        .border(2.dp, Leaf, RoundedCornerShape(16.dp))
+                        .clip(Squircle16)
+                        .background(EmeraldLeafLight)
+                        .border(1.5.dp, EmeraldLeaf, Squircle16)
                         .padding(14.dp)
                 ) {
                     Text(
@@ -95,7 +93,7 @@ fun PracticeFocusSection(
                         fontFamily = LexendFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
-                        color = Ink
+                        color = EmeraldLeafDark
                     )
                 }
             } else {
@@ -107,10 +105,10 @@ fun PracticeFocusSection(
                     atRiskLetters.take(6).forEach { letter ->
                         Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(Kalamansi.copy(alpha = 0.15f))
-                                .border(2.dp, Kalamansi, RoundedCornerShape(12.dp))
-                                .padding(horizontal = 10.dp, vertical = 6.dp)
+                                .clip(Squircle12)
+                                .background(ApricotGlowLight)
+                                .border(1.5.dp, ApricotGlow, Squircle12)
+                                .padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
@@ -118,37 +116,38 @@ fun PracticeFocusSection(
                                     fontFamily = LexendFontFamily,
                                     fontSize = 15.sp,
                                     fontWeight = FontWeight.ExtraBold,
-                                    color = Ink
+                                    color = TextMidnight
                                 )
                                 Spacer(modifier = Modifier.size(6.dp))
                                 Text(
                                     text = "${letter.accuracyPercentage.toInt()}%",
                                     fontFamily = LexendFontFamily,
-                                    fontSize = 14.sp,
+                                    fontSize = 13.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = DarkBrownOutline
+                                    color = ApricotGlowDark
                                 )
                             }
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
                 // Actionable advice card
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(Sand.copy(alpha = 0.35f))
-                        .padding(12.dp)
+                        .clip(Squircle14)
+                        .background(CanvasLight)
+                        .border(1.dp, ModernBorderSoft, Squircle14)
+                        .padding(14.dp)
                 ) {
                     Text(
                         text = "Tip: Spend 2-3 minutes practicing short pronunciation in 'Hear It' and 'Say It' to boost sound recognition.",
                         fontFamily = LexendFontFamily,
-                        fontSize = 14.sp,
+                        fontSize = 13.sp,
                         fontWeight = FontWeight.Normal,
-                        color = InkSoft
+                        color = TextMuted
                     )
                 }
             }

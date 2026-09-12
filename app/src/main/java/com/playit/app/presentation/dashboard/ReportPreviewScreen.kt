@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -36,19 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import com.playit.app.presentation.components.GummyBackButton
 import com.playit.app.presentation.components.GummyButton
-import com.playit.app.presentation.theme.Cloud
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.Ink
-import com.playit.app.presentation.theme.InkSoft
-import com.playit.app.presentation.theme.Leaf
-import com.playit.app.presentation.theme.LeafShadow
-import com.playit.app.presentation.theme.LexendFontFamily
-import com.playit.app.presentation.theme.Sand
-import com.playit.app.presentation.theme.SandDeep
-import com.playit.app.presentation.theme.Sky
-import com.playit.app.presentation.theme.SkyDeep
-import com.playit.app.presentation.theme.Ube
-import com.playit.app.presentation.theme.UbeShadow
+import com.playit.app.presentation.theme.*
 import java.io.File
 
 @Composable
@@ -66,10 +55,9 @@ fun ReportPreviewScreen(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        SkyDeep,
-                        Sky,
-                        Sand,
-                        SandDeep
+                        CanvasSoft,
+                        Color(0xFFF1F5F9),
+                        CanvasLight
                     )
                 )
             )
@@ -81,9 +69,6 @@ fun ReportPreviewScreen(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Header — Box overlay instead of Row + matched-width Spacer,
-            // so the title stays centered regardless of GummyBackButton's
-            // actual measured width.
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -98,7 +83,7 @@ fun ReportPreviewScreen(
                     fontFamily = LexendFontFamily,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Ink,
+                    color = TextMidnight,
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
@@ -107,10 +92,10 @@ fun ReportPreviewScreen(
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = Cloud),
-                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-                border = BorderStroke(3.dp, DarkBrownOutline)
+                shape = CardShape,
+                colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                border = BorderStroke(2.5.dp, ModernBorder)
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
@@ -119,7 +104,7 @@ fun ReportPreviewScreen(
                     Icon(
                         imageVector = Icons.Filled.Description,
                         contentDescription = "PDF Report",
-                        tint = Ube,
+                        tint = PrimaryJoy,
                         modifier = Modifier
                             .size(56.dp)
                             .padding(bottom = 12.dp)
@@ -130,7 +115,7 @@ fun ReportPreviewScreen(
                         fontFamily = LexendFontFamily,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Ink
+                        color = TextMidnight
                     )
 
                     Spacer(modifier = Modifier.height(6.dp))
@@ -139,7 +124,7 @@ fun ReportPreviewScreen(
                         text = "File Size: $fileSizeKb KB | Format: PDF",
                         fontFamily = LexendFontFamily,
                         fontSize = 14.sp,
-                        color = InkSoft
+                        color = TextMuted
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
@@ -148,7 +133,7 @@ fun ReportPreviewScreen(
                         text = "Saved locally to application documents folder.",
                         fontFamily = LexendFontFamily,
                         fontSize = 14.sp,
-                        color = InkSoft
+                        color = TextMuted
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -177,9 +162,9 @@ fun ReportPreviewScreen(
                                 Toast.makeText(context, "File does not exist.", Toast.LENGTH_SHORT).show()
                             }
                         },
-                        backgroundColor = Ube,
-                        shadowColor = UbeShadow,
-                        contentColor = Cloud,
+                        backgroundColor = PrimaryJoy,
+                        shadowColor = PrimaryJoyShadow,
+                        contentColor = Color.White,
                         fontSize = 16,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -210,9 +195,9 @@ fun ReportPreviewScreen(
                                 }
                             }
                         },
-                        backgroundColor = Leaf,
-                        shadowColor = LeafShadow,
-                        contentColor = Cloud,
+                        backgroundColor = EmeraldLeaf,
+                        shadowColor = EmeraldLeafShadow,
+                        contentColor = Color.White,
                         fontSize = 16,
                         modifier = Modifier
                             .fillMaxWidth()

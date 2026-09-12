@@ -44,11 +44,11 @@ fun BlendItCard(
 
     GummyContainer(
         onClick = onReplayAudio,
-        faceColor = Cloud,
-        shadowColor = CloudShadow,
-        shape = RoundedCornerShape(28.dp),
-        strokeWidth = 3.dp,
-        strokeColor = if (isCorrect) Leaf else DarkBrownOutline,
+        faceColor = com.playit.app.presentation.theme.SurfaceCard,
+        shadowColor = com.playit.app.presentation.theme.SurfaceCardShadow,
+        shape = com.playit.app.presentation.theme.CardShape,
+        strokeWidth = 2.5.dp,
+        strokeColor = if (isCorrect) com.playit.app.presentation.theme.EmeraldLeaf else com.playit.app.presentation.theme.ModernBorder,
         depthHeight = 6.dp,
         isSquashed = isCorrect,
         modifier = modifier
@@ -64,7 +64,7 @@ fun BlendItCard(
                     Box(
                         modifier = Modifier
                             .size(86.dp)
-                            .background(color = Tan.copy(alpha = 0.20f), shape = CircleShape)
+                            .background(color = com.playit.app.presentation.theme.SunnyGold.copy(alpha = 0.15f), shape = CircleShape)
                     )
                     GummyMotionAsset(
                         assetPath = assetPath,
@@ -84,23 +84,23 @@ fun BlendItCard(
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
                             contentDescription = null,
-                            tint = InkSoft,
+                            tint = com.playit.app.presentation.theme.TextMuted,
                             modifier = Modifier.size(22.dp)
                         )
                         Text(
                             text = "Pindutin para marinig",
                             fontFamily = LexendFontFamily,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = InkSoft
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = com.playit.app.presentation.theme.TextMuted
                         )
                     }
                     Text(
                         text = "Tap to hear word",
                         fontFamily = LexendFontFamily,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = InkSoft,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = com.playit.app.presentation.theme.TextMuted,
                         modifier = Modifier.padding(top = 2.dp)
                     )
                 }

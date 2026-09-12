@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.domain.model.LetterPerformance
 import com.playit.app.domain.model.RiskStatus
+import androidx.compose.ui.graphics.Color
 import com.playit.app.presentation.theme.*
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -35,12 +36,12 @@ fun MasteredSoundsShelf(
 
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Cloud),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        border = BorderStroke(3.dp, DarkBrownOutline)
+        shape = CardShape,
+        colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = BorderStroke(2.5.dp, ModernBorder)
     ) {
-        Column(modifier = Modifier.padding(18.dp)) {
+        Column(modifier = Modifier.padding(20.dp)) {
             // Section Title
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -48,16 +49,16 @@ fun MasteredSoundsShelf(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(36.dp)
                         .clip(CircleShape)
-                        .background(Leaf.copy(alpha = 0.2f))
-                        .border(2.dp, Leaf, CircleShape),
+                        .background(EmeraldLeafLight)
+                        .border(2.dp, EmeraldLeaf, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Filled.CheckCircle,
                         contentDescription = "Mastered",
-                        tint = Leaf,
+                        tint = EmeraldLeaf,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -68,29 +69,29 @@ fun MasteredSoundsShelf(
                     Text(
                         text = "Mastered Sounds (${masteredLetters.size})",
                         fontFamily = LexendFontFamily,
-                        fontSize = 16.sp,
+                        fontSize = 17.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = Ink
+                        color = TextMidnight
                     )
                     Text(
                         text = "Sounds successfully decoded & practiced",
                         fontFamily = LexendFontFamily,
-                        fontSize = 14.sp,
+                        fontSize = 13.sp,
                         fontWeight = FontWeight.Medium,
-                        color = InkSoft
+                        color = TextMuted
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             if (masteredLetters.isEmpty()) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(Sand.copy(alpha = 0.4f))
-                        .border(2.dp, Sand, RoundedCornerShape(16.dp))
+                        .clip(Squircle16)
+                        .background(CanvasLight)
+                        .border(1.5.dp, ModernBorderSoft, Squircle16)
                         .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
@@ -99,7 +100,7 @@ fun MasteredSoundsShelf(
                         fontFamily = LexendFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
-                        color = InkSoft
+                        color = TextMuted
                     )
                 }
             } else {
@@ -122,10 +123,6 @@ private fun GummyMasteredBadge(
     letter: LetterPerformance,
     modifier: Modifier = Modifier
 ) {
-    // Layered face+shadow rather than routing through GummyContainer: a mastered badge is a
-    // static achievement token, not a button, and GummyContainer's onClick would give it a false
-    // tappable affordance (ripple, focus ring) it shouldn't have. Same depth ratio as the
-    // ArithmeticGuardDialog keypad (~4dp reveal) for a consistent gummy feel.
     Box(
         modifier = modifier
             .size(54.dp)
@@ -136,16 +133,16 @@ private fun GummyMasteredBadge(
                 .fillMaxWidth()
                 .height(50.dp)
                 .offset(y = 4.dp)
-                .clip(RoundedCornerShape(14.dp))
-                .background(LeafShadow)
+                .clip(Squircle14)
+                .background(EmeraldLeafShadow)
         )
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
-                .clip(RoundedCornerShape(14.dp))
-                .background(Leaf)
-                .border(2.5.dp, DarkBrownOutline, RoundedCornerShape(14.dp)),
+                .clip(Squircle14)
+                .background(EmeraldLeaf)
+                .border(2.dp, ModernBorder, Squircle14),
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -153,7 +150,7 @@ private fun GummyMasteredBadge(
                 fontFamily = LexendFontFamily,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = Cloud
+                color = Color.White
             )
         }
     }

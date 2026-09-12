@@ -8,21 +8,33 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 
+import androidx.compose.ui.graphics.Color
+
 val LocalReducedMotion = staticCompositionLocalOf { false }
 
 private val LightColorScheme = lightColorScheme(
-    primary = LearningBlue,
-    onPrimary = CreamWhite,
-    secondary = GrowthGreen,
-    onSecondary = CreamWhite,
-    tertiary = AchievementGold,
-    onTertiary = TextPrimary,
-    background = SoftSky,
-    surface = CreamWhite,
-    onSurface = TextPrimary,
-    onBackground = TextPrimary,
-    outline = BorderColor,
-    error = DestructiveRed
+    primary = PrimaryJoy,
+    onPrimary = Color.White,
+    primaryContainer = PrimaryJoyLight,
+    onPrimaryContainer = PrimaryJoyDark,
+    secondary = EmeraldLeaf,
+    onSecondary = Color.White,
+    secondaryContainer = EmeraldLeafLight,
+    onSecondaryContainer = EmeraldLeafDark,
+    tertiary = SunnyGold,
+    onTertiary = TextMidnight,
+    tertiaryContainer = SunnyGoldLight,
+    onTertiaryContainer = SunnyGoldDark,
+    background = CanvasLight,
+    onBackground = TextMidnight,
+    surface = SurfaceCard,
+    onSurface = TextMidnight,
+    surfaceVariant = CanvasSoft,
+    onSurfaceVariant = TextMuted,
+    outline = ModernBorderSoft,
+    outlineVariant = ModernBorderFaint,
+    error = CoralBerry,
+    onError = Color.White
 )
 
 @Composable

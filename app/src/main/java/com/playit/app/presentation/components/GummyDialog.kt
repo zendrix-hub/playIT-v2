@@ -23,19 +23,19 @@ fun GummyDialog(
     dismissText: String? = null,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
-    confirmColor: Color = LearningBlue,
-    confirmShadowColor: Color = LearningBlueShadow,
+    confirmColor: Color = PrimaryJoy,
+    confirmShadowColor: Color = PrimaryJoyShadow,
     icon: @Composable (() -> Unit)? = null,
     content: @Composable (() -> Unit)? = null,
 ) {
     Dialog(onDismissRequest = onDismiss) {
         GummyStaticContainer(
             modifier = Modifier.fillMaxWidth(),
-            faceColor = CreamWhite,
-            shadowColor = CreamWhiteShadow,
-            shape = RoundedCornerShape(28.dp),
-            strokeWidth = 3.dp,
-            strokeColor = DarkBrownOutline,
+            faceColor = SurfaceCard,
+            shadowColor = SurfaceCardShadow,
+            shape = DialogShape,
+            strokeWidth = 2.5.dp,
+            strokeColor = ModernBorder,
             depthHeight = 4.dp
         ) {
             Column(

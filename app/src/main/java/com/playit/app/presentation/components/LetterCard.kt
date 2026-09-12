@@ -30,18 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.playit.app.presentation.theme.AndikaFontFamily
-import com.playit.app.presentation.theme.Cloud
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.Guava
-import com.playit.app.presentation.theme.InkSoft
-import com.playit.app.presentation.theme.Leaf
-import com.playit.app.presentation.theme.LexendFontFamily
-import com.playit.app.presentation.theme.Mango
-import com.playit.app.presentation.theme.Sand
-import com.playit.app.presentation.theme.SandShadow
-import com.playit.app.presentation.theme.Ube
-import com.playit.app.presentation.theme.UbeDark
+import com.playit.app.presentation.theme.*
 
 /**
  * High-fidelity 3D Gummy Letter Card — GummyContainer-backed flashcard overlaying
@@ -85,11 +74,11 @@ fun LetterCard(
 
     GummyContainer(
         onClick = onTapReplay,
-        faceColor = Sand,
-        shadowColor = SandShadow,
-        shape = RoundedCornerShape(28.dp),
-        strokeWidth = 3.dp,
-        strokeColor = DarkBrownOutline,
+        faceColor = SurfaceCard,
+        shadowColor = SurfaceCardShadow,
+        shape = CardShape,
+        strokeWidth = 2.5.dp,
+        strokeColor = ModernBorder,
         depthHeight = 6.dp,
         modifier = modifier
             .width(280.dp)
@@ -146,8 +135,8 @@ fun LetterCard(
                         .align(Alignment.TopEnd)
                         .padding(top = 2.dp, end = 2.dp)
                         .size(34.dp)
-                        .background(Cloud, CircleShape)
-                        .border(1.5.dp, DarkBrownOutline.copy(alpha = 0.25f), CircleShape)
+                        .background(SurfaceCard, CircleShape)
+                        .border(1.5.dp, ModernBorderSoft, CircleShape)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
@@ -158,7 +147,7 @@ fun LetterCard(
                     Icon(
                         imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
                         contentDescription = "Tap to listen",
-                        tint = if (isPlaying) Mango else UbeDark,
+                        tint = if (isPlaying) SunnyGold else PrimaryJoyDark,
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -188,7 +177,7 @@ fun LetterCard(
                         fontFamily = LexendFontFamily,
                         fontSize = 26.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = UbeDark,
+                        color = TextMidnight,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(horizontal = 12.dp)
                     )
@@ -199,8 +188,8 @@ fun LetterCard(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(6.dp),
                             modifier = Modifier
-                                .background(Cloud, RoundedCornerShape(16.dp))
-                                .border(1.5.dp, DarkBrownOutline.copy(alpha = 0.2f), RoundedCornerShape(16.dp))
+                                .background(CanvasLight, Squircle12)
+                                .border(1.5.dp, ModernBorderSoft, Squircle12)
                                 .clickable(
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = null,
@@ -211,7 +200,7 @@ fun LetterCard(
                             Icon(
                                 imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
                                 contentDescription = null,
-                                tint = if (isPlaying) Mango else UbeDark,
+                                tint = if (isPlaying) SunnyGold else PrimaryJoy,
                                 modifier = Modifier.size(16.dp)
                             )
                             Text(
@@ -219,7 +208,7 @@ fun LetterCard(
                                 fontFamily = LexendFontFamily,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = if (isPlaying) Mango else InkSoft
+                                color = if (isPlaying) SunnyGoldDark else TextMuted
                             )
                         }
                     }
@@ -229,8 +218,8 @@ fun LetterCard(
                         text = displayLetter,
                         fontFamily = LexendFontFamily,
                         fontSize = 58.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = UbeDark
+                        fontWeight = FontWeight.Black,
+                        color = PrimaryJoyDark
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
@@ -240,7 +229,7 @@ fun LetterCard(
                         fontFamily = LexendFontFamily,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = InkSoft
+                        color = TextMidnight
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
@@ -250,7 +239,7 @@ fun LetterCard(
                         fontFamily = AndikaFontFamily,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Ube
+                        color = PrimaryJoy
                     )
                 }
             }

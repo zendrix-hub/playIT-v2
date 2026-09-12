@@ -30,12 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.presentation.components.MascotState
 import com.playit.app.presentation.components.rememberAssetPainter
-import com.playit.app.presentation.theme.Cloud
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.Ink
-import com.playit.app.presentation.theme.InkSoft
-import com.playit.app.presentation.theme.LexendFontFamily
-import com.playit.app.presentation.theme.SoftSky
+import com.playit.app.presentation.theme.*
 
 @Composable
 fun TopStatsBar(
@@ -99,7 +94,7 @@ fun TopStatsBar(
                         .size(28.dp)
                         .clip(CircleShape)
                         .background(SoftSky)
-                        .border(1.5.dp, DarkBrownOutline, CircleShape),
+                        .border(1.5.dp, ModernBorder, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
@@ -113,7 +108,7 @@ fun TopStatsBar(
 
                 Text(
                     text = profileName.ifEmpty { "Learner" },
-                    color = Ink,
+                    color = TextMidnight,
                     fontSize = 15.sp,
                     fontFamily = LexendFontFamily,
                     fontWeight = FontWeight.Bold
@@ -153,7 +148,7 @@ fun TopStatsBar(
                 fontSize = 12.sp,
                 fontFamily = LexendFontFamily,
                 fontWeight = FontWeight.Bold,
-                color = InkSoft
+                color = TextMuted
             )
             
             Box(

@@ -40,27 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.playit.app.presentation.theme.AchievementGold
-import com.playit.app.presentation.theme.AchievementGoldShadow
-import com.playit.app.presentation.theme.CreamWhite
-import com.playit.app.presentation.theme.CreamWhiteShadow
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.EnergyOrange
-import com.playit.app.presentation.theme.EnergyOrangeShadow
-import com.playit.app.presentation.theme.FriendlyPurple
-import com.playit.app.presentation.theme.FriendlyPurpleShadow
-import com.playit.app.presentation.theme.GentleCorrectionOrange
-import com.playit.app.presentation.theme.GentleCorrectionOrangeShadow
-import com.playit.app.presentation.theme.GrowthGreen
-import com.playit.app.presentation.theme.GrowthGreenShadow
-import com.playit.app.presentation.theme.LearningBlue
-import com.playit.app.presentation.theme.LearningBlueShadow
-import com.playit.app.presentation.theme.LocalReducedMotion
-import com.playit.app.presentation.theme.LexendFontFamily
-import com.playit.app.presentation.theme.SoftSky
-import com.playit.app.presentation.theme.SoftSkyShadow
-import com.playit.app.presentation.theme.TextPrimary
-import com.playit.app.presentation.theme.deriveShadow
+import com.playit.app.presentation.theme.*
 
 /**
  * Playful Mascot Prompt Speech Bubble rendering Lily the Tarsier with 3D Gummy containers and tap response.
@@ -262,10 +242,10 @@ fun HeartBar(
     Row(
         modifier = modifier
             .background(
-                color = CreamWhite.copy(alpha = 0.9f),
-                shape = RoundedCornerShape(16.dp)
+                color = SurfaceCard,
+                shape = PillShape
             )
-            .border(1.5.dp, com.playit.app.presentation.theme.Sky, RoundedCornerShape(16.dp))
+            .border(1.5.dp, ModernBorderSoft, PillShape)
             .padding(horizontal = 12.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically

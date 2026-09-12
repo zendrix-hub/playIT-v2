@@ -42,18 +42,8 @@ import com.playit.app.presentation.dashboard.components.MasteredSoundsShelf
 import com.playit.app.presentation.dashboard.components.PracticeFocusSection
 import com.playit.app.presentation.dashboard.components.ProfileSwitcherDropdown
 import com.playit.app.presentation.dashboard.components.WordBlendingShelf
-import com.playit.app.presentation.theme.Cloud
-import com.playit.app.presentation.theme.Ink
-import com.playit.app.presentation.theme.InkSoft
-import com.playit.app.presentation.theme.LexendFontFamily
-import com.playit.app.presentation.theme.Sand
-import com.playit.app.presentation.theme.SandDeep
-import com.playit.app.presentation.theme.Sky
-import com.playit.app.presentation.theme.SkyDeep
-import com.playit.app.presentation.theme.Tan
-import com.playit.app.presentation.theme.TanDark
-import com.playit.app.presentation.theme.Ube
-import com.playit.app.presentation.theme.UbeShadow
+import androidx.compose.ui.graphics.Color
+import com.playit.app.presentation.theme.*
 import java.io.File
 
 @Composable
@@ -85,15 +75,14 @@ fun ParentDashboardScreen(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        SkyDeep,
-                        Sky,
-                        Sand,
-                        SandDeep
+                        CanvasSoft,
+                        Color(0xFFF1F5F9),
+                        CanvasLight
                     )
                 )
             )
     ) {
-        // Bohol Chocolate Hills bottom silhouette
+        // Soft rolling playground hills silhouette
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -110,7 +99,7 @@ fun ParentDashboardScreen(
                         .offset(x = if (index == 0) 0.dp else ((-14) * index).dp)
                         .clip(RoundedCornerShape(topStartPercent = 50, topEndPercent = 50))
                         .background(
-                            if (index % 2 == 0) Tan.copy(alpha = 0.35f) else TanDark.copy(alpha = 0.25f)
+                            if (index % 2 == 0) EmeraldLeaf.copy(alpha = 0.12f) else EmeraldLeafDark.copy(alpha = 0.18f)
                         )
                 )
             }
@@ -139,14 +128,14 @@ fun ParentDashboardScreen(
                         fontFamily = LexendFontFamily,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = Ink
+                        color = TextMidnight
                     )
                     Text(
                         text = "Progress & Phonics Mastery",
                         fontFamily = LexendFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
-                        color = InkSoft
+                        color = TextMuted
                     )
                 }
 
@@ -154,9 +143,9 @@ fun ParentDashboardScreen(
                     text = if (uiState.exportStatus is ExportStatus.Exporting) "Exporting" else "PDF",
                     icon = Icons.Filled.PictureAsPdf,
                     onClick = { viewModel.exportPdfReport() },
-                    backgroundColor = Ube,
-                    shadowColor = UbeShadow,
-                    contentColor = Cloud,
+                    backgroundColor = PrimaryJoy,
+                    shadowColor = PrimaryJoyShadow,
+                    contentColor = Color.White,
                     enabled = uiState.exportStatus !is ExportStatus.Exporting && uiState.selectedProfile != null,
                     fontSize = 13,
                     modifier = Modifier.height(52.dp)
@@ -181,7 +170,7 @@ fun ParentDashboardScreen(
                         .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = Ube)
+                    CircularProgressIndicator(color = PrimaryJoy)
                 }
             } else {
                 val dashboardData = uiState.dashboardData
@@ -214,7 +203,7 @@ fun ParentDashboardScreen(
                             text = "No profile data available.",
                             fontFamily = LexendFontFamily,
                             fontSize = 16.sp,
-                            color = InkSoft
+                            color = TextMuted
                         )
                     }
                 }

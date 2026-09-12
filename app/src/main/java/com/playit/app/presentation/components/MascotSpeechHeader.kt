@@ -43,14 +43,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.playit.app.presentation.theme.CreamWhite
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.Ink
-import com.playit.app.presentation.theme.LexendFontFamily
-import com.playit.app.presentation.theme.LocalReducedMotion
-import com.playit.app.presentation.theme.SoftSky
-import com.playit.app.presentation.theme.Ube
-import com.playit.app.presentation.theme.UbeLight
+import com.playit.app.presentation.theme.*
 
 /**
  * Compact Mascot Prompt Speech Bubble header matching playit-mockup.html.
@@ -157,10 +150,10 @@ fun MascotSpeechHeader(
                         bottomStart = 6.dp
                     )
                 )
-                .background(CreamWhite)
+                .background(SurfaceCard)
                 .border(
-                    width = 2.5.dp,
-                    color = DarkBrownOutline,
+                    width = 2.dp,
+                    color = ModernBorder,
                     shape = RoundedCornerShape(
                         topStart = 22.dp,
                         topEnd = 22.dp,
@@ -188,7 +181,7 @@ fun MascotSpeechHeader(
                     fontFamily = LexendFontFamily,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Ink,
+                    color = TextMidnight,
                     lineHeight = 32.sp,
                     modifier = Modifier.weight(1f)
                 )
@@ -199,14 +192,14 @@ fun MascotSpeechHeader(
                         modifier = Modifier
                             .size(34.dp)
                             .clip(CircleShape)
-                            .background(if (isPlayingAudio) Ube else UbeLight.copy(alpha = 0.4f))
-                            .border(1.5.dp, DarkBrownOutline, CircleShape),
+                            .background(if (isPlayingAudio) PrimaryJoy else PrimaryJoyLight)
+                            .border(1.5.dp, ModernBorder, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
                             contentDescription = "Listen to Lily",
-                            tint = if (isPlayingAudio) CreamWhite else Ink,
+                            tint = if (isPlayingAudio) Color.White else PrimaryJoyDark,
                             modifier = Modifier.size(20.dp)
                         )
                     }

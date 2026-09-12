@@ -173,8 +173,8 @@ fun UnitGuidebookDialog(
                 .fillMaxWidth(0.92f)
                 .fillMaxHeight(0.85f)
                 .clip(RoundedCornerShape(28.dp))
-                .background(Cloud)
-                .border(3.5.dp, DarkBrownOutline, RoundedCornerShape(28.dp))
+                .background(SurfaceCard)
+                .border(2.5.dp, ModernBorder, RoundedCornerShape(28.dp))
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 // Header Banner
@@ -259,7 +259,7 @@ fun UnitGuidebookDialog(
                             fontFamily = LexendFontFamily,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            color = InkSoft,
+                            color = TextMuted,
                             letterSpacing = 0.5.sp
                         )
                     }
@@ -269,8 +269,8 @@ fun UnitGuidebookDialog(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(16.dp))
-                                .background(Sand.copy(alpha = 0.25f))
-                                .border(2.dp, DarkBrownOutline.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
+                                .background(CanvasLight)
+                                .border(1.5.dp, ModernBorderSoft, RoundedCornerShape(16.dp))
                                 .padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -280,7 +280,7 @@ fun UnitGuidebookDialog(
                                     .size(48.dp)
                                     .clip(CircleShape)
                                     .background(theme.primaryColor)
-                                    .border(2.dp, DarkBrownOutline, CircleShape),
+                                    .border(2.dp, ModernBorder, CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
@@ -304,7 +304,7 @@ fun UnitGuidebookDialog(
                                         fontFamily = LexendFontFamily,
                                         fontSize = 15.sp,
                                         fontWeight = FontWeight.ExtraBold,
-                                        color = Ink
+                                        color = TextMidnight
                                     )
                                     Icon(
                                         imageVector = Icons.Rounded.VolumeUp,
@@ -318,7 +318,7 @@ fun UnitGuidebookDialog(
                                     fontFamily = LexendFontFamily,
                                     fontSize = 13.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = InkSoft
+                                    color = TextMuted
                                 )
                             }
                         }
@@ -331,7 +331,7 @@ fun UnitGuidebookDialog(
                             fontFamily = LexendFontFamily,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            color = InkSoft,
+                            color = TextMuted,
                             letterSpacing = 0.5.sp
                         )
                         Spacer(modifier = Modifier.height(6.dp))

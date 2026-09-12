@@ -40,18 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.domain.model.LetterPerformance
 import com.playit.app.domain.model.RiskStatus
-import com.playit.app.presentation.theme.Cloud
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.Ink
-import com.playit.app.presentation.theme.InkSoft
-import com.playit.app.presentation.theme.Kalamansi
-import com.playit.app.presentation.theme.KalamansiShadow
-import com.playit.app.presentation.theme.Leaf
-import com.playit.app.presentation.theme.LeafShadow
-import com.playit.app.presentation.theme.LexendFontFamily
-import com.playit.app.presentation.theme.Mango
-import com.playit.app.presentation.theme.MangoShadow
-import com.playit.app.presentation.theme.Sky
+import com.playit.app.presentation.theme.*
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -63,10 +52,10 @@ fun PhonemeHeatmapSection(
 
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(28.dp),
-        colors = CardDefaults.cardColors(containerColor = Cloud),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        border = androidx.compose.foundation.BorderStroke(3.dp, DarkBrownOutline)
+        shape = CardShape,
+        colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = androidx.compose.foundation.BorderStroke(2.5.dp, ModernBorder)
     ) {
         Column(
             modifier = Modifier.padding(20.dp)
@@ -79,15 +68,15 @@ fun PhonemeHeatmapSection(
                 Icon(
                     imageVector = Icons.Filled.Abc,
                     contentDescription = null,
-                    tint = Ink,
-                    modifier = Modifier.size(24.dp)
+                    tint = TextMidnight,
+                    modifier = Modifier.size(26.dp)
                 )
                 Text(
                     text = "Phoneme Recognition Heatmap",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.ExtraBold,
                     fontFamily = LexendFontFamily,
-                    color = Ink
+                    color = TextMidnight
                 )
             }
 
@@ -99,9 +88,9 @@ fun PhonemeHeatmapSection(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                LegendIndicator(label = "Mastered", color = Leaf)
-                LegendIndicator(label = "Practicing", color = Mango)
-                LegendIndicator(label = "Needs Help", color = Kalamansi)
+                LegendIndicator(label = "Mastered", color = EmeraldLeaf)
+                LegendIndicator(label = "Practicing", color = SunnyGold)
+                LegendIndicator(label = "Needs Help", color = CoralBerry)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -127,9 +116,9 @@ fun PhonemeHeatmapSection(
             selectedLetter?.let { lp ->
                 Spacer(modifier = Modifier.height(16.dp))
                 Surface(
-                    shape = RoundedCornerShape(16.dp),
-                    color = Sky,
-                    border = androidx.compose.foundation.BorderStroke(2.dp, DarkBrownOutline),
+                    shape = Squircle14,
+                    color = CanvasLight,
+                    border = androidx.compose.foundation.BorderStroke(1.5.dp, ModernBorderSoft),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
@@ -142,7 +131,7 @@ fun PhonemeHeatmapSection(
                             fontFamily = LexendFontFamily,
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp,
-                            color = Ink
+                            color = TextMidnight
                         )
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -151,14 +140,14 @@ fun PhonemeHeatmapSection(
                             Icon(
                                 imageVector = Icons.Filled.Star,
                                 contentDescription = null,
-                                tint = Mango,
+                                tint = SunnyGoldDark,
                                 modifier = Modifier.size(16.dp)
                             )
                             Text(
                                 text = "${lp.starsEarned} Stars (${lp.totalAttempts} attempts)",
                                 fontFamily = LexendFontFamily,
                                 fontSize = 13.sp,
-                                color = InkSoft
+                                color = TextMuted
                             )
                         }
                     }
@@ -179,14 +168,14 @@ private fun LegendIndicator(label: String, color: Color) {
                 .size(14.dp)
                 .clip(CircleShape)
                 .background(color)
-                .border(2.dp, DarkBrownOutline, CircleShape)
+                .border(1.5.dp, ModernBorder, CircleShape)
         )
         Text(
             text = label,
             fontSize = 12.sp,
             fontFamily = LexendFontFamily,
             fontWeight = FontWeight.Bold,
-            color = InkSoft
+            color = TextMuted
         )
     }
 }
@@ -198,9 +187,9 @@ private fun HeatmapChip(
     onClick: () -> Unit
 ) {
     val (faceColor, shadowColor) = when (letterPerformance.riskStatus) {
-        RiskStatus.GREEN -> Leaf to LeafShadow
-        RiskStatus.YELLOW -> Mango to MangoShadow
-        RiskStatus.RED -> Kalamansi to KalamansiShadow
+        RiskStatus.GREEN -> EmeraldLeaf to EmeraldLeafShadow
+        RiskStatus.YELLOW -> SunnyGold to SunnyGoldShadow
+        RiskStatus.RED -> CoralBerry to CoralBerryShadow
     }
 
     Box(
@@ -208,23 +197,21 @@ private fun HeatmapChip(
             .size(width = 44.dp, height = 48.dp)
             .clickable(onClick = onClick)
     ) {
-        // Gummy Bottom Depth Shadow (3dp)
         Box(
             modifier = Modifier
                 .size(width = 44.dp, height = 44.dp)
-                .offset(y = 4.dp)
-                .clip(RoundedCornerShape(12.dp))
+                .offset(y = 3.dp)
+                .clip(Squircle12)
                 .background(shadowColor)
-                .border(2.dp, DarkBrownOutline, RoundedCornerShape(12.dp))
         )
 
         // Top Face
         Box(
             modifier = Modifier
                 .size(width = 44.dp, height = 44.dp)
-                .clip(RoundedCornerShape(12.dp))
+                .clip(Squircle12)
                 .background(if (isSelected) faceColor.copy(alpha = 0.85f) else faceColor)
-                .border(2.dp, DarkBrownOutline, RoundedCornerShape(12.dp)),
+                .border(1.5.dp, ModernBorder, Squircle12),
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -232,7 +219,7 @@ private fun HeatmapChip(
                 fontFamily = LexendFontFamily,
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 18.sp,
-                color = if (letterPerformance.riskStatus == RiskStatus.YELLOW) Ink else Cloud
+                color = if (letterPerformance.riskStatus == RiskStatus.YELLOW) TextMidnight else Color.White
             )
         }
     }

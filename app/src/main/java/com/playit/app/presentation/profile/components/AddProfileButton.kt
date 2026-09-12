@@ -30,20 +30,20 @@ fun AddProfileButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val faceColor = if (enabled) Mango else Cloud
-    val shadowColor = if (enabled) MangoShadow else CloudShadow
-    val textColor = if (enabled) Ink else InkFaint
-    val strokeColor = if (enabled) DarkBrownOutline else DarkBrownOutline.copy(alpha = 0.35f)
+    val faceColor = if (enabled) SunnyGold else CanvasLight
+    val shadowColor = if (enabled) SunnyGoldShadow else SurfaceCardShadow
+    val textColor = if (enabled) TextMidnight else TextMuted
+    val strokeColor = if (enabled) ModernBorder else ModernBorderSoft
 
     GummyContainer(
         onClick = onClick,
         enabled = enabled,
         faceColor = faceColor,
         shadowColor = shadowColor,
-        shape = RoundedCornerShape(24.dp),
-        strokeWidth = 3.dp,
+        shape = CardShape,
+        strokeWidth = 2.5.dp,
         strokeColor = strokeColor,
-        depthHeight = 5.dp,
+        depthHeight = 6.dp,
         modifier = modifier
             .fillMaxWidth()
             .height(76.dp)

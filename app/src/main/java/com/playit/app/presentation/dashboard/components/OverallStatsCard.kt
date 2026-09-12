@@ -33,15 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.domain.model.ProfileDashboardData
-import com.playit.app.presentation.theme.Cloud
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.Ink
-import com.playit.app.presentation.theme.InkSoft
-import com.playit.app.presentation.theme.Leaf
-import com.playit.app.presentation.theme.LexendFontFamily
-import com.playit.app.presentation.theme.Mango
-import com.playit.app.presentation.theme.Sky
-import com.playit.app.presentation.theme.Ube
+import com.playit.app.presentation.theme.*
 
 @Composable
 fun OverallStatsCard(
@@ -52,16 +44,16 @@ fun OverallStatsCard(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Row 1: Accuracy Rate Card (slight -1 deg rotation)
+        // Row 1: Accuracy Rate Card
         GummyMetricCard(
             title = "Overall Accuracy",
             value = "${data.overallAccuracy.toInt()}%",
             subtitle = "Pronunciation & phoneme mastery",
             icon = Icons.Default.Check,
-            iconTint = Leaf,
-            rotation = -1f,
+            iconTint = EmeraldLeaf,
+            iconBg = EmeraldLeafLight,
             progress = (data.overallAccuracy / 100f).coerceIn(0f, 1f),
-            progressColor = Leaf
+            progressColor = EmeraldLeaf
         )
 
         // Row 2: Two Side-by-Side Cards (Letters Mastered & Total Stars)
@@ -74,8 +66,8 @@ fun OverallStatsCard(
                 value = "${data.completedLettersCount} / ${data.totalLettersCount}",
                 subtitle = "Letters",
                 icon = Icons.Default.CheckCircle,
-                iconTint = Ube,
-                rotation = 1f,
+                iconTint = PrimaryJoy,
+                iconBg = PrimaryJoyLight,
                 modifier = Modifier.weight(1f)
             )
 
@@ -84,8 +76,8 @@ fun OverallStatsCard(
                 value = "${data.totalStars}",
                 subtitle = "Rewards",
                 icon = Icons.Default.Star,
-                iconTint = Mango,
-                rotation = -1.5f,
+                iconTint = SunnyGoldDark,
+                iconBg = SunnyGoldLight,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -99,19 +91,17 @@ private fun GummyMetricCard(
     subtitle: String,
     icon: ImageVector,
     iconTint: Color,
-    rotation: Float,
+    iconBg: Color,
     progress: Float,
     progressColor: Color,
     modifier: Modifier = Modifier
 ) {
     Surface(
-        shape = RoundedCornerShape(28.dp),
-        color = Cloud,
-        border = BorderStroke(3.dp, DarkBrownOutline),
-        shadowElevation = 4.dp,
-        modifier = modifier
-            .fillMaxWidth()
-            .rotate(rotation)
+        shape = CardShape,
+        color = SurfaceCard,
+        border = BorderStroke(2.5.dp, ModernBorder),
+        shadowElevation = 2.dp,
+        modifier = modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Row(
@@ -127,15 +117,15 @@ private fun GummyMetricCard(
                         modifier = Modifier
                             .size(44.dp)
                             .clip(CircleShape)
-                            .background(Sky)
-                            .border(2.dp, DarkBrownOutline, CircleShape),
+                            .background(iconBg)
+                            .border(1.5.dp, iconTint, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(imageVector = icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(24.dp))
+                        Icon(imageVector = icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(22.dp))
                     }
                     Column {
-                        Text(text = title, fontFamily = LexendFontFamily, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Ink)
-                        Text(text = subtitle, fontFamily = LexendFontFamily, fontSize = 12.sp, color = InkSoft)
+                        Text(text = title, fontFamily = LexendFontFamily, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = TextMidnight)
+                        Text(text = subtitle, fontFamily = LexendFontFamily, fontSize = 12.sp, color = TextMuted)
                     }
                 }
 
@@ -150,20 +140,19 @@ private fun GummyMetricCard(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Gummy Progress Bar Well
+            // Modern Progress Bar
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(16.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(Sky)
-                    .border(2.dp, DarkBrownOutline, RoundedCornerShape(10.dp))
+                    .height(14.dp)
+                    .clip(PillShape)
+                    .background(ModernBorderFaint)
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(progress)
                         .fillMaxHeight()
-                        .clip(RoundedCornerShape(8.dp))
+                        .clip(PillShape)
                         .background(progressColor)
                 )
             }
@@ -178,23 +167,23 @@ private fun GummyMiniCard(
     subtitle: String,
     icon: ImageVector,
     iconTint: Color,
-    rotation: Float,
+    iconBg: Color,
     modifier: Modifier = Modifier
 ) {
     Surface(
-        shape = RoundedCornerShape(24.dp),
-        color = Cloud,
-        border = BorderStroke(3.dp, DarkBrownOutline),
-        shadowElevation = 4.dp,
-        modifier = modifier.rotate(rotation)
+        shape = Squircle20,
+        color = SurfaceCard,
+        border = BorderStroke(2.dp, ModernBorder),
+        shadowElevation = 2.dp,
+        modifier = modifier
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Box(
                 modifier = Modifier
                     .size(38.dp)
                     .clip(CircleShape)
-                    .background(Sky)
-                    .border(2.dp, DarkBrownOutline, CircleShape),
+                    .background(iconBg)
+                    .border(1.5.dp, iconTint, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(imageVector = icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(20.dp))
@@ -207,7 +196,7 @@ private fun GummyMiniCard(
                 fontFamily = LexendFontFamily,
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 20.sp,
-                color = Ink
+                color = TextMidnight
             )
 
             Spacer(modifier = Modifier.height(2.dp))
@@ -217,7 +206,7 @@ private fun GummyMiniCard(
                 fontFamily = LexendFontFamily,
                 fontWeight = FontWeight.Medium,
                 fontSize = 12.sp,
-                color = InkSoft
+                color = TextMuted
             )
         }
     }

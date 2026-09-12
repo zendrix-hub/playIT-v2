@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,23 +42,7 @@ import com.playit.app.presentation.components.LessonTopBar
 import com.playit.app.presentation.components.MascotSpeechHeader
 import com.playit.app.presentation.components.MascotState
 import com.playit.app.presentation.components.idleBounce
-import com.playit.app.presentation.theme.Cloud
-import com.playit.app.presentation.theme.CloudShadow
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.Ink
-import com.playit.app.presentation.theme.InkSoft
-import com.playit.app.presentation.theme.Kalamansi
-import com.playit.app.presentation.theme.KalamansiShadow
-import com.playit.app.presentation.theme.Leaf
-import com.playit.app.presentation.theme.LeafShadow
-import com.playit.app.presentation.theme.LexendFontFamily
-import com.playit.app.presentation.theme.Mango
-import com.playit.app.presentation.theme.MangoShadow
-import com.playit.app.presentation.theme.Sand
-import com.playit.app.presentation.theme.SandShadow
-import com.playit.app.presentation.theme.Sky
-import com.playit.app.presentation.theme.UbeDark
-import com.playit.app.presentation.theme.UbeLight
+import com.playit.app.presentation.theme.*
 import kotlinx.coroutines.delay
 
 @Composable
@@ -98,7 +84,15 @@ fun BlendItScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(brush = Brush.verticalGradient(colors = listOf(Sky, Sand)))
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFFE8F0FE),
+                        Color(0xFFF3E8FF),
+                        Color(0xFFFEF3C7)
+                    )
+                )
+            )
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             LessonTopBar(
@@ -136,11 +130,12 @@ fun BlendItScreen(
                 Text(
                     text = "Word: ${currentWordIndex + 1} / $totalWords",
                     fontFamily = LexendFontFamily,
-                    fontSize = 24.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = UbeDark,
+                    color = PrimaryJoyDark,
                     modifier = Modifier
-                        .background(color = UbeLight, shape = RoundedCornerShape(999.dp))
+                        .background(color = PrimaryJoy.copy(alpha = 0.12f), shape = PillShape)
+                        .border(width = 1.5.dp, color = PrimaryJoy.copy(alpha = 0.35f), shape = PillShape)
                         .padding(horizontal = 18.dp, vertical = 8.dp)
                 )
 
@@ -182,24 +177,24 @@ fun BlendItScreen(
                                 }
                             },
                             faceColor = when {
-                                isHighlighted -> Kalamansi
-                                tile != null && uiState is BlendItUiState.WordCorrect -> Leaf
-                                tile != null -> Cloud
-                                else -> Sand.copy(alpha = 0.5f)
+                                isHighlighted -> SunnyGold
+                                tile != null && uiState is BlendItUiState.WordCorrect -> EmeraldLeaf
+                                tile != null -> SurfaceCard
+                                else -> CanvasLight
                             },
                             shadowColor = when {
-                                isHighlighted -> KalamansiShadow
-                                tile != null && uiState is BlendItUiState.WordCorrect -> LeafShadow
-                                tile != null -> CloudShadow
-                                else -> SandShadow
+                                isHighlighted -> SunnyGoldShadow
+                                tile != null && uiState is BlendItUiState.WordCorrect -> EmeraldLeafShadow
+                                tile != null -> SurfaceCardShadow
+                                else -> SurfaceCardShadow
                             },
-                            shape = RoundedCornerShape(16.dp),
-                            strokeWidth = if (isHighlighted) 3.5.dp else 2.5.dp,
+                            shape = Squircle16,
+                            strokeWidth = if (isHighlighted) 3.dp else 2.dp,
                             strokeColor = when {
-                                isHighlighted -> Leaf
-                                uiState is BlendItUiState.WordCorrect -> Leaf
-                                uiState is BlendItUiState.WordIncorrect -> Kalamansi
-                                else -> DarkBrownOutline
+                                isHighlighted -> SunnyGold
+                                uiState is BlendItUiState.WordCorrect -> EmeraldLeaf
+                                uiState is BlendItUiState.WordIncorrect -> CoralBerry
+                                else -> ModernBorderSoft
                             },
                             depthHeight = if (isHighlighted) 6.dp else 4.dp,
                             modifier = Modifier
@@ -214,12 +209,12 @@ fun BlendItScreen(
                                     text = tile?.uppercase() ?: "_",
                                     fontFamily = LexendFontFamily,
                                     fontSize = 32.sp,
-                                    fontWeight = FontWeight.ExtraBold,
+                                    fontWeight = FontWeight.Black,
                                     color = when {
-                                        isHighlighted -> Ink
-                                        tile != null && uiState is BlendItUiState.WordCorrect -> Cloud
-                                        tile != null -> Ink
-                                        else -> InkSoft.copy(alpha = 0.4f)
+                                        isHighlighted -> TextMidnight
+                                        tile != null && uiState is BlendItUiState.WordCorrect -> Color.White
+                                        tile != null -> TextMidnight
+                                        else -> TextMuted.copy(alpha = 0.4f)
                                     }
                                 )
                             }
@@ -241,12 +236,12 @@ fun BlendItScreen(
                                     viewModel.placeTile(tileLetter)
                                 }
                             },
-                            faceColor = Mango,
-                            shadowColor = MangoShadow,
-                            shape = RoundedCornerShape(16.dp),
-                            strokeWidth = 2.5.dp,
-                            strokeColor = DarkBrownOutline,
-                            depthHeight = 4.dp,
+                            faceColor = SunnyGold,
+                            shadowColor = SunnyGoldShadow,
+                            shape = Squircle16,
+                            strokeWidth = 2.dp,
+                            strokeColor = ModernBorder,
+                            depthHeight = 5.dp,
                             modifier = Modifier
                                 .size(68.dp)
                                 .idleBounce()
@@ -256,8 +251,8 @@ fun BlendItScreen(
                                     text = tileLetter.uppercase(),
                                     fontFamily = LexendFontFamily,
                                     fontSize = 32.sp,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = Ink
+                                    fontWeight = FontWeight.Black,
+                                    color = TextMidnight
                                 )
                             }
                         }
@@ -282,12 +277,12 @@ fun BlendItScreen(
                             viewModel.submitWord()
                         }
                     },
-                    faceColor = if (isWordCorrect) Leaf else Mango,
-                    shadowColor = if (isWordCorrect) LeafShadow else MangoShadow,
-                    shape = RoundedCornerShape(18.dp),
-                    strokeWidth = 3.dp,
-                    strokeColor = DarkBrownOutline,
-                    depthHeight = 5.dp,
+                    faceColor = if (isWordCorrect) EmeraldLeaf else SunnyGold,
+                    shadowColor = if (isWordCorrect) EmeraldLeafShadow else SunnyGoldShadow,
+                    shape = ButtonShape,
+                    strokeWidth = 2.5.dp,
+                    strokeColor = ModernBorder,
+                    depthHeight = 6.dp,
                     isSquashed = isWordCorrect,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -305,8 +300,8 @@ fun BlendItScreen(
                             text = if (isWordCorrect) "Blending..." else "Check Word",
                             fontFamily = LexendFontFamily,
                             fontSize = 24.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = if (isWordCorrect) Cloud else Ink
+                            fontWeight = FontWeight.Black,
+                            color = if (isWordCorrect) Color.White else TextMidnight
                         )
                     }
                 }

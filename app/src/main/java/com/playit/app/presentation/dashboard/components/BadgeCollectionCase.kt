@@ -32,13 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.presentation.profile.components.AvatarCircle
-import com.playit.app.presentation.theme.Cloud
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.Ink
-import com.playit.app.presentation.theme.InkSoft
-import com.playit.app.presentation.theme.LexendFontFamily
-import com.playit.app.presentation.theme.Mango
-import com.playit.app.presentation.theme.MangoShadow
+import com.playit.app.presentation.theme.*
 
 @Composable
 fun BadgeCollectionCase(
@@ -47,12 +41,12 @@ fun BadgeCollectionCase(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Cloud),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        border = BorderStroke(3.dp, DarkBrownOutline)
+        shape = CardShape,
+        colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = BorderStroke(2.5.dp, ModernBorder)
     ) {
-        Column(modifier = Modifier.padding(18.dp)) {
+        Column(modifier = Modifier.padding(20.dp)) {
             // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -60,16 +54,16 @@ fun BadgeCollectionCase(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(36.dp)
                         .clip(CircleShape)
-                        .background(Mango.copy(alpha = 0.2f))
-                        .border(2.dp, Mango, CircleShape),
+                        .background(SunnyGoldLight)
+                        .border(2.dp, SunnyGold, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Filled.AutoAwesome,
                         contentDescription = "Badges",
-                        tint = DarkBrownOutline,
+                        tint = SunnyGoldDark,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -80,21 +74,21 @@ fun BadgeCollectionCase(
                     Text(
                         text = "Companion Badges",
                         fontFamily = LexendFontFamily,
-                        fontSize = 16.sp,
+                        fontSize = 17.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = Ink
+                        color = TextMidnight
                     )
                     Text(
                         text = "Animal explorer stamps earned",
                         fontFamily = LexendFontFamily,
-                        fontSize = 14.sp,
+                        fontSize = 13.sp,
                         fontWeight = FontWeight.Medium,
-                        color = InkSoft
+                        color = TextMuted
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // 6 Avatars / Badges
             Row(
@@ -119,7 +113,7 @@ private fun CompanionBadgeSlot(
 ) {
     Box(
         modifier = modifier
-            .size(46.dp)
+            .size(48.dp)
             .semantics(mergeDescendants = true) {
                 contentDescription = if (isUnlocked) {
                     "Companion $avatarId: unlocked"
@@ -130,34 +124,33 @@ private fun CompanionBadgeSlot(
         contentAlignment = Alignment.TopCenter
     ) {
         if (isUnlocked) {
-            // Soft translucent shadow to match the ring's translucent face
             Box(
                 modifier = Modifier
-                    .size(42.dp)
+                    .size(44.dp)
                     .offset(y = 3.dp)
                     .clip(CircleShape)
-                    .background(MangoShadow.copy(alpha = 0.25f))
+                    .background(SunnyGoldShadow.copy(alpha = 0.35f))
             )
             Box(
                 modifier = Modifier
-                    .size(42.dp)
+                    .size(44.dp)
                     .clip(CircleShape)
-                    .background(Mango.copy(alpha = 0.15f))
-                    .border(2.dp, DarkBrownOutline, CircleShape),
+                    .background(SunnyGoldLight)
+                    .border(2.dp, ModernBorder, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                AvatarCircle(avatarId = avatarId, size = 36)
+                AvatarCircle(avatarId = avatarId, size = 38)
             }
         } else {
             Box(
                 modifier = Modifier
                     .size(46.dp)
                     .clip(CircleShape)
-                    .background(Cloud)
-                    .border(2.dp, DarkBrownOutline.copy(alpha = 0.35f), CircleShape),
+                    .background(CanvasLight)
+                    .border(1.5.dp, ModernBorderSoft, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                AvatarCircle(avatarId = avatarId, size = 40)
+                AvatarCircle(avatarId = avatarId, size = 38)
             }
             // Small lock badge for locked companions
             Box(
@@ -165,14 +158,14 @@ private fun CompanionBadgeSlot(
                     .align(Alignment.BottomEnd)
                     .size(18.dp)
                     .clip(CircleShape)
-                    .background(Cloud)
-                    .border(1.5.dp, DarkBrownOutline.copy(alpha = 0.35f), CircleShape),
+                    .background(SurfaceCard)
+                    .border(1.5.dp, ModernBorderSoft, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Filled.Lock,
                     contentDescription = null,
-                    tint = InkSoft,
+                    tint = TextMuted,
                     modifier = Modifier.size(11.dp)
                 )
             }

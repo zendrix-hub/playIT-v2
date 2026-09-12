@@ -2,6 +2,7 @@ package com.playit.app.presentation.blendit
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -37,15 +39,7 @@ import com.playit.app.presentation.components.MascotState
 import com.playit.app.presentation.components.StarDisplay
 import com.playit.app.presentation.components.popIn
 import com.playit.app.presentation.components.rememberAssetPainter
-import com.playit.app.presentation.theme.Cloud
-import com.playit.app.presentation.theme.CloudShadow
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.Guava
-import com.playit.app.presentation.theme.Leaf
-import com.playit.app.presentation.theme.LexendFontFamily
-import com.playit.app.presentation.theme.Mango
-import com.playit.app.presentation.theme.Ube
-import com.playit.app.presentation.theme.UbeDark
+import com.playit.app.presentation.theme.*
 
 @Composable
 fun BlendItCompleteScreen(
@@ -120,8 +114,13 @@ fun BlendItCompleteScreen(
             Box(
                 modifier = Modifier
                     .background(
-                        color = Cloud.copy(alpha = 0.16f),
-                        shape = RoundedCornerShape(14.dp)
+                        color = SunnyGold.copy(alpha = 0.22f),
+                        shape = PillShape
+                    )
+                    .border(
+                        1.5.dp,
+                        SunnyGold.copy(alpha = 0.5f),
+                        PillShape
                     )
                     .padding(horizontal = 20.dp, vertical = 10.dp)
             ) {
@@ -138,7 +137,7 @@ fun BlendItCompleteScreen(
                     Text(
                         text = "$starsEarned ${if (starsEarned == 1) "Star" else "Stars"} • Bonus Unlocked!",
                         fontFamily = LexendFontFamily,
-                        fontSize = 14.sp,
+                        fontSize = 15.sp,
                         color = Cloud,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
@@ -148,7 +147,7 @@ fun BlendItCompleteScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // White continue button with 5dp depth (Pinned)
+            // Vibrant SunnyGold continue button
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -157,12 +156,12 @@ fun BlendItCompleteScreen(
             ) {
                 GummyContainer(
                     onClick = onReturnToMap,
-                    faceColor = Cloud,
-                    shadowColor = CloudShadow,
-                    shape = RoundedCornerShape(18.dp),
-                    strokeWidth = 3.dp,
-                    strokeColor = DarkBrownOutline,
-                    depthHeight = 5.dp,
+                    faceColor = com.playit.app.presentation.theme.SunnyGold,
+                    shadowColor = com.playit.app.presentation.theme.SunnyGoldShadow,
+                    shape = com.playit.app.presentation.theme.ButtonShape,
+                    strokeWidth = 2.5.dp,
+                    strokeColor = com.playit.app.presentation.theme.ModernBorder,
+                    depthHeight = 6.dp,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(64.dp)
@@ -176,8 +175,8 @@ fun BlendItCompleteScreen(
                             text = "Continue to Map",
                             fontFamily = LexendFontFamily,
                             fontSize = 24.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = UbeDark
+                            fontWeight = FontWeight.Black,
+                            color = com.playit.app.presentation.theme.TextMidnight
                         )
                     }
                 }

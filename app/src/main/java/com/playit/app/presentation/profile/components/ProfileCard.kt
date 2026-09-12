@@ -11,6 +11,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,12 +39,12 @@ fun ProfileCard(
 
     GummyContainer(
         onClick = { onSelect(profile.id) },
-        faceColor = Cloud,
-        shadowColor = CloudShadow,
-        shape = RoundedCornerShape(24.dp),
-        strokeWidth = 3.dp,
-        strokeColor = DarkBrownOutline,
-        depthHeight = 5.dp,
+        faceColor = SurfaceCard,
+        shadowColor = SurfaceCardShadow,
+        shape = CardShape,
+        strokeWidth = 2.5.dp,
+        strokeColor = ModernBorder,
+        depthHeight = 6.dp,
         modifier = modifier
             .fillMaxWidth()
             .height(112.dp)
@@ -71,8 +72,8 @@ fun ProfileCard(
                     text = profile.name,
                     fontFamily = LexendFontFamily,
                     fontSize = 24.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Ink,
+                    fontWeight = FontWeight.Black,
+                    color = TextMidnight,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -83,8 +84,13 @@ fun ProfileCard(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .background(
-                            color = Mango.copy(alpha = 0.22f),
-                            shape = RoundedCornerShape(12.dp)
+                            color = SunnyGold.copy(alpha = 0.18f),
+                            shape = Squircle12
+                        )
+                        .border(
+                            width = 1.5.dp,
+                            color = SunnyGold.copy(alpha = 0.45f),
+                            shape = Squircle12
                         )
                         .padding(horizontal = 14.dp, vertical = 6.dp)
                 ) {
@@ -97,9 +103,9 @@ fun ProfileCard(
                     Text(
                         text = "${profile.totalStars} $starsWordTitle",
                         fontFamily = LexendFontFamily,
-                        fontSize = 24.sp,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Ink
+                        color = TextMidnight
                     )
                 }
             }
@@ -109,16 +115,16 @@ fun ProfileCard(
             // Action Chevron Pill
             Box(
                 modifier = Modifier
-                    .size(44.dp)
+                    .size(46.dp)
                     .clip(CircleShape)
-                    .background(Ube)
-                    .border(2.dp, DarkBrownOutline, CircleShape),
+                    .background(PrimaryJoy)
+                    .border(2.dp, ModernBorder, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = null,
-                    tint = Cloud,
+                    tint = Color.White,
                     modifier = Modifier.size(22.dp)
                 )
             }

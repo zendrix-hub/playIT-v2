@@ -53,24 +53,55 @@ val Typography = Typography(
     displayLarge = TextStyle(
         fontFamily = LexendFontFamily,
         fontWeight = FontWeight.ExtraBold,
-        fontSize = 40.sp,
-        lineHeight = 48.sp
+        fontSize = 44.sp,
+        lineHeight = 52.sp,
+        letterSpacing = (-0.5).sp
     ),
-    // Screen titles
+    displayMedium = TextStyle(
+        fontFamily = LexendFontFamily,
+        fontWeight = FontWeight.ExtraBold,
+        fontSize = 36.sp,
+        lineHeight = 44.sp
+    ),
+    // Screen titles & Big headers
+    headlineLarge = TextStyle(
+        fontFamily = LexendFontFamily,
+        fontWeight = FontWeight.ExtraBold,
+        fontSize = 30.sp,
+        lineHeight = 38.sp
+    ),
     headlineMedium = TextStyle(
         fontFamily = LexendFontFamily,
         fontWeight = FontWeight.Bold,
-        fontSize = 28.sp,
-        lineHeight = 36.sp
+        fontSize = 26.sp,
+        lineHeight = 34.sp
     ),
-    // Instructions, subheadings
-    titleMedium = TextStyle(
+    headlineSmall = TextStyle(
         fontFamily = LexendFontFamily,
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = FontWeight.Bold,
         fontSize = 22.sp,
         lineHeight = 28.sp
     ),
-    // Child-facing reading content (24sp floor per Typography_Guide.md)
+    // Card titles, Instructions
+    titleLarge = TextStyle(
+        fontFamily = LexendFontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 22.sp,
+        lineHeight = 28.sp
+    ),
+    titleMedium = TextStyle(
+        fontFamily = LexendFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 20.sp,
+        lineHeight = 26.sp
+    ),
+    titleSmall = TextStyle(
+        fontFamily = LexendFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 18.sp,
+        lineHeight = 24.sp
+    ),
+    // Child-facing reading content (24sp floor)
     bodyLarge = TextStyle(
         fontFamily = LexendFontFamily,
         fontWeight = FontWeight.Medium,
@@ -84,11 +115,29 @@ val Typography = Typography(
         fontSize = 18.sp,
         lineHeight = 24.sp
     ),
-    // Helper text, captions — never below 16sp
-    labelMedium = TextStyle(
+    bodySmall = TextStyle(
         fontFamily = LexendFontFamily,
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
+        fontSize = 15.sp,
         lineHeight = 20.sp
+    ),
+    // Interactive buttons, badges, pills
+    labelLarge = TextStyle(
+        fontFamily = LexendFontFamily,
+        fontWeight = FontWeight.ExtraBold,
+        fontSize = 18.sp,
+        lineHeight = 24.sp
+    ),
+    labelMedium = TextStyle(
+        fontFamily = LexendFontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 15.sp,
+        lineHeight = 20.sp
+    ),
+    labelSmall = TextStyle(
+        fontFamily = LexendFontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 13.sp,
+        lineHeight = 16.sp
     )
 )

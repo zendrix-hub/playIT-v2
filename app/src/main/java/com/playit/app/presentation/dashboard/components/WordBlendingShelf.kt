@@ -32,16 +32,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.playit.app.presentation.theme.Cloud
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.Ink
-import com.playit.app.presentation.theme.InkSoft
-import com.playit.app.presentation.theme.Leaf
-import com.playit.app.presentation.theme.LeafShadow
-import com.playit.app.presentation.theme.LexendFontFamily
-import com.playit.app.presentation.theme.Sand
-import com.playit.app.presentation.theme.Sky
-import com.playit.app.presentation.theme.SkyShadow
+import androidx.compose.ui.graphics.Color
+import com.playit.app.presentation.theme.*
 
 @Composable
 fun WordBlendingShelf(
@@ -51,12 +43,12 @@ fun WordBlendingShelf(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Cloud),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        border = BorderStroke(3.dp, DarkBrownOutline)
+        shape = CardShape,
+        colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = BorderStroke(2.5.dp, ModernBorder)
     ) {
-        Column(modifier = Modifier.padding(18.dp)) {
+        Column(modifier = Modifier.padding(20.dp)) {
             // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -64,16 +56,16 @@ fun WordBlendingShelf(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(36.dp)
                         .clip(CircleShape)
-                        .background(Sky.copy(alpha = 0.2f))
-                        .border(2.dp, Sky, CircleShape),
+                        .background(AquaAdventureLight)
+                        .border(2.dp, AquaAdventure, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Extension,
                         contentDescription = "Word Blending",
-                        tint = DarkBrownOutline,
+                        tint = AquaAdventureDark,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -84,23 +76,23 @@ fun WordBlendingShelf(
                     Text(
                         text = "Word Construction ($completedGroups of $totalGroups)",
                         fontFamily = LexendFontFamily,
-                        fontSize = 16.sp,
+                        fontSize = 17.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = Ink
+                        color = TextMidnight
                     )
                     Text(
                         text = "Tactile syllable and word building progress",
                         fontFamily = LexendFontFamily,
-                        fontSize = 14.sp,
+                        fontSize = 13.sp,
                         fontWeight = FontWeight.Medium,
-                        color = InkSoft
+                        color = TextMuted
                     )
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 7 Group Completion Pods (Drops Style)
+            // 7 Group Completion Pods
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -116,28 +108,26 @@ fun WordBlendingShelf(
                         contentAlignment = Alignment.TopCenter
                     ) {
                         if (hasDepth) {
-                            // Shadow+face pair for done/current pods only. Locked pods stay flat
-                            // and translucent below - not yet "active" gets no raised depth.
                             Box(
                                 modifier = Modifier
                                     .size(34.dp)
-                                    .offset(y = 4.dp)
+                                    .offset(y = 3.dp)
                                     .clip(CircleShape)
-                                    .background(if (isDone) LeafShadow else SkyShadow)
+                                    .background(if (isDone) EmeraldLeafShadow else PrimaryJoyShadow)
                             )
                             Box(
                                 modifier = Modifier
                                     .size(34.dp)
                                     .clip(CircleShape)
-                                    .background(if (isDone) Leaf else Sky)
-                                    .border(2.dp, DarkBrownOutline, CircleShape),
+                                    .background(if (isDone) EmeraldLeaf else PrimaryJoy)
+                                    .border(2.dp, ModernBorder, CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
                                 if (isDone) {
                                     Icon(
                                         imageVector = Icons.Filled.Check,
                                         contentDescription = "Group $groupNum: Completed",
-                                        tint = Cloud,
+                                        tint = Color.White,
                                         modifier = Modifier.size(20.dp)
                                     )
                                 } else {
@@ -146,7 +136,7 @@ fun WordBlendingShelf(
                                         fontFamily = LexendFontFamily,
                                         fontSize = 14.sp,
                                         fontWeight = FontWeight.ExtraBold,
-                                        color = Ink,
+                                        color = Color.White,
                                         modifier = Modifier.semantics(mergeDescendants = true) {
                                             contentDescription = "Group $groupNum: in progress"
                                         }
@@ -156,16 +146,16 @@ fun WordBlendingShelf(
                         } else {
                             Box(
                                 modifier = Modifier
-                                    .size(38.dp)
+                                    .size(36.dp)
                                     .clip(CircleShape)
-                                    .background(Sand.copy(alpha = 0.5f))
-                                    .border(2.dp, DarkBrownOutline, CircleShape),
+                                    .background(CanvasLight)
+                                    .border(1.5.dp, ModernBorderSoft, CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.Lock,
                                     contentDescription = "Group $groupNum: Locked",
-                                    tint = InkSoft,
+                                    tint = ModernBorderSoft,
                                     modifier = Modifier.size(16.dp)
                                 )
                             }

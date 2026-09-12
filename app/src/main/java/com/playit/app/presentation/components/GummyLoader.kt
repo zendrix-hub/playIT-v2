@@ -29,12 +29,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.GentleCorrectionOrange
-import com.playit.app.presentation.theme.GrowthGreen
-import com.playit.app.presentation.theme.LearningBlue
-import com.playit.app.presentation.theme.LocalReducedMotion
-import com.playit.app.presentation.theme.TextPrimary
+import com.playit.app.presentation.theme.*
 import kotlin.math.roundToInt
 
 @Composable
@@ -43,7 +38,7 @@ fun GummyLoader(
     message: String? = null
 ) {
     val isReducedMotion = LocalReducedMotion.current
-    val colors = listOf(LearningBlue, GrowthGreen, GentleCorrectionOrange)
+    val colors = listOf(PrimaryJoy, EmeraldLeaf, SunnyGold)
     
     val infiniteTransition = rememberInfiniteTransition(label = "gummy_loader")
     
@@ -91,7 +86,7 @@ fun GummyLoader(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                colors.forEachIndexed { index, color ->
+                for ((index, color) in colors.withIndex()) {
                     val alpha = if (isReducedMotion) animations[index].value else 1f
                     val yOffset = if (isReducedMotion) 0f else animations[index].value
                     
@@ -101,7 +96,7 @@ fun GummyLoader(
                             .size(20.dp)
                             .alpha(alpha)
                             .background(color, CircleShape)
-                            .border(2.dp, DarkBrownOutline, CircleShape)
+                            .border(2.dp, ModernBorder, CircleShape)
                     )
                 }
             }
@@ -110,9 +105,10 @@ fun GummyLoader(
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(
                     text = message,
+                    fontFamily = LexendFontFamily,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
-                    color = TextPrimary
+                    color = TextMidnight
                 )
             }
         }

@@ -241,5 +241,15 @@ Change: Say It now asks the child to utter the letter's example WORD (m → "Mou
 - [x] **Integrated Numeric Keypad Parent Gate (Phase 5)**: Embedded custom on-screen 3x4 numeric keypad (1-9, C, 0, DEL with `Icons.AutoMirrored.Filled.Backspace`) and explicit top-right close button (`Icons.Filled.Close`) in `ArithmeticGuardDialog.kt` to eliminate Android soft keyboard layout jumps and IME clipping.
 - [x] **Full Verification & Zero-Emoji Audit (Phase 6)**: All 132/132 unit tests green (100% pass rate). Verified strict adherence to zero-emoji policy, 64dp minimum touch target floor, and 100% pure Kotlin in `domain/`. Built updated debug APK (`playit-debug.apk`).
 
+## Phase 16 — Complete Modern Grade 1 Design Language Overhaul (2026-09-12)
+- [x] **Strict Branch Isolation**: Carried out 100% of design changes on `feat/ui-rework` keeping `main` untouched.
+- [x] **Brand-New Theme Foundation**: Overwrote `Color.kt`, `Shape.kt`, `Type.kt`, and `Theme.kt` with modern high-energy tokens: `PrimaryJoy` (#6C5CE7), `SunnyGold` (#FFB800), `EmeraldLeaf` (#00C853), `CoralBerry` (#FF4757), `ApricotGlow` (#FF9F43), `AquaAdventure` (#0ABDE3), `ModernBorder` (#1E293B), `SurfaceCard` (#FFFFFF), `CanvasLight` (#F7FAFC), `TextMidnight` (#1A202C). Introduced refined squircle shapes (`Squircle12` to `Squircle32`), card elevation depth tokens, and modernized Lexend typography hierarchies.
+- [x] **Profile & Onboarding Modernization**: Refactored `ProfileSelectScreen.kt`, `NamePromptScreen.kt`, `ProfileCard.kt`, `AddProfileButton.kt`, and `AvatarCircle.kt` with clean high-contrast surfaces, vibrant tactile 3D borders, and enhanced avatar ring badges.
+- [x] **Map & Level Progression**: Overhauled `MapScreen.kt`, `TopStatsBar.kt`, `NodeActionPopupDialog.kt`, and `UnitGuidebookDialog.kt` with fresh modern stats pills (Streak, Stars, Hearts), crisp slate borders, and updated chapter banners.
+- [x] **Minigame & Lesson Polish**: Modernized `HearItScreen.kt`, `SayItScreen.kt`, `FindItScreen.kt`, `BlendItScreen.kt`, `LetterCompleteScreen.kt`, and `BlendItCompleteScreen.kt` with refreshed `LetterCard`, `BlendItCard`, `FindItGrid`, and celebratory overlays.
+- [x] **Parent Dashboard & Diagnostic Analytics**: Refactored all 14 parent diagnostic components (`ParentDashboardScreen.kt`, `ReportPreviewScreen.kt`, `LearnerHeroCard.kt`, `LetterPerformanceTable.kt`, `OverallStatsCard.kt`, `PhonemeHeatmapSection.kt`, `ArithmeticGuardDialog.kt`, etc.) for high legibility and clear educator hierarchy.
+- [x] **Zero-Emoji Policy Compliance**: Ensured zero emojis in UI text, buttons, titles, and speech bubbles; exclusively used Material vector graphics and transparent asset renders.
+- [x] **Compilation & APK Generation**: Verified clean compilation via `./gradlew compileDebugKotlin` and assembled `app-debug.apk` (97 MB) into workspace root `./playit-debug.apk`.
+
 
 

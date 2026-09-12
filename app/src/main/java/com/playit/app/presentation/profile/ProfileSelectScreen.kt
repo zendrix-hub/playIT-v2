@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -63,32 +64,31 @@ fun ProfileSelectScreen(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        SkyDeep,
-                        Sky,
-                        Sand,
-                        SandDeep
+                        Color(0xFFE8F0FE),
+                        Color(0xFFF3E8FF),
+                        Color(0xFFFEF3C7)
                     )
                 )
             )
     ) {
-        // Bohol Chocolate Hills bottom silhouette
+        // Modern cheerful rolling playground hills
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(80.dp)
+                .height(90.dp)
                 .align(Alignment.BottomCenter),
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.Center
         ) {
-            val hillWidths = listOf(70.dp, 100.dp, 85.dp, 115.dp, 80.dp, 95.dp)
+            val hillWidths = listOf(80.dp, 120.dp, 95.dp, 130.dp, 90.dp, 110.dp)
             hillWidths.forEachIndexed { index, width ->
                 Box(
                     modifier = Modifier
-                        .size(width = width, height = width * 0.55f)
-                        .offset(x = if (index == 0) 0.dp else ((-14) * index).dp)
+                        .size(width = width, height = width * 0.58f)
+                        .offset(x = if (index == 0) 0.dp else ((-18) * index).dp)
                         .clip(RoundedCornerShape(topStartPercent = 50, topEndPercent = 50))
                         .background(
-                            if (index % 2 == 0) Tan.copy(alpha = 0.35f) else TanDark.copy(alpha = 0.25f)
+                            if (index % 2 == 0) EmeraldLeaf.copy(alpha = 0.22f) else EmeraldLeafDark.copy(alpha = 0.15f)
                         )
                 )
             }

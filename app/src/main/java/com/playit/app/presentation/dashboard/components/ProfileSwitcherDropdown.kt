@@ -26,11 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.domain.model.Profile
 import com.playit.app.presentation.components.GummyContainer
-import com.playit.app.presentation.theme.Cloud
-import com.playit.app.presentation.theme.CloudShadow
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.Ink
-import com.playit.app.presentation.theme.LexendFontFamily
+import com.playit.app.presentation.theme.*
 
 @Composable
 fun ProfileSwitcherDropdown(
@@ -42,14 +38,13 @@ fun ProfileSwitcherDropdown(
     var expanded by remember { mutableStateOf(false) }
 
     Box(modifier = modifier) {
-        // Rebuilt with GummyContainer (52dp adult height) and Lexend font family
         GummyContainer(
             onClick = { expanded = true },
-            faceColor = Cloud,
-            shadowColor = CloudShadow,
-            shape = RoundedCornerShape(16.dp),
-            strokeWidth = 2.5.dp,
-            strokeColor = DarkBrownOutline,
+            faceColor = SurfaceCard,
+            shadowColor = SurfaceCardShadow,
+            shape = Squircle16,
+            strokeWidth = 2.dp,
+            strokeColor = ModernBorder,
             depthHeight = 4.dp,
             modifier = Modifier
                 .fillMaxWidth()
@@ -67,12 +62,12 @@ fun ProfileSwitcherDropdown(
                     fontFamily = LexendFontFamily,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Ink
+                    color = TextMidnight
                 )
                 Icon(
                     imageVector = Icons.Filled.ArrowDropDown,
                     contentDescription = null,
-                    tint = Ink
+                    tint = TextMidnight
                 )
             }
         }
@@ -89,7 +84,7 @@ fun ProfileSwitcherDropdown(
                             fontFamily = LexendFontFamily,
                             fontSize = 16.sp,
                             fontWeight = if (profile.id == selectedProfile?.id) FontWeight.Bold else FontWeight.Normal,
-                            color = Ink
+                            color = TextMidnight
                         )
                     },
                     onClick = {

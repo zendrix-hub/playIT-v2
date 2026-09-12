@@ -31,13 +31,13 @@ fun LearnerHeroCard(
 
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Cloud),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        border = BorderStroke(3.dp, DarkBrownOutline)
+        shape = CardShape,
+        colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = BorderStroke(2.5.dp, ModernBorder)
     ) {
         Column(
-            modifier = Modifier.padding(18.dp)
+            modifier = Modifier.padding(20.dp)
         ) {
             // Row 1: Avatar, Name, Streak & Level
             Row(
@@ -46,7 +46,7 @@ fun LearnerHeroCard(
             ) {
                 AvatarCircle(
                     avatarId = data.profile.avatarResId,
-                    size = 60
+                    size = 64
                 )
 
                 Spacer(modifier = Modifier.width(14.dp))
@@ -57,24 +57,24 @@ fun LearnerHeroCard(
                         fontFamily = LexendFontFamily,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = Ink
+                        color = TextMidnight
                     )
                     Text(
                         text = "Marungko Phonics Explorer",
                         fontFamily = LexendFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
-                        color = InkSoft
+                        color = TextMuted
                     )
                 }
 
                 // Streak Pill
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(999.dp))
-                        .background(Mango.copy(alpha = 0.2f))
-                        .border(2.dp, Mango, RoundedCornerShape(999.dp))
-                        .padding(horizontal = 10.dp, vertical = 5.dp)
+                        .clip(PillShape)
+                        .background(SunnyGoldLight)
+                        .border(2.dp, SunnyGold, PillShape)
+                        .padding(horizontal = 12.dp, vertical = 6.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
@@ -82,7 +82,7 @@ fun LearnerHeroCard(
                             fontFamily = LexendFontFamily,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            color = Ink
+                            color = SunnyGoldDark
                         )
                     }
                 }
@@ -102,14 +102,14 @@ fun LearnerHeroCard(
                         fontFamily = LexendFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Ink
+                        color = TextMidnight
                     )
                     Text(
                         text = "${data.completedLettersCount} of ${data.totalLettersCount} Sounds (${(masteryFraction * 100).toInt()}%)",
                         fontFamily = LexendFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Ube
+                        color = PrimaryJoy
                     )
                 }
 
@@ -119,10 +119,10 @@ fun LearnerHeroCard(
                     progress = { masteryFraction },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(12.dp)
-                        .clip(RoundedCornerShape(999.dp)),
-                    color = Leaf,
-                    trackColor = Sand.copy(alpha = 0.5f)
+                        .height(14.dp)
+                        .clip(PillShape),
+                    color = EmeraldLeaf,
+                    trackColor = ModernBorderFaint
                 )
             }
         }

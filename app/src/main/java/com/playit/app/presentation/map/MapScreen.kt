@@ -85,8 +85,11 @@ import com.playit.app.presentation.map.components.NodeActionPopupDialog
 import com.playit.app.presentation.map.components.TopStatsBar
 import com.playit.app.presentation.map.components.UnitGuidebookDialog
 import com.playit.app.presentation.map.components.calculateNodeXOffsetDp
+import com.playit.app.presentation.theme.ApricotGlow
 import com.playit.app.presentation.theme.Cloud
 import com.playit.app.presentation.theme.DarkBrownOutline
+import com.playit.app.presentation.theme.EmeraldLeaf
+import com.playit.app.presentation.theme.EmeraldLeafDark
 import com.playit.app.presentation.theme.Ink
 import com.playit.app.presentation.theme.InkFaint
 import com.playit.app.presentation.theme.InkSoft
@@ -98,9 +101,18 @@ import com.playit.app.presentation.theme.LocalReducedMotion
 import com.playit.app.presentation.theme.Mango
 import com.playit.app.presentation.theme.MangoDark
 import com.playit.app.presentation.theme.MangoShadow
+import com.playit.app.presentation.theme.ModernBorder
+import com.playit.app.presentation.theme.ModernBorderSoft
+import com.playit.app.presentation.theme.SunnyGold
+import com.playit.app.presentation.theme.SunnyGoldDark
+import com.playit.app.presentation.theme.SunnyGoldLight
+import com.playit.app.presentation.theme.SurfaceCard
+import com.playit.app.presentation.theme.SurfaceCardShadow
 import com.playit.app.presentation.theme.Tan
 import com.playit.app.presentation.theme.TanDark
 import com.playit.app.presentation.theme.TanShadow
+import com.playit.app.presentation.theme.TextMidnight
+import com.playit.app.presentation.theme.TextMuted
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.ui.graphics.Brush
@@ -504,9 +516,9 @@ fun MascotMapDialogueBubble(
 ) {
     GummyContainer(
         onClick = onClick,
-        faceColor = Cloud,
-        shadowColor = TanShadow.copy(alpha = 0.5f),
-        strokeColor = DarkBrownOutline,
+        faceColor = SurfaceCard,
+        shadowColor = SurfaceCardShadow,
+        strokeColor = ModernBorder,
         strokeWidth = 2.dp,
         depthHeight = 3.dp,
         shape = RoundedCornerShape(12.dp),
@@ -519,28 +531,28 @@ fun MascotMapDialogueBubble(
             Text(
                 text = message,
                 fontFamily = LexendFontFamily,
-                fontSize = 10.5.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Ink
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Black,
+                color = TextMidnight
             )
         }
     }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Letter Map Node — Authentic Duolingo 3D Stepping Stone Disc (duoling_map_sample.jpg)
+// Letter Map Node — Modern Stepping Stone Disc
 // ═══════════════════════════════════════════════════════════════════════════
 
-private val DuolingoGoldFace = Color(0xFFFFC800)
-private val DuolingoGoldShelf = Color(0xFFE5A500)
-private val DuolingoGoldStar = Color(0xFFB45309)
+private val NodeGoldFace = SunnyGold
+private val NodeGoldShelf = SunnyGoldDark
+private val NodeGoldStar = SunnyGoldDark
 
-private val DuolingoGreenFace = Color(0xFF58CC02)
-private val DuolingoGreenShelf = Color(0xFF46A302)
+private val NodeGreenFace = EmeraldLeaf
+private val NodeGreenShelf = EmeraldLeafDark
 
-private val DuolingoLockedFace = Color(0xFFE5E5E5)
-private val DuolingoLockedShelf = Color(0xFFCECECE)
-private val DuolingoLockedIcon = Color(0xFFAFAFAF)
+private val NodeLockedFace = Color(0xFFF1F5F9)
+private val NodeLockedShelf = Color(0xFFCBD5E1)
+private val NodeLockedIcon = Color(0xFF94A3B8)
 
 @Composable
 fun LetterMapNodeCard(
@@ -573,15 +585,15 @@ fun LetterMapNodeCard(
     )
 
     val faceColor = when {
-        isCompleted -> DuolingoGoldFace
-        node.isUnlocked -> DuolingoGreenFace
-        else -> DuolingoLockedFace
+        isCompleted -> NodeGoldFace
+        node.isUnlocked -> NodeGreenFace
+        else -> NodeLockedFace
     }
 
     val shelfColor = when {
-        isCompleted -> DuolingoGoldShelf
-        node.isUnlocked -> DuolingoGreenShelf
-        else -> DuolingoLockedShelf
+        isCompleted -> NodeGoldShelf
+        node.isUnlocked -> NodeGreenShelf
+        else -> NodeLockedShelf
     }
 
     val accessibilityLabel = when {
@@ -612,7 +624,7 @@ fun LetterMapNodeCard(
                         }
                         .border(
                             width = 3.5.dp,
-                            color = DuolingoGreenShelf,
+                            color = NodeGreenShelf,
                             shape = CircleShape
                         )
                 )
@@ -740,9 +752,9 @@ fun LetterMapNodeCard(
 // Blend It Challenge Node — Grand Golden Crown & Laurel 3D Challenge Disc
 // ═══════════════════════════════════════════════════════════════════════════
 
-private val BlendChallengeGoldFace = Color(0xFFFFB703)
-private val BlendChallengeGoldShelf = Color(0xFFD97706)
-private val BlendChallengeFlameAura = Color(0xFFFF8800)
+private val BlendChallengeGoldFace = SunnyGold
+private val BlendChallengeGoldShelf = SunnyGoldDark
+private val BlendChallengeFlameAura = ApricotGlow
 
 @Composable
 fun BlendItChallengeNodeCard(
@@ -773,10 +785,10 @@ fun BlendItChallengeNodeCard(
         label = "chestAuraAlpha"
     )
 
-    val chestFace = if (isUnlocked) Color(0xFFD97706) else Color(0xFFE2E8F0)
-    val chestShelf = if (isUnlocked) Color(0xFF92400E) else Color(0xFF94A3B8)
-    val trimGold = if (isUnlocked) Color(0xFFFFC93C) else Color(0xFFCBD5E1)
-    val lockBadgeColor = if (isUnlocked) Color(0xFFFFD54F) else Color(0xFF64748B)
+    val chestFace = if (isUnlocked) SunnyGold else Color(0xFFF1F5F9)
+    val chestShelf = if (isUnlocked) SunnyGoldDark else Color(0xFFCBD5E1)
+    val trimGold = if (isUnlocked) SunnyGoldLight else Color(0xFFE2E8F0)
+    val lockBadgeColor = if (isUnlocked) SunnyGold else Color(0xFF94A3B8)
 
     val accessibilityLabel = if (isUnlocked) {
         "Blend-It Treasure Chest Milestone, Unit ${node.groupId}, unlocked"
@@ -806,7 +818,7 @@ fun BlendItChallengeNodeCard(
                         }
                         .border(
                             width = 4.dp,
-                            color = Color(0xFFFFB703),
+                            color = ApricotGlow,
                             shape = RoundedCornerShape(26.dp)
                         )
                 )
@@ -819,7 +831,8 @@ fun BlendItChallengeNodeCard(
                 faceColor = chestFace,
                 shadowColor = chestShelf,
                 shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp, bottomStart = 16.dp, bottomEnd = 16.dp),
-                strokeWidth = 3.dp,
+                strokeWidth = 2.5.dp,
+                strokeColor = ModernBorder,
                 depthHeight = 8.dp,
                 modifier = Modifier.size(width = 90.dp, height = 76.dp)
             ) {
@@ -841,7 +854,7 @@ fun BlendItChallengeNodeCard(
                                     trimGold,
                                     RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
                                 )
-                                .border(1.5.dp, DarkBrownOutline, RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                                .border(1.5.dp, ModernBorder, RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         // Lower Base Rim
@@ -861,7 +874,7 @@ fun BlendItChallengeNodeCard(
                         modifier = Modifier
                             .size(34.dp)
                             .background(lockBadgeColor, RoundedCornerShape(10.dp))
-                            .border(2.dp, DarkBrownOutline, RoundedCornerShape(10.dp)),
+                            .border(2.dp, ModernBorder, RoundedCornerShape(10.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         if (isUnlocked) {

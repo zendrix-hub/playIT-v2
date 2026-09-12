@@ -15,13 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.playit.app.presentation.components.rememberAssetPainter
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.Guava
-import com.playit.app.presentation.theme.Leaf
-import com.playit.app.presentation.theme.Mango
-import com.playit.app.presentation.theme.Sand
-import com.playit.app.presentation.theme.Sky
-import com.playit.app.presentation.theme.Ube
+import com.playit.app.presentation.theme.*
 
 /**
  * Pediatric Animal Avatar Circle — renders one of the 6 companion animal avatars
@@ -37,12 +31,12 @@ fun AvatarCircle(
     val clampedId = avatarId.coerceIn(1, 6)
     val avatarPath = "images/mascot/avatar_0$clampedId.png"
     val bgColors = listOf(
-        Sky,
-        Mango,
-        Ube,
-        Leaf,
-        Sand,
-        Guava
+        AquaAdventure,
+        SunnyGold,
+        PrimaryJoy,
+        EmeraldLeaf,
+        ApricotGlow,
+        CoralBerry
     )
     val bgColor = bgColors[(clampedId - 1) % bgColors.size]
 
@@ -50,8 +44,8 @@ fun AvatarCircle(
         modifier = modifier
             .size(size.dp)
             .clip(CircleShape)
-            .background(bgColor)
-            .border(2.5.dp, DarkBrownOutline, CircleShape),
+            .background(bgColor.copy(alpha = 0.25f))
+            .border(2.5.dp, bgColor, CircleShape),
         contentAlignment = Alignment.Center
     ) {
         Image(

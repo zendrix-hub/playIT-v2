@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
@@ -140,6 +141,21 @@ fun GummyContainer(
                 .border(strokeWidth, strokeColor, shape),
             contentAlignment = Alignment.Center
         ) {
+            // Modern subtle top gloss highlight sheen
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .clip(shape)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color.White.copy(alpha = 0.22f),
+                                Color.White.copy(alpha = 0.04f),
+                                Color.Transparent
+                            )
+                        )
+                    )
+            )
             content()
         }
     }

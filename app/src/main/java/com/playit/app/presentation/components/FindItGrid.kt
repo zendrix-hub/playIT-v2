@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,19 +27,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.domain.manager.FindItPictureItem
 import com.playit.app.domain.model.Phoneme
-import com.playit.app.presentation.theme.CreamWhite
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.Ink
-import com.playit.app.presentation.theme.Leaf
-import com.playit.app.presentation.theme.LexendFontFamily
-import com.playit.app.presentation.theme.Sky
-import com.playit.app.presentation.theme.deriveShadow
+import com.playit.app.presentation.theme.*
 
 @Composable
 fun FindItCard(
     item: FindItPictureItem,
     borderColor: Color,
-    faceColor: Color = CreamWhite,
+    faceColor: Color = SurfaceCard,
     index: Int,
     isCorrect: Boolean = false,
     isIncorrect: Boolean = false,
@@ -50,10 +45,10 @@ fun FindItCard(
         onClick = onClick,
         faceColor = faceColor,
         shadowColor = faceColor.deriveShadow(),
-        shape = RoundedCornerShape(22.dp),
+        shape = Squircle20,
         strokeWidth = 2.5.dp,
         strokeColor = borderColor,
-        depthHeight = 4.dp,
+        depthHeight = 5.dp,
         isSquashed = isCorrect,
         modifier = Modifier
             .fillMaxWidth()
@@ -78,7 +73,7 @@ fun FindItCard(
                         modifier = Modifier
                             .size(54.dp)
                             .background(
-                                color = Sky.copy(alpha = 0.6f),
+                                color = PrimaryJoy.copy(alpha = 0.12f),
                                 shape = CircleShape
                             )
                     )
@@ -97,18 +92,19 @@ fun FindItCard(
                     text = item.word,
                     fontFamily = LexendFontFamily,
                     fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Ink
+                    fontWeight = FontWeight.Black,
+                    color = TextMidnight
                 )
             }
 
-            // Green Checkmark Badge when Found
+            // Emerald Checkmark Badge when Found
             if (isCorrect) {
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
+                        .padding(6.dp)
                         .size(26.dp)
-                        .background(Leaf, CircleShape),
+                        .background(EmeraldLeaf, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(

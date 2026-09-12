@@ -19,13 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.playit.app.presentation.theme.Cloud
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.Ink
-import com.playit.app.presentation.theme.InkSoft
-import com.playit.app.presentation.theme.Leaf
-import com.playit.app.presentation.theme.LexendFontFamily
-import com.playit.app.presentation.theme.Sky
+import com.playit.app.presentation.theme.*
 
 @Composable
 fun BlendItSummaryCard(
@@ -35,10 +29,10 @@ fun BlendItSummaryCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Cloud),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        border = androidx.compose.foundation.BorderStroke(3.dp, DarkBrownOutline)
+        shape = CardShape,
+        colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = androidx.compose.foundation.BorderStroke(2.5.dp, ModernBorder)
     ) {
         Column(
             modifier = Modifier.padding(20.dp)
@@ -49,17 +43,17 @@ fun BlendItSummaryCard(
                     fontFamily = LexendFontFamily,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Ink
+                    color = TextMidnight
                 )
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = "Completed $completedGroups of $totalGroups phoneme group challenges",
                 fontFamily = LexendFontFamily,
                 fontSize = 14.sp,
-                color = InkSoft
+                color = TextMuted
             )
 
             Spacer(modifier = Modifier.height(14.dp))
@@ -67,13 +61,12 @@ fun BlendItSummaryCard(
             val progress = if (totalGroups > 0) completedGroups.toFloat() / totalGroups.toFloat() else 0f
             LinearProgressIndicator(
                 progress = { progress },
-                color = Leaf,
-                trackColor = Sky,
+                color = EmeraldLeaf,
+                trackColor = ModernBorderFaint,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(12.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .border(1.5.dp, DarkBrownOutline, RoundedCornerShape(6.dp))
+                    .height(14.dp)
+                    .clip(PillShape)
             )
         }
     }

@@ -33,12 +33,12 @@ import com.playit.app.domain.model.MapNode
 import com.playit.app.presentation.components.GummyButton
 import com.playit.app.presentation.theme.*
 
-private val PopGreenFace = Color(0xFF58CC02)
-private val PopGreenShelf = Color(0xFF46A302)
-private val PopGoldFace = Color(0xFFFFC800)
-private val PopGoldShelf = Color(0xFFE5A500)
-private val PopLockedFace = Color(0xFFE2E8F0)
-private val PopLockedShelf = Color(0xFFCBD5E1)
+private val PopGreenFace = EmeraldLeaf
+private val PopGreenShelf = EmeraldLeafDark
+private val PopGoldFace = SunnyGold
+private val PopGoldShelf = SunnyGoldDark
+private val PopLockedFace = CanvasLight
+private val PopLockedShelf = SurfaceCardShadow
 
 /**
  * Duolingo Signature Floating 3D Node Action Popup Dialog.
@@ -73,9 +73,9 @@ fun NodeActionPopupDialog(
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.88f)
-                .clip(RoundedCornerShape(26.dp))
-                .background(Cloud)
-                .border(3.5.dp, DarkBrownOutline, RoundedCornerShape(26.dp))
+                .clip(DialogShape)
+                .background(SurfaceCard)
+                .border(2.5.dp, ModernBorder, DialogShape)
         ) {
             Column(
                 modifier = Modifier
@@ -169,7 +169,7 @@ fun NodeActionPopupDialog(
                         fontFamily = LexendFontFamily,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Black,
-                        color = Ink
+                        color = TextMidnight
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
@@ -177,7 +177,7 @@ fun NodeActionPopupDialog(
                         fontFamily = LexendFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
-                        color = InkSoft
+                        color = TextMuted
                     )
                 } else {
                     val blendNode = node as MapNode.BlendItNode
@@ -186,7 +186,7 @@ fun NodeActionPopupDialog(
                         fontFamily = LexendFontFamily,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Black,
-                        color = Ink
+                        color = TextMidnight
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
@@ -194,7 +194,7 @@ fun NodeActionPopupDialog(
                         fontFamily = LexendFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
-                        color = InkSoft
+                        color = TextMuted
                     )
                 }
 
@@ -267,7 +267,7 @@ fun NodeActionPopupDialog(
                         },
                         backgroundColor = btnBg,
                         shadowColor = btnShelf,
-                        contentColor = if (isCompleted) Color(0xFF78350F) else Color.White,
+                        contentColor = if (isCompleted) TextMidnight else Color.White,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp)
@@ -286,7 +286,7 @@ fun NodeActionPopupDialog(
                             fontFamily = LexendFontFamily,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium,
-                            color = InkSoft,
+                            color = TextMuted,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -316,7 +316,7 @@ private fun MiniPill(label: String) {
         modifier = Modifier
             .clip(RoundedCornerShape(8.dp))
             .background(Color.White)
-            .border(1.dp, Color(0xFFCBD5E1), RoundedCornerShape(8.dp))
+            .border(1.dp, ModernBorderSoft, RoundedCornerShape(8.dp))
             .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         Text(
@@ -324,7 +324,7 @@ private fun MiniPill(label: String) {
             fontFamily = LexendFontFamily,
             fontSize = 11.sp,
             fontWeight = FontWeight.Bold,
-            color = Ink
+            color = TextMidnight
         )
     }
 }

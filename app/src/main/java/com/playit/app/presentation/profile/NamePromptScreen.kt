@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,32 +62,31 @@ fun NamePromptScreen(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        SkyDeep,
-                        Sky,
-                        Sand,
-                        SandDeep
+                        Color(0xFFE8F0FE), // Airy crisp sky
+                        Color(0xFFF3E8FF), // Soft playful lavender
+                        Color(0xFFFEF3C7)  // Warm sunny cream
                     )
                 )
             )
     ) {
-        // Bohol Chocolate Hills bottom silhouette
+        // Vibrant Emerald rolling playground hills
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(80.dp)
+                .height(90.dp)
                 .align(Alignment.BottomCenter),
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.Center
         ) {
-            val hillWidths = listOf(70.dp, 100.dp, 85.dp, 115.dp, 80.dp, 95.dp)
+            val hillWidths = listOf(90.dp, 120.dp, 105.dp, 135.dp, 100.dp, 115.dp)
             hillWidths.forEachIndexed { index, width ->
                 Box(
                     modifier = Modifier
-                        .size(width = width, height = width * 0.55f)
-                        .offset(x = if (index == 0) 0.dp else ((-14) * index).dp)
+                        .size(width = width, height = width * 0.52f)
+                        .offset(x = if (index == 0) 0.dp else ((-18) * index).dp)
                         .clip(RoundedCornerShape(topStartPercent = 50, topEndPercent = 50))
                         .background(
-                            if (index % 2 == 0) Tan.copy(alpha = 0.35f) else TanDark.copy(alpha = 0.25f)
+                            if (index % 2 == 0) EmeraldLeaf.copy(alpha = 0.20f) else EmeraldLeaf.copy(alpha = 0.32f)
                         )
                 )
             }
@@ -115,14 +115,14 @@ fun NamePromptScreen(
                         fontFamily = LexendFontFamily,
                         fontSize = 28.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = Ink
+                        color = TextMidnight
                     )
                     Text(
                         text = "Create your player profile",
                         fontFamily = LexendFontFamily,
-                        fontSize = 24.sp,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Medium,
-                        color = InkSoft
+                        color = TextMuted
                     )
                 }
             }
@@ -171,16 +171,16 @@ fun NamePromptScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
-                                color = Kalamansi.copy(alpha = 0.15f),
-                                shape = RoundedCornerShape(14.dp)
+                                color = CoralBerry.copy(alpha = 0.12f),
+                                shape = Squircle12
                             )
                             .padding(horizontal = 16.dp, vertical = 10.dp)
                     ) {
                         Text(
                             text = (uiState as ProfileUiState.Error).message,
-                            color = Kalamansi,
+                            color = CoralBerry,
                             fontFamily = LexendFontFamily,
-                            fontSize = 24.sp,
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -192,9 +192,9 @@ fun NamePromptScreen(
             GummyButton(
                 text = if (uiState is ProfileUiState.Loading) "Creating..." else "Let's Play",
                 onClick = { viewModel.createProfile(name.trim(), selectedAvatarId) },
-                backgroundColor = Leaf,
-                shadowColor = LeafShadow,
-                contentColor = Cloud,
+                backgroundColor = EmeraldLeaf,
+                shadowColor = EmeraldLeafShadow,
+                contentColor = Color.White,
                 enabled = isNameValid && uiState !is ProfileUiState.Loading,
                 fontSize = 24,
                 isSquashed = isNameValid,

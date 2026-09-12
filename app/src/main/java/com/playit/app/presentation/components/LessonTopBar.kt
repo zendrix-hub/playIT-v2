@@ -4,6 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -22,12 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import com.playit.app.presentation.theme.CreamWhite
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.GrowthGreen
-import com.playit.app.presentation.theme.Ink
-import com.playit.app.presentation.theme.Leaf
-import com.playit.app.presentation.theme.Ube
+import com.playit.app.presentation.theme.*
 
 enum class LessonStep(val stepIndex: Int) {
     HEAR_IT(0),
@@ -77,9 +73,9 @@ fun LessonTopBar(
                 val isActive = step.stepIndex == currentStep.stepIndex
 
                 val targetColor = when {
-                    isCompleted -> Leaf
-                    isActive -> Ube
-                    else -> Color(0xFFE4E9E7)
+                    isCompleted -> EmeraldLeaf
+                    isActive -> PrimaryJoy
+                    else -> ModernBorderFaint
                 }
 
                 val animatedColor by animateColorAsState(
@@ -91,22 +87,21 @@ fun LessonTopBar(
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .height(9.dp)
-                        .clip(RoundedCornerShape(999.dp))
+                        .height(10.dp)
+                        .clip(PillShape)
                         .background(animatedColor)
                 )
             }
         }
 
-        // Hearts Status Indicator (if applicable in Say It & Find It)
+        // Hearts Status Indicator
         if (hearts != null) {
             Row(
                 modifier = Modifier
-                    .background(
-                        color = CreamWhite.copy(alpha = 0.95f),
-                        shape = RoundedCornerShape(999.dp)
-                    )
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                    .clip(PillShape)
+                    .background(SurfaceCard)
+                    .border(1.dp, ModernBorderSoft, PillShape)
+                    .padding(horizontal = 10.dp, vertical = 5.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {

@@ -1,6 +1,7 @@
 package com.playit.app.presentation.lettercomplete
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,7 +33,7 @@ import com.playit.app.presentation.components.DockedMascotWithBubble
 import com.playit.app.presentation.components.GummyContainer
 import com.playit.app.presentation.components.MascotState
 import com.playit.app.presentation.components.StarDisplay
-import com.playit.app.presentation.theme.Cloud
+import com.playit.app.presentation.theme.*
 import com.playit.app.presentation.theme.CloudShadow
 import com.playit.app.presentation.theme.DarkBrownOutline
 import com.playit.app.presentation.theme.Guava
@@ -103,7 +104,8 @@ fun LetterCompleteScreen(
 
             Box(
                 modifier = Modifier
-                    .background(color = Cloud.copy(alpha = 0.16f), shape = RoundedCornerShape(14.dp))
+                    .background(color = SunnyGold.copy(alpha = 0.22f), shape = PillShape)
+                    .border(1.5.dp, SunnyGold.copy(alpha = 0.5f), PillShape)
                     .padding(horizontal = 20.dp, vertical = 10.dp)
             ) {
                 Text(
@@ -121,12 +123,12 @@ fun LetterCompleteScreen(
             Box(modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = 12.dp)) {
                 GummyContainer(
                     onClick = onReturnToMap,
-                    faceColor = Cloud,
-                    shadowColor = CloudShadow,
-                    shape = RoundedCornerShape(18.dp),
-                    strokeWidth = 3.dp,
-                    strokeColor = DarkBrownOutline,
-                    depthHeight = 5.dp,
+                    faceColor = com.playit.app.presentation.theme.SunnyGold,
+                    shadowColor = com.playit.app.presentation.theme.SunnyGoldShadow,
+                    shape = com.playit.app.presentation.theme.ButtonShape,
+                    strokeWidth = 2.5.dp,
+                    strokeColor = com.playit.app.presentation.theme.ModernBorder,
+                    depthHeight = 6.dp,
                     modifier = Modifier.fillMaxWidth().height(64.dp)
                 ) {
                     Row(
@@ -138,8 +140,8 @@ fun LetterCompleteScreen(
                             text = "Continue to Map",
                             fontFamily = LexendFontFamily,
                             fontSize = 24.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = UbeDark
+                            fontWeight = FontWeight.Black,
+                            color = com.playit.app.presentation.theme.TextMidnight
                         )
                     }
                 }

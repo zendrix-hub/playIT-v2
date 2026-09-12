@@ -21,12 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.domain.model.LetterPerformance
-import com.playit.app.presentation.theme.Cloud
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.Ink
-import com.playit.app.presentation.theme.InkSoft
-import com.playit.app.presentation.theme.Kalamansi
-import com.playit.app.presentation.theme.LexendFontFamily
+import com.playit.app.presentation.theme.*
 
 @Composable
 fun AtRiskSection(
@@ -37,21 +32,21 @@ fun AtRiskSection(
 
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Kalamansi.copy(alpha = 0.15f)),
+        shape = CardShape,
+        colors = CardDefaults.cardColors(containerColor = ApricotGlowLight),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        border = androidx.compose.foundation.BorderStroke(2.5.dp, Kalamansi)
+        border = androidx.compose.foundation.BorderStroke(2.dp, ApricotGlow)
     ) {
         Column(
-            modifier = Modifier.padding(18.dp)
+            modifier = Modifier.padding(20.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = "Practice Recommended (${atRiskLetters.size} Letters)",
                     fontFamily = LexendFontFamily,
-                    fontSize = 16.sp,
+                    fontSize = 17.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Ink
+                    color = TextMidnight
                 )
             }
 
@@ -61,10 +56,10 @@ fun AtRiskSection(
                 text = "These sounds need a bit more practice. Extra time in Hear It / Say It will help strengthen mastery:",
                 fontFamily = LexendFontFamily,
                 fontSize = 13.sp,
-                color = InkSoft
+                color = TextMuted
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             Row {
                 atRiskLetters.forEach { lp ->
@@ -81,8 +76,8 @@ private fun BoxBadge(symbol: String, accuracy: Int) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .background(Cloud, shape = RoundedCornerShape(10.dp))
-            .border(1.5.dp, DarkBrownOutline.copy(alpha = 0.3f), RoundedCornerShape(10.dp))
+            .background(SurfaceCard, shape = Squircle12)
+            .border(1.5.dp, ModernBorderSoft, Squircle12)
             .padding(horizontal = 14.dp, vertical = 8.dp)
     ) {
         Text(
@@ -90,14 +85,14 @@ private fun BoxBadge(symbol: String, accuracy: Int) {
             fontFamily = LexendFontFamily,
             fontSize = 18.sp,
             fontWeight = FontWeight.ExtraBold,
-            color = Kalamansi
+            color = ApricotGlowDark
         )
         Text(
             text = "$accuracy%",
             fontFamily = LexendFontFamily,
-            fontSize = 11.sp,
+            fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
-            color = InkSoft
+            color = TextMuted
         )
     }
 }

@@ -69,21 +69,7 @@ import com.playit.app.presentation.components.LessonTopBar
 import com.playit.app.presentation.components.MascotSpeechHeader
 import com.playit.app.presentation.components.MascotState
 import com.playit.app.presentation.components.shake
-import com.playit.app.presentation.theme.Cloud
-import com.playit.app.presentation.theme.CloudShadow
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.Guava
-import com.playit.app.presentation.theme.GuavaShadow
-import com.playit.app.presentation.theme.Ink
-import com.playit.app.presentation.theme.InkSoft
-import com.playit.app.presentation.theme.Kalamansi
-import com.playit.app.presentation.theme.Leaf
-import com.playit.app.presentation.theme.LexendFontFamily
-import com.playit.app.presentation.theme.Mango
-import com.playit.app.presentation.theme.MangoShadow
-import com.playit.app.presentation.theme.Sand
-import com.playit.app.presentation.theme.Sky
-import com.playit.app.presentation.theme.UbeDark
+import com.playit.app.presentation.theme.*
 
 private val MIC_CTA_SIZE = 88.dp
 private val MIC_CTA_RING_BOUNDS = 180.dp
@@ -178,7 +164,15 @@ fun SayItScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(brush = Brush.verticalGradient(colors = listOf(Sky, Sand)))
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFFE8F0FE),
+                        Color(0xFFF3E8FF),
+                        Color(0xFFFEF3C7)
+                    )
+                )
+            )
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             LessonTopBar(currentStep = LessonStep.SAY_IT, onBack = onBack, hearts = hearts)
@@ -238,12 +232,12 @@ fun SayItScreen(
                     // Legacy letter-sound card (ng/ñ SME-pending letters) — pure phoneme audio
                     GummyContainer(
                         onClick = { viewModel.playPhonemeSound() },
-                        faceColor = Cloud,
-                        shadowColor = CloudShadow,
-                        shape = RoundedCornerShape(24.dp),
-                        strokeWidth = 3.dp,
-                        strokeColor = DarkBrownOutline,
-                        depthHeight = 5.dp,
+                        faceColor = SurfaceCard,
+                        shadowColor = SurfaceCardShadow,
+                        shape = CardShape,
+                        strokeWidth = 2.5.dp,
+                        strokeColor = ModernBorder,
+                        depthHeight = 6.dp,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(116.dp)
@@ -261,7 +255,7 @@ fun SayItScreen(
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
                                     contentDescription = "Hear Sound",
-                                    tint = if (isPlayingPhoneme) Mango else UbeDark,
+                                    tint = if (isPlayingPhoneme) SunnyGold else PrimaryJoyDark,
                                     modifier = Modifier.size(24.dp)
                                 )
                                 Text(
@@ -269,7 +263,7 @@ fun SayItScreen(
                                     fontFamily = LexendFontFamily,
                                     fontSize = 24.sp,
                                     fontWeight = FontWeight.ExtraBold,
-                                    color = if (isPlayingPhoneme) Mango else UbeDark
+                                    color = if (isPlayingPhoneme) SunnyGoldDark else PrimaryJoyDark
                                 )
                             }
                             Spacer(modifier = Modifier.height(2.dp))
@@ -277,8 +271,8 @@ fun SayItScreen(
                                 text = targetLetter,
                                 fontFamily = LexendFontFamily,
                                 fontSize = 48.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = Ink
+                                fontWeight = FontWeight.Black,
+                                color = TextMidnight
                             )
                         }
                     }
@@ -286,7 +280,7 @@ fun SayItScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                AudioWaveformBar(isRecording = isListening, activeColor = Guava)
+                AudioWaveformBar(isRecording = isListening, activeColor = CoralBerry)
 
                 Spacer(modifier = Modifier.height(4.dp))
 
@@ -298,7 +292,7 @@ fun SayItScreen(
                                 .size(MIC_CTA_SIZE * dynamicBoost)
                                 .scale(micPulseScale)
                                 .clip(CircleShape)
-                                .background(Guava.copy(alpha = micPulseAlpha))
+                                .background(CoralBerry.copy(alpha = micPulseAlpha))
                         )
                     }
 
@@ -306,25 +300,25 @@ fun SayItScreen(
                         onClick = if (isPlayingPhoneme || isModelInitializing) null else toggleListening,
                         enabled = !isPlayingPhoneme && !isModelInitializing,
                         faceColor = when {
-                            isModelInitializing -> Cloud
-                            isListening -> Guava
-                            else -> Mango
+                            isModelInitializing -> CanvasLight
+                            isListening -> CoralBerry
+                            else -> SunnyGold
                         },
                         shadowColor = when {
-                            isModelInitializing -> CloudShadow
-                            isListening -> GuavaShadow
-                            else -> MangoShadow
+                            isModelInitializing -> SurfaceCardShadow
+                            isListening -> CoralBerryDark
+                            else -> SunnyGoldShadow
                         },
                         shape = CircleShape,
-                        strokeWidth = 3.dp,
-                        strokeColor = DarkBrownOutline,
-                        depthHeight = 5.dp,
+                        strokeWidth = 2.5.dp,
+                        strokeColor = ModernBorder,
+                        depthHeight = 6.dp,
                         modifier = Modifier.size(MIC_CTA_SIZE)
                     ) {
                         Icon(
                             imageVector = if (isListening) Icons.Rounded.Stop else Icons.Rounded.Mic,
                             contentDescription = if (isListening) "Stop Listening" else "Record Voice",
-                            tint = if (isModelInitializing) InkSoft else Cloud,
+                            tint = if (isModelInitializing) TextMuted else Color.White,
                             modifier = Modifier.size(44.dp)
                         )
                     }
@@ -342,8 +336,8 @@ fun SayItScreen(
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     color = when {
-                        isListening -> Guava
-                        else -> InkSoft
+                        isListening -> CoralBerry
+                        else -> TextMuted
                     }
                 )
 
@@ -355,14 +349,14 @@ fun SayItScreen(
                         if (i < attempts.size) {
                             val isAttemptOk = attempts[i]
                             Box(
-                                modifier = Modifier.size(22.dp).clip(CircleShape).background(if (isAttemptOk) Leaf else Kalamansi),
+                                modifier = Modifier.size(22.dp).clip(CircleShape).background(if (isAttemptOk) EmeraldLeaf else ApricotGlow),
                                 contentAlignment = Alignment.Center
                             ) {
                                 if (isAttemptOk) {
                                     Icon(
                                         imageVector = Icons.Rounded.Check,
                                         contentDescription = "Correct attempt",
-                                        tint = Cloud,
+                                        tint = Color.White,
                                         modifier = Modifier.size(14.dp)
                                     )
                                 }
@@ -372,7 +366,7 @@ fun SayItScreen(
                                 modifier = Modifier
                                     .size(22.dp)
                                     .clip(CircleShape)
-                                    .background(Color(0xFFE4E9E7))
+                                    .background(ModernBorderSoft.copy(alpha = 0.5f))
                             )
                         }
                     }
@@ -382,16 +376,16 @@ fun SayItScreen(
 
                 Row(
                     modifier = Modifier
-                        .background(Cloud, RoundedCornerShape(999.dp))
-                        .border(1.5.dp, DarkBrownOutline.copy(alpha = 0.2f), RoundedCornerShape(999.dp))
+                        .background(SurfaceCard, PillShape)
+                        .border(1.5.dp, ModernBorderSoft, PillShape)
                         .padding(horizontal = 12.dp, vertical = 5.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(if (isNoisyEnvironment) Kalamansi else Leaf))
+                    Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(if (isNoisyEnvironment) ApricotGlow else EmeraldLeaf))
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = if (isNoisyEnvironment) "Noise: High" else "Noise: Good",
-                        color = InkSoft,
+                        color = TextMuted,
                         fontSize = 11.5.sp,
                         fontFamily = LexendFontFamily,
                         fontWeight = FontWeight.Bold
@@ -410,15 +404,15 @@ fun SayItScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 6.dp)
-                            .background(color = if (isCorrect) Leaf else Kalamansi, shape = RoundedCornerShape(16.dp))
-                            .border(2.5.dp, DarkBrownOutline, RoundedCornerShape(16.dp))
+                            .background(color = if (isCorrect) EmeraldLeaf else ApricotGlow, shape = Squircle16)
+                            .border(2.5.dp, ModernBorder, Squircle16)
                             .padding(vertical = 10.dp, horizontal = 16.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = if (isCorrect) "Awesome pronunciation!" else "Good try! Let's try again.",
-                            color = if (isCorrect) Cloud else Ink,
-                            fontWeight = FontWeight.ExtraBold,
+                            color = if (isCorrect) Color.White else TextMidnight,
+                            fontWeight = FontWeight.Black,
                             fontFamily = LexendFontFamily,
                             fontSize = 24.sp
                         )
@@ -433,9 +427,9 @@ fun SayItScreen(
                     text = "Next: Find It",
                     onClick = { if (state is SayItState.Correct) onNext(phoneme?.id?.toString() ?: "1") },
                     enabled = state is SayItState.Correct,
-                    backgroundColor = Mango,
-                    shadowColor = MangoShadow,
-                    contentColor = Ink,
+                    backgroundColor = EmeraldLeaf,
+                    shadowColor = EmeraldLeafShadow,
+                    contentColor = Color.White,
                     modifier = Modifier.fillMaxWidth().height(64.dp)
                 )
             }

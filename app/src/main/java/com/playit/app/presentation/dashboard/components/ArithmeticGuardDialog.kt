@@ -36,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,17 +44,7 @@ import androidx.compose.ui.window.Dialog
 import com.playit.app.domain.manager.ArithmeticGateManager
 import com.playit.app.presentation.components.GummyButton
 import com.playit.app.presentation.components.GummyContainer
-import com.playit.app.presentation.theme.Cloud
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.Ink
-import com.playit.app.presentation.theme.InkSoft
-import com.playit.app.presentation.theme.Kalamansi
-import com.playit.app.presentation.theme.Leaf
-import com.playit.app.presentation.theme.LeafShadow
-import com.playit.app.presentation.theme.LexendFontFamily
-import com.playit.app.presentation.theme.Sky
-import com.playit.app.presentation.theme.SkyShadow
-import com.playit.app.presentation.theme.Ube
+import com.playit.app.presentation.theme.*
 import kotlinx.coroutines.launch
 
 @Composable
@@ -72,10 +63,10 @@ fun ArithmeticGuardDialog(
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
-            shape = RoundedCornerShape(28.dp),
-            color = Cloud,
-            border = BorderStroke(3.dp, DarkBrownOutline),
-            shadowElevation = 8.dp,
+            shape = DialogShape,
+            color = SurfaceCard,
+            border = BorderStroke(2.5.dp, ModernBorder),
+            shadowElevation = 12.dp,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
@@ -92,7 +83,7 @@ fun ArithmeticGuardDialog(
                     Icon(
                         imageVector = Icons.Filled.Close,
                         contentDescription = "Close",
-                        tint = InkSoft,
+                        tint = TextMuted,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -102,171 +93,170 @@ fun ArithmeticGuardDialog(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // Header Lock Icon
-                Box(
-                    modifier = Modifier
-                        .size(56.dp)
-                        .clip(CircleShape)
-                        .background(Sky)
-                        .border(3.dp, DarkBrownOutline, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Lock,
-                        contentDescription = "Parent Lock",
-                        tint = Ube,
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Text(
-                    text = "Parent Zone",
-                    fontFamily = LexendFontFamily,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Ink
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = "Grown-ups only. Solve: ${problem.displayExpression} = ?",
-                    fontFamily = LexendFontFamily,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = InkSoft
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // PIN / Answer Display Box
-                Surface(
-                    shape = RoundedCornerShape(16.dp),
-                    color = if (isError) Kalamansi.copy(alpha = 0.15f) else Sky,
-                    border = BorderStroke(3.dp, if (isError) Kalamansi else DarkBrownOutline),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(54.dp)
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text(
-                            text = if (answerInput.isEmpty()) "--" else answerInput,
-                            fontFamily = LexendFontFamily,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            letterSpacing = 4.sp,
-                            color = if (isError) Kalamansi else Ube
+                    Box(
+                        modifier = Modifier
+                            .size(56.dp)
+                            .clip(CircleShape)
+                            .background(PrimaryJoyLight)
+                            .border(2.dp, PrimaryJoy, CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Lock,
+                            contentDescription = "Parent Lock",
+                            tint = PrimaryJoy,
+                            modifier = Modifier.size(28.dp)
                         )
                     }
-                }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                // 3x4 Keypad Grid
-                val keys = listOf(
-                    listOf("1", "2", "3"),
-                    listOf("4", "5", "6"),
-                    listOf("7", "8", "9"),
-                    listOf("C", "0", "DEL")
-                )
+                    Text(
+                        text = "Parent Zone",
+                        fontFamily = LexendFontFamily,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = TextMidnight
+                    )
 
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    keys.forEach { row ->
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            row.forEach { key ->
-                                when (key) {
-                                    "C" -> {
-                                        KeypadClearButton(
-                                            onClick = {
-                                                answerInput = ""
-                                                isError = false
-                                            },
-                                            modifier = Modifier.weight(1f)
-                                        )
-                                    }
-                                    "DEL" -> {
-                                        KeypadDeleteButton(
-                                            onClick = {
-                                                if (answerInput.isNotEmpty()) {
-                                                    answerInput = answerInput.dropLast(1)
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Text(
+                        text = "Grown-ups only. Solve: ${problem.displayExpression} = ?",
+                        fontFamily = LexendFontFamily,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = TextMuted
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // PIN / Answer Display Box
+                    Surface(
+                        shape = Squircle16,
+                        color = if (isError) CoralBerryLight else CanvasLight,
+                        border = BorderStroke(2.dp, if (isError) CoralBerry else ModernBorderSoft),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(54.dp)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Text(
+                                text = if (answerInput.isEmpty()) "--" else answerInput,
+                                fontFamily = LexendFontFamily,
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                letterSpacing = 4.sp,
+                                color = if (isError) CoralBerryDark else PrimaryJoy
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // 3x4 Keypad Grid
+                    val keys = listOf(
+                        listOf("1", "2", "3"),
+                        listOf("4", "5", "6"),
+                        listOf("7", "8", "9"),
+                        listOf("C", "0", "DEL")
+                    )
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        keys.forEach { row ->
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                row.forEach { key ->
+                                    when (key) {
+                                        "C" -> {
+                                            KeypadClearButton(
+                                                onClick = {
+                                                    answerInput = ""
                                                     isError = false
-                                                }
-                                            },
-                                            modifier = Modifier.weight(1f)
-                                        )
-                                    }
-                                    else -> {
-                                        KeypadNumberButton(
-                                            number = key,
-                                            onClick = {
-                                                if (answerInput.length < 4) {
-                                                    answerInput += key
-                                                    isError = false
-                                                }
-                                            },
-                                            modifier = Modifier.weight(1f)
-                                        )
+                                                },
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                        }
+                                        "DEL" -> {
+                                            KeypadDeleteButton(
+                                                onClick = {
+                                                    if (answerInput.isNotEmpty()) {
+                                                        answerInput = answerInput.dropLast(1)
+                                                        isError = false
+                                                    }
+                                                },
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                        }
+                                        else -> {
+                                            KeypadNumberButton(
+                                                number = key,
+                                                onClick = {
+                                                    if (answerInput.length < 4) {
+                                                        answerInput += key
+                                                        isError = false
+                                                    }
+                                                },
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                // Confirm Action Button (explicit 52dp adult height)
-                GummyButton(
-                    text = "Verify & Enter",
-                    backgroundColor = Leaf,
-                    shadowColor = LeafShadow,
-                    contentColor = Cloud,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp),
-                    onClick = {
-                        if (gateManager.validateAnswer(problem, answerInput)) {
-                            onCorrectSound()
-                            onPass()
-                        } else {
-                            onIncorrectSound()
-                            isError = true
-                            coroutineScope.launch {
-                                // Decaying gentle wobble (8 -> -8 -> 5 -> -5 -> 0)
-                                shakeOffset.animateTo(8f, tween(45))
-                                shakeOffset.animateTo(-8f, tween(90))
-                                shakeOffset.animateTo(5f, tween(90))
-                                shakeOffset.animateTo(-5f, tween(90))
-                                shakeOffset.animateTo(0f, tween(60))
+                    // Confirm Action Button
+                    GummyButton(
+                        text = "Verify & Enter",
+                        backgroundColor = EmeraldLeaf,
+                        shadowColor = EmeraldLeafShadow,
+                        contentColor = Color.White,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp),
+                        onClick = {
+                            if (gateManager.validateAnswer(problem, answerInput)) {
+                                onCorrectSound()
+                                onPass()
+                            } else {
+                                onIncorrectSound()
+                                isError = true
+                                coroutineScope.launch {
+                                    shakeOffset.animateTo(8f, tween(45))
+                                    shakeOffset.animateTo(-8f, tween(90))
+                                    shakeOffset.animateTo(5f, tween(90))
+                                    shakeOffset.animateTo(-5f, tween(90))
+                                    shakeOffset.animateTo(0f, tween(60))
+                                }
+                                problem = gateManager.generateProblem()
+                                answerInput = ""
                             }
-                            problem = gateManager.generateProblem()
-                            answerInput = ""
                         }
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                TextButton(onClick = onDismiss) {
-                    Text(
-                        text = "Cancel",
-                        fontFamily = LexendFontFamily,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = InkSoft
                     )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    TextButton(onClick = onDismiss) {
+                        Text(
+                            text = "Cancel",
+                            fontFamily = LexendFontFamily,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = TextMuted
+                        )
+                    }
                 }
             }
         }
     }
-}
 }
 
 @Composable
@@ -277,13 +267,13 @@ private fun KeypadNumberButton(
 ) {
     GummyContainer(
         onClick = onClick,
-        faceColor = Sky,
-        shadowColor = SkyShadow,
-        shape = RoundedCornerShape(14.dp),
-        strokeWidth = 2.dp,
-        strokeColor = DarkBrownOutline,
-        depthHeight = 4.dp,
-        modifier = modifier.height(52.dp)
+        faceColor = CanvasLight,
+        shadowColor = SurfaceCardShadow,
+        shape = Squircle12,
+        strokeWidth = 1.5.dp,
+        strokeColor = ModernBorderSoft,
+        depthHeight = 3.dp,
+        modifier = modifier.height(50.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
@@ -291,7 +281,7 @@ private fun KeypadNumberButton(
                 fontFamily = LexendFontFamily,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = Ink
+                color = TextMidnight
             )
         }
     }
@@ -304,20 +294,20 @@ private fun KeypadDeleteButton(
 ) {
     GummyContainer(
         onClick = onClick,
-        faceColor = Sky,
-        shadowColor = SkyShadow,
-        shape = RoundedCornerShape(14.dp),
-        strokeWidth = 2.dp,
-        strokeColor = DarkBrownOutline,
-        depthHeight = 4.dp,
-        modifier = modifier.height(52.dp)
+        faceColor = CoralBerryLight,
+        shadowColor = SurfaceCardShadow,
+        shape = Squircle12,
+        strokeWidth = 1.5.dp,
+        strokeColor = CoralBerry.copy(alpha = 0.4f),
+        depthHeight = 3.dp,
+        modifier = modifier.height(50.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Backspace,
                 contentDescription = "Delete",
-                tint = Ink,
-                modifier = Modifier.size(22.dp)
+                tint = CoralBerryDark,
+                modifier = Modifier.size(20.dp)
             )
         }
     }
@@ -330,21 +320,21 @@ private fun KeypadClearButton(
 ) {
     GummyContainer(
         onClick = onClick,
-        faceColor = Sky,
-        shadowColor = SkyShadow,
-        shape = RoundedCornerShape(14.dp),
-        strokeWidth = 2.dp,
-        strokeColor = DarkBrownOutline,
-        depthHeight = 4.dp,
-        modifier = modifier.height(52.dp)
+        faceColor = CanvasLight,
+        shadowColor = SurfaceCardShadow,
+        shape = Squircle12,
+        strokeWidth = 1.5.dp,
+        strokeColor = ModernBorderSoft,
+        depthHeight = 3.dp,
+        modifier = modifier.height(50.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
                 text = "C",
                 fontFamily = LexendFontFamily,
-                fontSize = 18.sp,
+                fontSize = 17.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = InkSoft
+                color = TextMuted
             )
         }
     }

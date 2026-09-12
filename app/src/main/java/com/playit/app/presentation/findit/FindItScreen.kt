@@ -1,6 +1,7 @@
 package com.playit.app.presentation.findit
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,21 +42,7 @@ import com.playit.app.presentation.components.LessonStep
 import com.playit.app.presentation.components.LessonTopBar
 import com.playit.app.presentation.components.MascotSpeechHeader
 import com.playit.app.presentation.components.MascotState
-import com.playit.app.presentation.theme.CreamWhite
-import com.playit.app.presentation.theme.Cloud
-import com.playit.app.presentation.theme.CloudShadow
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.Ink
-import com.playit.app.presentation.theme.Kalamansi
-import com.playit.app.presentation.theme.Leaf
-import com.playit.app.presentation.theme.LexendFontFamily
-import com.playit.app.presentation.theme.Mango
-import com.playit.app.presentation.theme.MangoShadow
-import com.playit.app.presentation.theme.Sand
-import com.playit.app.presentation.theme.Sky
-import com.playit.app.presentation.theme.UbeDark
-import com.playit.app.presentation.theme.UbeLight
-import com.playit.app.presentation.theme.UbeShadow
+import com.playit.app.presentation.theme.*
 
 @Composable
 fun FindItScreen(
@@ -77,7 +64,15 @@ fun FindItScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(brush = Brush.verticalGradient(colors = listOf(Sky, Sand)))
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFFE8F0FE),
+                        Color(0xFFF3E8FF),
+                        Color(0xFFFEF3C7)
+                    )
+                )
+            )
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             // 3-Segment Capsule Progress Bar + Back Button + Hearts Status
@@ -126,19 +121,22 @@ fun FindItScreen(
                         fontFamily = LexendFontFamily,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = UbeDark,
+                        color = PrimaryJoyDark,
                         modifier = Modifier
-                            .background(color = UbeLight, shape = RoundedCornerShape(999.dp))
+                            .background(color = PrimaryJoy.copy(alpha = 0.12f), shape = PillShape)
+                            .border(width = 1.5.dp, color = PrimaryJoy.copy(alpha = 0.35f), shape = PillShape)
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     )
 
                     GummyContainer(
                         onClick = if (isPlaying) null else ({ viewModel.playTargetSound() }),
                         enabled = !isPlaying,
-                        faceColor = if (isPlaying) Mango else Cloud,
-                        shadowColor = if (isPlaying) MangoShadow else CloudShadow,
-                        shape = RoundedCornerShape(999.dp),
-                        depthHeight = 3.dp,
+                        faceColor = if (isPlaying) SunnyGold else SurfaceCard,
+                        shadowColor = if (isPlaying) SunnyGoldShadow else SurfaceCardShadow,
+                        shape = PillShape,
+                        strokeWidth = 2.dp,
+                        strokeColor = ModernBorder,
+                        depthHeight = 4.dp,
                         modifier = Modifier
                             .wrapContentWidth()
                             .heightIn(min = 56.dp)
@@ -151,15 +149,15 @@ fun FindItScreen(
                             Icon(
                                 imageVector = if (isPlaying) Icons.AutoMirrored.Rounded.VolumeUp else Icons.Rounded.PlayArrow,
                                 contentDescription = if (isPlaying) "Playing" else "Hear Sound",
-                                tint = if (isPlaying) Ink else UbeDark,
+                                tint = if (isPlaying) TextMidnight else PrimaryJoyDark,
                                 modifier = Modifier.size(22.dp)
                             )
                             Text(
                                 text = "Hear: /${targetPhoneme?.letter?.uppercase() ?: "M"}/",
                                 fontFamily = LexendFontFamily,
                                 fontSize = 18.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = if (isPlaying) Ink else UbeDark
+                                fontWeight = FontWeight.Black,
+                                color = if (isPlaying) TextMidnight else PrimaryJoyDark
                             )
                         }
                     }
@@ -188,14 +186,14 @@ fun FindItScreen(
                                 val isIncorrectSelection = state is FindItState.Incorrect &&
                                         (state as FindItState.Incorrect).selectedItem.id == item.id
                                 val borderColor = when {
-                                    isFound -> Leaf
-                                    isIncorrectSelection -> Kalamansi
-                                    else -> DarkBrownOutline
+                                    isFound -> EmeraldLeaf
+                                    isIncorrectSelection -> CoralBerry
+                                    else -> ModernBorderSoft
                                 }
                                 val faceColor = when {
-                                    isFound -> Color(0xFFEAF7EE)
-                                    isIncorrectSelection -> Color(0xFFFFF4E4)
-                                    else -> CreamWhite
+                                    isFound -> EmeraldLeaf.copy(alpha = 0.15f)
+                                    isIncorrectSelection -> CoralBerry.copy(alpha = 0.12f)
+                                    else -> SurfaceCard
                                 }
                                 Box(modifier = Modifier.weight(1f)) {
                                     FindItCard(
@@ -228,14 +226,14 @@ fun FindItScreen(
                                 val isIncorrectSelection = state is FindItState.Incorrect &&
                                         (state as FindItState.Incorrect).selectedItem.id == item.id
                                 val borderColor = when {
-                                    isFound -> Leaf
-                                    isIncorrectSelection -> Kalamansi
-                                    else -> DarkBrownOutline
+                                    isFound -> EmeraldLeaf
+                                    isIncorrectSelection -> CoralBerry
+                                    else -> ModernBorderSoft
                                 }
                                 val faceColor = when {
-                                    isFound -> Color(0xFFEAF7EE)
-                                    isIncorrectSelection -> Color(0xFFFFF4E4)
-                                    else -> CreamWhite
+                                    isFound -> EmeraldLeaf.copy(alpha = 0.15f)
+                                    isIncorrectSelection -> CoralBerry.copy(alpha = 0.12f)
+                                    else -> SurfaceCard
                                 }
                                 Box(modifier = Modifier.weight(1f)) {
                                     FindItCard(
@@ -266,16 +264,16 @@ fun FindItScreen(
                             val item = pictureGrid[i]
                             val isFound = item.id in foundItemIds
                             val isIncorrectSelection = state is FindItState.Incorrect &&
-                                    (state as FindItState.Incorrect).selectedItem.id == item.id
+                                     (state as FindItState.Incorrect).selectedItem.id == item.id
                             val borderColor = when {
-                                isFound -> Leaf
-                                isIncorrectSelection -> Kalamansi
-                                else -> DarkBrownOutline
+                                isFound -> EmeraldLeaf
+                                isIncorrectSelection -> CoralBerry
+                                else -> ModernBorderSoft
                             }
                             val faceColor = when {
-                                isFound -> Color(0xFFEAF7EE)
-                                isIncorrectSelection -> Color(0xFFFFF4E4)
-                                else -> CreamWhite
+                                isFound -> EmeraldLeaf.copy(alpha = 0.15f)
+                                isIncorrectSelection -> CoralBerry.copy(alpha = 0.12f)
+                                else -> SurfaceCard
                             }
                             Box(
                                 modifier = Modifier
@@ -312,6 +310,9 @@ fun FindItScreen(
                     GummyButton(
                         text = "Complete Lesson",
                         onClick = { onNext(targetPhoneme?.id?.toString() ?: "1") },
+                        backgroundColor = EmeraldLeaf,
+                        shadowColor = EmeraldLeafShadow,
+                        contentColor = Color.White,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(64.dp)
