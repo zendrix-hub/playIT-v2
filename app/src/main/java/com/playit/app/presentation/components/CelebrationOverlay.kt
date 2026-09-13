@@ -73,7 +73,7 @@ private fun ReducedMotionCelebration(
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         if (type == CelebrationType.CONFETTI || type == CelebrationType.STAR_BURST) {
             Image(
-                painter = rememberAssetPainter("images/rewards/reward_star.png"),
+                painter = rememberAssetPainter("images/rewards/reward_star.webp"),
                 contentDescription = "Celebration star",
                 modifier = Modifier
                     .size(80.dp)

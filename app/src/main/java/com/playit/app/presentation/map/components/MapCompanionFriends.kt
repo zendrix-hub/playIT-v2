@@ -58,12 +58,12 @@ import com.playit.app.presentation.theme.TextMidnight
 import kotlinx.coroutines.launch
 
 enum class CompanionAnimal(val id: Int, val displayName: String, val assetPath: String) {
-    CAT(1, "Miki", "images/characters/avatar_01_cat.png"),
-    MONKEY(2, "Milo", "images/characters/avatar_02_monkey.png"),
-    BUNNY(3, "Bella", "images/characters/avatar_03_bunny.png"),
-    BEAR(4, "Barnaby", "images/characters/avatar_04_bear.png"),
-    FROG(5, "Finley", "images/characters/avatar_05_frog.png"),
-    OWL(6, "Ollie", "images/characters/avatar_06_owl.png");
+    CAT(1, "Miki", "images/characters/avatar_01_cat.webp"),
+    MONKEY(2, "Milo", "images/characters/avatar_02_monkey.webp"),
+    BUNNY(3, "Bella", "images/characters/avatar_03_bunny.webp"),
+    BEAR(4, "Barnaby", "images/characters/avatar_04_bear.webp"),
+    FROG(5, "Finley", "images/characters/avatar_05_frog.webp"),
+    OWL(6, "Ollie", "images/characters/avatar_06_owl.webp");
 
     companion object {
         fun fromId(id: Int): CompanionAnimal = values().find { it.id == id } ?: CAT
@@ -135,7 +135,7 @@ fun generateMapCharacterPlacements(
             PlacedMapCharacter(
                 id = "lily_active_guide",
                 character = MapCharacter.Lily(
-                    poseAssetPath = "images/mascot/lily_pointing.png",
+                    poseAssetPath = "images/mascot/lily_pointing.webp",
                     roleDescription = "Lily the Tarsier Guide"
                 ),
                 offsetDp = Offset(lilyX, lilyY),
@@ -185,51 +185,6 @@ fun generateMapCharacterPlacements(
                 tappedPhrase = "Let's try it!"
             )
         )
-    }
-
-    // ── 3. Supporting Animal Friends stationed along Chapter Biomes ───────────
-    val supportingAnimals = CompanionAnimal.values().filter { it.id != activeAnimal.id }
-    val cheerPhrases = listOf(
-        Pair("Hop hop! You can do it!", "Great job!"),
-        Pair("Keep going! Ribbit!", "You're amazing!"),
-        Pair("Bear-y good! Great job!", "Keep it up!"),
-        Pair("Hoo-ray! Super smart!", "Super star!"),
-        Pair("Swing high! Almost there!", "Let's go!")
-    )
-
-    val milestoneInterval = (nodeCount / (supportingAnimals.size + 1)).coerceAtLeast(4)
-
-    supportingAnimals.forEachIndexed { index, animal ->
-        val targetNodeIdx = ((index + 1) * milestoneInterval).coerceAtMost(nodeCount - 1)
-        if (targetNodeIdx != activeNodeIndex && targetNodeIdx != explorerNodeIndex && targetNodeIdx < nodeCenters.size) {
-            val center = nodeCenters[targetNodeIdx]
-            val centerDpX = center.x / density
-            val centerDpY = center.y / density
-
-            val isRight = (index % 2 == 1)
-            val compX = if (isRight) {
-                (centerDpX + 52f).coerceAtMost(canvasWidthDp - 84f)
-            } else {
-                (centerDpX - 94f).coerceAtLeast(10f)
-            }
-            val compY = centerDpY - 32f
-
-            val isUnlocked = targetNodeIdx <= activeNodeIndex
-            val phrases = cheerPhrases.getOrElse(index) { Pair("Keep learning!", "Hooray!") }
-
-            characters.add(
-                PlacedMapCharacter(
-                    id = "friend_${animal.id}",
-                    character = MapCharacter.Animal(animal, isLeader = false),
-                    offsetDp = Offset(compX, compY),
-                    isLily = false,
-                    isLeader = false,
-                    isUnlocked = isUnlocked,
-                    defaultPhrase = phrases.first,
-                    tappedPhrase = phrases.second
-                )
-            )
-        }
     }
 
     return characters

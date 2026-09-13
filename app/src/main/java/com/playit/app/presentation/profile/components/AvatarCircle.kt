@@ -45,7 +45,7 @@ fun AvatarCircle(
 ) {
     val clampedId = avatarId.coerceIn(1, 6)
     val charName = AVATAR_CHARACTERS[clampedId - 1]
-    val avatarPath = "images/characters/avatar_0${clampedId}_${charName}.png"
+    val avatarPath = "images/characters/avatar_0${clampedId}_${charName}.webp"
     val baseColor = AVATAR_BG_COLORS[(clampedId - 1) % AVATAR_BG_COLORS.size]
 
     Box(

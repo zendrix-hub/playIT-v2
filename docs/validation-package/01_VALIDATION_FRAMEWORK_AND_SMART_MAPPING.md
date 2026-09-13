@@ -23,47 +23,46 @@ The primary objective of the **Weeks 1–2 MVP Validation** is **formative and d
 
 ---
 
-## 2. Theoretical Evaluation Frameworks
+## 2. Theoretical Evaluation Framework: The UPA Model
 
-In accordance with the IT411 research guidelines, PlayIT integrates a **Tripartite Multi-Dimensional Framework** that evaluates software quality, pedagogical efficacy, and end-user acceptance across distinct stakeholder groups:
+In educational technology for early childhood learners, generic software usability metrics alone are insufficient. PlayIT adopts the **UPA Framework (Usability, Pedagogy, Accessibility)** as its primary overarching evaluation architecture. Each UPA component is operationalized through validated instruments across distinct stakeholder cohorts:
 
 ```mermaid
 graph TD
-    subgraph MultiStakeholderFramework["PlayIT Multi-Stakeholder Evaluation Framework"]
-        ISO["ISO 9241-11: Usability Framework<br>(Effectiveness, Efficiency, Satisfaction)"]
-        UPA["UPA Framework<br>(Usability, Pedagogy, Accessibility)"]
-        TAM["Technology Acceptance Model (TAM)<br>(Perceived Usefulness & Ease of Use)"]
+    subgraph UPAFramework["PlayIT UPA Evaluation Framework"]
+        U["<b>Usability (U)</b><br>• Child Smileometer (Read & MacFarlane, 2006)<br>• 10-Item SUS (Brooke, 1996)<br>• Observational Task Timings"]
+        P["<b>Pedagogy (P)</b><br>• DepEd Marungko Teacher Checklist (7 items)<br>• Child Pre/Post Phonics Assessment<br>• 26-Letter CVC Cumulative Blending"]
+        A["<b>Accessibility (A)</b><br>• Pediatric Touch Targets (≥64dp)<br>• WCAG 2.1 AA Visual Contrast & Dual-Coding<br>• 100% Offline Zero-Data Socioeconomic Equity"]
     end
 
     EarlyLearner["Early Learners (Grade 1 / Kinder)<br>N = 10–12"]
     Parents["Parents / Guardians<br>N = 8–10"]
-    Teachers["DepEd Teachers & Reading SMEs<br>N = 4–5"]
+    Teachers["DepEd Teachers & Reading Specialists<br>N = 4–5"]
     TechReviewers["Technical / IT Evaluators<br>N = 2–3"]
 
-    ISO --> EarlyLearner
-    ISO --> TechReviewers
-    UPA --> Teachers
-    UPA --> EarlyLearner
-    TAM --> Parents
-    TAM --> Teachers
+    U --> EarlyLearner
+    U --> Parents
+    U --> Teachers
+    P --> Teachers
+    P --> EarlyLearner
+    A --> Parents
+    A --> EarlyLearner
+    A --> TechReviewers
 ```
 
-### 2.1 Framework 1: ISO 9241-11 Usability Framework
-ISO 9241-11 defines usability as the extent to which a product can be used by specified users to achieve specified goals with **Effectiveness**, **Efficiency**, and **Satisfaction** in a specified context of use:
-- **Effectiveness:** Assessed via the accuracy with which early learners execute target learning tasks (e.g., successful phoneme vocalization in *Say It*, accurate picture discrimination in *Find It*, and error-free word assembly in *Blend It*).
-- **Efficiency:** Assessed by the time required to complete learning nodes, the number of heart deductions incurred, and the number of audio replays requested before correct task completion.
-- **Satisfaction:** Measured qualitatively through observable child engagement during gameplay and through a post-activity 3-point visual smiley rating scale.
+### 2.1 Component 1: Usability (U)
+- **Child Usability (Smileometer):** Young children (ages 5–7) cannot reliably complete multi-point textual Likert scales. Affective satisfaction is assessed using the **Smileometer** (Read & MacFarlane, 2006)—a 3-point visual scale (Sad, Neutral, Happy) presented immediately post-session.
+- **Adult Usability (System Usability Scale - SUS):** Parents and educators complete the standardized **10-item System Usability Scale (SUS)** (Brooke, 1996), producing a composite usability score benchmarked against the industry standard (Target: Mean SUS ≥ 75.0 / Grade B+).
+- **Behavioral Task Efficiency:** Evaluated through direct observation of time-on-task, touch accuracy, and vocal speech recognition latency (≤ 500ms).
 
-### 2.2 Framework 2: Usability, Pedagogy, and Accessibility (UPA) Framework
-Educational technology intended for young children requires validation beyond generic UI usability. The UPA Framework evaluates:
-- **Pedagogy:** Verification that the instructional sequence strictly adheres to the DepEd Marungko phono-syllabic hierarchy; that decodable CVC words are developmentally appropriate for Grade 1 readers; and that positive reinforcement mechanisms encourage mastery without punitive discouragement.
-- **Accessibility:** Verification that pediatric physical constraints are satisfied, including large interactive touch targets (minimum 64dp), high-contrast visual elements adhering to WCAG standards, and intuitive non-verbal visual cues that support pre-literate or emerging readers.
-- **Usability:** Verification that the interface flow is clear, predictable, and devoid of cognitive friction or accidental navigation traps.
+### 2.2 Component 2: Pedagogy (P)
+- **Expert Curricular Compliance:** Certified DepEd Grade 1 teachers and reading specialists evaluate the curriculum using a 7-item checklist (`PED-01` to `PED-07`) validating Marungko sequence fidelity, phoneme modeling clarity, decodable CVC appropriateness, and the 26-letter English scope.
+- **Empirical Learning Gain (Pre/Post Test):** To provide quantitative evidence of learning efficacy for Capstone Chapter 4, a 10-item diagnostic phonics assessment is administered before gameplay (Pre-Test) and after gameplay (Post-Test) to evaluate letter-sound recognition and CVC blending score gains.
 
-### 2.3 Framework 3: Technology Acceptance Model (TAM)
-TAM evaluates how adult stakeholders (parents, guardians, and educators) adopt and perceive the system:
-- **Perceived Usefulness (PU):** The degree to which parents and teachers believe PlayIT accelerates English letter-sound mastery and provides actionable diagnostic insights via the Parent Dashboard.
-- **Perceived Ease of Use (PEOU):** The degree to which parents believe the application is straightforward to set up, requires minimal technical literacy, and operates reliably in low-resource, 100% offline environments.
+### 2.3 Component 3: Accessibility (A)
+- **Pediatric Ergonomics:** Evaluates physical UI accessibility for young learners, verifying large interactive touch targets (minimum 64dp) and high-contrast color palettes adhering to WCAG 2.1 AA standards.
+- **Cognitive & Non-Verbal Scaffolding:** Uses mascot speech bubbles, spoken audio models, and visual icon dual-coding so emerging or non-reading children can navigate without adult intervention.
+- **Socioeconomic & Offline Equity:** Verifies 100% offline operability with zero mobile data requirement, ensuring equitable access for low-resource households with zero advertisements, paywalls, or privacy risks.
 
 ---
 
@@ -146,35 +145,41 @@ classDiagram
     StakeholderCohort <|-- TechnicalEvaluators
 ```
 
-### 5.1 Comprehensive Question-to-Construct Mapping
+### 5.1 Comprehensive Question-to-Construct Mapping (UPA Model)
 
-| Item Code | Evaluation Statement / Metric | Theoretical Construct | Intended Respondent Role | Data Type |
+| Item Code | Evaluation Statement / Metric | UPA Theoretical Construct | Target Respondent | Instrument / Data Type |
 |---|---|---|---|---|
-| **PED-01** | The letter progression strictly follows the sequential DepEd Marungko Approach. | UPA: Pedagogy | DepEd Teachers / SMEs | 5-pt Likert |
-| **PED-02** | The introductory module (*Hear It*) delivers accurate, natural phoneme modeling. | UPA: Pedagogy | DepEd Teachers / SMEs | 5-pt Likert |
-| **PED-03** | The speech production module (*Say It*) uses words that are decodable and age-appropriate. | UPA: Pedagogy | DepEd Teachers / SMEs | 5-pt Likert |
-| **PED-04** | The picture discrimination module (*Find It*) uses illustrations culturally familiar to Filipino learners. | UPA: Pedagogy | DepEd Teachers / SMEs | 5-pt Likert |
-| **PED-05** | The word synthesis module (*Blend It*) respects the cumulative letter availability of each group. | UPA: Pedagogy | DepEd Teachers / SMEs | 5-pt Likert |
-| **PED-06** | The 26-letter adaptation (excluding `ng` and `ñ`) is pedagogically appropriate for Grade 1 English. | UPA: Pedagogy | DepEd Teachers / SMEs | 5-pt Likert |
-| **PED-07** | The gamification mechanics (hearts, stars, streaks) reinforce learning without cognitive overload. | UPA: Pedagogy | DepEd Teachers / SMEs | 5-pt Likert |
-| **TAM-PU01** | PlayIT helps my child learn English letter sounds independently at home. | TAM: Perceived Usefulness | Parents / Guardians | 5-pt Likert |
-| **TAM-PU02** | The app makes reading practice more engaging than traditional paper worksheets. | TAM: Perceived Usefulness | Parents / Guardians | 5-pt Likert |
-| **TAM-PEOU01**| The app is easy for my child to navigate without constant adult assistance. | TAM: Ease of Use | Parents / Guardians | 5-pt Likert |
-| **TAM-PEOU02**| Creating a child profile and selecting an avatar was quick and intuitive. | TAM: Ease of Use | Parents / Guardians | 5-pt Likert |
-| **TAM-BI01** | I intend to use or continue using PlayIT with my child regularly for phonics practice at home. | TAM: Behavioral Intention | Parents / Guardians | 5-pt Likert |
-| **DASH-01** | The Parent Dashboard clearly identifies which letter sounds need further practice. | TAM: Utility | Parents / Guardians | 5-pt Likert |
-| **DASH-02** | The arithmetic security gate (e.g., 7 + 5 = ?) effectively prevents accidental child entry. | ISO: Security | Parents / Guardians | 5-pt Likert |
-| **OFFLINE-01** | The 100% offline capability is cost-saving and reliable for our household. | TAM: Practicality | Parents / Guardians | 5-pt Likert |
-| **SAFETY-01** | I feel confident because the app contains zero ads, external links, or paid transactions. | ISO: Safety & Privacy | Parents / Guardians | 5-pt Likert |
-| **OBS-01** | Child independently taps the unlocked letter node on the Level Map. *(Record time in seconds.)* | ISO: Effectiveness + Efficiency | Early Learners (Observer) | 3-pt Scale + Time (s) |
-| **OBS-02** | Child listens to audio model in *Hear It* and mimics the pronunciation. | UPA: Engagement | Early Learners (Observer) | 3-pt Scale |
-| **OBS-03** | Child taps the microphone and speaks clearly into the device. *(Record time from mic tap to ASR result in seconds.)* | ISO: Usability / ASR Efficiency | Early Learners (Observer) | 3-pt Scale + Time (s) |
-| **OBS-04** | Child correctly discriminates target pictures from distractors in *Find It*. | ISO: Effectiveness | Early Learners (Observer) | 3-pt Scale |
-| **OBS-05** | Child drags/taps letter tiles to build the target CVC word in *Blend It*. *(Record time from word display to submission in seconds.)* | UPA: Cognitive Load + Efficiency | Early Learners (Observer) | 3-pt Scale + Time (s) |
-| **SMILEY-01** | Child's post-session affective reaction ("How did you feel playing with Lily?"). | ISO: Satisfaction | Early Learners | 3-pt Visual Scale |
-| **SYS-01** | Speech recognition latency from mic release to feedback display (≤ 0.5s). | ISO 25010: Performance | Technical Evaluators | Numeric (ms) |
-| **SYS-02** | App operational stability and crash resilience during rapid UI navigation. | ISO 25010: Reliability | Technical Evaluators | Binary Pass/Fail |
-| **SYS-03** | Local SQLite/Room database persistence verified across application restarts. | ISO 25010: Integrity | Technical Evaluators | Binary Pass/Fail |
+| **PED-01** | The letter progression strictly follows the sequential DepEd Marungko Approach. | Pedagogy: Sequence Fidelity | DepEd Teachers / SMEs | 5-pt Likert (1–5) |
+| **PED-02** | The introductory module (*Hear It*) delivers accurate, natural phoneme modeling. | Pedagogy: Phonemic Audio | DepEd Teachers / SMEs | 5-pt Likert (1–5) |
+| **PED-03** | The speech production module (*Say It*) uses words that are decodable and age-appropriate. | Pedagogy: Vocalization | DepEd Teachers / SMEs | 5-pt Likert (1–5) |
+| **PED-04** | The picture discrimination module (*Find It*) uses illustrations culturally familiar to Filipino learners. | Pedagogy: Visual Discrimination | DepEd Teachers / SMEs | 5-pt Likert (1–5) |
+| **PED-05** | The word synthesis module (*Blend It*) respects the cumulative letter availability of each group. | Pedagogy: CVC Blending | DepEd Teachers / SMEs | 5-pt Likert (1–5) |
+| **PED-06** | The 26-letter adaptation (excluding `ng` and `ñ`) is pedagogically appropriate for Grade 1 English. | Pedagogy: Scope Validity | DepEd Teachers / SMEs | 5-pt Likert (1–5) |
+| **PED-07** | The gamification mechanics (hearts, stars, streaks) reinforce learning without cognitive overload. | Pedagogy: Motivation | DepEd Teachers / SMEs | 5-pt Likert (1–5) |
+| **PRE-POST** | Pre-play vs. post-play diagnostic test measuring phoneme identification and CVC blending accuracy. | Pedagogy: Empirical Learning Gain | Early Learners (Tested) | 0–10 Score Delta (Pre vs. Post) |
+| **SUS-01** | I think that I would like to use PlayIT frequently for my child's/students' reading practice. | Usability: System Usability Scale | Parents & Teachers | 5-pt Likert (Standard SUS) |
+| **SUS-02** | I found the application unnecessarily complex. *(Reverse-Scored)* | Usability: System Usability Scale | Parents & Teachers | 5-pt Likert (Standard SUS) |
+| **SUS-03** | I thought the application was easy to use and navigate. | Usability: System Usability Scale | Parents & Teachers | 5-pt Likert (Standard SUS) |
+| **SUS-04** | I think that I would need the support of a technical person to use this app. *(Reverse-Scored)* | Usability: System Usability Scale | Parents & Teachers | 5-pt Likert (Standard SUS) |
+| **SUS-05** | I found the various functions in this system were well integrated. | Usability: System Usability Scale | Parents & Teachers | 5-pt Likert (Standard SUS) |
+| **SUS-06** | I thought there was too much inconsistency in this system. *(Reverse-Scored)* | Usability: System Usability Scale | Parents & Teachers | 5-pt Likert (Standard SUS) |
+| **SUS-07** | I would imagine that most people would learn to use this system very quickly. | Usability: System Usability Scale | Parents & Teachers | 5-pt Likert (Standard SUS) |
+| **SUS-08** | I found the system very cumbersome or confusing to use. *(Reverse-Scored)* | Usability: System Usability Scale | Parents & Teachers | 5-pt Likert (Standard SUS) |
+| **SUS-09** | I felt very confident using the application. | Usability: System Usability Scale | Parents & Teachers | 5-pt Likert (Standard SUS) |
+| **SUS-10** | I needed to learn a lot of things before I could get going with this system. *(Reverse-Scored)* | Usability: System Usability Scale | Parents & Teachers | 5-pt Likert (Standard SUS) |
+| **SMILEY-01** | Child's post-session affective reaction ("How did you feel playing with Lily?"). | Usability: Affective Satisfaction | Early Learners | 3-pt Visual Smileometer |
+| **OBS-01** | Child independently taps the unlocked letter node on the Level Map. *(Record time in seconds.)* | Usability: Efficiency | Early Learners (Observed) | 3-pt Rubric + Time (s) |
+| **OBS-02** | Child listens to audio model in *Hear It* and mimics the pronunciation. | Usability: Engagement | Early Learners (Observed) | 3-pt Rubric |
+| **OBS-03** | Child taps the microphone and speaks clearly into the device. *(Record time to ASR result.)* | Usability: Vocal Efficiency | Early Learners (Observed) | 3-pt Rubric + Time (s) |
+| **OBS-04** | Child correctly discriminates target pictures from distractors in *Find It*. | Usability: Effectiveness | Early Learners (Observed) | 3-pt Rubric |
+| **OBS-05** | Child drags/taps letter tiles to build the target CVC word in *Blend It*. *(Record time to submit.)* | Usability: Cognitive Load | Early Learners (Observed) | 3-pt Rubric + Time (s) |
+| **ACC-01** | Interactive touch targets (≥64dp) are large and comfortable for small child hands. | Accessibility: Ergonomics | Parents & Teachers | 5-pt Likert (1–5) |
+| **ACC-02** | Spoken audio models and visual icons allow pre-readers to navigate without reading text. | Accessibility: Dual-Coding | Parents & Teachers | 5-pt Likert (1–5) |
+| **ACC-03** | 100% offline operability (zero WiFi/data) provides equal access for low-resource homes. | Accessibility: Socioeconomic Equity | Parents & Teachers | 5-pt Likert (1–5) |
+| **ACC-04** | Zero advertisements, zero paid transactions, and offline storage protect child privacy. | Accessibility: Safety & Privacy | Parents & Teachers | 5-pt Likert (1–5) |
+| **SYS-01** | Speech recognition latency from mic release to feedback display (≤ 0.5s). | Technical: ISO 25010 Latency | Technical Evaluators | Numeric (ms) |
+| **SYS-02** | App operational stability and 60 FPS animation smoothness during rapid navigation. | Technical: ISO 25010 Reliability | Technical Evaluators | Binary Pass/Fail |
+| **SYS-03** | Local SQLite/Room database persistence verified across application force-close restarts. | Technical: ISO 25010 Integrity | Technical Evaluators | Binary Pass/Fail |
 
 ---
 

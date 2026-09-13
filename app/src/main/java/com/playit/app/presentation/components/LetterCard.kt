@@ -157,7 +157,7 @@ fun LetterCard(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val pictureAsset = "images/pictures/picture_${word.lowercase()}.png"
+                val pictureAsset = "images/pictures/picture_${word.lowercase()}.webp"
                 GummyMotionAsset(
                     assetPath = pictureAsset,
                     contentDescription = if (promptMode) "Say the word $displayWord" else displayWord,

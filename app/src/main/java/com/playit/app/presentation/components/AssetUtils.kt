@@ -47,8 +47,25 @@ fun rememberAssetPainter(assetPath: String): Painter {
         }
 
         try {
-            val bitmap = context.assets.open(assetPath).use { inputStream ->
-                BitmapFactory.decodeStream(inputStream)
+            val inputStream = try {
+                context.assets.open(assetPath)
+            } catch (e: Exception) {
+                val alternatePath = when {
+                    assetPath.endsWith(".png", ignoreCase = true) ->
+                        assetPath.substring(0, assetPath.length - 4) + ".webp"
+                    assetPath.endsWith(".webp", ignoreCase = true) ->
+                        assetPath.substring(0, assetPath.length - 5) + ".png"
+                    else -> null
+                }
+                if (alternatePath != null) {
+                    context.assets.open(alternatePath)
+                } else {
+                    throw e
+                }
+            }
+
+            val bitmap = inputStream.use { stream ->
+                BitmapFactory.decodeStream(stream)
             }
             if (bitmap != null) {
                 AssetBitmapCache.put(assetPath, bitmap)
@@ -63,14 +80,14 @@ fun rememberAssetPainter(assetPath: String): Painter {
 }
 
 /**
- * Mascot Lily character states mapped to their production PNG asset paths in assets/images/mascot/.
+ * Mascot Lily character states mapped to their production WebP asset paths in assets/images/mascot/.
  */
 enum class MascotState(val assetPath: String) {
-    IDLE("images/mascot/lily_idle.png"),
-    CELEBRATING("images/mascot/lily_celebrating.png"),
-    ENCOURAGING("images/mascot/lily_encouraging.png"),
-    LISTENING("images/mascot/lily_listening.png"),
-    POINTING("images/mascot/lily_pointing.png"),
-    WAVING("images/mascot/lily_waving.png"),
-    THINKING("images/mascot/lily_thinking.png")
+    IDLE("images/mascot/lily_idle.webp"),
+    CELEBRATING("images/mascot/lily_celebrating.webp"),
+    ENCOURAGING("images/mascot/lily_encouraging.webp"),
+    LISTENING("images/mascot/lily_listening.webp"),
+    POINTING("images/mascot/lily_pointing.webp"),
+    WAVING("images/mascot/lily_waving.webp"),
+    THINKING("images/mascot/lily_thinking.webp")
 }

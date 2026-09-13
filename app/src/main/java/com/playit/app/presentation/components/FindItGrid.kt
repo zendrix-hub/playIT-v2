@@ -133,7 +133,7 @@ fun FindItCard(
     onClick: () -> Unit
 ) {
     val word = phoneme.exampleWord.lowercase()
-    val assetPath = "images/pictures/picture_$word.png"
+    val assetPath = "images/pictures/picture_$word.webp"
     val item = FindItPictureItem(
         id = phoneme.id.toString(),
         phonemeLetter = phoneme.letter,

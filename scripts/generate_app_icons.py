@@ -22,11 +22,38 @@ OUTLINE_WIDTH = 12
 BG_TOP = (255, 253, 238, 255)       # #FFFDEE (warm sunny morning light)
 BG_BOT = (254, 215, 102, 255)       # #FED766 (warm sunny golden glow)
 
-def get_mascot_image():
-    """Loads Lily the Tarsier from the latest master asset."""
+def get_clean_mascot_head():
+    """
+    Extracts Lily the Tarsier's iconic head from the master asset,
+    smoothing the neckline/chin into a graceful Headspace-style curve
+    with a continuous #2D373E vector outline.
+    """
     if not os.path.exists(MASCOT_PATH):
         raise FileNotFoundError(f"Mascot not found at {MASCOT_PATH}")
-    return Image.open(MASCOT_PATH).convert("RGBA")
+    lily = Image.open(MASCOT_PATH).convert("RGBA")
+
+    # Create a smooth head mask rounding the chin at y ~ 325
+    head_mask = Image.new("L", (512, 512), 0)
+    d_hm = ImageDraw.Draw(head_mask)
+    d_hm.rectangle([0, 0, 512, 260], fill=255)
+    d_hm.ellipse([110, 100, 402, 335], fill=255)
+
+    alpha = lily.split()[3]
+    head_alpha = Image.composite(alpha, Image.new("L", (512, 512), 0), head_mask)
+
+    head_only = lily.copy()
+    head_only.putalpha(head_alpha)
+
+    # Apply continuous #2D373E outline along the new chin curve
+    stroke_w = 6
+    small_alpha = head_alpha.filter(ImageFilter.MaxFilter(stroke_w * 2 + 1))
+    stroke_base = Image.new("RGBA", (512, 512), OUTLINE)
+    outlined = Image.new("RGBA", (512, 512), (0, 0, 0, 0))
+    outlined.paste(stroke_base, (0, 0), small_alpha)
+    head_clean = Image.alpha_composite(outlined, head_only)
+
+    bbox = head_clean.getbbox()
+    return head_clean.crop(bbox)
 
 def create_sunny_background(size=512):
     """Generates the soft warm sunny Headspace gradient background."""
@@ -43,10 +70,10 @@ def create_sunny_background(size=512):
 def create_master_squircle_icon(size=512):
     """
     Creates the complete master squircle app icon (512x512).
-    Features Headspace warm sunny backdrop with the newest Lily the Tarsier mascot,
-    tactile pediatric 3D gummy depth shadow, and continuous #2D373E outline.
+    Features Headspace warm sunny backdrop with Lily the Tarsier's hero head
+    peeking up from the bottom, tactile 3D gummy depth shadow, and continuous #2D373E border.
     """
-    lily = get_mascot_image()
+    head = get_clean_mascot_head()
     bg = create_sunny_background(size)
 
     mask = Image.new("L", (size, size), 0)
@@ -56,17 +83,17 @@ def create_master_squircle_icon(size=512):
     squircle = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     squircle.paste(bg, (0, 0), mask)
 
-    # Scale Lily so her head, ears, giant luminous eyes, and cute paws are prominently framed
+    # Scale Lily so her head, ears, and giant luminous eyes are prominently framed
     scale = 0.94
-    w = int(size * scale)
-    h = int(size * scale)
-    scaled_lily = lily.resize((w, h), Image.Resampling.LANCZOS)
+    w = int(head.width * scale)
+    h = int(head.height * scale)
+    scaled_head = head.resize((w, h), Image.Resampling.LANCZOS)
 
     pos_x = (size - w) // 2
-    pos_y = 28 # gives balanced top breathing margin for ears
+    pos_y = size - h - 30
 
     char_layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    char_layer.paste(scaled_lily, (pos_x, pos_y), scaled_lily)
+    char_layer.paste(scaled_head, (pos_x, pos_y), scaled_head)
 
     # Mask mascot to squircle
     char_masked = Image.new("RGBA", (size, size), (0, 0, 0, 0))
@@ -90,7 +117,7 @@ def create_round_launcher_icon(size=512):
     Creates the circular launcher icon with Lily gracefully framed
     inside the circular mask and framed with continuous #2D373E border.
     """
-    lily = get_mascot_image()
+    head = get_clean_mascot_head()
     bg = create_sunny_background(size)
 
     mask = Image.new("L", (size, size), 0)
@@ -100,16 +127,16 @@ def create_round_launcher_icon(size=512):
     round_bg = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     round_bg.paste(bg, (0, 0), mask)
 
-    scale = 0.88
-    w = int(size * scale)
-    h = int(size * scale)
-    scaled_lily = lily.resize((w, h), Image.Resampling.LANCZOS)
+    scale = 0.82
+    w = int(head.width * scale)
+    h = int(head.height * scale)
+    scaled_head = head.resize((w, h), Image.Resampling.LANCZOS)
 
     pos_x = (size - w) // 2
-    pos_y = 44
+    pos_y = (size - h) // 2 + 15
 
     char_layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    char_layer.paste(scaled_lily, (pos_x, pos_y), scaled_lily)
+    char_layer.paste(scaled_head, (pos_x, pos_y), scaled_head)
 
     char_masked = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     char_masked.paste(char_layer, (0, 0), mask)
@@ -125,19 +152,19 @@ def create_adaptive_foreground(size=512):
     Creates the Android 8.0+ adaptive icon foreground.
     Per Android adaptive icon specifications, key content must fit inside
     the central 72dp safe zone circle (diameter = 72/108 * size = ~341px).
-    Lily is scaled to 0.71 and centered so no launcher mask ever clips her.
+    Lily's head is scaled to 0.73 and centered so no launcher mask ever clips her.
     """
-    lily = get_mascot_image()
+    head = get_clean_mascot_head()
     fg = Image.new("RGBA", (size, size), (0, 0, 0, 0))
 
-    scale = 0.71
-    w = int(size * scale)
-    h = int(size * scale)
-    scaled_lily = lily.resize((w, h), Image.Resampling.LANCZOS)
+    scale = 0.73
+    w = int(head.width * scale)
+    h = int(head.height * scale)
+    scaled_head = head.resize((w, h), Image.Resampling.LANCZOS)
 
     pos_x = (size - w) // 2
     pos_y = (size - h) // 2 + 10
-    fg.paste(scaled_lily, (pos_x, pos_y), scaled_lily)
+    fg.paste(scaled_head, (pos_x, pos_y), scaled_head)
     return fg
 
 def main():

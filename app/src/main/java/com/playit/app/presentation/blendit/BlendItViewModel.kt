@@ -98,9 +98,9 @@ class BlendItViewModel @Inject constructor(
             val selected = blendItWordSelector.selectWordsForSession(groupId, availableWords)
             _words.value = selected.ifEmpty {
                 listOf(
-                    BlendItWord(1, 1, "SAM", "S-A-M", "audio/words/word_sam.mp3", "images/pictures/blendword_sam.png"),
-                    BlendItWord(2, 1, "SIS", "S-I-S", "audio/words/word_sis.mp3", "images/pictures/blendword_sis.png"),
-                    BlendItWord(3, 1, "AIM", "A-I-M", "audio/words/word_aim.mp3", "images/pictures/blendword_aim.png")
+                    BlendItWord(1, 1, "SAM", "S-A-M", "audio/words/word_sam.mp3", "images/pictures/blendword_sam.webp"),
+                    BlendItWord(2, 1, "SIS", "S-I-S", "audio/words/word_sis.mp3", "images/pictures/blendword_sis.webp"),
+                    BlendItWord(3, 1, "AIM", "A-I-M", "audio/words/word_aim.mp3", "images/pictures/blendword_aim.webp")
                 )
             }
             setupWordAtIndex(0)

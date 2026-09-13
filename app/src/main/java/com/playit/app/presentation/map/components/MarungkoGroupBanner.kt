@@ -1,6 +1,5 @@
 package com.playit.app.presentation.map.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,8 +13,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AutoStories
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -58,9 +59,9 @@ fun getMarungkoLettersForGroup(groupNumber: Int): String {
 }
 
 /**
- * Duolingo-style Section / Unit Header Banner (matching duoling_map_sample.jpg):
- * - Distinctive Bohol Biome palette (derived from tools/ images)
- * - "SECTION 1, UNIT X" label
+ * Modern Material 3 Section / Unit Header Banner:
+ * - Distinctive Bohol Biome palette
+ * - "SECTION 1, UNIT X" badge
  * - Bold unit title
  * - Right notebook / guidebook icon button
  * - Clean subtitle with horizontal divider wings: "── Practice sounds M, S, A, I ──"
@@ -80,7 +81,7 @@ fun MarungkoGroupBanner(
         GroupBannerStatus.LOCKED -> Color(0xFFE2E8F0)
     }
 
-    val bannerShelf = when (status) {
+    val bannerBorder = when (status) {
         GroupBannerStatus.COMPLETED -> theme.shelfColor
         GroupBannerStatus.IN_PROGRESS -> theme.shelfColor
         GroupBannerStatus.LOCKED -> Color(0xFFCBD5E1)
@@ -102,66 +103,53 @@ fun MarungkoGroupBanner(
             .padding(horizontal = 16.dp, vertical = 6.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 3D Duolingo Unit Card
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(78.dp)
+        // Material 3 Elevated Card
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(18.dp),
+            color = bannerBg,
+            shadowElevation = 3.dp,
+            border = androidx.compose.foundation.BorderStroke(2.dp, bannerBorder)
         ) {
-            // 3D Shelf Extrusion
-            Box(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(72.dp)
-                    .align(Alignment.BottomCenter)
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(bannerShelf)
-            )
-
-            // Top Card Face
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(72.dp)
-                    .align(Alignment.TopCenter)
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(bannerBg)
-                    .padding(horizontal = 18.dp, vertical = 10.dp)
+                    .padding(horizontal = 18.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.weight(1f)
                 ) {
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = "SECTION 1, UNIT $groupNumber".uppercase(),
-                            fontFamily = LexendFontFamily,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = headerColor,
-                            letterSpacing = 0.5.sp
-                        )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = theme.title,
-                            fontFamily = LexendFontFamily,
-                            fontSize = 17.sp,
-                            fontWeight = FontWeight.Black,
-                            color = titleColor
-                        )
-                    }
+                    Text(
+                        text = "SECTION 1, UNIT $groupNumber".uppercase(),
+                        fontFamily = LexendFontFamily,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = headerColor,
+                        letterSpacing = 0.5.sp
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = theme.title,
+                        fontFamily = LexendFontFamily,
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Black,
+                        color = titleColor
+                    )
+                }
 
-                    // Interactive Guidebook notebook icon button on the right
+                // Guidebook icon button on the right
+                Surface(
+                    onClick = onGuidebookClick,
+                    shape = RoundedCornerShape(12.dp),
+                    color = if (status == GroupBannerStatus.LOCKED) Color(0xFFCBD5E1) else theme.shelfColor,
+                    shadowElevation = 1.dp,
+                    modifier = Modifier.size(44.dp)
+                ) {
                     Box(
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(if (status == GroupBannerStatus.LOCKED) Color(0xFFCBD5E1) else theme.shelfColor)
-                            .clickable { onGuidebookClick() },
+                        modifier = Modifier.size(44.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -179,28 +167,30 @@ fun MarungkoGroupBanner(
 
         // Subtitle Divider line: ──── Practice sounds M, S, A, I ────
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp),
+            modifier = Modifier.fillMaxWidth(0.92f),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
             HorizontalDivider(
                 modifier = Modifier.weight(1f),
-                thickness = 2.dp,
-                color = Color(0xFFE2E8F0)
+                thickness = 1.5.dp,
+                color = if (status == GroupBannerStatus.LOCKED) Color(0xFFCBD5E1) else theme.shelfColor.copy(alpha = 0.40f)
             )
+
             Text(
-                text = "  ${theme.lettersSummary}  ",
+                text = theme.lettersSummary.uppercase(),
                 fontFamily = LexendFontFamily,
-                fontSize = 12.sp,
+                fontSize = 11.5.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF64748B)
+                color = if (status == GroupBannerStatus.LOCKED) Color(0xFF94A3B8) else theme.textSecondary,
+                letterSpacing = 0.8.sp,
+                modifier = Modifier.padding(horizontal = 12.dp)
             )
+
             HorizontalDivider(
                 modifier = Modifier.weight(1f),
-                thickness = 2.dp,
-                color = Color(0xFFE2E8F0)
+                thickness = 1.5.dp,
+                color = if (status == GroupBannerStatus.LOCKED) Color(0xFFCBD5E1) else theme.shelfColor.copy(alpha = 0.40f)
             )
         }
     }

@@ -260,7 +260,7 @@ fun SplashScreen(
 
                 // Master Lily Waving Artwork
                 Image(
-                    painter = rememberAssetPainter("images/mascot/lily_waving.png"),
+                    painter = rememberAssetPainter("images/mascot/lily_waving.webp"),
                     contentDescription = "Lily the Tarsier welcoming you",
                     contentScale = ContentScale.Fit,
                     modifier = Modifier

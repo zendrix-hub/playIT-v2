@@ -40,7 +40,7 @@ fun BlendItCard(
     onReplayAudio: () -> Unit = {}
 ) {
     val cleanWord = word.lowercase()
-    val assetPath = "images/pictures/blendword_$cleanWord.png"
+    val assetPath = "images/pictures/blendword_$cleanWord.webp"
 
     GummyContainer(
         onClick = onReplayAudio,

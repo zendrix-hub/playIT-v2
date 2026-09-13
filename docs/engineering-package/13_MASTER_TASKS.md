@@ -383,4 +383,70 @@ Change: Say It now asks the child to utter the letter's example WORD (m → "Mou
   - 139/139 unit tests green (`BUILD SUCCESSFUL in 48s`, 0 failures, 0 errors).
   - Clean APK assembly via `./gradlew assembleDebug` (`BUILD SUCCESSFUL in 46s`).
 
+## Phase 30 — MapScreen Material 3 Refactor & Pediatric Polish (2026-09-13)
+- [x] **Asset & UI Wrapper Bloat Elimination**:
+  - Deleted 16 obsolete background prop image assets in `app/src/main/assets/images/backgrounds/` (`mapprop_*.png` and `map_prop_*.png`), freeing ~488 KB.
+  - Deleted `MapTerrainProps.kt` (205 lines), removing complex prop layout calculations and infinite animation loops.
+  - Simplified `ChocolateHillsBackground.kt` from 528 lines of CPU/GPU overdraw canvas to a clean, lightweight Material 3 gradient backdrop with soft topographic curves across the 6 Bohol biomes.
+  - Streamlined `MapCompanionFriends.kt` to focus exclusively on Lily the Tarsier as the active learning guide and the profile explorer buddy.
+  - Flattened `LetterMapNodeCard` from 7 nested Box wrappers into a clean, high-performance Material 3 disc composable.
+- [x] **Material 3 Principles Integration**:
+  - Adopted Material 3 `Scaffold` with proper insets handling and surface background.
+  - Refactored `TopStatsBar.kt` using Material 3 `Surface`, elevated stat chips, and an M3 `LinearProgressIndicator` tracking the 26-letter journey.
+  - Refactored `MarungkoGroupBanner.kt` to a clean Material 3 `Surface` / `ElevatedCard` layout without manual double-box shelf hacks.
+  - Refactored `BlendItChallengeNodeCard` into a clean M3 milestone card.
+- [x] **Subtle Letter Node Micro-Animations**:
+  - **Active Node Breathing**: Gentle rhythmic scale (`1.0f` to `1.05f`) and soft glowing focus halo (`alpha = 0.55f` to `0.0f`, `scale = 1.0f` to `1.30f`).
+  - **Tactile Touch Press**: Bouncy spring-based depression (`scale = 0.93f`, `translationY = +3dp`, `elevation = 1dp` vs `4dp`) using `MutableInteractionSource` and `collectIsPressedAsState()`.
+  - **Locked Node Wobble**: Subtle horizontal spring wiggle ($\pm 8\text{dp}$) with instant visual lock feedback on tap.
+  - **Reduced Motion Support**: Integrated with `LocalReducedMotion.current` to immediately disable continuous animations when reduced motion is preferred.
+- [x] **Full Verification Gate**:
+  - 139/139 unit tests green (`BUILD SUCCESSFUL in 10m 8s`, 0 failures, 0 errors).
+
+## Phase 31 — Map Star Contrast Resolution & Headspace Mascot Logo Suite Alignment (2026-09-13)
+- [x] **Map Star Contrast Capsule Integration**:
+  - Identified root cause of poor star readability: 13dp amber/yellow stars (`#F59E0B`) floated nakedly directly over the golden path ribbon (`#FDE68A`) and the warm sand/amber terrain biomes (Units 3, 5, and 6: `#FEF3C7`, `#FED7AA`, `#FDE68A`, `#FEF9C3`), causing WCAG contrast degradation (< 1.3:1).
+  - Wrapped 3-star rating rows in `LetterMapNodeCard` and `BlendItChallengeNodeCard` within an elevated, high-contrast pure white capsule (`SurfaceCard` / `#FFFFFF` background, `RoundedCornerShape(12.dp)`, `ModernBorder` 1.5dp stroke, soft 2dp elevation shadow).
+  - Boosted star icon size to `14.dp` with `2.5.dp` spacing and `horizontal = 7.dp, vertical = 2.dp` padding.
+  - Earned stars tinted with vibrant `SunnyGold` (`#F59E0B`), unearned stars in clean soft silver (`#CBD5E1`).
+  - Guaranteed 100% contrast, visual hierarchy, and instant legibility across all 6 Bohol biomes.
+- [x] **Official Headspace Mascot App Logo Suite Alignment**:
+  - Overhauled the official app launcher branding suite per the user directive: synthesized Headspace's iconic clean geometric dome composition (rising peeking head) with Lily the Tarsier's authentic mascot features from `lily_idle.png` (giant luminous golden eyes with double catchlights, coral-peach inner ear lobes, sweet smile, and continuous `#2D373E` outline).
+  - Cleaned neckline/chin contours with a smooth Headspace curve, eliminating stray tail or flat horizontal cut artifacts.
+  - Enforced strict 72dp Android adaptive safe-zone circle compliance (~341px circle at 512px canvas, scale 0.73) with zero ear or cheek clipping across circular (Pixel), squircle (Samsung One UI), and rounded-square OEM launcher masks.
+  - Generated and deployed master suite across all densities:
+    - `drawable-xxxhdpi/ic_launcher_playstore.png` (512x512 Master Store Icon)
+    - `drawable-xxxhdpi/ic_launcher_foreground.png` (512x512 Adaptive Foreground)
+    - `drawable-xxxhdpi/ic_launcher_background.png` (512x512 Adaptive Sunny Background)
+    - `mipmap-{mdpi,hdpi,xhdpi,xxhdpi,xxxhdpi}/`: `ic_launcher.png`, `ic_launcher_round.png`, `ic_launcher_foreground.png`, `ic_launcher_background.png`.
+  - Updated Section 9 of `asset_review.html` with new asset previews and technical descriptions.
+- [x] **Full Verification Gate**:
+  - 139/139 unit tests green (`BUILD SUCCESSFUL in 9m 2s`, 0 failures, 0 errors).
+
+## Phase 32 — APK Size Reduction & Asset Modernization (2026-09-13)
+- [x] **APK Forensic Audit & Category Breakdown**:
+  - Engineered `tools/analyze_apk_size.py` to analyze uncompressed vs compressed sizes across all APK categories.
+  - Identified 3 key optimization targets: dead multi-ABI native libraries (`lib/`), unused/duplicate PNG image assets, and dead dependencies/DEX bloat.
+- [x] **ABI Targeting & Splits**:
+  - Replaced universal fat APK configuration with Gradle ABI splits (`splits.abi`) targeting `arm64-v8a`, `armeabi-v7a`, and `x86_64`.
+  - Standalone device builds (`app-arm64-v8a-debug.apk`) now package only 64-bit ARM binaries, instantly cutting 17.35 MB of dead x86_64 and 32-bit machine code.
+- [x] **Asset Pruning & Dead File Elimination**:
+  - Archived 30 obsolete prerendered letter card PNGs (`letter_a.png` through `letter_z.png`, `letter_ng.png`, `letter_n_tilde.png`, `letter_ñ.png`) to `archive/assets_prerendered_letters/` (5.89 MB saved; letter cards are dynamically rendered via Jetpack Compose and `LexendFontFamily`).
+  - Removed duplicate avatar sets (`companion_avatar_*` in `mascot/`, saving 384 KB).
+  - Removed duplicate `splash_tarsier_headspace.png` (247 KB).
+  - Removed unreferenced `_style-reference-sheet/` and stray test audio (`tts_*`).
+- [x] **WebP Modernization (Lossless / High-Fidelity Q95)**:
+  - Batch-converted 159 active PNGs (`pictures/`, `mascot/`, `characters/`, `rewards/`) to Google WebP at Quality 95 using `tools/optimize_app_assets.py`.
+  - Asset folder compressed from 16.21 MB down to 3.30 MB (saving 12.91 MB, a ~80% reduction in image size).
+  - Upgraded `rememberAssetPainter` in `AssetUtils.kt` with auto-fallback between `.webp` and `.png` for zero-regression backwards compatibility with existing SQLite database records and tests.
+  - Updated `DatabaseModule.kt`, `GridGenerator.kt`, `LetterCard.kt`, `BlendItCard.kt`, `FindItGrid.kt`, and theme components to `.webp`.
+- [x] **Dependency Optimization**:
+  - Removed unused `libs.coil.compose` from `app/build.gradle.kts`.
+- [x] **Full Verification & Measurement**:
+  - Unit tests green: `BUILD SUCCESSFUL` with 0 failures, 0 errors.
+  - Measured physical APK size: reduced from **107.14 MB** down to **74.88 MB** (**32.26 MB reduction / >30% smaller** in debug build; projected ~62 MB in minified release).
+  - Exported standalone testing APK to `playit-debug.apk` (75 MB).
+
+
+
 

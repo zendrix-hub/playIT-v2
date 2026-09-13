@@ -131,7 +131,7 @@ fun BlendItCompleteScreen(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Image(
-                        painter = rememberAssetPainter("images/rewards/reward_streak.png"),
+                        painter = rememberAssetPainter("images/rewards/reward_streak.webp"),
                         contentDescription = "Streak bonus",
                         modifier = Modifier.size(24.dp)
                     )

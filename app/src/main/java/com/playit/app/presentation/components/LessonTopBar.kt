@@ -108,7 +108,7 @@ fun LessonTopBar(
                 for (i in 1..maxHearts) {
                     val isAlive = i <= hearts
                     Image(
-                        painter = rememberAssetPainter("images/rewards/reward_heart.png"),
+                        painter = rememberAssetPainter("images/rewards/reward_heart.webp"),
                         contentDescription = if (isAlive) "Heart Active" else "Heart Lost",
                         modifier = Modifier
                             .size(20.dp)

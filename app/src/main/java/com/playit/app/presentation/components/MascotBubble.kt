@@ -40,7 +40,7 @@ fun MascotBubbleComponent(
     backgroundColor: Color = CreamWhite
 ) {
     val displayAssetPath = if (avatarId != null && avatarId in 1..6) {
-        "images/mascot/avatar_0$avatarId.png"
+        "images/mascot/avatar_0$avatarId.webp"
     } else {
         mascotState.assetPath
     }

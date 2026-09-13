@@ -16,34 +16,34 @@ data class FindItPictureItem(
 class GridGenerator @Inject constructor() {
 
     private val pictureBank: Map<String, List<Pair<String, String>>> = mapOf(
-        "m" to listOf("Mouse" to "images/pictures/picture_mouse.png", "Mat" to "images/pictures/blendword_mat.png", "Map" to "images/pictures/picture_map.png"),
-        "s" to listOf("Sun" to "images/pictures/picture_sun.png", "Star" to "images/pictures/picture_star.png", "Snake" to "images/pictures/picture_snake.png"),
-        "a" to listOf("Apple" to "images/pictures/picture_apple.png", "Ant" to "images/pictures/picture_ant.png", "Axe" to "images/pictures/picture_axe.png"),
-        "i" to listOf("Insect" to "images/pictures/picture_insect.png", "Igloo" to "images/pictures/picture_igloo.png", "Ink" to "images/pictures/picture_ink.png"),
-        "o" to listOf("Orange" to "images/pictures/picture_orange.png", "Owl" to "images/pictures/picture_owl.png", "Ox" to "images/pictures/picture_ox.png"),
-        "b" to listOf("Ball" to "images/pictures/picture_ball.png", "Bat" to "images/pictures/blendword_bat.png", "Bus" to "images/pictures/blendword_bus.png"),
-        "e" to listOf("Elephant" to "images/pictures/picture_elephant.png", "Egg" to "images/pictures/picture_egg.png", "Envelope" to "images/pictures/picture_envelope.png"),
-        "u" to listOf("Umbrella" to "images/pictures/picture_umbrella.png", "Up" to "images/pictures/blendword_sub.png", "Uncle" to "images/pictures/picture_uncle.png"),
-        "t" to listOf("Tiger" to "images/pictures/picture_tiger.png", "Tree" to "images/pictures/picture_tree.png", "Top" to "images/pictures/picture_top.png"),
-        "k" to listOf("Kite" to "images/pictures/picture_kite.png", "Kit" to "images/pictures/blendword_kit.png", "Key" to "images/pictures/picture_key.png"),
-        "l" to listOf("Lion" to "images/pictures/picture_lion.png", "Lit" to "images/pictures/blendword_lit.png", "Leaf" to "images/pictures/picture_leaf.png"),
-        "y" to listOf("Yoyo" to "images/pictures/picture_yoyo.png", "Yak" to "images/pictures/picture_yak.png", "Yarn" to "images/pictures/picture_yarn.png"),
-        "n" to listOf("Nest" to "images/pictures/picture_nest.png", "Nut" to "images/pictures/picture_nut.png", "Net" to "images/pictures/picture_net.png"),
-        "g" to listOf("Goat" to "images/pictures/picture_goat.png", "Gap" to "images/pictures/blendword_gap.png", "Gift" to "images/pictures/picture_gift.png"),
-        "ng" to listOf("Ring" to "images/pictures/picture_ring.png", "Wing" to "images/pictures/picture_wing.png", "King" to "images/pictures/picture_king.png"),
-        "p" to listOf("Pig" to "images/pictures/picture_pig.png", "Pan" to "images/pictures/blendword_pan.png", "Pin" to "images/pictures/blendword_pin.png"),
-        "r" to listOf("Rabbit" to "images/pictures/picture_rabbit.png", "Road" to "images/pictures/blendword_road.png", "Rocket" to "images/pictures/picture_rocket.png"),
-        "d" to listOf("Dog" to "images/pictures/picture_dog.png", "Draw" to "images/pictures/blendword_draw.png", "Duck" to "images/pictures/picture_duck.png"),
-        "h" to listOf("Hat" to "images/pictures/picture_hat.png", "Hen" to "images/pictures/blendword_hen.png", "Hand" to "images/pictures/blendword_hand.png"),
-        "w" to listOf("Watch" to "images/pictures/picture_watch.png", "Web" to "images/pictures/blendword_web.png", "Worm" to "images/pictures/picture_worm.png"),
-        "c" to listOf("Cat" to "images/pictures/picture_cat.png", "Cake" to "images/pictures/blendword_cake.png", "Cup" to "images/pictures/blendword_cup.png"),
-        "f" to listOf("Fish" to "images/pictures/picture_fish.png", "Fan" to "images/pictures/blendword_fan.png", "Fox" to "images/pictures/blendword_fox.png"),
-        "j" to listOf("Jug" to "images/pictures/picture_jug.png", "Jam" to "images/pictures/blendword_jam.png", "Jet" to "images/pictures/picture_jet.png"),
-        "ñ" to listOf("Piña" to "images/pictures/picture_pina.png", "Niño" to "images/pictures/picture_nino.png", "Baño" to "images/pictures/picture_bano.png"),
-        "q" to listOf("Queen" to "images/pictures/picture_queen.png", "Quiz" to "images/pictures/blendword_quiz.png", "Quilt" to "images/pictures/picture_quilt.png"),
-        "v" to listOf("Van" to "images/pictures/picture_van.png", "Vase" to "images/pictures/picture_vase.png", "Vest" to "images/pictures/picture_vest.png"),
-        "x" to listOf("Box" to "images/pictures/picture_box.png", "Fox" to "images/pictures/blendword_fox.png", "Six" to "images/pictures/picture_six.png"),
-        "z" to listOf("Zebra" to "images/pictures/picture_zebra.png", "Zoo" to "images/pictures/blendword_zoo.png", "Zip" to "images/pictures/picture_zip.png")
+        "m" to listOf("Mouse" to "images/pictures/picture_mouse.webp", "Mat" to "images/pictures/blendword_mat.webp", "Map" to "images/pictures/picture_map.webp"),
+        "s" to listOf("Sun" to "images/pictures/picture_sun.webp", "Star" to "images/pictures/picture_star.webp", "Snake" to "images/pictures/picture_snake.webp"),
+        "a" to listOf("Apple" to "images/pictures/picture_apple.webp", "Ant" to "images/pictures/picture_ant.webp", "Axe" to "images/pictures/picture_axe.webp"),
+        "i" to listOf("Insect" to "images/pictures/picture_insect.webp", "Igloo" to "images/pictures/picture_igloo.webp", "Ink" to "images/pictures/picture_ink.webp"),
+        "o" to listOf("Orange" to "images/pictures/picture_orange.webp", "Owl" to "images/pictures/picture_owl.webp", "Ox" to "images/pictures/picture_ox.webp"),
+        "b" to listOf("Ball" to "images/pictures/picture_ball.webp", "Bat" to "images/pictures/blendword_bat.webp", "Bus" to "images/pictures/blendword_bus.webp"),
+        "e" to listOf("Elephant" to "images/pictures/picture_elephant.webp", "Egg" to "images/pictures/picture_egg.webp", "Envelope" to "images/pictures/picture_envelope.webp"),
+        "u" to listOf("Umbrella" to "images/pictures/picture_umbrella.webp", "Up" to "images/pictures/blendword_sub.webp", "Uncle" to "images/pictures/picture_uncle.webp"),
+        "t" to listOf("Tiger" to "images/pictures/picture_tiger.webp", "Tree" to "images/pictures/picture_tree.webp", "Top" to "images/pictures/picture_top.webp"),
+        "k" to listOf("Kite" to "images/pictures/picture_kite.webp", "Kit" to "images/pictures/blendword_kit.webp", "Key" to "images/pictures/picture_key.webp"),
+        "l" to listOf("Lion" to "images/pictures/picture_lion.webp", "Lit" to "images/pictures/blendword_lit.webp", "Leaf" to "images/pictures/picture_leaf.webp"),
+        "y" to listOf("Yoyo" to "images/pictures/picture_yoyo.webp", "Yak" to "images/pictures/picture_yak.webp", "Yarn" to "images/pictures/picture_yarn.webp"),
+        "n" to listOf("Nest" to "images/pictures/picture_nest.webp", "Nut" to "images/pictures/picture_nut.webp", "Net" to "images/pictures/picture_net.webp"),
+        "g" to listOf("Goat" to "images/pictures/picture_goat.webp", "Gap" to "images/pictures/blendword_gap.webp", "Gift" to "images/pictures/picture_gift.webp"),
+        "ng" to listOf("Ring" to "images/pictures/picture_ring.webp", "Wing" to "images/pictures/picture_wing.webp", "King" to "images/pictures/picture_king.webp"),
+        "p" to listOf("Pig" to "images/pictures/picture_pig.webp", "Pan" to "images/pictures/blendword_pan.webp", "Pin" to "images/pictures/blendword_pin.webp"),
+        "r" to listOf("Rabbit" to "images/pictures/picture_rabbit.webp", "Road" to "images/pictures/blendword_road.webp", "Rocket" to "images/pictures/picture_rocket.webp"),
+        "d" to listOf("Dog" to "images/pictures/picture_dog.webp", "Draw" to "images/pictures/blendword_draw.webp", "Duck" to "images/pictures/picture_duck.webp"),
+        "h" to listOf("Hat" to "images/pictures/picture_hat.webp", "Hen" to "images/pictures/blendword_hen.webp", "Hand" to "images/pictures/blendword_hand.webp"),
+        "w" to listOf("Watch" to "images/pictures/picture_watch.webp", "Web" to "images/pictures/blendword_web.webp", "Worm" to "images/pictures/picture_worm.webp"),
+        "c" to listOf("Cat" to "images/pictures/picture_cat.webp", "Cake" to "images/pictures/blendword_cake.webp", "Cup" to "images/pictures/blendword_cup.webp"),
+        "f" to listOf("Fish" to "images/pictures/picture_fish.webp", "Fan" to "images/pictures/blendword_fan.webp", "Fox" to "images/pictures/blendword_fox.webp"),
+        "j" to listOf("Jug" to "images/pictures/picture_jug.webp", "Jam" to "images/pictures/blendword_jam.webp", "Jet" to "images/pictures/picture_jet.webp"),
+        "ñ" to listOf("Piña" to "images/pictures/picture_pina.webp", "Niño" to "images/pictures/picture_nino.webp", "Baño" to "images/pictures/picture_bano.webp"),
+        "q" to listOf("Queen" to "images/pictures/picture_queen.webp", "Quiz" to "images/pictures/blendword_quiz.webp", "Quilt" to "images/pictures/picture_quilt.webp"),
+        "v" to listOf("Van" to "images/pictures/picture_van.webp", "Vase" to "images/pictures/picture_vase.webp", "Vest" to "images/pictures/picture_vest.webp"),
+        "x" to listOf("Box" to "images/pictures/picture_box.webp", "Fox" to "images/pictures/blendword_fox.webp", "Six" to "images/pictures/picture_six.webp"),
+        "z" to listOf("Zebra" to "images/pictures/picture_zebra.webp", "Zoo" to "images/pictures/blendword_zoo.webp", "Zip" to "images/pictures/picture_zip.webp")
     )
 
     /**
@@ -52,9 +52,9 @@ class GridGenerator @Inject constructor() {
     fun generate5ItemGrid(targetPhonemeLetter: String, availablePhonemes: List<Phoneme> = emptyList()): List<FindItPictureItem> {
         val cleanTarget = targetPhonemeLetter.lowercase().trim()
         val targetCandidates = pictureBank[cleanTarget] ?: listOf(
-            "Target 1" to "images/pictures/picture_mouse.png",
-            "Target 2" to "images/pictures/picture_sun.png",
-            "Target 3" to "images/pictures/picture_apple.png"
+            "Target 1" to "images/pictures/picture_mouse.webp",
+            "Target 2" to "images/pictures/picture_sun.webp",
+            "Target 3" to "images/pictures/picture_apple.webp"
         )
 
         val correctItems = targetCandidates.take(3).mapIndexed { idx, (word, img) ->
@@ -101,9 +101,9 @@ class GridGenerator @Inject constructor() {
         } else {
             gridItems.addAll(distractors)
             val fallbackCandidates = listOf(
-                Phoneme(2, "s", "audio/phonemes/phoneme_s.mp3", "images/pictures/picture_sun.png", "Sun"),
-                Phoneme(3, "a", "audio/phonemes/phoneme_a.mp3", "images/pictures/picture_apple.png", "Apple"),
-                Phoneme(4, "i", "audio/phonemes/phoneme_i.mp3", "images/pictures/picture_insect.png", "Insect")
+                Phoneme(2, "s", "audio/phonemes/phoneme_s.mp3", "images/pictures/picture_sun.webp", "Sun"),
+                Phoneme(3, "a", "audio/phonemes/phoneme_a.mp3", "images/pictures/picture_apple.webp", "Apple"),
+                Phoneme(4, "i", "audio/phonemes/phoneme_i.mp3", "images/pictures/picture_insect.webp", "Insect")
             )
             for (candidate in fallbackCandidates) {
                 if (gridItems.size < 4 && gridItems.none { it.id == candidate.id }) {

@@ -95,7 +95,7 @@ fun ProfileCard(
                         .padding(horizontal = 14.dp, vertical = 6.dp)
                 ) {
                     Image(
-                        painter = rememberAssetPainter("images/rewards/reward_star.png"),
+                        painter = rememberAssetPainter("images/rewards/reward_star.webp"),
                         contentDescription = null,
                         modifier = Modifier.size(22.dp)
                     )

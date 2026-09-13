@@ -55,7 +55,7 @@ fun MascotBubble(
     onMascotTap: (() -> Unit)? = null
 ) {
     val displayAssetPath = if (avatarId != null && avatarId in 1..6) {
-        "images/mascot/avatar_0$avatarId.png"
+        "images/mascot/avatar_0$avatarId.webp"
     } else {
         mascotState.assetPath
     }
@@ -261,7 +261,7 @@ fun HeartBar(
         for (i in 1..maxHearts) {
             val isFilled = i <= currentHearts
             androidx.compose.foundation.Image(
-                painter = rememberAssetPainter("images/rewards/reward_heart.png"),
+                painter = rememberAssetPainter("images/rewards/reward_heart.webp"),
                 contentDescription = if (isFilled) "Heart Active" else "Heart Empty",
                 modifier = Modifier
                     .size(24.dp)
@@ -289,7 +289,7 @@ fun StarDisplay(
         for (i in 1..maxStars) {
             val isEarned = i <= earnedStars
             androidx.compose.foundation.Image(
-                painter = rememberAssetPainter("images/rewards/reward_star.png"),
+                painter = rememberAssetPainter("images/rewards/reward_star.webp"),
                 contentDescription = if (isEarned) "Star Earned" else "Star Locked",
                 modifier = Modifier
                     .size(starSize)
