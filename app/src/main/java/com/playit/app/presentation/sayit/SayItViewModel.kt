@@ -67,6 +67,7 @@ class SayItViewModel @Inject constructor(
 
     private val _isPlayingPhoneme = MutableStateFlow(false)
     val isPlayingPhoneme: StateFlow<Boolean> = _isPlayingPhoneme.asStateFlow()
+    val isAudioPlaying: StateFlow<Boolean> = audioPlayer.isAudioPlaying
 
     private val _audioAmplitude = MutableStateFlow(0f)
     val audioAmplitude: StateFlow<Float> = _audioAmplitude.asStateFlow()

@@ -43,10 +43,18 @@ google-services.json
 
 # Agent and MCP local configs (may contain personal credentials)
 .agents/
+skills-lock.json
 .env
 *.env
 voice_*.mp3
 test_*.mp3
+
+# External Tool Repositories
+tools/VoiceStudio/
+tools/whisper/
+tools/Fooocus/
+tools/review_audio/
+tools/sfx_preview/
 
 # Python cache
 __pycache__/

@@ -8,9 +8,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.AutoStories
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.icons.rounded.VolumeUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -51,77 +51,70 @@ object GuidebookRepository {
                 title = "Chocolate Hills Phonics",
                 biomeName = "Chocolate Hills, Bohol",
                 letters = listOf(
-                    GuidebookLetter("M", "/m/", "Mais", "Continuous humming sound"),
-                    GuidebookLetter("S", "/s/", "Saging", "Hissing continuous sound"),
-                    GuidebookLetter("A", "/a/", "Aso", "Open vowel sound"),
-                    GuidebookLetter("I", "/i/", "Ibon", "Front high vowel sound"),
-                    GuidebookLetter("O", "/o/", "Orasan", "Round back vowel sound")
+                    GuidebookLetter("M", "/m/", "Mouse", "Continuous humming sound"),
+                    GuidebookLetter("S", "/s/", "Sun", "Hissing continuous sound"),
+                    GuidebookLetter("A", "/æ/", "Apple", "Open vowel sound"),
+                    GuidebookLetter("I", "/ɪ/", "Insect", "Front high vowel sound")
                 ),
-                blendWords = listOf("AMA", "MAMA", "MASA", "SAMA", "AAMI")
+                blendWords = listOf("SAM", "SIS", "AIM")
             )
             2 -> GuidebookUnitData(
                 unitNumber = 2,
                 title = "Loboc River Phonics",
                 biomeName = "Loboc River Valley",
                 letters = listOf(
-                    GuidebookLetter("B", "/b/", "Bangka", "Voiced bilabial stop"),
-                    GuidebookLetter("U", "/u/", "Ulan", "High back vowel sound"),
-                    GuidebookLetter("T", "/t/", "Tarsier", "Voiceless alveolar stop"),
-                    GuidebookLetter("K", "/k/", "Keso", "Voiceless velar stop"),
-                    GuidebookLetter("L", "/l/", "Lobo", "Alveolar lateral liquid")
+                    GuidebookLetter("O", "/ɒ/", "Orange", "Round back vowel sound"),
+                    GuidebookLetter("B", "/b/", "Ball", "Voiced bilabial stop"),
+                    GuidebookLetter("E", "/e/", "Elephant", "Mid front vowel sound"),
+                    GuidebookLetter("U", "/ʌ/", "Umbrella", "Short central vowel sound")
                 ),
-                blendWords = listOf("BATA", "KUBO", "BOLA", "TELA", "LATA")
+                blendWords = listOf("BUS", "SUB", "MOM", "BEE", "BIB")
             )
             3 -> GuidebookUnitData(
                 unitNumber = 3,
                 title = "Panglao Shore Phonics",
                 biomeName = "Panglao Coral Shore",
                 letters = listOf(
-                    GuidebookLetter("Y", "/j/", "Yoyo", "Palatal glide sound"),
-                    GuidebookLetter("N", "/n/", "Niyog", "Alveolar nasal sound"),
-                    GuidebookLetter("G", "/g/", "Gatas", "Voiced velar stop"),
-                    GuidebookLetter("R", "/r/", "Relo", "Alveolar tap/trill"),
-                    GuidebookLetter("P", "/p/", "Pato", "Voiceless bilabial stop")
+                    GuidebookLetter("T", "/t/", "Tiger", "Voiceless alveolar stop"),
+                    GuidebookLetter("K", "/k/", "Kite", "Voiceless velar stop"),
+                    GuidebookLetter("L", "/l/", "Lion", "Alveolar lateral liquid"),
+                    GuidebookLetter("Y", "/j/", "Yoyo", "Palatal glide sound")
                 ),
-                blendWords = listOf("PUSA", "GABI", "ROSA", "NIPA", "YAYA")
+                blendWords = listOf("BAT", "MAT", "KIT", "TOY", "BOY")
             )
             4 -> GuidebookUnitData(
                 unitNumber = 4,
                 title = "Tarsier Forest Phonics",
                 biomeName = "Tarsier Rainforest Sanctuary",
                 letters = listOf(
-                    GuidebookLetter("D", "/d/", "Dahon", "Voiced alveolar stop"),
-                    GuidebookLetter("H", "/h/", "Halaman", "Glottal fricative sound"),
-                    GuidebookLetter("W", "/w/", "Watawat", "Labio-velar glide"),
-                    GuidebookLetter("C", "/k/", "Carrot", "Hard velar consonant"),
-                    GuidebookLetter("V", "/v/", "Vinta", "Voiced labiodental fricative")
+                    GuidebookLetter("N", "/n/", "Nest", "Alveolar nasal sound"),
+                    GuidebookLetter("G", "/g/", "Goat", "Voiced velar stop"),
+                    GuidebookLetter("P", "/p/", "Pig", "Voiceless bilabial stop")
                 ),
-                blendWords = listOf("DAHON", "HANGIN", "WATAWAT", "VASO", "CORAL")
+                blendWords = listOf("PIG", "PAN", "BUG", "PIN", "NAP")
             )
             5 -> GuidebookUnitData(
                 unitNumber = 5,
                 title = "Mountain Summit Phonics",
                 biomeName = "Bohol Mountain Summit",
                 letters = listOf(
-                    GuidebookLetter("Z", "/z/", "Zebra", "Voiced alveolar fricative"),
-                    GuidebookLetter("J", "/dʒ/", "Jacket", "Voiced postalveolar affricate"),
-                    GuidebookLetter("F", "/f/", "Fork", "Voiceless labiodental fricative"),
-                    GuidebookLetter("X", "/ks/", "Xylophone", "Consonant blend sound"),
-                    GuidebookLetter("Q", "/kw/", "Queen", "Velar stop with glide")
+                    GuidebookLetter("R", "/r/", "Rabbit", "Alveolar liquid sound"),
+                    GuidebookLetter("D", "/d/", "Dog", "Voiced alveolar stop"),
+                    GuidebookLetter("H", "/h/", "Hat", "Glottal fricative sound"),
+                    GuidebookLetter("W", "/w/", "Watch", "Labio-velar glide")
                 ),
-                blendWords = listOf("ZEBRA", "JELLY", "FIESTA", "XRAY", "QUOTA")
+                blendWords = listOf("DOG", "HAT", "HEN", "BED", "WEB")
             )
             6 -> GuidebookUnitData(
                 unitNumber = 6,
                 title = "Baclayon Heritage Phonics",
                 biomeName = "Baclayon Heritage Trail",
                 letters = listOf(
-                    GuidebookLetter("C", "/k/", "Carrot", "Hard velar consonant"),
-                    GuidebookLetter("F", "/f/", "Fork", "Voiceless labiodental fricative"),
-                    GuidebookLetter("J", "/dʒ/", "Jacket", "Voiced postalveolar affricate"),
-                    GuidebookLetter("Ñ", "/ɲ/", "Niño", "Palatal nasal sound")
+                    GuidebookLetter("C", "/k/", "Cat", "Hard velar consonant"),
+                    GuidebookLetter("F", "/f/", "Fish", "Voiceless labiodental fricative"),
+                    GuidebookLetter("J", "/dʒ/", "Jug", "Voiced postalveolar affricate")
                 ),
-                blendWords = listOf("CAT", "FAN", "JAM", "PIÑA")
+                blendWords = listOf("CAT", "FAN", "CAP", "CUP", "JAM")
             )
             7 -> GuidebookUnitData(
                 unitNumber = 7,
@@ -130,23 +123,22 @@ object GuidebookRepository {
                 letters = listOf(
                     GuidebookLetter("Q", "/kw/", "Queen", "Velar stop with glide"),
                     GuidebookLetter("V", "/v/", "Van", "Voiced labiodental fricative"),
-                    GuidebookLetter("X", "/ks/", "Xylophone", "Consonant blend sound"),
+                    GuidebookLetter("X", "/ks/", "Box", "Consonant blend sound"),
                     GuidebookLetter("Z", "/z/", "Zebra", "Voiced alveolar fricative")
                 ),
-                blendWords = listOf("QUIZ", "VAN", "BOX", "ZOO")
+                blendWords = listOf("VAN", "BOX", "FOX", "ZOO", "QUIZ")
             )
             else -> GuidebookUnitData(
                 unitNumber = 1,
                 title = "Chocolate Hills Phonics",
                 biomeName = "Chocolate Hills, Bohol",
                 letters = listOf(
-                    GuidebookLetter("M", "/m/", "Mais", "Continuous humming sound"),
-                    GuidebookLetter("S", "/s/", "Saging", "Hissing continuous sound"),
-                    GuidebookLetter("A", "/a/", "Aso", "Open vowel sound"),
-                    GuidebookLetter("I", "/i/", "Ibon", "Front high vowel sound"),
-                    GuidebookLetter("O", "/o/", "Orasan", "Round back vowel sound")
+                    GuidebookLetter("M", "/m/", "Mouse", "Continuous humming sound"),
+                    GuidebookLetter("S", "/s/", "Sun", "Hissing continuous sound"),
+                    GuidebookLetter("A", "/æ/", "Apple", "Open vowel sound"),
+                    GuidebookLetter("I", "/ɪ/", "Insect", "Front high vowel sound")
                 ),
-                blendWords = listOf("AMA", "MAMA", "MASA", "SAMA", "AAMI")
+                blendWords = listOf("SAM", "SIS", "AIM")
             )
         }
     }
@@ -307,7 +299,7 @@ fun UnitGuidebookDialog(
                                         color = TextMidnight
                                     )
                                     Icon(
-                                        imageVector = Icons.Rounded.VolumeUp,
+                                        imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
                                         contentDescription = null,
                                         tint = theme.primaryColor,
                                         modifier = Modifier.size(16.dp)

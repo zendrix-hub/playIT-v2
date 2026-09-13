@@ -35,6 +35,7 @@ class ProfileViewModelTest {
         every { profileRepository.getAllProfiles() } returns profilesFlow
         every { audioResolver.getSfxPath(any()) } returns "sfx_path.mp3"
         every { audioResolver.getVoPath(any()) } returns "vo_path.mp3"
+        every { audioPlayer.isAudioPlaying } returns MutableStateFlow(false)
         viewModel = ProfileViewModel(profileRepository, sessionManager, audioPlayer, audioResolver)
     }
 

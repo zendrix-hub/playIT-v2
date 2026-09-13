@@ -55,6 +55,7 @@ class BlendItViewModelTest {
         every { audioResolver.getRotatingEncourageVo() } returns "encourage_vo.mp3"
         every { audioResolver.getRotatingHintVo() } returns "hint_vo.mp3"
         every { audioResolver.getVoPath(any()) } returns "vo_path.mp3"
+        every { audioPlayer.isAudioPlaying } returns MutableStateFlow(false)
     }
 
     @After
@@ -102,6 +103,7 @@ class BlendItViewModelTest {
 
     @Test
     fun submitWord_correctWord_transitionsToWordCorrectAndAdvances() = runTest {
+        coEvery { audioPlayer.playAssetAudioAwait(any()) } coAnswers { kotlinx.coroutines.delay(500) }
         viewModel = BlendItViewModel(
             blendItWordRepository, blendItAttemptRepository, blendItWordSelector,
             sessionManager, audioPlayer, audioResolver, savedStateHandle

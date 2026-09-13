@@ -3,17 +3,31 @@ package com.playit.app.data.audio
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.MediaPlayer
-import android.media.SoundPool
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.util.concurrent.ConcurrentHashMap
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.resume
 
 private const val TAG = "AudioPlayer"
 
+/**
+ * Unified Audio Player for PlayIT.
+ *
+ * Enforces:
+ * 1. Single audio playback pipeline to prevent overlapping audio streams.
+ * 2. Real-time [isAudioPlaying] state tracking so UI buttons and transitions can be gated.
+ * 3. Strict sequential playback in [playSequence] and [playSequenceAwait] where each audio asset
+ *    plays completely before the next one starts, with an organic acoustic pause between assets.
+ * 4. Cancellation-safe coroutine extensions ([playAssetAudioAwait], [playSequenceAwait]).
+ */
 @Singleton
 class AudioPlayer @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -21,68 +35,16 @@ class AudioPlayer @Inject constructor(
 ) {
 
     private var mediaPlayer: MediaPlayer? = null
-    private var isSequencePlaying = false
     private val mainHandler = Handler(Looper.getMainLooper())
     private var activeTempFile: java.io.File? = null
 
-    private val soundPool: SoundPool by lazy {
-        val audioAttributes = AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_GAME)
-            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-            .build()
-        SoundPool.Builder()
-            .setMaxStreams(6)
-            .setAudioAttributes(audioAttributes)
-            .build()
-    }
+    // Session token to invalidate obsolete callbacks from superseded/stopped playback
+    private var currentSessionId: Long = 0L
 
-    private val sfxSoundIdCache = ConcurrentHashMap<String, Int>()
+    private val _isAudioPlaying = MutableStateFlow(false)
+    val isAudioPlaying: StateFlow<Boolean> = _isAudioPlaying.asStateFlow()
 
-    init {
-        preloadCommonSfx()
-    }
-
-    /**
-     * Pre-loads all standard SFX into SoundPool memory for 0ms latency hardware playback.
-     */
-    private fun preloadCommonSfx() {
-        try {
-            SfxEvent.values().forEach { event ->
-                val sfxPath = audioResolver.getSfxPath(event)
-                loadSoundIntoPool(sfxPath)
-            }
-        } catch (e: Exception) {
-            Log.w(TAG, "Failed to preload some SFX assets into SoundPool", e)
-        }
-    }
-
-    private fun loadSoundIntoPool(assetPath: String): Int? {
-        sfxSoundIdCache[assetPath]?.let { return it }
-        return try {
-            val afd = context.assets.openFd(assetPath)
-            val soundId = soundPool.load(afd.fileDescriptor, afd.startOffset, afd.length, 1)
-            afd.close()
-            sfxSoundIdCache[assetPath] = soundId
-            soundId
-        } catch (e: Exception) {
-            try {
-                val tempFile = java.io.File(context.cacheDir, "sfx_${assetPath.hashCode()}.mp3")
-                if (!tempFile.exists()) {
-                    context.assets.open(assetPath).use { input ->
-                        tempFile.outputStream().use { output ->
-                            input.copyTo(output)
-                        }
-                    }
-                }
-                val soundId = soundPool.load(tempFile.absolutePath, 1)
-                sfxSoundIdCache[assetPath] = soundId
-                soundId
-            } catch (ex: Exception) {
-                Log.e(TAG, "Error loading SFX into SoundPool: $assetPath", ex)
-                null
-            }
-        }
-    }
+    val isPlaying: StateFlow<Boolean> get() = isAudioPlaying
 
     /**
      * When set to true, audio playback falls back to audible dev placeholders
@@ -91,27 +53,17 @@ class AudioPlayer @Inject constructor(
     var useDevPlaceholders: Boolean = false
 
     /**
-     * Plays an SFX event instantly with zero latency via SoundPool.
+     * Plays an SFX event through the managed single-pipeline audio player.
      */
     @Synchronized
     fun playSfx(event: SfxEvent, onComplete: (() -> Unit)? = null) {
         val path = audioResolver.getSfxPath(event)
-        playSfxInternal(path, onComplete)
-    }
-
-    private fun playSfxInternal(assetPath: String, onComplete: (() -> Unit)? = null) {
-        val soundId = sfxSoundIdCache[assetPath] ?: loadSoundIntoPool(assetPath)
-        if (soundId != null && soundId > 0) {
-            soundPool.play(soundId, 1.0f, 1.0f, 1, 0, 1.0f)
-            onComplete?.invoke()
-        } else {
-            playWithMediaPlayer(assetPath, onComplete)
-        }
+        playAssetAudio(path, onComplete)
     }
 
     /**
      * Plays a single asset file safely.
-     * Routes SFX to SoundPool for zero latency, and VO / speech to MediaPlayer.
+     * Guaranteed to stop any existing playback and track completion accurately.
      */
     @Synchronized
     fun playAssetAudio(assetPath: String, onComplete: (() -> Unit)? = null) {
@@ -128,19 +80,33 @@ class AudioPlayer @Inject constructor(
             assetPath
         }
 
-        if (targetPath.contains("/sfx_") || targetPath.startsWith("audio/ui/sfx_")) {
-            playSfxInternal(targetPath, onComplete)
-            return
-        }
+        val sessionId = ++currentSessionId
+        mainHandler.removeCallbacksAndMessages(null)
+        stopInternal()
+        _isAudioPlaying.value = true
 
-        playWithMediaPlayer(targetPath, onComplete)
+        mainHandler.post {
+            executePlay(targetPath, sessionId) {
+                _isAudioPlaying.value = false
+                onComplete?.invoke()
+            }
+        }
     }
 
-    private fun playWithMediaPlayer(targetPath: String, onComplete: (() -> Unit)?) {
+    private fun executePlay(targetPath: String, sessionId: Long, onComplete: (() -> Unit)?) {
+        if (sessionId != currentSessionId) return
         stopInternal()
+        _isAudioPlaying.value = true
 
         try {
-            val player = mediaPlayer ?: MediaPlayer().also { mediaPlayer = it }
+            val player = mediaPlayer ?: MediaPlayer().also {
+                val audioAttributes = AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_GAME)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .build()
+                it.setAudioAttributes(audioAttributes)
+                mediaPlayer = it
+            }
             player.reset()
 
             try {
@@ -148,7 +114,7 @@ class AudioPlayer @Inject constructor(
                 player.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
                 afd.close()
             } catch (e: Exception) {
-                // If openFd fails (e.g. compressed asset), copy asset to cache temp file and play
+                // If openFd fails (e.g. compressed asset), copy asset to cache temp file
                 Log.w(TAG, "openFd failed for $targetPath, falling back to cache file stream", e)
                 val tempFile = java.io.File(context.cacheDir, "temp_audio_${System.currentTimeMillis()}.mp3")
                 context.assets.open(targetPath).use { input ->
@@ -161,6 +127,10 @@ class AudioPlayer @Inject constructor(
             }
 
             player.setOnPreparedListener { mp ->
+                if (sessionId != currentSessionId) {
+                    try { mp.reset() } catch (_: Exception) {}
+                    return@setOnPreparedListener
+                }
                 try {
                     mp.start()
                 } catch (e: Exception) {
@@ -171,14 +141,16 @@ class AudioPlayer @Inject constructor(
             }
 
             player.setOnCompletionListener {
+                if (sessionId != currentSessionId) return@setOnCompletionListener
                 cleanupActiveTempFile()
                 onComplete?.invoke()
             }
 
             player.setOnErrorListener { mp, what, extra ->
                 Log.e(TAG, "MediaPlayer error occurred for asset $targetPath: what=$what extra=$extra")
+                if (sessionId != currentSessionId) return@setOnErrorListener true
                 cleanupActiveTempFile()
-                mp.reset()
+                try { mp.reset() } catch (_: Exception) {}
                 onComplete?.invoke()
                 true
             }
@@ -191,12 +163,98 @@ class AudioPlayer @Inject constructor(
         }
     }
 
-    private fun cleanupActiveTempFile() {
-        activeTempFile?.let { file ->
-            try {
-                if (file.exists()) file.delete()
-            } catch (_: Exception) {}
-            activeTempFile = null
+    /**
+     * Plays multiple audio assets sequentially (e.g. SFX chime followed by mascot VO).
+     * Strictly waits for each asset to finish playing completely before starting the next.
+     */
+    @Synchronized
+    fun playSequence(assetPaths: List<String>, onComplete: (() -> Unit)? = null) {
+        val validPaths = assetPaths.filter { it.isNotBlank() }
+        if (validPaths.isEmpty()) {
+            _isAudioPlaying.value = false
+            onComplete?.invoke()
+            return
+        }
+
+        val sessionId = ++currentSessionId
+        mainHandler.removeCallbacksAndMessages(null)
+        stopInternal()
+        _isAudioPlaying.value = true
+
+        mainHandler.post {
+            playNextInSequence(validPaths, index = 0, sessionId = sessionId, onComplete = onComplete)
+        }
+    }
+
+    private fun playNextInSequence(paths: List<String>, index: Int, sessionId: Long, onComplete: (() -> Unit)?) {
+        if (sessionId != currentSessionId) return
+
+        if (index >= paths.size) {
+            _isAudioPlaying.value = false
+            onComplete?.invoke()
+            return
+        }
+
+        val currentPath = paths[index]
+        val targetPath = if (useDevPlaceholders && !currentPath.startsWith("audio/_dev_placeholder/")) {
+            val devPath = audioResolver.getDevPlaceholderForAsset(currentPath)
+            Log.w(TAG, "DEV PLACEHOLDER AUDIO ACTIVE: Playing dev placeholder '$devPath' for production asset '$currentPath'")
+            devPath
+        } else {
+            currentPath
+        }
+
+        executePlay(targetPath, sessionId) {
+            if (sessionId != currentSessionId) return@executePlay
+
+            if (index + 1 < paths.size) {
+                // Natural acoustic gap between sequential clips (120ms)
+                _isAudioPlaying.value = true
+                mainHandler.postDelayed({
+                    if (sessionId == currentSessionId) {
+                        playNextInSequence(paths, index + 1, sessionId, onComplete)
+                    }
+                }, 120L)
+            } else {
+                _isAudioPlaying.value = false
+                onComplete?.invoke()
+            }
+        }
+    }
+
+    /**
+     * Coroutine-friendly suspension function to play an audio asset and await its full completion.
+     */
+    suspend fun playAssetAudioAwait(assetPath: String, timeoutMillis: Long = 8000L) {
+        withTimeoutOrNull(timeoutMillis) {
+            suspendCancellableCoroutine<Unit> { continuation ->
+                playAssetAudio(assetPath) {
+                    if (continuation.isActive) {
+                        continuation.resume(Unit)
+                    }
+                }
+                continuation.invokeOnCancellation {
+                    stop()
+                }
+            }
+        }
+    }
+
+    /**
+     * Coroutine-friendly suspension function to play an audio sequence and await its full completion.
+     */
+    suspend fun playSequenceAwait(assetPaths: List<String>, timeoutMillis: Long = 10000L) {
+        withTimeoutOrNull(timeoutMillis) {
+            suspendCancellableCoroutine<Unit> { continuation ->
+                playSequence(assetPaths) {
+                    if (continuation.isActive) {
+                        continuation.resume(Unit)
+                    }
+                }
+                continuation.invokeOnCancellation {
+                    stop()
+                }
+            }
         }
     }
 
@@ -211,53 +269,15 @@ class AudioPlayer @Inject constructor(
     }
 
     /**
-     * Plays multiple audio assets sequentially (e.g. SFX chime followed by mascot VO).
-     */
-    @Synchronized
-    fun playSequence(assetPaths: List<String>, onComplete: (() -> Unit)? = null) {
-        val validPaths = assetPaths.filter { it.isNotBlank() }
-        if (validPaths.isEmpty()) {
-            onComplete?.invoke()
-            return
-        }
-
-        isSequencePlaying = true
-        playNextInSequence(validPaths, index = 0, onComplete = onComplete)
-    }
-
-    private fun playNextInSequence(paths: List<String>, index: Int, onComplete: (() -> Unit)?) {
-        if (!isSequencePlaying || index >= paths.size) {
-            isSequencePlaying = false
-            onComplete?.invoke()
-            return
-        }
-
-        val currentPath = paths[index]
-        val isSfx = currentPath.contains("/sfx_") || currentPath.startsWith("audio/ui/sfx_")
-
-        if (isSfx && index + 1 < paths.size) {
-            playSfxInternal(currentPath)
-            mainHandler.postDelayed({
-                if (isSequencePlaying) {
-                    playNextInSequence(paths, index + 1, onComplete)
-                }
-            }, 300L)
-        } else {
-            playAssetAudio(currentPath) {
-                playNextInSequence(paths, index + 1, onComplete)
-            }
-        }
-    }
-
-    /**
-     * Stops current playback and clears sequence state.
+     * Stops current playback and clears sequence state and timers.
      */
     @Synchronized
     fun stop() {
-        isSequencePlaying = false
+        ++currentSessionId
         mainHandler.removeCallbacksAndMessages(null)
         stopInternal()
         cleanupActiveTempFile()
+        _isAudioPlaying.value = false
     }
 
     private fun stopInternal() {
@@ -277,18 +297,21 @@ class AudioPlayer @Inject constructor(
         }
     }
 
+    private fun cleanupActiveTempFile() {
+        activeTempFile?.let { file ->
+            try {
+                if (file.exists()) file.delete()
+            } catch (_: Exception) {}
+            activeTempFile = null
+        }
+    }
+
     @Synchronized
     fun release() {
-        mainHandler.removeCallbacksAndMessages(null)
-        stopInternal()
-        cleanupActiveTempFile()
+        stop()
         try {
             mediaPlayer?.release()
         } catch (_: Exception) {}
         mediaPlayer = null
-        try {
-            soundPool.release()
-        } catch (_: Exception) {}
-        sfxSoundIdCache.clear()
     }
 }

@@ -86,22 +86,13 @@ fun AvatarPicker(
                                     contentDescription = "$avatarName avatar" + if (isSelected) ", selected" else ""
                                 }
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(76.dp)
-                                    .clip(CircleShape)
-                                    .background(if (isSelected) Mango.copy(alpha = 0.35f) else Cloud)
-                                    .border(
-                                        width = if (isSelected) 4.dp else 2.5.dp,
-                                        color = if (isSelected) Mango else DarkBrownOutline.copy(alpha = 0.4f),
-                                        shape = CircleShape
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                AvatarCircle(avatarId = avatarId, size = 66)
-                            }
+                            AvatarCircle(
+                                avatarId = avatarId,
+                                size = 74,
+                                isSelected = isSelected
+                            )
 
-                            Spacer(modifier = Modifier.height(4.dp))
+                            Spacer(modifier = Modifier.height(6.dp))
 
                             Text(
                                 text = avatarName,

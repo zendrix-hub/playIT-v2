@@ -62,21 +62,34 @@ class MapPathGeometryTest {
     }
 
     @Test
-    fun generateCompanionPlacements_placesExplorerLeaderAndFriends() {
+    fun generateMapCharacterPlacements_placesExplorerLeaderAndFriends() {
         val dummyCenters = (0 until 28).map { i -> Offset(200f + i * 2f, 100f + i * 80f) }
-        val placements = com.playit.app.presentation.map.components.generateCompanionPlacements(
+        val dummyNodes = (0 until 28).map { i ->
+            com.playit.app.domain.model.MapNode.LetterNode(
+                id = "$i",
+                orderIndex = i,
+                isUnlocked = (i == 0),
+                groupNumber = 1,
+                symbol = "M",
+                starsEarned = 0
+            )
+        }
+        val placements = com.playit.app.presentation.map.components.generateMapCharacterPlacements(
             nodeCount = 28,
             nodeCenters = dummyCenters,
+            nodes = dummyNodes,
             activeNodeIndex = 0,
             activeAvatarId = 2, // Milo the Monkey
+            profileName = "Juan",
             canvasWidthDp = 400f,
             density = 2.0f
         )
 
         assertTrue("Should generate at least explorer leader plus supporting friends", placements.isNotEmpty())
-        val leader = placements.find { it.isExplorerLeader }
+        val leader = placements.find { it.isLeader }
         assertTrue("Leader must be present", leader != null)
-        assertEquals("Leader animal must match active avatar", com.playit.app.presentation.map.components.CompanionAnimal.MONKEY, leader?.animal)
+        val leaderAnimal = (leader?.character as? com.playit.app.presentation.map.components.MapCharacter.Animal)?.animal
+        assertEquals("Leader animal must match active avatar", com.playit.app.presentation.map.components.CompanionAnimal.MONKEY, leaderAnimal)
     }
 
     @Test

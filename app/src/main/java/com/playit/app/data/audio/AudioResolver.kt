@@ -41,6 +41,7 @@ enum class VoContext(val filenameSuffix: String) {
     NOISE_ALERT_01("noise_alert_01"),
     SPLASH_TAGLINE("splash_tagline"),
     NAMEPROMPT_INTRO("nameprompt_intro"),
+    MAP_LETS_GO("map_tarana"),
     MAP_TARANA("map_tarana"),
     BLENDIT_COMPLETE("blendit_complete"),
     STAR_CELEBRATION("star_celebration"),

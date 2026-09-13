@@ -62,6 +62,7 @@ class HearItViewModel @Inject constructor(
 
     private val _isPlayingPrompt = MutableStateFlow(false)
     val isPlayingPrompt: StateFlow<Boolean> = _isPlayingPrompt.asStateFlow()
+    val isAudioPlaying: StateFlow<Boolean> = audioPlayer.isAudioPlaying
 
     fun playIntroThenPhonemeSound() {
         audioPlayer.stop()

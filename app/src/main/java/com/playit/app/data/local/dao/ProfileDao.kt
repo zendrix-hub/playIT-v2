@@ -28,4 +28,10 @@ interface ProfileDao {
 
     @Delete
     suspend fun deleteProfile(profile: ProfileEntity)
+
+    @Query("UPDATE profiles SET totalStars = totalStars + :starDelta WHERE profileId = :profileId")
+    suspend fun addStars(profileId: Long, starDelta: Int)
+
+    @Query("UPDATE profiles SET totalStars = :totalStars WHERE profileId = :profileId")
+    suspend fun updateTotalStars(profileId: Long, totalStars: Int)
 }

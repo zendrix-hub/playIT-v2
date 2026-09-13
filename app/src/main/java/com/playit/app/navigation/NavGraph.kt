@@ -3,9 +3,11 @@ package com.playit.app.navigation
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.playit.app.presentation.blendit.BlendItCompleteScreen
 import com.playit.app.presentation.blendit.BlendItCompleteViewModel
 import com.playit.app.presentation.blendit.BlendItScreen
@@ -132,8 +134,8 @@ fun NavGraph(
             val viewModel: FindItViewModel = hiltViewModel()
             FindItScreen(
                 viewModel = viewModel,
-                onNext = { phonemeId ->
-                    navController.navigate(Routes.letterComplete(phonemeId))
+                onNext = { phonemeId, heartsLost ->
+                    navController.navigate(Routes.letterComplete(phonemeId, heartsLost))
                 },
                 onBack = {
                     navController.popBackStack()
@@ -141,7 +143,16 @@ fun NavGraph(
             )
         }
 
-        composable(Routes.LETTER_COMPLETE) {
+        composable(
+            route = Routes.LETTER_COMPLETE,
+            arguments = listOf(
+                navArgument("phonemeId") { type = NavType.StringType },
+                navArgument("heartsLost") {
+                    type = NavType.StringType
+                    defaultValue = "0"
+                }
+            )
+        ) {
             val viewModel: LetterCompleteViewModel = hiltViewModel()
             LetterCompleteScreen(
                 viewModel = viewModel,
@@ -157,8 +168,8 @@ fun NavGraph(
             val viewModel: BlendItViewModel = hiltViewModel()
             BlendItScreen(
                 viewModel = viewModel,
-                onSessionComplete = { groupId ->
-                    navController.navigate(Routes.blendItComplete(groupId.toString()))
+                onSessionComplete = { groupId, heartsLost ->
+                    navController.navigate(Routes.blendItComplete(groupId.toString(), heartsLost))
                 },
                 onBack = {
                     navController.popBackStack()
@@ -166,7 +177,16 @@ fun NavGraph(
             )
         }
 
-        composable(Routes.BLEND_IT_COMPLETE) {
+        composable(
+            route = Routes.BLEND_IT_COMPLETE,
+            arguments = listOf(
+                navArgument("groupId") { type = NavType.StringType },
+                navArgument("heartsLost") {
+                    type = NavType.StringType
+                    defaultValue = "0"
+                }
+            )
+        ) {
             val viewModel: BlendItCompleteViewModel = hiltViewModel()
             BlendItCompleteScreen(
                 viewModel = viewModel,

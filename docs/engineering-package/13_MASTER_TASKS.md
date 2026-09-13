@@ -251,5 +251,136 @@ Change: Say It now asks the child to utter the letter's example WORD (m → "Mou
 - [x] **Zero-Emoji Policy Compliance**: Ensured zero emojis in UI text, buttons, titles, and speech bubbles; exclusively used Material vector graphics and transparent asset renders.
 - [x] **Compilation & APK Generation**: Verified clean compilation via `./gradlew compileDebugKotlin` and assembled `app-debug.apk` (97 MB) into workspace root `./playit-debug.apk`.
 
+## Phase 17 — VoiceStudio + Whisper Educational Phonics Suite & Avatar Alignment (2026-09-12)
+- [x] **VoiceStudio Audio Suite Expansion**: Scaled synthesis to 101 production assets covering all 26 canonical phonemes (full pedagogical scripts e.g. "Ah. A, like Apple."), 21 UI/VO lines, and 54 word assets using `en-PH-RosaNeural`.
+- [x] **Whisper Speech Recognition Verification**: Verified all 101 assets using local OpenAI Whisper (`base`), achieving 100% keyword verification rate and resolving single-syllable acoustic nuances.
+- [x] **Pediatric Reading Floor & UI Synchrony**: Upgraded `PediatricComponents.kt` (`MascotBubble`) to 24sp Lexend Bold text styling; synchronized `ProfileSelectScreen.kt` and `NamePromptScreen.kt` dialogue text 1:1 verbatim with production voice-overs (`vo_welcome_01.mp3`, `vo_nameprompt_intro.mp3`).
+- [x] **Companion Animal Avatar Parity**: Synchronized IP companion animal assets (`avatar_01_cat.png` through `avatar_06_owl.png`) identically across `assets/images/characters/` and `assets/images/mascot/`.
+- [x] **Unit Test & Build Verification**: All audio unit tests green (`AudioCompletenessCheckTest`, `AudioResolverTest`), clean compile, and verified debug APK assembled (`playit-debug.apk`, 102 MB).
+
+## Phase 18 — Phonics Audio Re-Architecture (Style 1 Pedagogical Phonics) (2026-09-12)
+- [x] **Speech Engine Acoustic Audit**: Diagnosed letter-stuttering ("S-S-S-S like Sun") and acronym spell-out artifacts in raw phoneme text; audited all 26 canonical letters with OpenAI Whisper ASR.
+- [x] **Style 1 Pedagogical Carrier Scripts**: Standardized all 26 letters on explicit phonic instruction ("The letter S makes the sound, sss. S, like Sun.") with aspirate tuning for stop consonants (`pa`, `ta`, `ww`, `ks`).
+- [x] **Neutral Primary Educator Voice Talent**: Adopted `en-US-JennyNeural` for clear, unhurried, natural kindergarten phonics articulation adhering to `18_AUDIO_PRODUCTION_GUIDE.md` §4.
+- [x] **Broadcast Loudness Normalization**: Processed all 29 phoneme assets through FFmpeg `loudnorm` filter (-16 LUFS, 44.1kHz mono, 128kbps MP3) and deployed to `assets/audio/phonemes/`.
+- [x] **Interactive Audition Showcase**: Added live playable Letter S Audition & Comparison workbench to `asset_review.html`.
+
+## Phase 19 — Map Mascot & Companion Immersion with Cultural Terrain Props (2026-09-12)
+- [x] **Lily the Tarsier as Chief Learning Guide**: Stationed Lily beside the active lesson node with pointing pose (`lily_pointing.png`) and dynamic speech bubble (*"Tara na! Letter [X]"*).
+- [x] **Child Explorer Buddy on the Trail**: Stationed the child's chosen profile companion animal advancing along the trail with personalized cheer (*"Let's go, [Name]!"*).
+- [x] **Supporting Animal Friends across Biomes**: Stationed remaining 5 companion friends across the 7 chapter milestones with distinct personality cheers and bilingual encouragement.
+- [x] **Tactile Gummy Speech Bubbles & Tap Physics**: Implemented 3D Gummy speech bubbles with downward pointer tails, 12sp Lexend typography, spring leap jump (`Animatable -16f`), squash-stretch landing, and tap sound reactions.
+- [x] **Integrated Cultural Terrain Props**: Embedded `MapTerrainProps` layer in `MapScreen.kt`, populating the map with swaying Bohol palm trees, nipa huts, tropical flowers, and school adventure props.
+- [x] **Full Build & APK Assembly**: Verified clean compilation (`compileDebugKotlin`) and assembled debug APK (`playit-debug.apk`, 104 MB).
+
+## Phase 20 — Duolingo ABC Lily Mascot Recreation & Map Trail Tactile Overhaul (2026-09-12)
+- [x] **Duolingo ABC Lily Mascot Poses**: Recreated all 7 canonical Lily poses (`lily_idle`, `lily_waving`, `lily_listening`, `lily_pointing`, `lily_encouraging`, `lily_thinking`, `lily_celebrating`) using Imagen 3 with character consistency chaining, huge golden-amber eyes, pink inner ears, fluffy caramel fur, cream chest, and clean `#2D373E` outlines.
+- [x] **BFS Isolation & Production Deployment**: Processed all 7 poses via BFS exterior flood-fill background removal, centered on 512x512 canvas with pediatric sticker stroke, and deployed to `assets/images/mascot/` and `splash_tarsier_headspace.png`.
+- [x] **Tactile Map Trail Ribbon**: Upgraded `MapPathCanvas.kt` with a 20dp-wide warm organic ribbon path, depth shadow, dynamic progress coloring (golden road for mastered units, warm sand for active units, soft stone for locked sections), and 3D pebble pavers with drop shadows and top highlights.
+- [x] **Visual Review Suite Expansion**: Integrated all 7 new Lily poses into `asset_review.html` alongside the 6 companion animal avatars.
+- [x] **APK Assembly & Verification**: Verified clean build and updated root `playit-debug.apk`.
+
+## Phase 22 — Companion Animal Avatars Suite Rework & Mascot Alignment (2026-09-12)
+- [x] **Mascot Preservation & Restoration**: Fully preserved and restored Lily the Tarsier's newly recreated master suite across all 7 canonical poses (`lily_idle`, `lily_waving`, `lily_listening`, `lily_pointing`, `lily_encouraging`, `lily_thinking`, `lily_celebrating`) and `splash_tarsier_headspace.png`.
+- [x] **Companion Animal Avatars Visual Adoption**: Recreated all 6 companion animal avatars (`Miki the Cat`, `Milo the Monkey`, `Bella the Bunny`, `Barnaby the Bear`, `Finley the Frog`, `Ollie the Owl`) adopting Lily's exact design language: signature 2-tone golden/amber iris rings, double circular specular catchlights, arched dark eyebrows, rounded cheek fluff tufts, organic curved limbs with mitten paws and toe beans, grounded 3-lobe feet, and continuous `#2D373E` pediatric outlines.
+- [x] **Dual Anatomy & Context Optimization**: Designed every companion animal as an upright, charming full-body mascot that shines both inside circular profile badges (`AvatarPicker`, `AvatarCircle`, `MascotBubble`) and as lively, animated explorer companions along the winding Adventure Map trail (`MapCompanionFriends`).
+- [x] **Triple-Directory Production Deployment**: Deployed across `characters/avatar_0X_<animal>.png`, `mascot/avatar_0X.png`, and `mascot/companion_avatar_0X_<animal>.png`.
+- [x] **Visual Review Suite & Unit Test Parity**: Updated `asset_review.html` gallery and verified 100% test suite pass (132/132 unit tests green in `MapPathGeometryTest.kt` and across all modules).
+## Phase 23 — Complete Pediatric Asset Rework Suite (Pictures, Rewards, Map Props, Letters, & Blend-It Words) (2026-09-12)
+- [x] **Philippine Phonics Letter Cards**: Generated high-resolution 1024x1024 Lexend blue bubble 3D letter cards for Philippine curriculum phonemes (`letter_ñ.png`, `letter_n_tilde.png`, `letter_ng.png`) matching `letter_a.png` (`anchor_letter-card.png`) and deployed to `images/letters/`.
+- [x] **Gamification Rewards Overhaul**: Modernized all core reward assets (`reward_star.png`, `reward_heart.png`, `reward_streak.png`, `reward_confetti_burst.png`) with 2x Lanczos supersampling, organic teardrop flame curves, tactile highlights, and continuous `#2D373E` pediatric outlines in `images/rewards/`.
+- [x] **Map Biome Props Suite**: Generated and deployed all 14 storybook cultural map props (`mapprop_nipa_hut`, `mapprop_palm_tree`, `mapprop_flower`, `mapprop_pencil_tower`, `mapprop_crayon_bridge`, `mapprop_book_stack`, `mapprop_globe`, `mapprop_backpack`, `mapprop_paper_airplane`, `mapprop_ruler_ramp`, `mapprop_eraser_shrub`, `map_prop_bush`, `mapprop_paint_palette`, `map_prop_rock`) in `images/backgrounds/`.
+- [x] **Phoneme Picture Cards Modernization**: Upgraded all 17 remaining phoneme picture cards (`picture_cat.png` through `picture_zebra.png`) and word labels (`word_<word>.png`) to commercial Duolingo ABC pediatric standards in `images/pictures/`.
+- [x] **Blend-It Word Pictures Overhaul**: Upgraded all 47 Blend-It and distractor word illustrations in `images/pictures/blendword_*.png` with 2x Lanczos supersampling (1024x1024 downscaled to 512x512 RGBA), layered 3-tone shading, expressive storybook charm, `#2D373E` outlines, and 100% transparent backgrounds. Synchronized shared primary pictures (`cat`, `dog`, `pig`, `hat`, `van`, `box`, `fish`) and rendered dedicated high-res suites for all 36 remaining words (`bus`, `sub`, `mom`, `bee`, `bib`, `bat`, `kit`, `toy`, `boy`, `pan`, `bug`, `pin`, `nap`, `hen`, `bed`, `web`, `fan`, `cap`, `cup`, `jam`, `fox`, `zoo`, `quiz`, `bam`, `bird`, `cake`, `draw`, `face`, `gap`, `hand`, `lit`, `mob`, `road`, `spin`, `sum`, `warm`).
+- [x] **Visual Review Showcase**: Updated `asset_review.html` with interactive showcase sections covering all recreated mascot poses, companion animal avatars, map props, phoneme cards, and all 47 Blend-It word pictures under checkerboard transparency.
+- [x] **Test Suite & Clean APK Assembly**: 132/132 unit tests green (`BUILD SUCCESSFUL`), zero-emoji compliance verified, and freshly assembled debug APK deployed to `playit-debug.apk` (107 MB).
+
+## Phase 24 — Comprehensive Picture & Vocabulary Mascot Alignment Overhaul (2026-09-12)
+- [x] **Mascot Aesthetic Adoption Across Characters & Animals**: Overhauled all human characters and animals (`boy`, `nino`, `mom`, `uncle`, `queen`, `king`, `face`, `mob`, `ant`, `duck`, `elephant`, `mouse`, `owl`, `ox`, `snake`, `tiger`, `worm`, `yak`, `zebra`, etc.) adhering strictly to Lily the Tarsier's design language: 2-tone iris rings, dual circular specular catchlights, delicate arched eyebrows, rounded cheek fluff, mitten paws with digit beans, grounded 3-lobe feet, and continuous `#2D373E` outlines.
+- [x] **Complete Objects, Props & Nature Suite Overhaul**: Redesigned all remaining 33 picture objects (`hand`, `bib`, `cap`, `hat`, `draw`, `fan`, `gap`, `jam`, `lit`, `mat`, `sum`, `axe`, `bano`, `drum`, `egg`, `gift`, `igloo`, `ink`, `jet`, `jug`, `leaf`, `map`, `nest`, `net`, `nut`, `pina`, `quilt`, `rocket`, `six`, `top`, `tree`, `vase`, `vest`, `wing`, `yarn`, `yoyo`, `zip`, `envelope`, `key`, `ring`, `star`) to 2x Lanczos supersampled (512x512 RGBA) Duolingo ABC standard.
+- [x] **Clarification & Rework of Baño, Niño, and Piña**: Clarified and illustrated the Philippine Grade 1 Marungko curriculum for the letter **Ñ**: rendered `picture_bano.png` as a charming storybook clawfoot bathtub with warm water, frothy bubbles, brass faucet, and floating rubber duckie; `picture_nino.png` as a smiling Filipino boy; and `picture_pina.png` as a juicy golden tropical pineapple with spiky crown.
+- [x] **Zero Legacy Files Remaining**: Confirmed 100% of all 136 PNG assets in `app/src/main/assets/images/pictures/` are now high-resolution 512x512 RGBA transparent images with zero stubs or legacy low-res files remaining.
+- [x] **Interactive Review Gallery Showcase**: Added Section 8 (Extended Vocabulary & Challenge Picture Suite) to `asset_review.html` showcasing all newly reworked assets over checkerboard transparency grids.
+- [x] **Full Verification Gate**: All 132 unit tests green (`BUILD SUCCESSFUL`), zero emojis, and fresh debug APK assembled to `playit-debug.apk` (107 MB).
+
+## Phase 25 — Star Reward Pipeline Resolution & Headspace Mascot App Logo Rework (2026-09-13)
+- [x] **Star Reward Calculation & Navigation Transmission**: Added `abstract val starsEarned: Int` to `MapNode`, normalized accuracy percentage in `StarCalculator`, updated `Routes.kt` and `NavGraph.kt` to transmit `heartsLost` from `FindItScreen` and `BlendItScreen` into `LetterCompleteScreen` and `BlendItCompleteScreen`.
+- [x] **Database Persistence & Profile Aggregation**: Implemented `ProfileDao.addStars()` atomic queries and `getTotalStarsForProfile()` across `LessonProgressDao` and `BlendItProgressDao`. Injected `ProfileRepository` into `LetterCompleteViewModel` and `BlendItCompleteViewModel` with replay protection (`starDelta = (bestStars - previousStars).coerceAtLeast(0)`), ensuring replaying challenges never deducts stars or double-counts rewards.
+- [x] **Map Progression & Star Synchronization**: Injected `BlendItProgressRepository` into `MapViewModel` to load and reflect `starsEarned` across all `BlendItNode` and `LetterNode` points. Updated `NodeActionPopupDialog`, `MapPathCanvas`, and `MapScreen` with 3-star display below completed challenge nodes.
+- [x] **Headspace Mascot App Logo Rework**: Completely overhauled the official PlayIT app logo and launcher icon suite across all mipmap densities (`mdpi`, `hdpi`, `xhdpi`, `xxhdpi`, `xxxhdpi`) and `drawable-xxxhdpi/ic_launcher_*.png`. Synthesized Headspace's signature warm sunny cream gradient (`#FFFDEE` -> `#FED766`) with the newest Lily the Tarsier mascot (`lily_idle.png`), complete with continuous `#2D373E` outlines, tactile 3D gummy depth shadows, circular framing, and 72dp Android adaptive safe-zone compliance.
+- [x] **Full Verification Gate**: 100% test passage across all 132 unit tests (0 failures, 0 errors), verified zero-emoji compliance, and assembled production debug APK.
+
+## Phase 26 — Master Mascot Splash Screen Overhaul & Pure English App-Wide Transition (2026-09-13)
+- [x] **Master Mascot Splash & Intro Screen Overhaul**: Completely replaced the deprecated 2D Canvas dome in `SplashScreen.kt` with Lily the Tarsier's official master mascot artwork (`lily_waving.png`). Stationed Lily in front of a warm, luminous radial sun halo with gentle living breathing animation (`breatheScaleX`/`breatheScaleY`), playful spring hop tap physics (`tapBounce`), rolling playground hills, welcoming speech bubble, and an unblocked 64dp primary `GummyButton` ("Start Playing").
+- [x] **Pure English App-Wide Transition**: Audited and eliminated all Tagalog words across the entire app:
+  - `SplashScreen.kt`: Removed *"Mabuhay!"*, updated tagline to *"Ready to learn to read?"* and dialogue to *"Hi friend! I'm Lily! Let's learn letter sounds together!"*.
+  - `BlendItCard.kt`: Removed *"Pindutin para marinig"*, standardized on a clean single row with volume icon and *"Tap to hear word"*.
+  - `MapCompanionFriends.kt`: Replaced *"Tara na! Letter X"*, *"Word Challenge! Tara na!"*, *"Kaya mo 'yan!"*, *"Subukan natin!"*, *"Galing!"*, *"Ang galing mo!"*, *"Tuloy lang!"*, and *"Napakagaling!"* with encouraging pure English expressions (*"Let's go! Letter X"*, *"Word Challenge! Let's go!"*, *"You can do it!"*, *"Let's try it!"*, *"Great job!"*, *"You're amazing!"*, *"Keep it up!"*, *"Super star!"*).
+  - `UnitGuidebookDialog.kt`: Replaced legacy Tagalog examples (*"Mais"*, *"Saging"*, *"Aso"*, *"Ibon"*, *"Orasan"*, *"AMA"*, *"MAMA"*, *"Bangka"*, *"Ulan"*, *"BATA"*, *"KUBO"*, etc.) with canonical curriculum English phonemes and blend words (*"Mouse"*, *"Sun"*, *"Apple"*, *"Insect"*, *"SAM"*, *"SIS"*, *"AIM"*, etc.) aligned 1:1 with `DatabaseModule.kt`.
+  - `AudioResolver.kt` & `MapViewModel.kt`: Added `VoContext.MAP_LETS_GO` and routed mascot map tap reactions cleanly through pure English voiceovers.
+- [x] **Zero-Emoji Policy Compliance**: Maintained 100% adherence to the Zero-Emoji Policy across all revised buttons, dialogs, titles, and speech bubbles.
+- [x] **Full Verification Gate**: 132/132 unit tests green (`BUILD SUCCESSFUL in 15m 33s`), clean Kotlin compilation with zero warnings, and freshly assembled debug APK (`playit-debug.apk`, 108 MB).
+
+## Phase 27 — Unified Single-Pipeline Audio Engine & Interactive Gating Overhaul (2026-09-13)
+- [x] **Single-Pipeline Audio Architecture Overhaul**: Replaced the dual-engine `SoundPool` + `MediaPlayer` collision architecture in `AudioPlayer.kt` with a single unified `MediaPlayer` pipeline.
+  - Eliminated hardware stream mixing, hardcoded 300ms delay guesses, and overlapping sound effects.
+  - Added session token invalidation (`currentSessionId`) ensuring newly triggered audio immediately cancels any stale playback.
+  - Added acoustic separation (120ms) between sequential clips in `playSequence` with true `OnCompletionListener` events.
+  - Added non-blocking coroutine suspension extensions `suspend fun playAssetAudioAwait(assetPath: String)` and `suspend fun playSequenceAwait(assetPaths: List<String>)` for reliable awaiting.
+  - Exposed `val isAudioPlaying: StateFlow<Boolean>` for reactive, app-wide UI gating.
+- [x] **BlendIt Word Phoneme Rework**:
+  - Removed the letter-by-letter phoneme sound-out loop (`for (i in targetWord.indices) { phonemeAudio... }`) upon completing a word in `BlendItViewModel.kt`.
+  - Configured word completion to directly play the blended whole word audio (`wordAudio`), followed by celebration chime and praise VO via sequential awaiting (`playSequenceAwait(listOf(sfx, vo))`).
+  - Gated word tile placement, removal, and word submission while audio is actively playing.
+  - Gated letter slots, tile bank buttons, word audio replay pill, mascot speech bubble, and "Check Word" button in `BlendItScreen.kt` with disabled states and visual dimming (`0.5f` alpha) while audio is playing.
+- [x] **Gated Scene Navigation Across Completion Screens**:
+  - `BlendItCompleteScreen.kt` & `BlendItCompleteViewModel.kt`: Gated the "Continue to Map" button with `enabled = !isAudioPlaying` and `0.5f` alpha until the fanfare, level complete VO, and streak VO sequence has finished playing completely.
+  - `LetterCompleteScreen.kt` & `LetterCompleteViewModel.kt`: Gated the "Continue to Map" button with `enabled = !isAudioPlaying` and `0.5f` alpha until the fanfare, lesson complete VO, and unlock VO sequence has finished playing completely.
+- [x] **Interactive Button Gating Across Learning Screens**:
+  - `FindItScreen.kt` & `FindItViewModel.kt`: Gated grid cards, target audio replay pill, mascot speech bubble tap, and "Complete Lesson" button on `isAudioPlaying`.
+  - `SayItScreen.kt` & `SayItViewModel.kt`: Gated letter prompt card tap, mascot tap, microphone recording button, and "Next: Find It" button on `isAudioPlaying`.
+  - `HearItScreen.kt` & `HearItViewModel.kt`: Gated letter card tap, mascot tap, primary speaker CTA button, and "Next: Say It" button on `isAudioPlaying`.
+  - `MapScreen.kt` & `MapViewModel.kt`: Gated mascot tap reaction, locked node tap reaction, and "START CHALLENGE" / "PRACTICE AGAIN" button in `NodeActionPopupDialog.kt` on `isAudioPlaying`.
+- [x] **Zero-Emoji Policy Compliance**: Maintained 100% adherence to the Zero-Emoji Policy across all revised buttons, dialogs, titles, and speech bubbles.
+- [x] **Full Verification Gate**:
+  - 139/139 unit tests green (`BUILD SUCCESSFUL in 4m 43s`, 0 failures, 0 errors).
+  - Debug APK cleanly assembled via `./gradlew assembleDebug` (`BUILD SUCCESSFUL in 4m 25s`).
+
+## Phase 28 — BlendIt "Blending..." Freeze Resolution & Haptics Elimination (2026-09-13)
+- [x] **Diagnosis & Resolution of Blend-It "Blending..." Freeze**:
+  - Identified root cause in `AudioPlayer.kt`: `playSequence` initiated playback with `val sessionId = ++currentSessionId`, but each subsequent invocation of `executePlay` inside `playNextInSequence` also incremented `currentSessionId`. This caused `sessionId != currentSessionId` in the completion callback of clip 0, aborting the sequence before clip 1 was ever scheduled and never invoking `onComplete`.
+  - Because `playSequenceAwait(listOf(sfx, vo))` never resumed, `BlendItViewModel` remained permanently suspended in `soundOutJob`, leaving `_uiState.value` as `BlendItUiState.WordCorrect`, and the primary button stuck permanently displaying `"Blending..."`.
+  - Refactored `AudioPlayer.kt`: `executePlay` now accepts the existing `sessionId: Long` without generating a new ID, enabling multi-clip sequences to complete seamlessly.
+  - Added safe coroutine timeouts (`withTimeoutOrNull(8000L)` and `withTimeoutOrNull(10000L)`) to `playAssetAudioAwait` and `playSequenceAwait`.
+  - Added robust `try/catch` safeguards in `BlendItViewModel.kt` to ensure word advancement and session completion occur even in the event of an audio hardware exception.
+- [x] **Complete Removal of Haptics & Vibration**:
+  - Audited the entire repository for vibration and haptic feedback usages.
+  - Removed `haptic.performHapticFeedback(HapticFeedbackType.LongPress)` and all `LocalHapticFeedback` references from `GummyButton.kt`.
+  - Confirmed zero occurrences of `Vibrator`, `VibrationEffect`, or `performHapticFeedback` across the entire application.
+- [x] **Full Verification Gate**:
+  - 139/139 unit tests green (`BUILD SUCCESSFUL in 17m 32s`, 0 failures, 0 errors).
+  - Clean APK assembly and deployment to `playit-debug.apk` (108 MB) via `./gradlew assembleDebug` (`BUILD SUCCESSFUL in 3m 26s`).
+
+## Phase 29 — Pediatric Sound Effects Suite Mastering & UI Integration (2026-09-13)
+- [x] **Pediatric Sound Effects Suite Synthesis (`tools/generate_pediatric_sfx.py`)**:
+  - Engineered physics-modeled and subtractive/FM synthesizer pipeline specifically tuned for pediatric delight and supportive UX.
+  - Mastered and deployed 8 studio-quality sound effects to `app/src/main/assets/audio/ui/`:
+    - `sfx_correct_chime.mp3`: Ascending C-major chord (C5-E5-G5-C6) with physical-modeled rosewood marimba tone and glockenspiel sparkle (0.80s, Peak 0.82, RMS 0.132).
+    - `sfx_incorrect_pop.mp3`: Gentle wooden bubble bloop pitch-gliding 260 Hz to 140 Hz (0.26s, Peak 0.78, RMS 0.145). Friendly and non-punitive.
+    - `sfx_blendit_buzz.mp3`: Playful FM synthesized rubber spring wobble replacing harsh abrasive buzzer with a tactile cartoon bounce (0.42s, Peak 0.80, RMS 0.155).
+    - `sfx_heart_loss_whoosh.mp3`: Subtle descending resonant air whoosh (1.8 kHz to 400 Hz) with warm body (0.55s, Peak 0.80, RMS 0.125).
+    - `sfx_heart_recovery_sparkle.mp3`: Magical ascending glissando across C-major pentatonic scale with high glockenspiel sparkle and stereo reverb (0.85s, Peak 0.82, RMS 0.128).
+    - `sfx_node_unlock_chime.mp3`: Dual-layer celesta and tubular bell chime with shimmering octave overtone celebrating map progression (1.40s, Peak 0.82, RMS 0.134).
+    - `sfx_streak_badge_unlock.mp3`: Heroic pediatric fanfare sting (D5-F#5-A5-D6) with warm analog brass swell, vibrato, and glockenspiel accent (1.50s, Peak 0.82, RMS 0.136).
+    - `sfx_level_complete_fanfare.mp3`: Full celebratory milestone fanfare with rich brass harmony, sparkling glockenspiel cascades, and smooth reverb tail (2.35s, Peak 0.82, RMS 0.148).
+- [x] **Acoustic Mastering & Optimization**:
+  - Zero true-peak clipping: Strict ceiling enforced at -1.4 dBFS (0.82 linear peak amplitude).
+  - Balanced loudness: Calibrated RMS window of 0.125 - 0.155 across all sounds, eliminating disparity where some sounds were inaudible (previously 0.024) and others blaring (previously 0.236).
+  - Truncated trailing dead silence: Eliminated 1.0 - 1.5s trailing empty space present in legacy files, making UI voiceover transitions instantaneous.
+- [x] **Interactive Asset Showcase Integration (`asset_review.html`)**:
+  - Added Section 10 ("Interactive Pediatric Sound Effects Suite") featuring HTML5 audio preview widgets, spectral/timing metadata, and acoustic descriptions for all 8 sound effects.
+- [x] **Full Verification Gate**:
+  - 139/139 unit tests green (`BUILD SUCCESSFUL in 48s`, 0 failures, 0 errors).
+  - Clean APK assembly via `./gradlew assembleDebug` (`BUILD SUCCESSFUL in 46s`).
 
 

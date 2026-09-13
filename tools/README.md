@@ -12,10 +12,17 @@ tools/
 ├── free-for-dev.png          # Reference: Free for Developers Catalog (132K stars)
 ├── mcp servers.png           # Reference: Awesome MCP Servers (92K stars)
 ├── tool 1.png                # Reference: AI Media, Audio & Video Generation Suite
+├── fooocus.png               # Reference: lllyasviel/Fooocus SDXL Image Suite
 ├── README.md                 # This guide
 ├── elevenlabs_voice_studio.py# Filipina Voice Synthesizer (ElevenLabs API + Zero-Cost Edge Neural)
+├── voice_studio_runner.py    # VoiceStudio multi-engine batch phoneme & audio synthesizer
 ├── dictionary_validator.py   # Phonics Curriculum & CVC Discovery via Public APIs
-└── asset_pipeline_optimizer.py # Alpha Background Removal & 4-Benchmark Outline Styler
+├── asset_pipeline_optimizer.py # Alpha Background Removal & 4-Benchmark Outline Styler
+├── fooocus_asset_bridge.py   # Fooocus SDXL Generation to Android Asset Bridge
+├── whisper_evaluator.py      # OpenAI Whisper Speech & Phoneme Accuracy Benchmark Evaluator
+├── VoiceStudio/              # Cloned debpalash/VoiceStudio suite (16 TTS / 11 ASR engines)
+├── whisper/                  # Cloned openai/whisper speech recognition repository
+└── Fooocus/                  # Cloned lllyasviel/Fooocus SDXL image generation suite
 ```
 
 ---
@@ -75,16 +82,70 @@ python tools/dictionary_validator.py --word bat
 
 ---
 
-### C. Asset Pipeline Optimizer (`asset_pipeline_optimizer.py`)
+### C. Asset Pipeline Optimizer & Fooocus Bridge (`asset_pipeline_optimizer.py` & `fooocus_asset_bridge.py`)
 
-Applies background cleanup, transparent alpha channels, and the `#2D373E` continuous 4-Benchmark outline:
+Applies background cleanup, transparent alpha channels, and the `#2D373E` continuous 4-Benchmark outline to raw or Fooocus SDXL generations:
 
 ```bash
-python tools/asset_pipeline_optimizer.py --input raw_character.png --out app/src/main/assets/images/characters/lily_wave.png --size 512 --outline 8
+# 1. Single asset processing:
+python tools/asset_pipeline_optimizer.py --input raw_character.png --out app/src/main/assets/images/characters/kuting_wave.png --size 512 --outline 8
+
+# 2. Bridge images generated from Fooocus directly into PlayIT Android assets:
+python tools/fooocus_asset_bridge.py --input tools/Fooocus/outputs/001.png --type picture --name word_mouse --size 512
+
+# 3. Batch bridge an entire folder of Fooocus generations:
+python tools/fooocus_asset_bridge.py --input raw_cvc_generations/ --type picture --size 512
+```
+
+Fooocus PlayIT style presets are available in `tools/Fooocus/sdxl_styles/sdxl_styles_playit.json`:
+- `PlayIT Pediatric Vector`: Clean 2D Duolingo ABC vector illustration style
+- `PlayIT Mascot Kuting`: Philippine tarsier mascot poses with warm golden eyes
+- `PlayIT Phonics Object`: Simple high-contrast phonics picture card icons
+
+---
+
+### D. OpenAI Whisper Speech & Phoneme Evaluator (`whisper_evaluator.py`)
+
+Benchmarks Say It child speech attempts, validates phoneme accuracy, and grades audio against expected curriculum targets:
+
+```bash
+# Evaluate a recorded audio sample against target phoneme 'm'
+python tools/whisper_evaluator.py --audio test_child_m.wav --target m --model base
+
+# Evaluate against a target CVC word
+python tools/whisper_evaluator.py --audio test_child_mouse.wav --target mouse --threshold 0.8
 ```
 
 ---
 
-### D. Automated CI/CD (GitHub Actions)
+### E. VoiceStudio Multi-Engine Audio Runner (`voice_studio_runner.py`)
+
+Local, offline batch audio synthesis for 28 Marungko letter phonemes, CVC words, and mascot voice lines:
+
+```bash
+# Batch generate all core phoneme audio clips (/m/, /s/, /a/, etc.)
+python tools/voice_studio_runner.py --batch-phonemes
+
+# Batch generate CVC word audio clips ('mouse', 'sun', 'apple', etc.)
+python tools/voice_studio_runner.py --batch-words
+
+# Batch generate mascot celebration and instructional VO lines
+python tools/voice_studio_runner.py --batch-vo
+```
+
+---
+
+### F. Integrated Engineering Agent Skills & Ponytail Rules
+
+The repository is equipped with the following AI agent capabilities in `.agents/`:
+1. **Matt Pocock Skills (`mattpocock/skills`)**:
+   - `implement`, `tdd`, `code-review`, `diagnosing-bugs`, `domain-modeling`, `codebase-design`, `improve-codebase-architecture`, `to-spec`, `to-tickets`, `triage`, `wizard`, `grill-me`.
+2. **Ponytail (`DietrichGebert/ponytail`)**:
+   - `.agents/rules/ponytail.md`: Lazy senior dev principles (YAGNI, stdlib first, native platform features, zero bloat, shortest clean working diff).
+   - Skills: `ponytail`, `ponytail-review`, `ponytail-audit`, `ponytail-debt`, `ponytail-gain`.
+
+---
+
+### G. Automated CI/CD (GitHub Actions)
 
 Located in [`.github/workflows/android_ci.yml`](../.github/workflows/android_ci.yml), this workflow automatically runs unit tests and compiles the fresh debug APK on every commit to `main`.

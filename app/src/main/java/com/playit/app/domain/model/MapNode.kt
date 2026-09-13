@@ -5,6 +5,7 @@ sealed class MapNode {
     abstract val orderIndex: Int
     abstract val isUnlocked: Boolean
     abstract val groupNumber: Int
+    abstract val starsEarned: Int
 
     data class LetterNode(
         override val id: String,
@@ -12,7 +13,7 @@ sealed class MapNode {
         override val isUnlocked: Boolean,
         override val groupNumber: Int = 1,
         val symbol: String,
-        val starsEarned: Int
+        override val starsEarned: Int
     ) : MapNode()
 
     data class BlendItNode(
@@ -21,6 +22,6 @@ sealed class MapNode {
         override val isUnlocked: Boolean,
         override val groupNumber: Int = 1,
         val groupId: String,
-        val starsEarned: Int
+        override val starsEarned: Int
     ) : MapNode()
 }

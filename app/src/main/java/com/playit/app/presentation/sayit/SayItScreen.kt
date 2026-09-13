@@ -53,6 +53,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -90,6 +91,7 @@ fun SayItScreen(
     val isNoisyEnvironment by viewModel.isNoisyEnvironment.collectAsStateWithLifecycle()
     val isPlayingPhoneme by viewModel.isPlayingPhoneme.collectAsStateWithLifecycle()
     val isPlayingPrompt by viewModel.isPlayingPrompt.collectAsStateWithLifecycle()
+    val isAudioPlaying by viewModel.isAudioPlaying.collectAsStateWithLifecycle()
     val loadError by viewModel.loadError.collectAsStateWithLifecycle()
     val targetLetter = phoneme?.letter?.uppercase() ?: "M"
     val targetWord by viewModel.targetWord.collectAsStateWithLifecycle()
@@ -208,7 +210,7 @@ fun SayItScreen(
                     },
                     isPlayingAudio = isPlayingPrompt,
                     amplitude = audioAmplitude,
-                    onMascotTap = { viewModel.playSayItIntroAudio() }
+                    onMascotTap = { if (!isAudioPlaying) viewModel.playSayItIntroAudio() }
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -226,12 +228,13 @@ fun SayItScreen(
                         showSpeakerIcon = true,
                         isPlaying = isPlayingPhoneme,
                         modifier = Modifier.shake(trigger = state is SayItState.Incorrect),
-                        onTapReplay = { viewModel.playWordAudio() }
+                        onTapReplay = { if (!isAudioPlaying && !isListening) viewModel.playWordAudio() }
                     )
                 } else {
                     // Legacy letter-sound card (ng/ñ SME-pending letters) — pure phoneme audio
                     GummyContainer(
-                        onClick = { viewModel.playPhonemeSound() },
+                        onClick = { if (!isAudioPlaying && !isListening) viewModel.playPhonemeSound() },
+                        enabled = !isAudioPlaying && !isListening,
                         faceColor = SurfaceCard,
                         shadowColor = SurfaceCardShadow,
                         shape = CardShape,
@@ -296,9 +299,10 @@ fun SayItScreen(
                         )
                     }
 
+                    val isMicEnabled = !isAudioPlaying && !isModelInitializing && state !is SayItState.Correct
                     GummyContainer(
-                        onClick = if (isPlayingPhoneme || isModelInitializing) null else toggleListening,
-                        enabled = !isPlayingPhoneme && !isModelInitializing,
+                        onClick = if (isMicEnabled) toggleListening else null,
+                        enabled = isMicEnabled,
                         faceColor = when {
                             isModelInitializing -> CanvasLight
                             isListening -> CoralBerry
@@ -423,14 +427,20 @@ fun SayItScreen(
             }
 
             Box(modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 24.dp, vertical = 12.dp)) {
+                val isNextEnabled = state is SayItState.Correct && !isAudioPlaying
                 GummyButton(
                     text = "Next: Find It",
-                    onClick = { if (state is SayItState.Correct) onNext(phoneme?.id?.toString() ?: "1") },
-                    enabled = state is SayItState.Correct,
+                    onClick = { if (isNextEnabled) onNext(phoneme?.id?.toString() ?: "1") },
+                    enabled = isNextEnabled,
                     backgroundColor = EmeraldLeaf,
                     shadowColor = EmeraldLeafShadow,
                     contentColor = Color.White,
-                    modifier = Modifier.fillMaxWidth().height(64.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(64.dp)
+                        .graphicsLayer {
+                            alpha = if (isNextEnabled) 1f else 0.5f
+                        }
                 )
             }
         }

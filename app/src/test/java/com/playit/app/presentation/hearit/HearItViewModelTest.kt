@@ -8,6 +8,7 @@ import com.playit.app.domain.repository.PhonemeRepository
 import io.mockk.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.*
 import org.junit.After
 import org.junit.Assert.*
@@ -36,6 +37,7 @@ class HearItViewModelTest {
         every { audioPlayer.playAssetAudio(any(), any()) } answers {
             secondArg<(() -> Unit)?>()?.invoke()
         }
+        every { audioPlayer.isAudioPlaying } returns MutableStateFlow(false)
     }
 
     @After

@@ -73,6 +73,7 @@ fun HearItScreen(
     val phoneme by viewModel.phoneme.collectAsStateWithLifecycle()
     val isPlaying by viewModel.isPlaying.collectAsStateWithLifecycle()
     val isPlayingPrompt by viewModel.isPlayingPrompt.collectAsStateWithLifecycle()
+    val isAudioPlaying by viewModel.isAudioPlaying.collectAsStateWithLifecycle()
     val playCount by viewModel.playCount.collectAsStateWithLifecycle()
     val loadError by viewModel.loadError.collectAsStateWithLifecycle()
     val targetLetter = phoneme?.letter?.uppercase() ?: "M"
@@ -180,7 +181,7 @@ fun HearItScreen(
                     },
                     mascotState = if (isPlaying) MascotState.LISTENING else if (playCount > 0) MascotState.POINTING else MascotState.IDLE,
                     isPlayingAudio = isPlayingPrompt,
-                    onMascotTap = { viewModel.playHearItIntroAudio() }
+                    onMascotTap = { if (!isAudioPlaying) viewModel.playHearItIntroAudio() }
                 )
 
                 Spacer(modifier = Modifier.height(14.dp))
@@ -191,12 +192,13 @@ fun HearItScreen(
                     soundText = "Sound: /${phoneme?.letter ?: "m"}/",
                     cardRotation = cardRotation,
                     wordOverride = phoneme?.exampleWord,
-                    onTapReplay = { if (!isPlaying) viewModel.playPhonemeSound() }
+                    onTapReplay = { if (!isPlaying && !isAudioPlaying) viewModel.playPhonemeSound() }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Pulsating 88dp PrimaryJoy Speaker Replay Button
+                val canPlayAudio = !isPlaying && !isAudioPlaying
                 Box(
                     modifier = Modifier.size(AUDIO_CTA_RING_BOUNDS),
                     contentAlignment = Alignment.Center
@@ -212,8 +214,8 @@ fun HearItScreen(
                     }
 
                     GummyContainer(
-                        onClick = if (isPlaying) null else ({ viewModel.playPhonemeSound() }),
-                        enabled = !isPlaying,
+                        onClick = if (canPlayAudio) ({ viewModel.playPhonemeSound() }) else null,
+                        enabled = canPlayAudio,
                         faceColor = com.playit.app.presentation.theme.PrimaryJoy,
                         shadowColor = com.playit.app.presentation.theme.PrimaryJoyDark,
                         shape = CircleShape,
@@ -249,7 +251,7 @@ fun HearItScreen(
                                         colors = if (filled) {
                                              listOf(com.playit.app.presentation.theme.PrimaryJoy, com.playit.app.presentation.theme.PrimaryJoyDark)
                                         } else {
-                                            listOf(com.playit.app.presentation.theme.PrimaryJoyLight.copy(alpha = 0.35f), com.playit.app.presentation.theme.PrimaryJoyLight.copy(alpha = 0.15f))
+                                             listOf(com.playit.app.presentation.theme.PrimaryJoyLight.copy(alpha = 0.35f), com.playit.app.presentation.theme.PrimaryJoyLight.copy(alpha = 0.15f))
                                         }
                                     )
                                 )
@@ -272,14 +274,15 @@ fun HearItScreen(
                     .navigationBarsPadding()
                     .padding(horizontal = 24.dp, vertical = 12.dp)
             ) {
+                val canProceed = isUnlocked && !isAudioPlaying
                 GummyButton(
                     text = "Next: Say It",
                     onClick = {
-                        if (isUnlocked) {
+                        if (canProceed) {
                             onNext(phoneme?.id?.toString() ?: "1")
                         }
                     },
-                    enabled = isUnlocked,
+                    enabled = canProceed,
                     backgroundColor = com.playit.app.presentation.theme.SunnyGold,
                     shadowColor = com.playit.app.presentation.theme.SunnyGoldShadow,
                     contentColor = com.playit.app.presentation.theme.TextMidnight,
@@ -289,6 +292,7 @@ fun HearItScreen(
                         .graphicsLayer {
                             scaleX = unlockScale.value
                             scaleY = unlockScale.value
+                            alpha = if (canProceed) 1f else 0.5f
                         }
                 )
             }

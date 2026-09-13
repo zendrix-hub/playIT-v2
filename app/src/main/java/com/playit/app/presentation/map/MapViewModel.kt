@@ -11,6 +11,7 @@ import com.playit.app.domain.manager.StreakTracker
 import com.playit.app.domain.manager.UnlockManager
 import com.playit.app.domain.model.MapNode
 import com.playit.app.domain.repository.AchievementRepository
+import com.playit.app.domain.repository.BlendItProgressRepository
 import com.playit.app.domain.repository.LessonProgressRepository
 import com.playit.app.domain.repository.LetterGroupMemberRepository
 import com.playit.app.domain.repository.LetterGroupRepository
@@ -43,6 +44,7 @@ class MapViewModel @Inject constructor(
     private val letterGroupRepository: LetterGroupRepository,
     private val letterGroupMemberRepository: LetterGroupMemberRepository,
     private val lessonProgressRepository: LessonProgressRepository,
+    private val blendItProgressRepository: BlendItProgressRepository,
     private val profileRepository: ProfileRepository,
     private val achievementRepository: AchievementRepository,
     private val sessionManager: SessionManager,
@@ -54,6 +56,7 @@ class MapViewModel @Inject constructor(
 ) : ViewModel() {
 
     val activeProfileId: StateFlow<Long?> = sessionManager.activeProfileId
+    val isAudioPlaying: StateFlow<Boolean> = audioPlayer.isAudioPlaying
 
     init {
         viewModelScope.launch {
@@ -67,17 +70,20 @@ class MapViewModel @Inject constructor(
     }
 
     fun playHeartRecoverySound() {
+        if (audioPlayer.isAudioPlaying.value) return
         val sfx = audioResolver.getSfxPath(SfxEvent.HEART_RECOVERY_SPARKLE)
         audioPlayer.playAssetAudio(sfx)
     }
 
     fun playMascotTapReaction() {
+        if (audioPlayer.isAudioPlaying.value) return
         val sfx = audioResolver.getSfxPath(SfxEvent.NODE_UNLOCK_CHIME)
-        val vo = audioResolver.getVoPath(VoContext.MAP_TARANA)
+        val vo = audioResolver.getVoPath(VoContext.MAP_LETS_GO)
         audioPlayer.playSequence(listOf(sfx, vo))
     }
 
     fun onLockedNodeTapped() {
+        if (audioPlayer.isAudioPlaying.value) return
         val sfx = audioResolver.getSfxPath(SfxEvent.INCORRECT_POP)
         val vo = audioResolver.getRotatingEncourageVo()
         audioPlayer.playSequence(listOf(sfx, vo))
@@ -115,8 +121,9 @@ class MapViewModel @Inject constructor(
             phonemeRepository.getAllPhonemes(),
             letterGroupRepository.getAllGroups(),
             letterGroupMemberRepository.getAllMembers(),
-            lessonProgressRepository.getProgressForProfile(profileId)
-        ) { phonemes, groups, members, progressList ->
+            lessonProgressRepository.getProgressForProfile(profileId),
+            blendItProgressRepository.getProgressForProfile(profileId)
+        ) { phonemes, groups, members, progressList, blendProgressList ->
             val nodesList = mutableListOf<MapNode>()
             var globalIndex = 0
 
@@ -142,6 +149,7 @@ class MapViewModel @Inject constructor(
 
                 // Insert BlendIt Challenge Node after each group of letters
                 val isBlendItUnlocked = groupUnlockManager.isBlendItUnlocked(group.groupId, members, progressList)
+                val blendProgress = blendProgressList.find { it.groupId == group.groupId }
                 nodesList.add(
                     MapNode.BlendItNode(
                         id = "blend_${group.groupId}",
@@ -149,7 +157,7 @@ class MapViewModel @Inject constructor(
                         isUnlocked = isBlendItUnlocked,
                         groupNumber = group.groupNumber,
                         groupId = group.groupId.toString(),
-                        starsEarned = 0
+                        starsEarned = blendProgress?.starsEarned ?: 0
                     )
                 )
             }

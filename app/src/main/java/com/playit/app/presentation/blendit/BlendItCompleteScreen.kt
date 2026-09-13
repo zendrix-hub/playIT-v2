@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -47,6 +48,7 @@ fun BlendItCompleteScreen(
     onReturnToMap: () -> Unit
 ) {
     val starsEarned by viewModel.starsEarned.collectAsStateWithLifecycle()
+    val isAudioPlaying by viewModel.isAudioPlaying.collectAsStateWithLifecycle()
     
     var isPlaying by remember { mutableStateOf(true) }
 
@@ -155,7 +157,8 @@ fun BlendItCompleteScreen(
                     .padding(bottom = 12.dp)
             ) {
                 GummyContainer(
-                    onClick = onReturnToMap,
+                    onClick = { if (!isAudioPlaying) onReturnToMap() },
+                    enabled = !isAudioPlaying,
                     faceColor = com.playit.app.presentation.theme.SunnyGold,
                     shadowColor = com.playit.app.presentation.theme.SunnyGoldShadow,
                     shape = com.playit.app.presentation.theme.ButtonShape,
@@ -165,6 +168,9 @@ fun BlendItCompleteScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(64.dp)
+                        .graphicsLayer {
+                            alpha = if (!isAudioPlaying) 1f else 0.5f
+                        }
                 ) {
                     Row(
                         modifier = Modifier.fillMaxSize(),

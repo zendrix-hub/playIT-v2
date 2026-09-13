@@ -181,6 +181,20 @@ private class FakeProfileRepository : ProfileRepository {
     override suspend fun deleteProfile(profile: Profile) {
         profiles.remove(profile.id)
     }
+
+    override suspend fun addStars(profileId: Long, starDelta: Int) {
+        val existing = profiles[profileId]
+        if (existing != null && starDelta > 0) {
+            profiles[profileId] = existing.copy(totalStars = existing.totalStars + starDelta)
+        }
+    }
+
+    override suspend fun updateTotalStars(profileId: Long, totalStars: Int) {
+        val existing = profiles[profileId]
+        if (existing != null) {
+            profiles[profileId] = existing.copy(totalStars = totalStars)
+        }
+    }
 }
 
 private class FakeAchievementRepository : AchievementRepository {

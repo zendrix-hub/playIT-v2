@@ -23,6 +23,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -47,12 +48,13 @@ private val PopLockedShelf = SurfaceCardShadow
 @Composable
 fun NodeActionPopupDialog(
     node: MapNode,
+    isAudioPlaying: Boolean = false,
     onStartChallenge: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
     val isLetter = node is MapNode.LetterNode
     val isUnlocked = node.isUnlocked
-    val starsEarned = if (node is MapNode.LetterNode) node.starsEarned else 0
+    val starsEarned = node.starsEarned
     val isCompleted = starsEarned > 0
 
     val primaryColor = when {
@@ -261,16 +263,22 @@ fun NodeActionPopupDialog(
                         text = buttonText,
                         icon = Icons.Rounded.PlayArrow,
                         onClick = {
-                            val nodeId = if (isLetter) (node as MapNode.LetterNode).id else "blend_${(node as MapNode.BlendItNode).groupId}"
-                            onStartChallenge(nodeId)
-                            onDismiss()
+                            if (!isAudioPlaying) {
+                                val nodeId = if (isLetter) (node as MapNode.LetterNode).id else "blend_${(node as MapNode.BlendItNode).groupId}"
+                                onStartChallenge(nodeId)
+                                onDismiss()
+                            }
                         },
+                        enabled = !isAudioPlaying,
                         backgroundColor = btnBg,
                         shadowColor = btnShelf,
                         contentColor = if (isCompleted) TextMidnight else Color.White,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(56.dp)
+                            .graphicsLayer {
+                                alpha = if (isAudioPlaying) 0.5f else 1f
+                            }
                     )
                 } else {
                     // Locked Card Guidance

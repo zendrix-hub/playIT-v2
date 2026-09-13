@@ -1,8 +1,8 @@
 """
 PlayIT Official App Icon Suite Generator
-Generates the Headspace-inspired Tarsier Dome App Logo:
+Generates the Headspace-styled Lily the Tarsier App Logo using the newest mascot:
 1. 512x512 Master Store Icon (ic_launcher_playstore.png)
-2. Adaptive Icon Foreground & Background (ic_launcher_foreground.png, ic_launcher_background.png)
+2. Android Adaptive Icon Foreground & Background (ic_launcher_foreground.png, ic_launcher_background.png)
 3. Full Mipmap Density Suite: mdpi (48), hdpi (72), xhdpi (96), xxhdpi (144), xxxhdpi (192)
 4. Round and Squircle Icons
 """
@@ -12,162 +12,137 @@ from PIL import Image, ImageDraw, ImageFilter
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RES_DIR = os.path.join(BASE_DIR, "app", "src", "main", "res")
+TOOLS_DIR = os.path.join(BASE_DIR, "tools")
+MASCOT_PATH = os.path.join(BASE_DIR, "app", "src", "main", "assets", "images", "mascot", "lily_idle.png")
 
-OUTLINE = (45, 55, 62, 255)       # #2D373E
+OUTLINE = (45, 55, 62, 255)         # #2D373E
 OUTLINE_WIDTH = 12
 
-MANGO = (250, 123, 40, 255)       # #FA7B28
-MANGO_TOP = (255, 145, 50, 255)
-EAR_INNER = (255, 175, 120, 255)  # #FFAF78
-CREAM_PATCH = (255, 238, 215, 255)# #FFEED7
-PUPIL = (31, 58, 61, 255)         # #1F3A3D
-WHITE = (255, 255, 255, 255)
-ROSY_CHEEK = (255, 170, 185, 255)
-TONGUE = (244, 63, 94, 255)       # #F43F5E
+# Headspace signature warm sunny cream gradient
+BG_TOP = (255, 253, 238, 255)       # #FFFDEE (warm sunny morning light)
+BG_BOT = (254, 215, 102, 255)       # #FED766 (warm sunny golden glow)
 
-SUNNY_BG_TOP = (255, 253, 238, 255) # #FFFDEE
-SUNNY_BG_BOT = (254, 218, 106, 255) # #FEDA6A
-
-def apply_outline(fill_img, stroke_w=OUTLINE_WIDTH, stroke_color=OUTLINE):
-    alpha = fill_img.split()[3]
-    expanded_alpha = alpha.filter(ImageFilter.MaxFilter(stroke_w * 2 + 1))
-    stroke_base = Image.new("RGBA", fill_img.size, stroke_color)
-    stroke_layer = Image.new("RGBA", fill_img.size, (0, 0, 0, 0))
-    stroke_layer.paste(stroke_base, (0, 0), expanded_alpha)
-    return Image.alpha_composite(stroke_layer, fill_img)
+def get_mascot_image():
+    """Loads Lily the Tarsier from the latest master asset."""
+    if not os.path.exists(MASCOT_PATH):
+        raise FileNotFoundError(f"Mascot not found at {MASCOT_PATH}")
+    return Image.open(MASCOT_PATH).convert("RGBA")
 
 def create_sunny_background(size=512):
-    """Generates the soft sunny radial/linear background gradient."""
+    """Generates the soft warm sunny Headspace gradient background."""
     bg = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     d = ImageDraw.Draw(bg)
     for y in range(size):
         ratio = y / float(size - 1)
-        r = int(SUNNY_BG_TOP[0] * (1 - ratio) + SUNNY_BG_BOT[0] * ratio)
-        g = int(SUNNY_BG_TOP[1] * (1 - ratio) + SUNNY_BG_BOT[1] * ratio)
-        b = int(SUNNY_BG_TOP[2] * (1 - ratio) + SUNNY_BG_BOT[2] * ratio)
+        r = int(BG_TOP[0] * (1 - ratio) + BG_BOT[0] * ratio)
+        g = int(BG_TOP[1] * (1 - ratio) + BG_BOT[1] * ratio)
+        b = int(BG_TOP[2] * (1 - ratio) + BG_BOT[2] * ratio)
         d.line([(0, y), (size - 1, y)], fill=(r, g, b, 255))
     return bg
 
-def create_headspace_tarsier_character(size=512, dome_top_offset=0):
-    """Renders the Headspace-style geometric Tarsier character."""
-    char_img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    d = ImageDraw.Draw(char_img)
-
-    # 1. Ears rising from dome
-    ear_w = 68
-    ear_h = 75
-    ear_y = 185 + dome_top_offset
-    # Left Ear
-    d.ellipse([82 - ear_w, ear_y - ear_h, 82 + ear_w, ear_y + ear_h], fill=MANGO)
-    d.ellipse([82 - ear_w * 0.65, ear_y - ear_h * 0.65, 82 + ear_w * 0.65, ear_y + ear_h * 0.65], fill=EAR_INNER)
-    # Right Ear
-    d.ellipse([size - 82 - ear_w, ear_y - ear_h, size - 82 + ear_w, ear_y + ear_h], fill=MANGO)
-    d.ellipse([size - 82 - ear_w * 0.65, ear_y - ear_h * 0.65, size - 82 + ear_w * 0.65, ear_y + ear_h * 0.65], fill=EAR_INNER)
-
-    # 2. Main Headspace Tarsier Dome Head
-    dome_top_y = 195 + dome_top_offset
-    d.ellipse([size // 2 - 230, dome_top_y, size // 2 + 230, size + 160 + dome_top_offset], fill=MANGO)
-
-    # 3. Soft Cream Eye Patches
-    patch_r = 65
-    patch_y = 302 + dome_top_offset
-    d.ellipse([size // 2 - 85 - patch_r, patch_y - patch_r, size // 2 - 85 + patch_r, patch_y + patch_r], fill=CREAM_PATCH)
-    d.ellipse([size // 2 + 85 - patch_r, patch_y - patch_r, size // 2 + 85 + patch_r, patch_y + patch_r], fill=CREAM_PATCH)
-
-    # 4. Cheerful Rosy Cheek Blush
-    d.ellipse([size // 2 - 170, patch_y + 40, size // 2 - 118, patch_y + 75], fill=ROSY_CHEEK)
-    d.ellipse([size // 2 + 118, patch_y + 40, size // 2 + 170, patch_y + 75], fill=ROSY_CHEEK)
-
-    # 5. Giant Glossy Catchlight Tarsier Eyes
-    pupil_r = 38
-    # Left Pupil
-    d.ellipse([size // 2 - 85 - pupil_r, patch_y - pupil_r, size // 2 - 85 + pupil_r, patch_y + pupil_r], fill=PUPIL)
-    d.ellipse([size // 2 - 93 - 12, patch_y - 18, size // 2 - 93 + 12, patch_y + 8], fill=WHITE)
-    d.ellipse([size // 2 - 72 - 6, patch_y + 12, size // 2 - 72 + 6, patch_y + 24], fill=WHITE)
-
-    # Right Pupil
-    d.ellipse([size // 2 + 85 - pupil_r, patch_y - pupil_r, size // 2 + 85 + pupil_r, patch_y + pupil_r], fill=PUPIL)
-    d.ellipse([size // 2 + 77 - 12, patch_y - 18, size // 2 + 77 + 12, patch_y + 8], fill=WHITE)
-    d.ellipse([size // 2 + 98 - 6, patch_y + 12, size // 2 + 98 + 6, patch_y + 24], fill=WHITE)
-
-    # 6. Minimalist Nose Dot
-    d.ellipse([size // 2 - 5, patch_y + 35, size // 2 + 5, patch_y + 45], fill=PUPIL)
-
-    # 7. Cheerful Open Smile with Tongue
-    d.pieslice([size // 2 - 38, patch_y + 52, size // 2 + 38, patch_y + 105], 0, 180, fill=PUPIL)
-    d.pieslice([size // 2 - 26, patch_y + 74, size // 2 + 26, patch_y + 105], 0, 180, fill=TONGUE)
-
-    # 8. Apply unified 4-Benchmark continuous outline
-    char_outlined = apply_outline(char_img, stroke_w=10)
-    return char_outlined
-
 def create_master_squircle_icon(size=512):
-    """Creates the complete master squircle app icon."""
+    """
+    Creates the complete master squircle app icon (512x512).
+    Features Headspace warm sunny backdrop with the newest Lily the Tarsier mascot,
+    tactile pediatric 3D gummy depth shadow, and continuous #2D373E outline.
+    """
+    lily = get_mascot_image()
     bg = create_sunny_background(size)
 
     mask = Image.new("L", (size, size), 0)
-    mask_draw = ImageDraw.Draw(mask)
-    mask_draw.rounded_rectangle([16, 16, size - 16, size - 16], radius=115, fill=255)
+    d_mask = ImageDraw.Draw(mask)
+    d_mask.rounded_rectangle([16, 16, size - 16, size - 16], radius=115, fill=255)
 
     squircle = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     squircle.paste(bg, (0, 0), mask)
 
-    # Character masked to squircle
-    character = create_headspace_tarsier_character(size, dome_top_offset=0)
+    # Scale Lily so her head, ears, giant luminous eyes, and cute paws are prominently framed
+    scale = 0.94
+    w = int(size * scale)
+    h = int(size * scale)
+    scaled_lily = lily.resize((w, h), Image.Resampling.LANCZOS)
+
+    pos_x = (size - w) // 2
+    pos_y = 28 # gives balanced top breathing margin for ears
+
+    char_layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    char_layer.paste(scaled_lily, (pos_x, pos_y), scaled_lily)
+
+    # Mask mascot to squircle
     char_masked = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    char_masked.paste(character, (0, 0), mask)
+    char_masked.paste(char_layer, (0, 0), mask)
+    squircle = Image.alpha_composite(squircle, char_masked)
 
-    # Composite
-    final_icon = Image.alpha_composite(squircle, char_masked)
-
-    # 3D Gummy Depth Shadow on bottom
+    # 3D Gummy depth shadow on bottom edge
     depth_layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     d_depth = ImageDraw.Draw(depth_layer)
-    d_depth.rounded_rectangle([16, size - 46, size - 16, size - 16], radius=115, fill=(0, 0, 0, 35))
-    final_icon = Image.alpha_composite(final_icon, depth_layer)
+    d_depth.rounded_rectangle([16, size - 48, size - 16, size - 16], radius=115, fill=(0, 0, 0, 35))
+    squircle = Image.alpha_composite(squircle, depth_layer)
 
-    # Final Outer Bevel Border
-    d_final = ImageDraw.Draw(final_icon)
-    d_final.rounded_rectangle([16, 16, size - 16, size - 16], radius=115, outline=OUTLINE, width=12)
-    return final_icon
+    # Final continuous #2D373E pediatric border
+    d_final = ImageDraw.Draw(squircle)
+    d_final.rounded_rectangle([16, 16, size - 16, size - 16], radius=115, outline=OUTLINE, width=OUTLINE_WIDTH)
+
+    return squircle
 
 def create_round_launcher_icon(size=512):
-    """Creates the circular launcher icon."""
+    """
+    Creates the circular launcher icon with Lily gracefully framed
+    inside the circular mask and framed with continuous #2D373E border.
+    """
+    lily = get_mascot_image()
     bg = create_sunny_background(size)
 
     mask = Image.new("L", (size, size), 0)
-    mask_draw = ImageDraw.Draw(mask)
-    mask_draw.ellipse([16, 16, size - 16, size - 16], fill=255)
+    d_mask = ImageDraw.Draw(mask)
+    d_mask.ellipse([16, 16, size - 16, size - 16], fill=255)
 
     round_bg = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     round_bg.paste(bg, (0, 0), mask)
 
-    character = create_headspace_tarsier_character(size, dome_top_offset=10)
+    scale = 0.88
+    w = int(size * scale)
+    h = int(size * scale)
+    scaled_lily = lily.resize((w, h), Image.Resampling.LANCZOS)
+
+    pos_x = (size - w) // 2
+    pos_y = 44
+
+    char_layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    char_layer.paste(scaled_lily, (pos_x, pos_y), scaled_lily)
+
     char_masked = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    char_masked.paste(character, (0, 0), mask)
+    char_masked.paste(char_layer, (0, 0), mask)
 
     final_icon = Image.alpha_composite(round_bg, char_masked)
 
     d_final = ImageDraw.Draw(final_icon)
-    d_final.ellipse([16, 16, size - 16, size - 16], outline=OUTLINE, width=12)
+    d_final.ellipse([16, 16, size - 16, size - 16], outline=OUTLINE, width=OUTLINE_WIDTH)
     return final_icon
 
 def create_adaptive_foreground(size=512):
-    """Creates the adaptive icon foreground centered inside the safe zone (72%)."""
+    """
+    Creates the Android 8.0+ adaptive icon foreground.
+    Per Android adaptive icon specifications, key content must fit inside
+    the central 72dp safe zone circle (diameter = 72/108 * size = ~341px).
+    Lily is scaled to 0.71 and centered so no launcher mask ever clips her.
+    """
+    lily = get_mascot_image()
     fg = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    char = create_headspace_tarsier_character(size, dome_top_offset=0)
-    
-    # Scale to 80% to fit within the Android adaptive circle safe-zone
-    w, h = int(size * 0.80), int(size * 0.80)
-    scaled_char = char.resize((w, h), Image.Resampling.LANCZOS)
-    offset_x = (size - w) // 2
-    offset_y = (size - h) // 2 + 20
-    fg.paste(scaled_char, (offset_x, offset_y), scaled_char)
+
+    scale = 0.71
+    w = int(size * scale)
+    h = int(size * scale)
+    scaled_lily = lily.resize((w, h), Image.Resampling.LANCZOS)
+
+    pos_x = (size - w) // 2
+    pos_y = (size - h) // 2 + 10
+    fg.paste(scaled_lily, (pos_x, pos_y), scaled_lily)
     return fg
 
 def main():
     print("=" * 80)
-    print("[*] Generating Reworked Headspace Tarsier App Icon Suite...")
+    print("[*] Generating PlayIT Headspace App Icon Suite (New Mascot Edition)...")
     print("=" * 80)
 
     master = create_master_squircle_icon(512)
@@ -175,19 +150,24 @@ def main():
     adaptive_fg = create_adaptive_foreground(512)
     adaptive_bg = create_sunny_background(512)
 
-    # 1. Master Play Store Icon
+    # 1. Master Play Store Icon (512x512)
     master_path = os.path.join(RES_DIR, "drawable-xxxhdpi", "ic_launcher_playstore.png")
     master.save(master_path, format="PNG")
     print(f"  [+] Saved Play Store Master: {master_path}")
 
-    # 2. Adaptive Foreground & Background
+    # 2. Adaptive Foreground & Background in drawable-xxxhdpi
     fg_path = os.path.join(RES_DIR, "drawable-xxxhdpi", "ic_launcher_foreground.png")
     bg_path = os.path.join(RES_DIR, "drawable-xxxhdpi", "ic_launcher_background.png")
     adaptive_fg.save(fg_path, format="PNG")
     adaptive_bg.save(bg_path, format="PNG")
-    print("  [+] Saved Adaptive Icon Foreground & Background")
+    print("  [+] Saved Adaptive Icon Foreground & Background (drawable-xxxhdpi)")
 
-    # 3. Density Mipmaps
+    # 3. Save preview for tools / inspection
+    os.makedirs(TOOLS_DIR, exist_ok=True)
+    master.save(os.path.join(TOOLS_DIR, "app_logo_splash_exact.png"), format="PNG")
+    print("  [+] Saved preview to tools/app_logo_splash_exact.png")
+
+    # 4. Density Mipmaps
     densities = {
         "mipmap-mdpi": 48,
         "mipmap-hdpi": 72,
@@ -212,7 +192,7 @@ def main():
         print(f"  [+] Generated {folder} ({dim}x{dim})")
 
     print("=" * 80)
-    print("[*] Official PlayIT App Icon Suite successfully updated!")
+    print("[*] Official PlayIT App Icon Suite successfully updated with newest mascot!")
 
 if __name__ == "__main__":
     main()

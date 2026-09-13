@@ -51,4 +51,14 @@ class ProfileRepositoryImpl @Inject constructor(
     override suspend fun deleteProfile(profile: Profile) {
         profileDao.deleteProfile(profile.toEntity())
     }
+
+    override suspend fun addStars(profileId: Long, starDelta: Int) {
+        if (starDelta > 0) {
+            profileDao.addStars(profileId, starDelta)
+        }
+    }
+
+    override suspend fun updateTotalStars(profileId: Long, totalStars: Int) {
+        profileDao.updateTotalStars(profileId, totalStars)
+    }
 }

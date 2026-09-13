@@ -50,9 +50,16 @@ fun MascotBubble(
     message: String,
     modifier: Modifier = Modifier,
     mascotState: MascotState = MascotState.IDLE,
+    avatarId: Int? = null,
     backgroundColor: Color = CreamWhite,
     onMascotTap: (() -> Unit)? = null
 ) {
+    val displayAssetPath = if (avatarId != null && avatarId in 1..6) {
+        "images/mascot/avatar_0$avatarId.png"
+    } else {
+        mascotState.assetPath
+    }
+
     var tapTrigger by remember { mutableStateOf(0) }
     val tapBounceScale by animateFloatAsState(
         targetValue = if (tapTrigger % 2 == 1) 1.22f else 1.0f,
@@ -95,8 +102,8 @@ fun MascotBubble(
                 depthHeight = 3.dp
             ) {
                 androidx.compose.foundation.Image(
-                    painter = rememberAssetPainter(mascotState.assetPath),
-                    contentDescription = "Lily the Tarsier",
+                    painter = rememberAssetPainter(displayAssetPath),
+                    contentDescription = if (avatarId != null) "Companion Avatar $avatarId" else "Lily the Tarsier",
                     contentScale = androidx.compose.ui.layout.ContentScale.Fit,
                     modifier = Modifier
                         .fillMaxSize()
@@ -108,10 +115,11 @@ fun MascotBubble(
 
             Text(
                 text = message,
-                fontSize = 17.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = TextPrimary,
-                lineHeight = 23.sp,
+                fontFamily = LexendFontFamily,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = TextMidnight,
+                lineHeight = 32.sp,
                 modifier = Modifier.weight(1f)
             )
         }

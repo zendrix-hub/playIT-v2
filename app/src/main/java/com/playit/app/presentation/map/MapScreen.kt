@@ -80,6 +80,7 @@ import com.playit.app.presentation.map.components.ChocolateHillsBackground
 import com.playit.app.presentation.map.components.GroupBannerStatus
 import com.playit.app.presentation.map.components.MapCompanionFriends
 import com.playit.app.presentation.map.components.MapPathCanvas
+import com.playit.app.presentation.map.components.MapTerrainProps
 import com.playit.app.presentation.map.components.MarungkoGroupBanner
 import com.playit.app.presentation.map.components.NodeActionPopupDialog
 import com.playit.app.presentation.map.components.TopStatsBar
@@ -148,6 +149,7 @@ fun MapScreen(
 
     val mapNodes by viewModel.mapNodes.collectAsStateWithLifecycle()
     val userStats by viewModel.userStats.collectAsStateWithLifecycle()
+    val isAudioPlaying by viewModel.isAudioPlaying.collectAsStateWithLifecycle()
     val isReducedMotion = LocalReducedMotion.current
     val scrollState = rememberScrollState()
 
@@ -263,6 +265,7 @@ fun MapScreen(
             MascotBubble(
                 message = welcomeGreeting,
                 mascotState = MascotState.ENCOURAGING,
+                avatarId = userStats.avatarId,
                 backgroundColor = animatedBubbleBg,
                 onMascotTap = { viewModel.playMascotTapReaction() },
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
@@ -365,6 +368,16 @@ fun MapScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
+                // Layer 1.5: Swaying Cultural Terrain Props (Palm Trees, Nipa Huts, Tropical Flowers, Adventure Props)
+                MapTerrainProps(
+                    nodeCount = mapNodes.size,
+                    nodeVerticalSpacing = spacingDp,
+                    topPadding = topPaddingDp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(totalMapHeightDp)
+                )
+
                 // Layer 2: Continuous rope-colored dashed trail path
                 MapPathCanvas(
                     nodeCenters = nodeCenters,
@@ -452,13 +465,15 @@ fun MapScreen(
                     }
                 }
 
-                // Layer 4: Full-body Animal Avatar Companions with Breathing Animation (Leader Avatar beside active node + Cheerful Friends)
+                // Layer 4: Animated Lily the Tarsier & Companion Friends with interactive Gummy speech bubbles
                 MapCompanionFriends(
                     nodeCount = mapNodes.size,
                     nodeCenters = nodeCenters,
+                    nodes = mapNodes,
                     activeNodeIndex = activeNodeIndex,
                     activeAvatarId = userStats.avatarId,
-                    onCompanionTap = { animal ->
+                    profileName = userStats.profileName,
+                    onCompanionTap = { _ ->
                         viewModel.playMascotTapReaction()
                     },
                     modifier = Modifier
@@ -472,6 +487,7 @@ fun MapScreen(
         selectedNodeForAction?.let { targetNode ->
             NodeActionPopupDialog(
                 node = targetNode,
+                isAudioPlaying = isAudioPlaying,
                 onStartChallenge = { nodeId ->
                     selectedNodeForAction = null
                     onNodeSelected(nodeId)
@@ -923,6 +939,25 @@ fun BlendItChallengeNodeCard(
                     color = Color.White,
                     letterSpacing = 0.5.sp
                 )
+            }
+        }
+
+        // 3 Subtle Stars row under Mastered Blend It Nodes
+        if (node.starsEarned > 0) {
+            Row(
+                modifier = Modifier.padding(top = 2.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                repeat(3) { starIdx ->
+                    val isEarned = starIdx < node.starsEarned
+                    Icon(
+                        imageVector = Icons.Rounded.Star,
+                        contentDescription = "Star ${starIdx + 1}",
+                        tint = if (isEarned) Color(0xFFF59E0B) else Color(0xFFCBD5E1),
+                        modifier = Modifier.size(13.dp)
+                    )
+                }
             }
         }
     }

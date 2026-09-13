@@ -17,4 +17,7 @@ interface LessonProgressDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveProgress(progress: LessonProgressEntity)
+
+    @Query("SELECT SUM(starsEarned) FROM lesson_progress WHERE profileId = :profileId")
+    suspend fun getTotalStarsForProfile(profileId: Long): Int?
 }

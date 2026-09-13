@@ -13,6 +13,7 @@ import com.playit.app.domain.model.LessonProgress
 import com.playit.app.domain.model.Phoneme
 import com.playit.app.domain.repository.LessonProgressRepository
 import com.playit.app.domain.repository.PhonemeRepository
+import com.playit.app.domain.repository.ProfileRepository
 import com.playit.app.navigation.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +26,7 @@ import javax.inject.Inject
 class LetterCompleteViewModel @Inject constructor(
     private val phonemeRepository: PhonemeRepository,
     private val lessonProgressRepository: LessonProgressRepository,
+    private val profileRepository: ProfileRepository,
     private val streakTracker: StreakTracker,
     private val sessionManager: SessionManager,
     private val audioPlayer: AudioPlayer,
@@ -40,6 +42,7 @@ class LetterCompleteViewModel @Inject constructor(
 
     private val _starsEarned = MutableStateFlow(3)
     val starsEarned: StateFlow<Int> = _starsEarned.asStateFlow()
+    val isAudioPlaying: StateFlow<Boolean> = audioPlayer.isAudioPlaying
 
     private val _loadError = MutableStateFlow(false)
     val loadError: StateFlow<Boolean> = _loadError.asStateFlow()
@@ -70,17 +73,27 @@ class LetterCompleteViewModel @Inject constructor(
             val stars = StarCalculator.calculateStars(heartsLost = heartsLost)
             _starsEarned.value = stars
 
-            // Save lesson completion and record streak activity
+            // Query existing progress to calculate star delta and prevent downgrading
+            val existing = lessonProgressRepository.getProgressForPhoneme(profileId, phonemeId)
+            val previousStars = existing?.starsEarned ?: 0
+            val bestStars = maxOf(previousStars, stars)
+            val starDelta = (bestStars - previousStars).coerceAtLeast(0)
+
+            // Save lesson completion with highest stars earned
             lessonProgressRepository.saveProgress(
                 LessonProgress(
+                    id = existing?.id ?: 0,
                     profileId = profileId,
                     phonemeId = phonemeId,
-                    starsEarned = stars,
+                    starsEarned = bestStars,
                     heartsLost = heartsLost,
                     isCompleted = true,
                     completedAt = System.currentTimeMillis()
                 )
             )
+            if (starDelta > 0) {
+                profileRepository.addStars(profileId, starDelta)
+            }
             streakTracker.recordActivity(profileId)
 
             // Play completion fanfare + complete VO line, followed by unlock chime + unlock VO

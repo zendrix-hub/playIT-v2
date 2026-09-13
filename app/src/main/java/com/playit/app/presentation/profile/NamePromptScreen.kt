@@ -131,7 +131,7 @@ fun NamePromptScreen(
 
             // Companion Mascot Dialogue
             MascotSpeechHeader(
-                message = "What is your name? Let's choose your friendly animal avatar!",
+                message = "What is your name? Let's choose your friendly animal buddy!",
                 mascotState = mascotState,
                 isPlayingAudio = isPlayingIntro,
                 onMascotTap = { viewModel.playNamePromptIntro() },

@@ -10,6 +10,7 @@ import com.playit.app.domain.model.LessonProgress
 import com.playit.app.domain.model.Phoneme
 import com.playit.app.domain.repository.LessonProgressRepository
 import com.playit.app.domain.repository.PhonemeRepository
+import com.playit.app.domain.repository.ProfileRepository
 import com.playit.app.navigation.SessionManager
 import io.mockk.*
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +28,7 @@ class LetterCompleteViewModelTest {
     private lateinit var viewModel: LetterCompleteViewModel
     private val phonemeRepository: PhonemeRepository = mockk(relaxed = true)
     private val lessonProgressRepository: LessonProgressRepository = mockk(relaxed = true)
+    private val profileRepository: ProfileRepository = mockk(relaxed = true)
     private val streakTracker: StreakTracker = mockk(relaxed = true)
     private val sessionManager: SessionManager = mockk()
     private val audioPlayer: AudioPlayer = mockk(relaxed = true)
@@ -53,6 +55,8 @@ class LetterCompleteViewModelTest {
         every { audioResolver.getSfxPath(any()) } returns "sfx_path.mp3"
         every { audioResolver.getVoPath(any()) } returns "vo_path.mp3"
         coEvery { phonemeRepository.getPhonemeById(1) } returns testPhoneme
+        coEvery { lessonProgressRepository.getProgressForPhoneme(1L, 1) } returns null
+        every { audioPlayer.isAudioPlaying } returns MutableStateFlow(false)
     }
 
     @After
@@ -66,7 +70,7 @@ class LetterCompleteViewModelTest {
         every { savedStateHandle.get<String>("heartsLost") } returns "0"
 
         viewModel = LetterCompleteViewModel(
-            phonemeRepository, lessonProgressRepository, streakTracker,
+            phonemeRepository, lessonProgressRepository, profileRepository, streakTracker,
             sessionManager, audioPlayer, audioResolver, savedStateHandle
         )
         advanceUntilIdle()
@@ -80,6 +84,7 @@ class LetterCompleteViewModelTest {
                 match { it.phonemeId == 1 && it.profileId == 1L && it.starsEarned == 3 && it.heartsLost == 0 && it.isCompleted }
             )
         }
+        coVerify { profileRepository.addStars(1L, 3) }
         coVerify { streakTracker.recordActivity(1L) }
         verify { audioPlayer.playSequence(any()) }
     }
@@ -90,7 +95,7 @@ class LetterCompleteViewModelTest {
         every { savedStateHandle.get<String>("heartsLost") } returns "1"
 
         viewModel = LetterCompleteViewModel(
-            phonemeRepository, lessonProgressRepository, streakTracker,
+            phonemeRepository, lessonProgressRepository, profileRepository, streakTracker,
             sessionManager, audioPlayer, audioResolver, savedStateHandle
         )
         advanceUntilIdle()
@@ -101,6 +106,7 @@ class LetterCompleteViewModelTest {
                 match { it.starsEarned == 2 && it.heartsLost == 1 }
             )
         }
+        coVerify { profileRepository.addStars(1L, 2) }
     }
 
     @Test
@@ -109,7 +115,7 @@ class LetterCompleteViewModelTest {
         every { savedStateHandle.get<String>("heartsLost") } returns "2"
 
         viewModel = LetterCompleteViewModel(
-            phonemeRepository, lessonProgressRepository, streakTracker,
+            phonemeRepository, lessonProgressRepository, profileRepository, streakTracker,
             sessionManager, audioPlayer, audioResolver, savedStateHandle
         )
         advanceUntilIdle()
@@ -123,12 +129,42 @@ class LetterCompleteViewModelTest {
     }
 
     @Test
+    fun completeLesson_replayWithLowerStars_preservesHighestStarsAndAddsZeroDelta() = runTest {
+        every { savedStateHandle.get<String>("phonemeId") } returns "1"
+        every { savedStateHandle.get<String>("heartsLost") } returns "2" // 2 stars
+        coEvery { lessonProgressRepository.getProgressForPhoneme(1L, 1) } returns LessonProgress(
+            profileId = 1L,
+            phonemeId = 1,
+            starsEarned = 3, // previously 3 stars
+            heartsLost = 0,
+            isCompleted = true
+        )
+
+        viewModel = LetterCompleteViewModel(
+            phonemeRepository, lessonProgressRepository, profileRepository, streakTracker,
+            sessionManager, audioPlayer, audioResolver, savedStateHandle
+        )
+        advanceUntilIdle()
+
+        // UI reflects current attempt
+        assertEquals(2, viewModel.starsEarned.value)
+        // Saved progress preserves highest (3 stars)
+        coVerify {
+            lessonProgressRepository.saveProgress(
+                match { it.starsEarned == 3 }
+            )
+        }
+        // Profile totalStars is not incremented (delta = 0)
+        coVerify(exactly = 0) { profileRepository.addStars(any(), any()) }
+    }
+
+    @Test
     fun completeLesson_handlesMissingPhoneme_andSetsLoadError() = runTest {
         every { savedStateHandle.get<String>("phonemeId") } returns "99"
         coEvery { phonemeRepository.getPhonemeById(99) } returns null
 
         viewModel = LetterCompleteViewModel(
-            phonemeRepository, lessonProgressRepository, streakTracker,
+            phonemeRepository, lessonProgressRepository, profileRepository, streakTracker,
             sessionManager, audioPlayer, audioResolver, savedStateHandle
         )
         advanceUntilIdle()
@@ -144,7 +180,7 @@ class LetterCompleteViewModelTest {
         coEvery { phonemeRepository.getPhonemeById(1) } returns null andThen testPhoneme
 
         viewModel = LetterCompleteViewModel(
-            phonemeRepository, lessonProgressRepository, streakTracker,
+            phonemeRepository, lessonProgressRepository, profileRepository, streakTracker,
             sessionManager, audioPlayer, audioResolver, savedStateHandle
         )
         advanceUntilIdle()

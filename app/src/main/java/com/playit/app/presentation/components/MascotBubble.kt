@@ -36,8 +36,15 @@ fun MascotBubbleComponent(
     message: String,
     modifier: Modifier = Modifier,
     mascotState: MascotState = MascotState.IDLE,
+    avatarId: Int? = null,
     backgroundColor: Color = CreamWhite
 ) {
+    val displayAssetPath = if (avatarId != null && avatarId in 1..6) {
+        "images/mascot/avatar_0$avatarId.png"
+    } else {
+        mascotState.assetPath
+    }
+
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -58,8 +65,8 @@ fun MascotBubbleComponent(
                 contentAlignment = Alignment.Center
             ) {
                 GummyMotionAsset(
-                    assetPath = mascotState.assetPath,
-                    contentDescription = "Lily the Tarsier (${mascotState.name})",
+                    assetPath = displayAssetPath,
+                    contentDescription = if (avatarId != null) "Companion Avatar $avatarId" else "Lily the Tarsier (${mascotState.name})",
                     isIdleFloating = true,
                     floatDistance = 2.dp,
                     modifier = Modifier

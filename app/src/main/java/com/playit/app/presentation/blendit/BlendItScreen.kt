@@ -48,7 +48,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun BlendItScreen(
     viewModel: BlendItViewModel,
-    onSessionComplete: (Int) -> Unit,
+    onSessionComplete: (Int, Int) -> Unit,
     onBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -58,15 +58,15 @@ fun BlendItScreen(
     val placedTiles by viewModel.placedTiles.collectAsStateWithLifecycle()
     val hearts by viewModel.hearts.collectAsStateWithLifecycle()
     val currentWordIndex by viewModel.currentWordIndex.collectAsStateWithLifecycle()
+    val isAudioPlaying by viewModel.isAudioPlaying.collectAsStateWithLifecycle()
     val isPlayingPrompt by viewModel.isPlayingPrompt.collectAsStateWithLifecycle()
     val highlightedSlotIndex by viewModel.highlightedSlotIndex.collectAsStateWithLifecycle()
     val totalWords = words.size.coerceAtLeast(1)
 
-    // Fires onSessionComplete once SessionComplete is emitted
+    // Fires onSessionComplete once SessionComplete is emitted (audios have already fully played)
     LaunchedEffect(uiState) {
         if (uiState is BlendItUiState.SessionComplete) {
-            delay(800L) // allow completion chime and celebration animation to play
-            onSessionComplete(viewModel.groupId)
+            onSessionComplete(viewModel.groupId, viewModel.totalHeartsLost.value)
         }
     }
 
@@ -121,7 +121,7 @@ fun BlendItScreen(
                         else -> MascotState.POINTING
                     },
                     isPlayingAudio = isPlayingPrompt,
-                    onMascotTap = { viewModel.playBlendItIntroAudio() }
+                    onMascotTap = { if (!isAudioPlaying) viewModel.playBlendItIntroAudio() }
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -146,7 +146,7 @@ fun BlendItScreen(
                     BlendItCard(
                         word = wordItem.word,
                         isCorrect = uiState is BlendItUiState.WordCorrect,
-                        onReplayAudio = { viewModel.playTargetWordAudio() }
+                        onReplayAudio = { if (!isAudioPlaying && uiState !is BlendItUiState.WordCorrect) viewModel.playTargetWordAudio() }
                     )
                 }
 
@@ -170,12 +170,14 @@ fun BlendItScreen(
                             ),
                             label = "slotScale_$i"
                         )
+                        val isSlotInteractive = !isAudioPlaying && uiState !is BlendItUiState.WordCorrect
                         GummyContainer(
                             onClick = {
-                                if (tile != null && uiState !is BlendItUiState.WordCorrect) {
+                                if (tile != null && isSlotInteractive) {
                                     viewModel.removeTile(i)
                                 }
                             },
+                            enabled = isSlotInteractive,
                             faceColor = when {
                                 isHighlighted -> SunnyGold
                                 tile != null && uiState is BlendItUiState.WordCorrect -> EmeraldLeaf
@@ -230,12 +232,14 @@ fun BlendItScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     tileBank.forEachIndexed { _, tileLetter ->
+                        val isTileInteractive = !isAudioPlaying && uiState !is BlendItUiState.WordCorrect
                         GummyContainer(
                             onClick = {
-                                if (uiState !is BlendItUiState.WordCorrect) {
+                                if (isTileInteractive) {
                                     viewModel.placeTile(tileLetter)
                                 }
                             },
+                            enabled = isTileInteractive,
                             faceColor = SunnyGold,
                             shadowColor = SunnyGoldShadow,
                             shape = Squircle16,
@@ -271,12 +275,14 @@ fun BlendItScreen(
             ) {
                 val isReady = placedTiles.size == (currentWord?.word?.length ?: 3)
                 val isWordCorrect = uiState is BlendItUiState.WordCorrect
+                val isCheckEnabled = isReady && !isWordCorrect && !isAudioPlaying
                 GummyContainer(
                     onClick = {
-                        if (isReady && !isWordCorrect) {
+                        if (isCheckEnabled) {
                             viewModel.submitWord()
                         }
                     },
+                    enabled = isCheckEnabled,
                     faceColor = if (isWordCorrect) EmeraldLeaf else SunnyGold,
                     shadowColor = if (isWordCorrect) EmeraldLeafShadow else SunnyGoldShadow,
                     shape = ButtonShape,
@@ -288,7 +294,7 @@ fun BlendItScreen(
                         .fillMaxWidth()
                         .height(64.dp)
                         .graphicsLayer {
-                            alpha = if (isReady) 1f else 0.45f
+                            alpha = if (isCheckEnabled) 1f else 0.45f
                         }
                 ) {
                     Row(

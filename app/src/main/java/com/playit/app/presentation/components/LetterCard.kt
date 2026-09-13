@@ -58,8 +58,8 @@ fun LetterCard(
         "m" to "mouse", "n" to "nest", "o" to "orange", "p" to "pig",
         "q" to "queen", "r" to "rabbit", "s" to "sun",
         "t" to "tiger", "u" to "umbrella", "v" to "van", "w" to "watch",
-        "x" to "xylophone",
-        "y" to "yoyo", "z" to "zebra"
+        "x" to "box", "y" to "yoyo", "z" to "zebra",
+        "ng" to "ring", "ñ" to "pina", "enye" to "pina"
     )
 
     val word = wordOverride ?: letterMap[letter.lowercase()] ?: "apple"

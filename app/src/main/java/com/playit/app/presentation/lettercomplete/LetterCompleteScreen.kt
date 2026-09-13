@@ -23,6 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -51,6 +52,7 @@ fun LetterCompleteScreen(
 ) {
     val phoneme by viewModel.phoneme.collectAsStateWithLifecycle()
     val starsEarned by viewModel.starsEarned.collectAsStateWithLifecycle()
+    val isAudioPlaying by viewModel.isAudioPlaying.collectAsStateWithLifecycle()
     val letter = phoneme?.letter?.uppercase() ?: "M"
 
     var isPlaying by remember { mutableStateOf(true) }
@@ -122,14 +124,20 @@ fun LetterCompleteScreen(
 
             Box(modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = 12.dp)) {
                 GummyContainer(
-                    onClick = onReturnToMap,
+                    onClick = { if (!isAudioPlaying) onReturnToMap() },
+                    enabled = !isAudioPlaying,
                     faceColor = com.playit.app.presentation.theme.SunnyGold,
                     shadowColor = com.playit.app.presentation.theme.SunnyGoldShadow,
                     shape = com.playit.app.presentation.theme.ButtonShape,
                     strokeWidth = 2.5.dp,
                     strokeColor = com.playit.app.presentation.theme.ModernBorder,
                     depthHeight = 6.dp,
-                    modifier = Modifier.fillMaxWidth().height(64.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(64.dp)
+                        .graphicsLayer {
+                            alpha = if (!isAudioPlaying) 1f else 0.5f
+                        }
                 ) {
                     Row(
                         modifier = Modifier.fillMaxSize(),

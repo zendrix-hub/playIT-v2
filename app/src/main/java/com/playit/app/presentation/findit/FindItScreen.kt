@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,7 +48,7 @@ import com.playit.app.presentation.theme.*
 @Composable
 fun FindItScreen(
     viewModel: FindItViewModel,
-    onNext: (String) -> Unit,
+    onNext: (String, Int) -> Unit,
     onBack: () -> Unit
 ) {
     val targetPhoneme by viewModel.targetPhoneme.collectAsStateWithLifecycle()
@@ -58,6 +59,7 @@ fun FindItScreen(
     val hearts by viewModel.hearts.collectAsStateWithLifecycle()
     val isPlaying by viewModel.isPlaying.collectAsStateWithLifecycle()
     val isPlayingPrompt by viewModel.isPlayingPrompt.collectAsStateWithLifecycle()
+    val isAudioPlaying by viewModel.isAudioPlaying.collectAsStateWithLifecycle()
 
     val targetLetter = targetPhoneme?.letter?.uppercase() ?: "M"
 
@@ -106,7 +108,7 @@ fun FindItScreen(
                         else -> MascotState.POINTING
                     },
                     isPlayingAudio = isPlayingPrompt,
-                    onMascotTap = { viewModel.playFindItIntroAudio() }
+                    onMascotTap = { if (!isAudioPlaying) viewModel.playFindItIntroAudio() }
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -123,16 +125,16 @@ fun FindItScreen(
                         fontWeight = FontWeight.ExtraBold,
                         color = PrimaryJoyDark,
                         modifier = Modifier
-                            .background(color = PrimaryJoy.copy(alpha = 0.12f), shape = PillShape)
-                            .border(width = 1.5.dp, color = PrimaryJoy.copy(alpha = 0.35f), shape = PillShape)
+                            .background(PrimaryJoyLight.copy(alpha = 0.25f), PillShape)
+                            .border(1.5.dp, PrimaryJoy.copy(alpha = 0.35f), PillShape)
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     )
 
                     GummyContainer(
-                        onClick = if (isPlaying) null else ({ viewModel.playTargetSound() }),
-                        enabled = !isPlaying,
-                        faceColor = if (isPlaying) SunnyGold else SurfaceCard,
-                        shadowColor = if (isPlaying) SunnyGoldShadow else SurfaceCardShadow,
+                        onClick = if (isAudioPlaying) null else ({ viewModel.playTargetSound() }),
+                        enabled = !isAudioPlaying,
+                        faceColor = if (isAudioPlaying) SunnyGold else SurfaceCard,
+                        shadowColor = if (isAudioPlaying) SunnyGoldShadow else SurfaceCardShadow,
                         shape = PillShape,
                         strokeWidth = 2.dp,
                         strokeColor = ModernBorder,
@@ -204,7 +206,7 @@ fun FindItScreen(
                                         isCorrect = isFound,
                                         isIncorrect = isIncorrectSelection,
                                         onClick = {
-                                            if (state !is FindItState.GameOver && state !is FindItState.Completed) {
+                                            if (!isAudioPlaying && state !is FindItState.GameOver && state !is FindItState.Completed) {
                                                 viewModel.selectPictureItem(item)
                                             }
                                         }
@@ -244,7 +246,7 @@ fun FindItScreen(
                                         isCorrect = isFound,
                                         isIncorrect = isIncorrectSelection,
                                         onClick = {
-                                            if (state !is FindItState.GameOver && state !is FindItState.Completed) {
+                                            if (!isAudioPlaying && state !is FindItState.GameOver && state !is FindItState.Completed) {
                                                 viewModel.selectPictureItem(item)
                                             }
                                         }
@@ -288,7 +290,7 @@ fun FindItScreen(
                                     isCorrect = isFound,
                                     isIncorrect = isIncorrectSelection,
                                     onClick = {
-                                        if (state !is FindItState.GameOver && state !is FindItState.Completed) {
+                                        if (!isAudioPlaying && state !is FindItState.GameOver && state !is FindItState.Completed) {
                                             viewModel.selectPictureItem(item)
                                         }
                                     }
@@ -309,13 +311,21 @@ fun FindItScreen(
                 ) {
                     GummyButton(
                         text = "Complete Lesson",
-                        onClick = { onNext(targetPhoneme?.id?.toString() ?: "1") },
+                        onClick = {
+                            if (!isAudioPlaying) {
+                                onNext(targetPhoneme?.id?.toString() ?: "1", viewModel.heartManager.heartsLost)
+                            }
+                        },
+                        enabled = !isAudioPlaying,
                         backgroundColor = EmeraldLeaf,
                         shadowColor = EmeraldLeafShadow,
                         contentColor = Color.White,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(64.dp)
+                            .graphicsLayer {
+                                alpha = if (!isAudioPlaying) 1f else 0.5f
+                            }
                     )
                 }
             }

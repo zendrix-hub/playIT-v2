@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PlayIT — Complete Asset Review Showcase</title>
+  <style>
+    :root {
+      --bg-cream: #FFFBEB;
+      --card-bg: #FFFFFF;
+      --navy: #2D3748;
+      --slate: #4A5568;
+      --mint: #38A169;
+      --mint-light: #C6F6D5;
+      --sky: #3182CE;
+      --sky-light: #BEE3F8;
+      --amber: #D69E2E;
+      --amber-light: #FEFCBF;
+      --border-color: #E2E8F0;
+      --outline: #2D373E;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg-cream);
+      color: var(--navy);
+      padding: 32px 20px;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    header h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+    header p {
+      font-size: 1.1rem;
+      color: var(--slate);
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin: 4px;
+    }
+    .badge-green { background: var(--mint-light); color: var(--mint); }
+    .badge-blue { background: var(--sky-light); color: var(--sky); }
+    .badge-amber { background: var(--amber-light); color: var(--amber); }
+
+    section {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 32px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      border: 2px solid #EDF2F7;
+    }
+    section h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--navy);
+    }
+    section p.desc {
+      color: var(--slate);
+      margin-bottom: 24px;
+      font-size: 0.95rem;
+    }
+
+    /* Grid for Images */
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .card-item {
+      background: #F7FAFC;
+      border: 2px solid #E2E8F0;
+      border-radius: 16px;
+      padding: 14px;
+      text-align: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card-item:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+      border-color: #CBD5E0;
+    }
+    .checkerboard {
+      background-color: #FFFFFF;
+      background-image: 
+        linear-gradient(45deg, #F0F4F8 25%, transparent 25%), 
+        linear-gradient(-45deg, #F0F4F8 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #F0F4F8 75%), 
+        linear-gradient(-45deg, transparent 75%, #F0F4F8 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+      border-radius: 12px;
+      height: 170px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+      overflow: hidden;
+      border: 1px solid #E2E8F0;
+    }
+    .checkerboard img {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+    }
+    .card-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--navy);
+      margin-bottom: 2px;
+    }
+    .card-path {
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: var(--slate);
+    }
+
+    /* Grid for Audio */
+    .audio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+    .audio-item {
+      background: #F7FAFC;
+      border: 2px solid #E2E8F0;
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .audio-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .audio-label {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--navy);
+    }
+    .whisper-status {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      background: #C6F6D5;
+      color: #22543D;
+    }
+    .audio-transcript {
+      font-style: italic;
+      color: var(--slate);
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+      min-height: 40px;
+    }
+    audio {
+      width: 100%;
+      height: 36px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>PlayIT Production Asset Showcase</h1>
+      <p>Universal Commercial-Grade Pediatric Asset Suite — Duolingo ABC Standard</p>
+      <div style="margin-top: 12px;">
+        <span class="badge badge-green">Zero-Emoji Policy Verified</span>
+        <span class="badge badge-blue">2x Supersampled Vector Precision</span>
+        <span class="badge badge-amber">#2D373E Pediatric Sticker Outline</span>
+        <span class="badge badge-green">100% Transparent RGBA</span>
+      </div>
+    </header>
+
+    <!-- SECTION 1: REWARDS SUITE -->
+    <section>
+      <h2>Pediatric Rewards Suite</h2>
+      <p class="desc">
+        Commercial-grade reward assets rendered with 2x Lanczos supersampling (1024x1024 -> 512x512). Features 3D facet and gel shading, cute expressive faces, and #2D373E continuous outlines.
+      </p>
+      <div class="image-grid">
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/assets/images/rewards/reward_star.png" alt="Reward Star">
+          </div>
+          <div class="card-title">Reward Star</div>
+          <div class="card-path">reward_star.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/assets/images/rewards/reward_heart.png" alt="Reward Heart">
+          </div>
+          <div class="card-title">Reward Heart</div>
+          <div class="card-path">reward_heart.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/assets/images/rewards/reward_streak.png" alt="Reward Streak Flame">
+          </div>
+          <div class="card-title">Streak Flame</div>
+          <div class="card-path">reward_streak.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/assets/images/rewards/reward_confetti_burst.png" alt="Reward Confetti Burst">
+          </div>
+          <div class="card-title">Confetti Burst</div>
+          <div class="card-path">reward_confetti_burst.png</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: MAP PROPS & BACKGROUNDS -->
+    <section>
+      <h2>Map Background Props Suite</h2>
+      <p class="desc">
+        All 14 storybook map props upgraded to smooth, supersampled vector art with rich gradients, highlights, and #2D373E pediatric sticker outlines.
+      </p>
+      <div class="image-grid">
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/assets/images/backgrounds/mapprop_nipa_hut.png" alt="Nipa Hut">
+          </div>
+          <div class="card-title">Nipa Hut (Bahay Kubo)</div>
+          <div class="card-path">mapprop_nipa_hut.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/assets/images/backgrounds/mapprop_palm_tree.png" alt="Palm Tree">
+          </div>
+          <div class="card-title">Palm Tree</div>
+          <div class="card-path">mapprop_palm_tree.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/assets/images/backgrounds/mapprop_flower.png" alt="Gumamela Flower">
+          </div>
+          <div class="card-title">Flower (Gumamela)</div>
+          <div class="card-path">mapprop_flower.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/assets/images/backgrounds/mapprop_pencil_tower.png" alt="Pencil Tower">
+          </div>
+          <div class="card-title">Pencil Tower</div>
+          <div class="card-path">mapprop_pencil_tower.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/assets/images/backgrounds/mapprop_crayon_bridge.png" alt="Crayon Bridge">
+          </div>
+          <div class="card-title">Crayon Bridge</div>
+          <div class="card-path">mapprop_crayon_bridge.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/assets/images/backgrounds/mapprop_book_stack.png" alt="Book Stack">
+          </div>
+          <div class="card-title">Book Stack</div>
+          <div class="card-path">mapprop_book_stack.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/assets/images/backgrounds/mapprop_globe.png" alt="Globe">
+          </div>
+          <div class="card-title">School Globe</div>
+          <div class="card-path">mapprop_globe.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/assets/images/backgrounds/mapprop_backpack.png" alt="Backpack">
+          </div>
+          <div class="card-title">Backpack</div>
+          <div class="card-path">mapprop_backpack.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/assets/images/backgrounds/mapprop_paper_airplane.png" alt="Paper Airplane">
+          </div>
+          <div class="card-title">Paper Airplane</div>
+          <div class="card-path">mapprop_paper_airplane.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/assets/images/backgrounds/mapprop_ruler_ramp.png" alt="Ruler Ramp">
+          </div>
+          <div class="card-title">Ruler Ramp</div>
+          <div class="card-path">mapprop_ruler_ramp.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/assets/images/backgrounds/mapprop_eraser_shrub.png" alt="Eraser Shrub">
+          </div>
+          <div class="card-title">Eraser Shrub</div>
+          <div class="card-path">mapprop_eraser_shrub.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/assets/images/backgrounds/mapprop_magnifying_glass.png" alt="Magnifying Glass">
+          </div>
+          <div class="card-title">Magnifying Glass</div>
+          <div class="card-path">mapprop_magnifying_glass.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/assets/images/backgrounds/mapprop_paint_palette.png" alt="Paint Palette">
+          </div>
+          <div class="card-title">Paint Palette</div>
+          <div class="card-path">mapprop_paint_palette.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/assets/images/backgrounds/map_prop_rock.png" alt="Pebble Rock">
+          </div>
+          <div class="card-title">Storybook Rock</div>
+          <div class="card-path">map_prop_rock.png</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: ALL 26 PHONEME PICTURE CARDS -->
+    <section>
+      <h2>Phoneme Picture Cards (26 Complete Set)</h2>
+      <p class="desc">
+        Complete primary phoneme card inventory matching Duolingo ABC pediatric standards with expressive faces, warm 3-tone shading, and #2D373E outlines.
+      </p>
+      <div class="image-grid">
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_apple.png" alt="Apple"></div>
+          <div class="card-title">Letter A — Apple</div>
+          <div class="card-path">picture_apple.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_ball.png" alt="Ball"></div>
+          <div class="card-title">Letter B — Ball</div>
+          <div class="card-path">picture_ball.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_cat.png" alt="Cat"></div>
+          <div class="card-title">Letter C — Cat</div>
+          <div class="card-path">picture_cat.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_dog.png" alt="Dog"></div>
+          <div class="card-title">Letter D — Dog</div>
+          <div class="card-path">picture_dog.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_elephant.png" alt="Elephant"></div>
+          <div class="card-title">Letter E — Elephant</div>
+          <div class="card-path">picture_elephant.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_fish.png" alt="Fish"></div>
+          <div class="card-title">Letter F — Fish</div>
+          <div class="card-path">picture_fish.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_goat.png" alt="Goat"></div>
+          <div class="card-title">Letter G — Goat</div>
+          <div class="card-path">picture_goat.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_hat.png" alt="Hat"></div>
+          <div class="card-title">Letter H — Hat</div>
+          <div class="card-path">picture_hat.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_insect.png" alt="Insect"></div>
+          <div class="card-title">Letter I — Insect</div>
+          <div class="card-path">picture_insect.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_jug.png" alt="Jug"></div>
+          <div class="card-title">Letter J — Jug</div>
+          <div class="card-path">picture_jug.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_kite.png" alt="Kite"></div>
+          <div class="card-title">Letter K — Kite</div>
+          <div class="card-path">picture_kite.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_lion.png" alt="Lion"></div>
+          <div class="card-title">Letter L — Lion</div>
+          <div class="card-path">picture_lion.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_mouse.png" alt="Mouse"></div>
+          <div class="card-title">Letter M — Mouse</div>
+          <div class="card-path">picture_mouse.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_nest.png" alt="Nest"></div>
+          <div class="card-title">Letter N — Nest</div>
+          <div class="card-path">picture_nest.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_orange.png" alt="Orange"></div>
+          <div class="card-title">Letter O — Orange</div>
+          <div class="card-path">picture_orange.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_pig.png" alt="Pig"></div>
+          <div class="card-title">Letter P — Pig</div>
+          <div class="card-path">picture_pig.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_queen.png" alt="Queen"></div>
+          <div class="card-title">Letter Q — Queen</div>
+          <div class="card-path">picture_queen.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_rabbit.png" alt="Rabbit"></div>
+          <div class="card-title">Letter R — Rabbit</div>
+          <div class="card-path">picture_rabbit.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_sun.png" alt="Sun"></div>
+          <div class="card-title">Letter S — Sun</div>
+          <div class="card-path">picture_sun.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_tiger.png" alt="Tiger"></div>
+          <div class="card-title">Letter T — Tiger</div>
+          <div class="card-path">picture_tiger.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_umbrella.png" alt="Umbrella"></div>
+          <div class="card-title">Letter U — Umbrella</div>
+          <div class="card-path">picture_umbrella.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_van.png" alt="Van"></div>
+          <div class="card-title">Letter V — Van</div>
+          <div class="card-path">picture_van.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_watch.png" alt="Watch"></div>
+          <div class="card-title">Letter W — Watch</div>
+          <div class="card-path">picture_watch.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_box.png" alt="Box"></div>
+          <div class="card-title">Letter X — Box</div>
+          <div class="card-path">picture_box.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_yoyo.png" alt="Yoyo"></div>
+          <div class="card-title">Letter Y — Yoyo</div>
+          <div class="card-path">picture_yoyo.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_zebra.png" alt="Zebra"></div>
+          <div class="card-title">Letter Z — Zebra</div>
+          <div class="card-path">picture_zebra.png</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: UNIFIED LETTER CARDS -->
+    <section>
+      <h2>Lexend Bubble Letter Cards (Sample)</h2>
+      <p class="desc">
+        1024x1024 Lexend blue bubble letter cards matching the anchor letter standard, including newly crafted NG, N-tilde, and Enie cards.
+      </p>
+      <div class="image-grid">
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/letters/letter_a.png" alt="Letter A"></div>
+          <div class="card-title">Letter A</div>
+          <div class="card-path">letter_a.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/letters/letter_m.png" alt="Letter M"></div>
+          <div class="card-title">Letter M</div>
+          <div class="card-path">letter_m.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/letters/letter_s.png" alt="Letter S"></div>
+          <div class="card-title">Letter S</div>
+          <div class="card-path">letter_s.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/letters/letter_n.png" alt="Letter N"></div>
+          <div class="card-title">Letter N</div>
+          <div class="card-path">letter_n.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/letters/letter_n_tilde.png" alt="Letter N Tilde"></div>
+          <div class="card-title">Letter N Tilde</div>
+          <div class="card-path">letter_n_tilde.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/letters/letter_ng.png" alt="Letter NG"></div>
+          <div class="card-title">Letter NG</div>
+          <div class="card-path">letter_ng.png</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: COMPANION ANIMAL AVATARS & MASCOT LILY -->
+    <section>
+      <h2>Companion Animal Avatars & Mascot Lily</h2>
+      <p class="desc">
+        Mascot Lily the Philippine Tarsier and the 6 companion animal avatars, all sharing Lily's signature 2-tone iris rings, double circular catchlights, arched eyebrows, and pediatric outlines.
+      </p>
+      <div class="image-grid">
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/mascot/lily_idle.png" alt="Lily Idle"></div>
+          <div class="card-title">Lily — Idle</div>
+          <div class="card-path">lily_idle.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/mascot/lily_celebrating.png" alt="Lily Celebrating"></div>
+          <div class="card-title">Lily — Celebrating</div>
+          <div class="card-path">lily_celebrating.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/mascot/avatar_01.png" alt="Cat Avatar"></div>
+          <div class="card-title">Avatar 1 — Cat</div>
+          <div class="card-path">avatar_01.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/mascot/avatar_02.png" alt="Monkey Avatar"></div>
+          <div class="card-title">Avatar 2 — Monkey</div>
+          <div class="card-path">avatar_02.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/mascot/avatar_03.png" alt="Bunny Avatar"></div>
+          <div class="card-title">Avatar 3 — Bunny</div>
+          <div class="card-path">avatar_03.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/mascot/avatar_04.png" alt="Bear Avatar"></div>
+          <div class="card-title">Avatar 4 — Bear</div>
+          <div class="card-path">avatar_04.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/mascot/avatar_05.png" alt="Frog Avatar"></div>
+          <div class="card-title">Avatar 5 — Frog</div>
+          <div class="card-path">avatar_05.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/mascot/avatar_06.png" alt="Owl Avatar"></div>
+          <div class="card-title">Avatar 6 — Owl</div>
+          <div class="card-path">avatar_06.png</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 6: ELEVATED AUDIO SAMPLES -->
+    <section>
+      <h2>Audio Verification Samples</h2>
+      <p class="desc">
+        Synthesized via VoiceStudio using Philippine English neural voice (en-PH-RosaNeural). All audio verified with 100% transcription accuracy.
+      </p>
+      <div class="audio-grid">
+        <div class="audio-item">
+          <div class="audio-header">
+            <span class="audio-label">Letter M Phonics</span>
+            <span class="whisper-status">Verified 100%</span>
+          </div>
+          <div class="audio-transcript">"Mmm. M, like Mouse."</div>
+          <audio controls src="app/src/main/assets/audio/phonemes/phoneme_m.mp3"></audio>
+        </div>
+        <div class="audio-item">
+          <div class="audio-header">
+            <span class="audio-label">Letter S Phonics</span>
+            <span class="whisper-status">Verified 100%</span>
+          </div>
+          <div class="audio-transcript">"Sss. S, like Sun."</div>
+          <audio controls src="app/src/main/assets/audio/phonemes/phoneme_s.mp3"></audio>
+        </div>
+        <div class="audio-item">
+          <div class="audio-header">
+            <span class="audio-label">Letter A Phonics</span>
+            <span class="whisper-status">Verified 100%</span>
+          </div>
+          <div class="audio-transcript">"Ah. A, like Apple."</div>
+          <audio controls src="app/src/main/assets/audio/phonemes/phoneme_a.mp3"></audio>
+        </div>
+        <div class="audio-item">
+          <div class="audio-header">
+            <span class="audio-label">Welcome VO</span>
+            <span class="whisper-status">Verified 100%</span>
+          </div>
+          <div class="audio-transcript">"Welcome to PlayIT! Let's explore together!"</div>
+          <audio controls src="app/src/main/assets/audio/vo/vo_welcome_01.mp3"></audio>
+        </div>
+      </div>
+    </section>
+    <!-- SECTION 7: BLEND-IT WORD ILLUSTRATIONS -->
+    <section>
+      <h2>Blend-It Word Pictures (47 Storybook Illustrations)</h2>
+      <p class="desc">
+        All 47 Blend-It and distractor word cards rendered with 2x Lanczos supersampling (1024x1024 downscaled to 512x512), 
+        3-tone pediatric shading, #2D373E continuous sticker borders, and transparent RGBA backgrounds.
+      </p>
+      <div class="image-grid">
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_aim.png" alt="AIM"></div>
+          <div class="card-title">AIM</div>
+          <div class="card-path">blendword_aim.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_bam.png" alt="BAM"></div>
+          <div class="card-title">BAM</div>
+          <div class="card-path">blendword_bam.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_bat.png" alt="BAT"></div>
+          <div class="card-title">BAT</div>
+          <div class="card-path">blendword_bat.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_bed.png" alt="BED"></div>
+          <div class="card-title">BED</div>
+          <div class="card-path">blendword_bed.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_bee.png" alt="BEE"></div>
+          <div class="card-title">BEE</div>
+          <div class="card-path">blendword_bee.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_bib.png" alt="BIB"></div>
+          <div class="card-title">BIB</div>
+          <div class="card-path">blendword_bib.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_bird.png" alt="BIRD"></div>
+          <div class="card-title">BIRD</div>
+          <div class="card-path">blendword_bird.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_box.png" alt="BOX"></div>
+          <div class="card-title">BOX</div>
+          <div class="card-path">blendword_box.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_boy.png" alt="BOY"></div>
+          <div class="card-title">BOY</div>
+          <div class="card-path">blendword_boy.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_bug.png" alt="BUG"></div>
+          <div class="card-title">BUG</div>
+          <div class="card-path">blendword_bug.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_bus.png" alt="BUS"></div>
+          <div class="card-title">BUS</div>
+          <div class="card-path">blendword_bus.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_cake.png" alt="CAKE"></div>
+          <div class="card-title">CAKE</div>
+          <div class="card-path">blendword_cake.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_cap.png" alt="CAP"></div>
+          <div class="card-title">CAP</div>
+          <div class="card-path">blendword_cap.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_cat.png" alt="CAT"></div>
+          <div class="card-title">CAT</div>
+          <div class="card-path">blendword_cat.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_cup.png" alt="CUP"></div>
+          <div class="card-title">CUP</div>
+          <div class="card-path">blendword_cup.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_dog.png" alt="DOG"></div>
+          <div class="card-title">DOG</div>
+          <div class="card-path">blendword_dog.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_draw.png" alt="DRAW"></div>
+          <div class="card-title">DRAW</div>
+          <div class="card-path">blendword_draw.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_face.png" alt="FACE"></div>
+          <div class="card-title">FACE</div>
+          <div class="card-path">blendword_face.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_fan.png" alt="FAN"></div>
+          <div class="card-title">FAN</div>
+          <div class="card-path">blendword_fan.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_fish.png" alt="FISH"></div>
+          <div class="card-title">FISH</div>
+          <div class="card-path">blendword_fish.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_fox.png" alt="FOX"></div>
+          <div class="card-title">FOX</div>
+          <div class="card-path">blendword_fox.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_gap.png" alt="GAP"></div>
+          <div class="card-title">GAP</div>
+          <div class="card-path">blendword_gap.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_hand.png" alt="HAND"></div>
+          <div class="card-title">HAND</div>
+          <div class="card-path">blendword_hand.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_hat.png" alt="HAT"></div>
+          <div class="card-title">HAT</div>
+          <div class="card-path">blendword_hat.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_hen.png" alt="HEN"></div>
+          <div class="card-title">HEN</div>
+          <div class="card-path">blendword_hen.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_jam.png" alt="JAM"></div>
+          <div class="card-title">JAM</div>
+          <div class="card-path">blendword_jam.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_kit.png" alt="KIT"></div>
+          <div class="card-title">KIT</div>
+          <div class="card-path">blendword_kit.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_lit.png" alt="LIT"></div>
+          <div class="card-title">LIT</div>
+          <div class="card-path">blendword_lit.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_mat.png" alt="MAT"></div>
+          <div class="card-title">MAT</div>
+          <div class="card-path">blendword_mat.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_mob.png" alt="MOB"></div>
+          <div class="card-title">MOB</div>
+          <div class="card-path">blendword_mob.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_mom.png" alt="MOM"></div>
+          <div class="card-title">MOM</div>
+          <div class="card-path">blendword_mom.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_nap.png" alt="NAP"></div>
+          <div class="card-title">NAP</div>
+          <div class="card-path">blendword_nap.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_pan.png" alt="PAN"></div>
+          <div class="card-title">PAN</div>
+          <div class="card-path">blendword_pan.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_pig.png" alt="PIG"></div>
+          <div class="card-title">PIG</div>
+          <div class="card-path">blendword_pig.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_pin.png" alt="PIN"></div>
+          <div class="card-title">PIN</div>
+          <div class="card-path">blendword_pin.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_quiz.png" alt="QUIZ"></div>
+          <div class="card-title">QUIZ</div>
+          <div class="card-path">blendword_quiz.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_road.png" alt="ROAD"></div>
+          <div class="card-title">ROAD</div>
+          <div class="card-path">blendword_road.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_sam.png" alt="SAM"></div>
+          <div class="card-title">SAM</div>
+          <div class="card-path">blendword_sam.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_sis.png" alt="SIS"></div>
+          <div class="card-title">SIS</div>
+          <div class="card-path">blendword_sis.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_spin.png" alt="SPIN"></div>
+          <div class="card-title">SPIN</div>
+          <div class="card-path">blendword_spin.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_sub.png" alt="SUB"></div>
+          <div class="card-title">SUB</div>
+          <div class="card-path">blendword_sub.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_sum.png" alt="SUM"></div>
+          <div class="card-title">SUM</div>
+          <div class="card-path">blendword_sum.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_toy.png" alt="TOY"></div>
+          <div class="card-title">TOY</div>
+          <div class="card-path">blendword_toy.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_van.png" alt="VAN"></div>
+          <div class="card-title">VAN</div>
+          <div class="card-path">blendword_van.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_warm.png" alt="WARM"></div>
+          <div class="card-title">WARM</div>
+          <div class="card-path">blendword_warm.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_web.png" alt="WEB"></div>
+          <div class="card-title">WEB</div>
+          <div class="card-path">blendword_web.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/blendword_zoo.png" alt="ZOO"></div>
+          <div class="card-title">ZOO</div>
+          <div class="card-path">blendword_zoo.png</div>
+        </div>
+      </div>
+    </section>
+    <!-- SECTION 8: EXTENDED VOCABULARY & CHALLENGE PICTURES -->
+    <section>
+      <h2>Extended Vocabulary & Challenge Picture Suite</h2>
+      <p class="desc">
+        All remaining vocabulary and phonics challenge cards (including animals, insects, Baño, Niño, Piña, and everyday storybook objects)
+        redesigned following Lily the Tarsier mascot standards: 2x Lanczos supersampling (512x512 RGBA), 2-tone eyes with double catchlights,
+        layered 3-tone shading, and #2D373E continuous outlines.
+      </p>
+      <div class="image-grid">
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_bano.png" alt="BAÑO (Bathtub)"></div>
+          <div class="card-title">BAÑO (Bathtub)</div>
+          <div class="card-path">picture_bano.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_nino.png" alt="NIÑO (Boy)"></div>
+          <div class="card-title">NIÑO (Boy)</div>
+          <div class="card-path">picture_nino.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_pina.png" alt="PIÑA (Pineapple)"></div>
+          <div class="card-title">PIÑA (Pineapple)</div>
+          <div class="card-path">picture_pina.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_uncle.png" alt="UNCLE"></div>
+          <div class="card-title">UNCLE</div>
+          <div class="card-path">picture_uncle.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_king.png" alt="KING"></div>
+          <div class="card-title">KING</div>
+          <div class="card-path">picture_king.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_ant.png" alt="ANT"></div>
+          <div class="card-title">ANT</div>
+          <div class="card-path">picture_ant.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_duck.png" alt="DUCK"></div>
+          <div class="card-title">DUCK</div>
+          <div class="card-path">picture_duck.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_owl.png" alt="OWL"></div>
+          <div class="card-title">OWL</div>
+          <div class="card-path">picture_owl.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_ox.png" alt="OX"></div>
+          <div class="card-title">OX</div>
+          <div class="card-path">picture_ox.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_snake.png" alt="SNAKE"></div>
+          <div class="card-title">SNAKE</div>
+          <div class="card-path">picture_snake.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_worm.png" alt="WORM"></div>
+          <div class="card-title">WORM</div>
+          <div class="card-path">picture_worm.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_yak.png" alt="YAK"></div>
+          <div class="card-title">YAK</div>
+          <div class="card-path">picture_yak.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_axe.png" alt="AXE"></div>
+          <div class="card-title">AXE</div>
+          <div class="card-path">picture_axe.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_drum.png" alt="DRUM"></div>
+          <div class="card-title">DRUM</div>
+          <div class="card-path">picture_drum.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_egg.png" alt="EGG"></div>
+          <div class="card-title">EGG</div>
+          <div class="card-path">picture_egg.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_gift.png" alt="GIFT"></div>
+          <div class="card-title">GIFT</div>
+          <div class="card-path">picture_gift.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_igloo.png" alt="IGLOO"></div>
+          <div class="card-title">IGLOO</div>
+          <div class="card-path">picture_igloo.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_ink.png" alt="INK"></div>
+          <div class="card-title">INK</div>
+          <div class="card-path">picture_ink.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_jet.png" alt="JET"></div>
+          <div class="card-title">JET</div>
+          <div class="card-path">picture_jet.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_leaf.png" alt="LEAF"></div>
+          <div class="card-title">LEAF</div>
+          <div class="card-path">picture_leaf.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_map.png" alt="MAP"></div>
+          <div class="card-title">MAP</div>
+          <div class="card-path">picture_map.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_net.png" alt="NET"></div>
+          <div class="card-title">NET</div>
+          <div class="card-path">picture_net.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_nut.png" alt="NUT"></div>
+          <div class="card-title">NUT</div>
+          <div class="card-path">picture_nut.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_quilt.png" alt="QUILT"></div>
+          <div class="card-title">QUILT</div>
+          <div class="card-path">picture_quilt.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_rocket.png" alt="ROCKET"></div>
+          <div class="card-title">ROCKET</div>
+          <div class="card-path">picture_rocket.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_six.png" alt="SIX"></div>
+          <div class="card-title">SIX</div>
+          <div class="card-path">picture_six.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_top.png" alt="TOP"></div>
+          <div class="card-title">TOP</div>
+          <div class="card-path">picture_top.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_tree.png" alt="TREE"></div>
+          <div class="card-title">TREE</div>
+          <div class="card-path">picture_tree.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_vase.png" alt="VASE"></div>
+          <div class="card-title">VASE</div>
+          <div class="card-path">picture_vase.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_vest.png" alt="VEST"></div>
+          <div class="card-title">VEST</div>
+          <div class="card-path">picture_vest.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_wing.png" alt="WING"></div>
+          <div class="card-title">WING</div>
+          <div class="card-path">picture_wing.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_yarn.png" alt="YARN"></div>
+          <div class="card-title">YARN</div>
+          <div class="card-path">picture_yarn.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_zip.png" alt="ZIP"></div>
+          <div class="card-title">ZIP</div>
+          <div class="card-path">picture_zip.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_envelope.png" alt="ENVELOPE"></div>
+          <div class="card-title">ENVELOPE</div>
+          <div class="card-path">picture_envelope.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_key.png" alt="KEY"></div>
+          <div class="card-title">KEY</div>
+          <div class="card-path">picture_key.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_ring.png" alt="RING"></div>
+          <div class="card-title">RING</div>
+          <div class="card-path">picture_ring.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard"><img src="app/src/main/assets/images/pictures/picture_star.png" alt="STAR"></div>
+          <div class="card-title">STAR</div>
+          <div class="card-path">picture_star.png</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 9: OFFICIAL APP LOGO & LAUNCHER ICONS -->
+    <section>
+      <h2>Official App Logo & Launcher Icon Suite (Headspace Style x New Mascot)</h2>
+      <p class="desc">
+        Reworked app branding merging Headspace's iconic warm sunny gradient (#FFFDEE &rarr; #FED766) with the newest Lily the Tarsier mascot design. Includes 512x512 Play Store master, legacy squircle/round icons, and Android 8.0+ adaptive foreground/background layers adhering strictly to the 72dp circular safe-zone.
+      </p>
+      <div class="image-grid">
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/res/drawable-xxxhdpi/ic_launcher_playstore.png" alt="Play Store Master">
+          </div>
+          <div class="card-title">Play Store Master (512x512)</div>
+          <div class="card-path">drawable-xxxhdpi/ic_launcher_playstore.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" alt="Squircle Launcher Icon">
+          </div>
+          <div class="card-title">Squircle Icon (192x192)</div>
+          <div class="card-path">mipmap-xxxhdpi/ic_launcher.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png" alt="Round Launcher Icon">
+          </div>
+          <div class="card-title">Round Icon (192x192)</div>
+          <div class="card-path">mipmap-xxxhdpi/ic_launcher_round.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png" alt="Adaptive Foreground">
+          </div>
+          <div class="card-title">Adaptive FG Safe-Zone</div>
+          <div class="card-path">mipmap-xxxhdpi/ic_launcher_foreground.png</div>
+        </div>
+        <div class="card-item">
+          <div class="checkerboard">
+            <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher_background.png" alt="Adaptive Background">
+          </div>
+          <div class="card-title">Adaptive Sunny BG</div>
+          <div class="card-path">mipmap-xxxhdpi/ic_launcher_background.png</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 10: PEDIATRIC SOUND EFFECTS SUITE -->
+    <section>
+      <h2>Interactive Pediatric Sound Effects Suite (Mastered Studio SFX)</h2>
+      <p class="desc">
+        Brand-new studio sound effects suite synthesized via modal bar physical modeling, warm analog brass synthesis, FM shimmer bells, and gentle resonant sweeps. Calibrated for pediatric delight: non-punitive, warm, peak-limited to -1.4 dBFS (0.82 linear peak) with zero clipping, balanced RMS loudness (0.125 - 0.155), and trimmed trailing dead silence for immediate UI responsiveness.
+      </p>
+      <div class="audio-grid">
+        <div class="audio-item">
+          <div class="audio-header">
+            <span class="audio-label">Correct Chime (Reward)</span>
+            <span class="whisper-status">Marimba + Glockenspiel (0.80s)</span>
+          </div>
+          <div class="audio-transcript">Ascending C-major chord (C5-E5-G5-C6) with physical-modeled rosewood marimba tone and glockenspiel sparkle. Peak: 0.82, RMS: 0.132.</div>
+          <audio controls src="app/src/main/assets/audio/ui/sfx_correct_chime.mp3"></audio>
+        </div>
+
+        <div class="audio-item">
+          <div class="audio-header">
+            <span class="audio-label">Gentle Bloop (Try Again)</span>
+            <span class="whisper-status">Soft Bubble Pop (0.26s)</span>
+          </div>
+          <div class="audio-transcript">Gentle wooden bubble bloop pitch-gliding 260 Hz &rarr; 140 Hz. Non-punitive, warm, and friendly. Peak: 0.78, RMS: 0.145.</div>
+          <audio controls src="app/src/main/assets/audio/ui/sfx_incorrect_pop.mp3"></audio>
+        </div>
+
+        <div class="audio-item">
+          <div class="audio-header">
+            <span class="audio-label">Blend-It Wobble (Bounce)</span>
+            <span class="whisper-status">Cartoon Spring Boing (0.42s)</span>
+          </div>
+          <div class="audio-transcript">Playful FM synthesized rubber spring wobble with lowpass warmth. Replaces harsh buzzer with a tactile bounce. Peak: 0.80, RMS: 0.155.</div>
+          <audio controls src="app/src/main/assets/audio/ui/sfx_blendit_buzz.mp3"></audio>
+        </div>
+
+        <div class="audio-item">
+          <div class="audio-header">
+            <span class="audio-label">Heart Loss (Airy Sigh)</span>
+            <span class="whisper-status">Resonant Pink Noise (0.55s)</span>
+          </div>
+          <div class="audio-transcript">Subtle descending resonant air whoosh (1.8 kHz &rarr; 400 Hz) with warm body. Calming and supportive. Peak: 0.80, RMS: 0.125.</div>
+          <audio controls src="app/src/main/assets/audio/ui/sfx_heart_loss_whoosh.mp3"></audio>
+        </div>
+
+        <div class="audio-item">
+          <div class="audio-header">
+            <span class="audio-label">Heart Recovery (Sparkle)</span>
+            <span class="whisper-status">7-Chime Pentatonic (0.85s)</span>
+          </div>
+          <div class="audio-transcript">Magical ascending glissando across C-major pentatonic scale with high glockenspiel sparkle and stereo reverb. Peak: 0.82, RMS: 0.128.</div>
+          <audio controls src="app/src/main/assets/audio/ui/sfx_heart_recovery_sparkle.mp3"></audio>
+        </div>
+
+        <div class="audio-item">
+          <div class="audio-header">
+            <span class="audio-label">Map Node Unlock</span>
+            <span class="whisper-status">Celesta & Chimes (1.40s)</span>
+          </div>
+          <div class="audio-transcript">Dual-layer celesta and tubular bell chime with shimmering octave overtone celebrating map route progression. Peak: 0.82, RMS: 0.134.</div>
+          <audio controls src="app/src/main/assets/audio/ui/sfx_node_unlock_chime.mp3"></audio>
+        </div>
+
+        <div class="audio-item">
+          <div class="audio-header">
+            <span class="audio-label">Streak Badge Unlock</span>
+            <span class="whisper-status">Heraldic Brass Sting (1.50s)</span>
+          </div>
+          <div class="audio-transcript">Heroic pediatric fanfare sting (D5-F#5-A5-D6) with warm analog brass swell, vibrato, and glockenspiel accent. Peak: 0.82, RMS: 0.136.</div>
+          <audio controls src="app/src/main/assets/audio/ui/sfx_streak_badge_unlock.mp3"></audio>
+        </div>
+
+        <div class="audio-item">
+          <div class="audio-header">
+            <span class="audio-label">Level Complete Fanfare</span>
+            <span class="whisper-status">Orchestral Finale (2.35s)</span>
+          </div>
+          <div class="audio-transcript">Full celebratory milestone fanfare with rich brass harmony, sparkling glockenspiel cascades, and smooth reverb tail. Peak: 0.82, RMS: 0.148.</div>
+          <audio controls src="app/src/main/assets/audio/ui/sfx_level_complete_fanfare.mp3"></audio>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
+

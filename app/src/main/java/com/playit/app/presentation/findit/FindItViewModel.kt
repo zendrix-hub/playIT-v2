@@ -99,6 +99,7 @@ class FindItViewModel @Inject constructor(
 
     private val _isPlayingPrompt = MutableStateFlow(false)
     val isPlayingPrompt: StateFlow<Boolean> = _isPlayingPrompt.asStateFlow()
+    val isAudioPlaying: StateFlow<Boolean> = audioPlayer.isAudioPlaying
 
     fun playIntroThenTargetSound() {
         audioPlayer.stop()
@@ -116,6 +117,7 @@ class FindItViewModel @Inject constructor(
     }
 
     fun playTargetSound() {
+        if (audioPlayer.isAudioPlaying.value) return
         audioPlayer.stop()
         _isPlayingPrompt.value = false
         val target = _targetPhoneme.value ?: return
@@ -127,12 +129,13 @@ class FindItViewModel @Inject constructor(
     }
 
     fun playHintAudio() {
+        if (audioPlayer.isAudioPlaying.value) return
         val hintVo = audioResolver.getRotatingHintVo()
         audioPlayer.playAssetAudio(hintVo)
     }
 
     fun selectPictureItem(item: FindItPictureItem) {
-        if (item.id in _foundItemIds.value) return
+        if (audioPlayer.isAudioPlaying.value || item.id in _foundItemIds.value || _state.value is FindItState.Completed || _state.value is FindItState.GameOver) return
         val target = _targetPhoneme.value ?: return
         val profileId = sessionManager.activeProfileId.value ?: 1L
 

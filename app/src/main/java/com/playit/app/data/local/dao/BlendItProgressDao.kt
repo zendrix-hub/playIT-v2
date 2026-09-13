@@ -17,4 +17,7 @@ interface BlendItProgressDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveProgress(progress: BlendItProgressEntity)
+
+    @Query("SELECT SUM(starsEarned) FROM blend_it_progress WHERE profileId = :profileId")
+    suspend fun getTotalStarsForProfile(profileId: Long): Int?
 }

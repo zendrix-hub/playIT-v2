@@ -109,6 +109,7 @@ class BlendItViewModel @Inject constructor(
 
     private val _isPlayingPrompt = MutableStateFlow(false)
     val isPlayingPrompt: StateFlow<Boolean> = _isPlayingPrompt.asStateFlow()
+    val isAudioPlaying: StateFlow<Boolean> = audioPlayer.isAudioPlaying
 
     private fun setupWordAtIndex(index: Int) {
         val wordObj = _words.value.getOrNull(index) ?: return
@@ -162,6 +163,7 @@ class BlendItViewModel @Inject constructor(
     }
 
     fun placeTile(letter: Char) {
+        if (audioPlayer.isAudioPlaying.value || _uiState.value is BlendItUiState.WordCorrect) return
         audioPlayer.stop()
         val currentBank = _tileBank.value.toMutableList()
         val index = currentBank.indexOf(letter)
@@ -178,6 +180,7 @@ class BlendItViewModel @Inject constructor(
     }
 
     fun removeTile(index: Int) {
+        if (audioPlayer.isAudioPlaying.value || _uiState.value is BlendItUiState.WordCorrect) return
         if (index < _lockedHintCount.value) return
         val currentPlaced = _placedTiles.value.toMutableList()
         if (index in currentPlaced.indices) {
@@ -191,6 +194,7 @@ class BlendItViewModel @Inject constructor(
     }
 
     fun submitWord() {
+        if (audioPlayer.isAudioPlaying.value || _uiState.value is BlendItUiState.WordCorrect) return
         val targetWordObj = _words.value.getOrNull(_currentWordIndex.value) ?: return
         val targetWord = targetWordObj.word
         val constructedWord = _placedTiles.value.joinToString("")
@@ -212,29 +216,19 @@ class BlendItViewModel @Inject constructor(
             _uiState.value = BlendItUiState.WordCorrect
             soundOutJob?.cancel()
             soundOutJob = viewModelScope.launch {
-                // Sequential phoneme sound-out loop
-                for (i in targetWord.indices) {
-                    _highlightedSlotIndex.value = i
-                    val letter = targetWord[i].toString()
-                    val phonemeAudio = audioResolver.getPhonemePath(letter)
-                    if (phonemeAudio != null) {
-                        audioPlayer.playAssetAudio(phonemeAudio)
-                    }
-                    kotlinx.coroutines.delay(400)
+                try {
+                    // Play whole word audio directly (do not play phonemes audio for each letter per user instruction)
+                    val wordAudio = audioResolver.getWordPath(targetWord)
+                    audioPlayer.playAssetAudioAwait(wordAudio)
+
+                    // Celebration chime and VO
+                    val sfx = audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME)
+                    val vo = audioResolver.getRotatingCorrectVo()
+                    audioPlayer.playSequenceAwait(listOf(sfx, vo))
+                } catch (e: Exception) {
+                    android.util.Log.e("BlendItViewModel", "Audio playback error during word completion", e)
                 }
-                _highlightedSlotIndex.value = null
 
-                // Whole word audio
-                val wordAudio = audioResolver.getWordPath(targetWord)
-                audioPlayer.playAssetAudio(wordAudio)
-                kotlinx.coroutines.delay(600)
-
-                // Celebration chime and VO
-                val sfx = audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME)
-                val vo = audioResolver.getRotatingCorrectVo()
-                audioPlayer.playSequence(listOf(sfx, vo))
-
-                kotlinx.coroutines.delay(1000)
                 if (_currentWordIndex.value + 1 < _words.value.size) {
                     setupWordAtIndex(_currentWordIndex.value + 1)
                 } else {
@@ -250,12 +244,18 @@ class BlendItViewModel @Inject constructor(
             val sfxBuzz = audioResolver.getSfxPath(SfxEvent.BLENDIT_BUZZ)
             val sfxWhoosh = audioResolver.getSfxPath(SfxEvent.HEART_LOSS_WHOOSH)
             val voEncourage = audioResolver.getRotatingEncourageVo()
-            audioPlayer.playSequence(listOf(sfxBuzz, sfxWhoosh, voEncourage))
-
-            if (isGameOver) {
-                _uiState.value = BlendItUiState.HeartDepleted
-            } else {
-                _uiState.value = BlendItUiState.WordIncorrect(heartManager.currentHearts)
+            soundOutJob?.cancel()
+            soundOutJob = viewModelScope.launch {
+                try {
+                    audioPlayer.playSequenceAwait(listOf(sfxBuzz, sfxWhoosh, voEncourage))
+                } catch (e: Exception) {
+                    android.util.Log.e("BlendItViewModel", "Audio playback error during incorrect attempt", e)
+                }
+                if (isGameOver) {
+                    _uiState.value = BlendItUiState.HeartDepleted
+                } else {
+                    _uiState.value = BlendItUiState.WordIncorrect(heartManager.currentHearts)
+                }
             }
         }
     }

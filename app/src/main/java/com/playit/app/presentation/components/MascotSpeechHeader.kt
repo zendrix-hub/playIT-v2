@@ -54,6 +54,7 @@ fun MascotSpeechHeader(
     message: String,
     modifier: Modifier = Modifier,
     mascotState: MascotState = MascotState.IDLE,
+    avatarId: Int? = null,
     isPlayingAudio: Boolean = false,
     amplitude: Float = 0f,
     onMascotTap: (() -> Unit)? = null
@@ -119,9 +120,14 @@ fun MascotSpeechHeader(
                 },
             contentAlignment = Alignment.Center
         ) {
+            val displayAssetPath = if (avatarId != null && avatarId in 1..6) {
+                "images/mascot/avatar_0$avatarId.png"
+            } else {
+                mascotState.assetPath
+            }
             Image(
-                painter = rememberAssetPainter(mascotState.assetPath),
-                contentDescription = "Lily the Tarsier",
+                painter = rememberAssetPainter(displayAssetPath),
+                contentDescription = if (avatarId != null) "Companion Avatar $avatarId" else "Lily the Tarsier",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier.fillMaxSize()
             )

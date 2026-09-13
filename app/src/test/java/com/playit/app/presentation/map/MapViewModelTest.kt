@@ -31,6 +31,7 @@ class MapViewModelTest {
     private val letterGroupRepository: LetterGroupRepository = mockk(relaxed = true)
     private val letterGroupMemberRepository: LetterGroupMemberRepository = mockk(relaxed = true)
     private val lessonProgressRepository: LessonProgressRepository = mockk(relaxed = true)
+    private val blendItProgressRepository: BlendItProgressRepository = mockk(relaxed = true)
     private val profileRepository: ProfileRepository = mockk(relaxed = true)
     private val achievementRepository: AchievementRepository = mockk(relaxed = true)
     private val sessionManager: SessionManager = mockk(relaxed = true)
@@ -76,10 +77,12 @@ class MapViewModelTest {
         every { letterGroupRepository.getAllGroups() } returns flowOf(testGroups)
         every { letterGroupMemberRepository.getAllMembers() } returns flowOf(testMembers)
         every { lessonProgressRepository.getProgressForProfile(1L) } returns flowOf(emptyList())
+        every { blendItProgressRepository.getProgressForProfile(1L) } returns flowOf(emptyList())
 
         every { audioResolver.getSfxPath(any()) } returns "sfx.mp3"
         every { audioResolver.getVoPath(any()) } returns "vo.mp3"
         every { audioResolver.getRotatingEncourageVo() } returns "encourage.mp3"
+        every { audioPlayer.isAudioPlaying } returns MutableStateFlow(false)
     }
 
     @After
@@ -91,7 +94,7 @@ class MapViewModelTest {
     fun init_recordsActivityAndResetsStreakIfInactive() = runTest {
         viewModel = MapViewModel(
             phonemeRepository, letterGroupRepository, letterGroupMemberRepository,
-            lessonProgressRepository, profileRepository, achievementRepository,
+            lessonProgressRepository, blendItProgressRepository, profileRepository, achievementRepository,
             sessionManager, unlockManager, groupUnlockManager, streakTracker,
             audioPlayer, audioResolver
         )
@@ -105,7 +108,7 @@ class MapViewModelTest {
     fun userStats_aggregatesProfileAndAchievements() = runTest {
         viewModel = MapViewModel(
             phonemeRepository, letterGroupRepository, letterGroupMemberRepository,
-            lessonProgressRepository, profileRepository, achievementRepository,
+            lessonProgressRepository, blendItProgressRepository, profileRepository, achievementRepository,
             sessionManager, unlockManager, groupUnlockManager, streakTracker,
             audioPlayer, audioResolver
         )
@@ -132,7 +135,7 @@ class MapViewModelTest {
 
         viewModel = MapViewModel(
             phonemeRepository, letterGroupRepository, letterGroupMemberRepository,
-            lessonProgressRepository, profileRepository, achievementRepository,
+            lessonProgressRepository, blendItProgressRepository, profileRepository, achievementRepository,
             sessionManager, unlockManager, groupUnlockManager, streakTracker,
             audioPlayer, audioResolver
         )
@@ -163,10 +166,52 @@ class MapViewModelTest {
     }
 
     @Test
+    fun mapNodes_loadsEarnedStarsForLettersAndBlendItNodes() = runTest {
+        every { unlockManager.isPhonemeUnlocked(1, any()) } returns true
+        every { unlockManager.isPhonemeUnlocked(2, any()) } returns true
+        every { groupUnlockManager.isBlendItUnlocked(1, any(), any()) } returns true
+
+        val letterProgress = listOf(
+            LessonProgress(profileId = 1L, phonemeId = 1, starsEarned = 3, isCompleted = true),
+            LessonProgress(profileId = 1L, phonemeId = 2, starsEarned = 2, isCompleted = true)
+        )
+        val blendProgress = listOf(
+            BlendItProgress(profileId = 1L, groupId = 1, starsEarned = 3, isCompleted = true)
+        )
+        every { lessonProgressRepository.getProgressForProfile(1L) } returns flowOf(letterProgress)
+        every { blendItProgressRepository.getProgressForProfile(1L) } returns flowOf(blendProgress)
+
+        viewModel = MapViewModel(
+            phonemeRepository, letterGroupRepository, letterGroupMemberRepository,
+            lessonProgressRepository, blendItProgressRepository, profileRepository, achievementRepository,
+            sessionManager, unlockManager, groupUnlockManager, streakTracker,
+            audioPlayer, audioResolver
+        )
+        val collectJob = launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.mapNodes.collect()
+        }
+        advanceUntilIdle()
+
+        val nodes = viewModel.mapNodes.value
+        assertEquals(3, nodes.size)
+
+        val letterNode1 = nodes[0] as MapNode.LetterNode
+        assertEquals(3, letterNode1.starsEarned)
+
+        val letterNode2 = nodes[1] as MapNode.LetterNode
+        assertEquals(2, letterNode2.starsEarned)
+
+        val blendNode = nodes[2] as MapNode.BlendItNode
+        assertEquals(3, blendNode.starsEarned)
+
+        collectJob.cancel()
+    }
+
+    @Test
     fun audioActions_invokeAudioPlayerCorrectly() {
         viewModel = MapViewModel(
             phonemeRepository, letterGroupRepository, letterGroupMemberRepository,
-            lessonProgressRepository, profileRepository, achievementRepository,
+            lessonProgressRepository, blendItProgressRepository, profileRepository, achievementRepository,
             sessionManager, unlockManager, groupUnlockManager, streakTracker,
             audioPlayer, audioResolver
         )
@@ -185,7 +230,7 @@ class MapViewModelTest {
     fun clearSession_clearsActiveProfile() {
         viewModel = MapViewModel(
             phonemeRepository, letterGroupRepository, letterGroupMemberRepository,
-            lessonProgressRepository, profileRepository, achievementRepository,
+            lessonProgressRepository, blendItProgressRepository, profileRepository, achievementRepository,
             sessionManager, unlockManager, groupUnlockManager, streakTracker,
             audioPlayer, audioResolver
         )

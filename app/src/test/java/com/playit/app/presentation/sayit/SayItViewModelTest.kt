@@ -50,6 +50,7 @@ class SayItViewModelTest {
         every { audioResolver.getRotatingEncourageVo() } returns "encourage_vo"
         every { speechValidator.validate(any(), any()) } returns false
         every { speechValidator.validateWord(any(), any()) } returns false
+        every { audioPlayer.isAudioPlaying } returns MutableStateFlow(false)
     }
 
     @After

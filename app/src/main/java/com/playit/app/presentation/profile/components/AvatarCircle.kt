@@ -12,49 +12,63 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.playit.app.presentation.components.rememberAssetPainter
 import com.playit.app.presentation.theme.*
 
+private val AVATAR_CHARACTERS = listOf(
+    "cat", "monkey", "bunny", "bear", "frog", "owl"
+)
+
+private val AVATAR_BG_COLORS = listOf(
+    AquaAdventure,
+    SunnyGold,
+    PrimaryJoy,
+    EmeraldLeaf,
+    ApricotGlow,
+    CoralBerry
+)
+
 /**
  * Pediatric Animal Avatar Circle — renders one of the 6 companion animal avatars
- * (Cat, Monkey, Bunny, Bear, Frog, Owl) with a themed background and DarkBrownOutline.
- * Zero-emoji compliant, replacing legacy unicode placeholder with production assets.
+ * (Cat, Monkey, Bunny, Bear, Frog, Owl) with clean selection rings, elevation,
+ * and tight bounding boxes suitable for profile frames and dialogue heads.
  */
 @Composable
 fun AvatarCircle(
     avatarId: Int,
-    size: Int,
+    size: Int = 64,
+    isSelected: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val clampedId = avatarId.coerceIn(1, 6)
-    val avatarPath = "images/mascot/avatar_0$clampedId.png"
-    val bgColors = listOf(
-        AquaAdventure,
-        SunnyGold,
-        PrimaryJoy,
-        EmeraldLeaf,
-        ApricotGlow,
-        CoralBerry
-    )
-    val bgColor = bgColors[(clampedId - 1) % bgColors.size]
+    val charName = AVATAR_CHARACTERS[clampedId - 1]
+    val avatarPath = "images/characters/avatar_0${clampedId}_${charName}.png"
+    val baseColor = AVATAR_BG_COLORS[(clampedId - 1) % AVATAR_BG_COLORS.size]
 
     Box(
         modifier = modifier
             .size(size.dp)
+            .shadow(elevation = if (isSelected) 6.dp else 2.dp, shape = CircleShape)
             .clip(CircleShape)
-            .background(bgColor.copy(alpha = 0.25f))
-            .border(2.5.dp, bgColor, CircleShape),
+            .background(if (isSelected) baseColor.copy(alpha = 0.35f) else Cloud)
+            .border(
+                width = if (isSelected) 3.5.dp else 2.dp,
+                color = if (isSelected) baseColor else DarkBrownOutline.copy(alpha = 0.35f),
+                shape = CircleShape
+            ),
         contentAlignment = Alignment.Center
     ) {
         Image(
             painter = rememberAssetPainter(avatarPath),
-            contentDescription = "Avatar $clampedId",
+            contentDescription = "Avatar $clampedId ($charName)",
             contentScale = ContentScale.Fit,
             modifier = Modifier
                 .fillMaxSize()
-                .padding((size * 0.1f).dp)
+                .padding((size * 0.08f).dp)
         )
     }
 }
+
