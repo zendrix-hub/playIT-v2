@@ -323,7 +323,7 @@ The repository reads the microphone with an `AudioRecord` loop at 16 kHz mono. E
 
 ### 6.5 AudioComposer and Asset Manifest
 
-SoundPool has no playback-completion callback, so the composer sequences clips using each clip's stored duration and explicit pause steps. A Media3 ExoPlayer playlist is an alternative for the modeling sequence, with SoundPool kept for instant feedback sounds. The asset manifest, stored as JSON in the app's assets, holds one entry per clip with these fields: clip ID, type (phoneme, key word, carrier, or feedback), letter, IPA, duration in milliseconds, source (AI word extraction, human model, or voice-converted), tool and voice, Gate 1 to 3 results, version, and release date. The build includes only released clips.
+SoundPool has no playback-completion callback, so the composer sequences clips using each clip's stored duration and explicit pause steps. A Media3 ExoPlayer playlist is an alternative for the modeling sequence, with SoundPool kept for instant feedback sounds. The asset manifest, stored as JSON in the app's assets, holds one entry per clip with these fields: clip ID, type (phoneme, key word, carrier, or feedback), letter, IPA, duration in milliseconds, source (AI word extraction (Kokoro), Kokoro phoneme input, or human recording), tool and voice, Gate 1 to 3 results, version, and release date. The build includes only released clips.
 
 ### 6.6 LearnerModel and Review Scheduler
 
