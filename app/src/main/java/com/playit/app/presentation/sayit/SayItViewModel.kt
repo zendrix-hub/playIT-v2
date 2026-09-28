@@ -12,6 +12,8 @@ import com.playit.app.domain.manager.HeartManager
 import com.playit.app.domain.manager.SpeechValidator
 import com.playit.app.domain.model.Phoneme
 import com.playit.app.domain.repository.PhonemeRepository
+import com.playit.app.domain.model.SpeechErrorType
+import com.playit.app.domain.model.SpeechJudgement
 import com.playit.app.domain.repository.SayItAttemptRepository
 import com.playit.app.navigation.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +29,10 @@ sealed class SayItState {
     object Idle : SayItState()
     object Listening : SayItState()
     data class Correct(val transcript: String) : SayItState()
-    data class Incorrect(val transcript: String) : SayItState()
+    data class Incorrect(
+        val transcript: String,
+        val errorType: SpeechErrorType = SpeechErrorType.OTHER_WORD
+    ) : SayItState()
 }
 
 @HiltViewModel
@@ -236,16 +241,9 @@ class SayItViewModel @Inject constructor(
         _isPlayingPhoneme.value = false
 
         autoStopJob?.cancel()
-        // Word mode: target = the example word to say (e.g. "mouse"). Legacy mode: the
-        // letter sound. Grammar is scoped to the accepted variants + generic decoy words.
         val targetWord = _targetWord.value
-        val target = targetWord ?: _phoneme.value?.letter?.lowercase() ?: "m"
-        val acceptedList = if (targetWord != null) {
-            speechValidator.getAcceptedWordVariants(targetWord)
-        } else {
-            speechValidator.getAcceptedVariants(target)
-        }
-        voskRecognizer.setGrammar((acceptedList + listOf("cat", "dog", "sun", "ball", "yes", "no")).distinct())
+        val letter = _phoneme.value?.letter?.lowercase() ?: "m"
+        voskRecognizer.setGrammar(speechValidator.grammarFor(letter, targetWord))
 
         _state.value = SayItState.Listening
         _isNoisyEnvironment.value = false
@@ -261,12 +259,11 @@ class SayItViewModel @Inject constructor(
         voskRecognizer.startListening(
             onResult = { transcript ->
                 if (transcript.isNotBlank() && _state.value is SayItState.Listening) {
-                    val isCorrect = if (targetWord != null) {
-                        speechValidator.validateWord(transcript, targetWord)
-                    } else {
-                        speechValidator.validate(transcript, target)
-                    }
-                    if (isCorrect) {
+                    val judgement = judgeTranscript(transcript, targetWord, letter)
+                    if (judgement.isCorrect ||
+                        judgement.errorType == SpeechErrorType.LETTER_NAME ||
+                        judgement.errorType == SpeechErrorType.ADDED_VOWEL
+                    ) {
                         autoStopJob?.cancel()
                         voskRecognizer.stopListening()
                         evaluateSpeech(transcript)
@@ -274,6 +271,21 @@ class SayItViewModel @Inject constructor(
                 }
             }
         )
+    }
+
+    private fun judgeTranscript(transcript: String, targetWord: String?, letter: String): SpeechJudgement {
+        return when {
+            targetWord != null -> speechValidator.judgeWord(transcript, targetWord, letter)
+            letter == "ng" || letter == "ñ" -> {
+                val ok = speechValidator.validate(transcript, letter)
+                SpeechJudgement(
+                    isCorrect = ok,
+                    errorType = if (ok) SpeechErrorType.NONE else SpeechErrorType.OTHER_WORD,
+                    heard = transcript
+                )
+            }
+            else -> speechValidator.judgeSound(transcript, letter, null)
+        }
     }
 
     fun stopListening() {
@@ -289,12 +301,9 @@ class SayItViewModel @Inject constructor(
         autoStopJob?.cancel()
         _audioAmplitude.value = 0f
         val targetWord = _targetWord.value
-        val targetLetter = _phoneme.value?.letter ?: "m"
-        val isCorrect = if (targetWord != null) {
-            speechValidator.validateWord(transcript, targetWord)
-        } else {
-            speechValidator.validate(transcript, targetLetter)
-        }
+        val letter = _phoneme.value?.letter?.lowercase() ?: "m"
+        val judgement = judgeTranscript(transcript, targetWord, letter)
+        val isCorrect = judgement.isCorrect
         val profileId = sessionManager.activeProfileId.value ?: 1L
         val phonemeId = _phoneme.value?.id ?: 1
 
@@ -305,14 +314,17 @@ class SayItViewModel @Inject constructor(
         }
 
         if (isCorrect) {
-            _state.value = SayItState.Correct(transcript.ifBlank { targetWord ?: targetLetter })
+            _state.value = SayItState.Correct(transcript.ifBlank { targetWord ?: letter })
             val sfx = audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME)
             val vo = audioResolver.getRotatingCorrectVo()
             audioPlayer.playSequence(listOf(sfx, vo))
         } else {
             heartManager.deductHeart()
             _hearts.value = heartManager.currentHearts
-            _state.value = SayItState.Incorrect(transcript.ifBlank { "Try again!" })
+            _state.value = SayItState.Incorrect(
+                transcript = transcript.ifBlank { "Try again!" },
+                errorType = judgement.errorType
+            )
 
             val sfxPop = audioResolver.getSfxPath(SfxEvent.INCORRECT_POP)
             val sfxWhoosh = audioResolver.getSfxPath(SfxEvent.HEART_LOSS_WHOOSH)

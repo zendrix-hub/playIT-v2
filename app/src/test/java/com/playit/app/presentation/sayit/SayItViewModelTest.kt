@@ -6,6 +6,8 @@ import com.playit.app.data.audio.AudioResolver
 import com.playit.app.data.speech.VoskRecognizer
 import com.playit.app.domain.manager.SpeechValidator
 import com.playit.app.domain.model.Phoneme
+import com.playit.app.domain.model.SpeechErrorType
+import com.playit.app.domain.model.SpeechJudgement
 import com.playit.app.domain.repository.PhonemeRepository
 import com.playit.app.domain.repository.SayItAttemptRepository
 import com.playit.app.navigation.SessionManager
@@ -50,6 +52,21 @@ class SayItViewModelTest {
         every { audioResolver.getRotatingEncourageVo() } returns "encourage_vo"
         every { speechValidator.validate(any(), any()) } returns false
         every { speechValidator.validateWord(any(), any()) } returns false
+        every { speechValidator.grammarFor(any(), any()) } returns listOf("mouse")
+        every { speechValidator.judgeWord(any(), any(), any()) } answers {
+            SpeechJudgement(
+                isCorrect = false,
+                errorType = SpeechErrorType.OTHER_WORD,
+                heard = firstArg<String?>() ?: ""
+            )
+        }
+        every { speechValidator.judgeSound(any(), any(), any()) } answers {
+            SpeechJudgement(
+                isCorrect = false,
+                errorType = SpeechErrorType.OTHER_WORD,
+                heard = firstArg<String?>() ?: ""
+            )
+        }
     }
 
     @After
@@ -125,7 +142,8 @@ class SayItViewModelTest {
     @Test
     fun evaluateSpeech_correctTranscript_setsCorrectState() = runTest {
         coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
-        every { speechValidator.validateWord("mouse", "mouse") } returns true
+        every { speechValidator.judgeWord("mouse", "mouse", "m") } returns
+            SpeechJudgement(isCorrect = true, errorType = SpeechErrorType.NONE, heard = "mouse")
 
         createViewModel()
         advanceUntilIdle()
@@ -174,8 +192,10 @@ class SayItViewModelTest {
     @Test
     fun evaluateSpeech_recordsMultipleAttemptsInList() = runTest {
         coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
-        every { speechValidator.validateWord("cat", "mouse") } returns false
-        every { speechValidator.validateWord("mouse", "mouse") } returns true
+        every { speechValidator.judgeWord("cat", "mouse", "m") } returns
+            SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.OTHER_WORD, heard = "cat")
+        every { speechValidator.judgeWord("mouse", "mouse", "m") } returns
+            SpeechJudgement(isCorrect = true, errorType = SpeechErrorType.NONE, heard = "mouse")
 
         createViewModel()
         advanceUntilIdle()
@@ -191,7 +211,8 @@ class SayItViewModelTest {
     fun wordMode_letterSoundTranscript_isIncorrect() = runTest {
         // Whole word required — saying only the letter sound must not pass in word mode.
         coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
-        every { speechValidator.validateWord("m", "mouse") } returns false
+        every { speechValidator.judgeWord("m", "mouse", "m") } returns
+            SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.LETTER_NAME, heard = "m")
 
         createViewModel()
         advanceUntilIdle()
@@ -223,34 +244,107 @@ class SayItViewModelTest {
     }
 
     @Test
-    fun wordMode_startListening_grammarIsWordVariantsPlusDecoys() = runTest {
+    fun startListening_setsLetterScopedGrammar() = runTest {
         coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
-        every { speechValidator.getAcceptedWordVariants("mouse") } returns listOf("mouse")
+        val expectedGrammar = listOf("mouse", "m", "em", "ma", "muh")
+        every { speechValidator.grammarFor("m", "mouse") } returns expectedGrammar
 
         createViewModel()
         advanceUntilIdle()
 
-        val grammarSlot = slot<List<String>>()
-        every { voskRecognizer.setGrammar(capture(grammarSlot)) } just Runs
-
         viewModel.startListening()
 
-        assertTrue(grammarSlot.isCaptured)
-        val grammar = grammarSlot.captured
-        assertTrue(grammar.contains("mouse"))
-        assertTrue(grammar.containsAll(listOf("cat", "dog", "sun", "ball", "yes", "no")))
-        assertFalse(grammar.contains("m"))
-        assertFalse(grammar.contains("em"))
-        assertFalse(grammar.contains("muh"))
+        verify { voskRecognizer.setGrammar(expectedGrammar) }
 
         // Drain the 3.8s auto-stop timer so runTest has no pending coroutines.
         advanceUntilIdle()
     }
 
     @Test
+    fun evaluateSpeech_letterName_setsIncorrectWithLetterName() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        every { speechValidator.judgeWord("em", "mouse", "m") } returns
+            SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.LETTER_NAME, heard = "em")
+
+        createViewModel()
+        advanceUntilIdle()
+
+        viewModel.evaluateSpeech("em")
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertTrue(state is SayItState.Incorrect)
+        assertEquals(SpeechErrorType.LETTER_NAME, (state as SayItState.Incorrect).errorType)
+        assertEquals("em", state.transcript)
+    }
+
+    @Test
+    fun evaluateSpeech_addedVowel_setsIncorrectWithAddedVowel() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        every { speechValidator.judgeWord("ma", "mouse", "m") } returns
+            SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.ADDED_VOWEL, heard = "ma")
+
+        createViewModel()
+        advanceUntilIdle()
+
+        viewModel.evaluateSpeech("ma")
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertTrue(state is SayItState.Incorrect)
+        assertEquals(SpeechErrorType.ADDED_VOWEL, (state as SayItState.Incorrect).errorType)
+        assertEquals("ma", state.transcript)
+    }
+
+    @Test
+    fun onResult_letterName_stopsListeningEarly() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        val callbackSlot = slot<(String) -> Unit>()
+        every { voskRecognizer.startListening(capture(callbackSlot)) } just Runs
+        every { speechValidator.judgeWord("em", "mouse", "m") } returns
+            SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.LETTER_NAME, heard = "em")
+
+        createViewModel()
+        advanceUntilIdle()
+
+        viewModel.startListening()
+        assertTrue(callbackSlot.isCaptured)
+
+        callbackSlot.captured.invoke("em")
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertTrue(state is SayItState.Incorrect)
+        assertEquals(SpeechErrorType.LETTER_NAME, (state as SayItState.Incorrect).errorType)
+        verify { voskRecognizer.stopListening() }
+    }
+
+    @Test
+    fun onResult_addedVowel_stopsListeningEarly() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        val callbackSlot = slot<(String) -> Unit>()
+        every { voskRecognizer.startListening(capture(callbackSlot)) } just Runs
+        every { speechValidator.judgeWord("ma", "mouse", "m") } returns
+            SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.ADDED_VOWEL, heard = "ma")
+
+        createViewModel()
+        advanceUntilIdle()
+
+        viewModel.startListening()
+        assertTrue(callbackSlot.isCaptured)
+
+        callbackSlot.captured.invoke("ma")
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertTrue(state is SayItState.Incorrect)
+        assertEquals(SpeechErrorType.ADDED_VOWEL, (state as SayItState.Incorrect).errorType)
+        verify { voskRecognizer.stopListening() }
+    }
+
+    @Test
     fun playWordAudio_whenListening_stopsListeningAndPlaysAudio() = runTest {
         coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
-        every { speechValidator.getAcceptedWordVariants("mouse") } returns listOf("mouse")
         every { audioResolver.getWordPath("mouse") } returns "audio/words/word_mouse.mp3"
 
         createViewModel()
