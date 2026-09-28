@@ -1,5 +1,7 @@
 package com.playit.app.domain.manager
 
+import com.playit.app.domain.model.SpeechErrorType
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -22,80 +24,145 @@ class SpeechValidatorTest {
     }
 
     @Test
-    fun exactLetterMatch_returnsTrue() {
-        assertTrue(speechValidator.validate("m", "m"))
-        assertTrue(speechValidator.validate("s", "s"))
-        assertTrue(speechValidator.validate("a", "a"))
-        assertTrue(speechValidator.validate("z", "z"))
+    fun legacyNgEnye_exactMatch_returnsTrue() {
         assertTrue(speechValidator.validate("ng", "ng"))
         assertTrue(speechValidator.validate("ñ", "ñ"))
     }
 
     @Test
-    fun letterNameVariations_returnTrue() {
-        assertTrue(speechValidator.validate("em", "m"))
-        assertTrue(speechValidator.validate("es", "s"))
-        assertTrue(speechValidator.validate("bee", "b"))
-        assertTrue(speechValidator.validate("aitch", "h"))
-        assertTrue(speechValidator.validate("kay", "k"))
-        assertTrue(speechValidator.validate("cue", "q"))
-        assertTrue(speechValidator.validate("double", "w"))
-        assertTrue(speechValidator.validate("ex", "x"))
-        assertTrue(speechValidator.validate("why", "y"))
-        assertTrue(speechValidator.validate("zed", "z"))
-        assertTrue(speechValidator.validate("zee", "z"))
+    fun judgeSound_letterName_rejected() {
+        val cases = listOf(
+            Triple("em", "m", 600),
+            Triple("es", "s", 600),
+            Triple("bee", "b", 600),
+            Triple("zee", "z", 600),
+            Triple("ay", "a", 600),
+            Triple("m", "m", 600)
+        )
+        for ((text, letter, duration) in cases) {
+            val result = speechValidator.judgeSound(text, letter, duration)
+            assertFalse("Expected isCorrect false for ($text, $letter, $duration)", result.isCorrect)
+            assertEquals("Expected LETTER_NAME for ($text, $letter, $duration)", SpeechErrorType.LETTER_NAME, result.errorType)
+        }
     }
 
     @Test
-    fun phonicsSoundOnomatopoeias_returnTrue() {
-        assertTrue(speechValidator.validate("mmm", "m"))
-        assertTrue(speechValidator.validate("sss", "s"))
-        assertTrue(speechValidator.validate("buh", "b"))
-        assertTrue(speechValidator.validate("duh", "d"))
-        assertTrue(speechValidator.validate("fuh", "f"))
-        assertTrue(speechValidator.validate("guh", "g"))
-        assertTrue(speechValidator.validate("huh", "h"))
-        assertTrue(speechValidator.validate("kuh", "k"))
-        assertTrue(speechValidator.validate("luh", "l"))
-        assertTrue(speechValidator.validate("puh", "p"))
-        assertTrue(speechValidator.validate("tuh", "t"))
-        assertTrue(speechValidator.validate("vuh", "v"))
-        assertTrue(speechValidator.validate("wuh", "w"))
-        assertTrue(speechValidator.validate("zuh", "z"))
-        assertTrue(speechValidator.validate("eng", "ng"))
-        assertTrue(speechValidator.validate("enya", "ñ"))
+    fun judgeSound_addedVowel_rejected() {
+        val cases = listOf(
+            Triple("ma", "m", 600),
+            Triple("muh", "m", 600),
+            Triple("sa", "s", 600),
+            Triple("buh", "b", 600)
+        )
+        for ((text, letter, duration) in cases) {
+            val result = speechValidator.judgeSound(text, letter, duration)
+            assertFalse("Expected isCorrect false for ($text, $letter, $duration)", result.isCorrect)
+            assertEquals("Expected ADDED_VOWEL for ($text, $letter, $duration)", SpeechErrorType.ADDED_VOWEL, result.errorType)
+        }
     }
 
     @Test
-    fun anchorCurriculumWords_returnTrue() {
-        assertTrue(speechValidator.validate("apple", "a"))
-        assertTrue(speechValidator.validate("ball", "b"))
-        assertTrue(speechValidator.validate("cat", "c"))
-        assertTrue(speechValidator.validate("dog", "d"))
-        assertTrue(speechValidator.validate("elephant", "e"))
-        assertTrue(speechValidator.validate("fish", "f"))
-        assertTrue(speechValidator.validate("goat", "g"))
-        assertTrue(speechValidator.validate("hat", "h"))
-        assertTrue(speechValidator.validate("insect", "i"))
-        assertTrue(speechValidator.validate("jug", "j"))
-        assertTrue(speechValidator.validate("kite", "k"))
-        assertTrue(speechValidator.validate("lion", "l"))
-        assertTrue(speechValidator.validate("mouse", "m"))
-        assertTrue(speechValidator.validate("nest", "n"))
-        assertTrue(speechValidator.validate("orange", "o"))
-        assertTrue(speechValidator.validate("pig", "p"))
-        assertTrue(speechValidator.validate("queen", "q"))
-        assertTrue(speechValidator.validate("rabbit", "r"))
-        assertTrue(speechValidator.validate("sun", "s"))
-        assertTrue(speechValidator.validate("tiger", "t"))
-        assertTrue(speechValidator.validate("umbrella", "u"))
-        assertTrue(speechValidator.validate("van", "v"))
-        assertTrue(speechValidator.validate("watch", "w"))
-        assertTrue(speechValidator.validate("box", "x"))
-        assertTrue(speechValidator.validate("yoyo", "y"))
-        assertTrue(speechValidator.validate("zebra", "z"))
-        assertTrue(speechValidator.validate("ring", "ng"))
-        assertTrue(speechValidator.validate("piña", "ñ"))
+    fun judgeSound_substitution_rejected() {
+        val cases = listOf(
+            Triple("pa", "f", 600),
+            Triple("ba", "v", 600),
+            Triple("sa", "z", 600)
+        )
+        for ((text, letter, duration) in cases) {
+            val result = speechValidator.judgeSound(text, letter, duration)
+            assertFalse("Expected isCorrect false for ($text, $letter, $duration)", result.isCorrect)
+            assertEquals("Expected SUBSTITUTION for ($text, $letter, $duration)", SpeechErrorType.SUBSTITUTION, result.errorType)
+        }
+    }
+
+    @Test
+    fun judgeSound_anchorWord_isOtherWord() {
+        val result = speechValidator.judgeSound("mouse", "m", 600)
+        assertFalse(result.isCorrect)
+        assertEquals(SpeechErrorType.OTHER_WORD, result.errorType)
+    }
+
+    @Test
+    fun judgeSound_sustainedContinuous_accepted() {
+        val case1 = speechValidator.judgeSound("", "m", 600)
+        assertTrue(case1.isCorrect)
+        assertEquals(SpeechErrorType.NONE, case1.errorType)
+
+        val case2 = speechValidator.judgeSound("[unk]", "s", 450)
+        assertTrue(case2.isCorrect)
+        assertEquals(SpeechErrorType.NONE, case2.errorType)
+    }
+
+    @Test
+    fun judgeSound_tooShort_rejected() {
+        val result = speechValidator.judgeSound("", "m", 200)
+        assertFalse(result.isCorrect)
+        assertEquals(SpeechErrorType.NO_SPEECH, result.errorType)
+    }
+
+    @Test
+    fun judgeSound_stop_neverAcceptedBySustain() {
+        val result = speechValidator.judgeSound("", "b", 800)
+        assertFalse(result.isCorrect)
+        assertEquals(SpeechErrorType.UNCONFIRMED, result.errorType)
+    }
+
+    @Test
+    fun judgeSound_noDuration_unconfirmed() {
+        val result = speechValidator.judgeSound("", "m", null)
+        assertFalse(result.isCorrect)
+        assertEquals(SpeechErrorType.UNCONFIRMED, result.errorType)
+    }
+
+    @Test
+    fun validate_prefixRuleRemoved() {
+        assertFalse(speechValidator.validate("mo", "m"))
+        assertFalse(speechValidator.validate("muh", "m"))
+    }
+
+    @Test
+    fun judgeWord_paths() {
+        val case1 = speechValidator.judgeWord("mouse", "mouse", "m")
+        assertTrue(case1.isCorrect)
+        assertEquals(SpeechErrorType.NONE, case1.errorType)
+
+        val case2 = speechValidator.judgeWord("em", "mouse", "m")
+        assertFalse(case2.isCorrect)
+        assertEquals(SpeechErrorType.LETTER_NAME, case2.errorType)
+
+        val case3 = speechValidator.judgeWord("ma", "mouse", "m")
+        assertFalse(case3.isCorrect)
+        assertEquals(SpeechErrorType.ADDED_VOWEL, case3.errorType)
+
+        val case4 = speechValidator.judgeWord("cat", "mouse", "m")
+        assertFalse(case4.isCorrect)
+        assertEquals(SpeechErrorType.OTHER_WORD, case4.errorType)
+
+        val case5 = speechValidator.judgeWord("", "mouse", "m")
+        assertFalse(case5.isCorrect)
+        assertEquals(SpeechErrorType.NO_SPEECH, case5.errorType)
+    }
+
+    @Test
+    fun grammarFor_wordMode_hasFoilsNotGenericDecoys() {
+        val grammar = speechValidator.grammarFor("m", "mouse")
+        assertTrue(grammar.contains("mouse"))
+        assertTrue(grammar.contains("em"))
+        assertTrue(grammar.contains("ma"))
+        assertFalse(grammar.contains("cat"))
+        assertFalse(grammar.contains("dog"))
+        assertFalse(grammar.contains("yes"))
+        assertFalse(grammar.contains("no"))
+    }
+
+    @Test
+    fun grammarFor_soundMode_hasNoAcceptedTokens() {
+        val grammar = speechValidator.grammarFor("m", null)
+        assertTrue(grammar.contains("em"))
+        assertTrue(grammar.contains("ma"))
+        assertFalse(grammar.contains("mm"))
+        assertFalse(grammar.contains("mmm"))
+        assertFalse(grammar.contains("mouse"))
     }
 
     @Test
