@@ -118,17 +118,19 @@ Short-sound lengths are **[proposed]** upper limits. Vowels are the short vowel 
 
 ### 2.3 AI Audio Production
 
-Text-to-speech voices are trained on words and sentences. Asked to say "m," they say the letter name; asked for a short sound such as "b," they add a vowel ("buh"). The pipeline therefore never asks an AI voice to say a letter alone.
+The AI voice is Kokoro-82M, an open text-to-speech model released under the Apache-2.0 license. The team runs it in Google Colab with an American English voice at 24 kHz, using `tools/audio/playit_audio.ipynb`. Nothing in the app calls it at runtime.
+
+Text-to-speech voices are trained on words and sentences. Asked to say "m," they say the letter name; asked for a short sound such as "b," they add a vowel ("buh"). The pipeline therefore never asks an AI voice to say a letter alone. Kokoro also accepts phoneme (IPA) input, which spells out the sound itself rather than the letter, so it can be asked for a held /m/ without the letter name.
 
 **Table 5.** Production method by sound type
 
 | Sound type | Recommended method | Fallback |
 |---|---|---|
-| Continuous (13 letters: a, e, i, o, u, f, l, m, n, r, s, v, z) | Generate the key word with the AI voice, cut out the target sound, and lengthen it to about 800 ms with a time-stretch that keeps pitch | Prompt the voice with a stretched spelling ("mmmm", "ssss") and keep only clips that pass all gates |
-| Short (13 letters: b, c, d, g, h, j, k, p, q, t, w, x, y) | Record a human model (a teacher, or a team member coached by one) saying each sound clipped short; optionally pass it through AI speech-to-speech voice conversion so it matches the app voice | Cut the release burst from an AI-generated word before the vowel begins, and keep it only if it passes all gates |
-| Carrier phrases, key words, feedback | Generate with the AI voice, since these are normal words and sentences | None needed |
+| Continuous (13 letters: a, e, i, o, u, f, l, m, n, r, s, v, z) | Give Kokoro the sound as phoneme input for a held sound, trying several repeat counts and speeds; trim the steadiest part to about 800 ms and keep it only if it passes Gate 1 | Generate the key word, cut out the target sound, and lengthen it to about 800 ms with a time-stretch that keeps pitch; keep only clips that pass all gates |
+| Short (13 letters: b, c, d, g, h, j, k, p, q, t, w, x, y) | Record a human model (a teacher, or a team member coached by one) saying each sound clipped short, and use it as recorded (Kokoro has no speech-to-speech voice conversion) | Cut the release burst from an AI-generated word before the vowel begins, and keep it only if it passes all gates |
+| Carrier phrases, key words, feedback | Generate with the AI voice, since these are normal words and sentences. Lines that contain a pure sound ("Yes! /m/, lips together") are generated as fragments and joined with the phoneme clip at runtime | None needed |
 
-Every clip follows one editing standard. Trim the silence, add a fixed 50 ms pad at each end, apply a 5–10 ms fade to prevent clicks, normalize loudness so all clips play at the same level, and export mono WAV. Record the tool, voice, and settings for every clip in the asset manifest (SDD Section 6.5), and confirm that the tool's license allows use in a distributed app.
+Every clip follows one editing standard. Trim the silence, add a fixed 50 ms pad at each end, apply a 5–10 ms fade to prevent clicks, normalize loudness so all clips play at the same level, and export mono WAV. Record the tool, voice, and settings for every clip in the asset manifest (SDD Section 6.5), and confirm that the tool's license allows use in a distributed app. The Colab notebook applies this standard, runs the automated part of Gate 1, and writes the manifest entries.
 
 ### 2.4 Quality Gates
 
@@ -202,7 +204,7 @@ Say It no longer removes hearts. Hearts stay in Find It, where a wrong tap is th
 
 ### 5.2 NFR-AUD-01 Audio Production and Release · NEW · P0
 
-**Requirement.** No phoneme clip shall be produced by asking an AI voice to say a letter alone. Continuous sounds shall be extracted from AI-generated words and lengthened, and short sounds shall come from a human model, optionally voice-converted. Every phoneme clip shall pass the three gates in Table 6 before release, and the asset manifest shall record its source, tool, settings, and gate results.
+**Requirement.** No phoneme clip shall be produced by asking an AI voice to say a letter alone. Continuous sounds shall be produced with Kokoro-82M phoneme input, with extraction from Kokoro-generated key words as the fallback, and short sounds shall come from a human model. Every phoneme clip shall pass the three gates in Table 6 before release, and the asset manifest shall record its source, tool (Kokoro-82M and its version, or human model), voice, settings, license, and gate results.
 
 **Acceptance.** The manifest shows three passed gates for 26 of 26 phoneme clips. TC-AUD-03 confirms that the build contains only released clips.
 
@@ -397,7 +399,7 @@ Five members cover six roles, so one member holds two. The project manager role 
 | R4 | False rejects frustrate children with no adult present | Medium | High | No hearts in Say It; prompt ladder; false-reject limit in NFR-ASR-01 | Lower the threshold or widen accepted variants |
 | R5 | Scripts and clips for 26 letters overrun the schedule | High | Medium | Chapter 1 as the Round 2 slice; one script template for all letters | Move Chapters 2 to 7 after Round 2 |
 | R6 | Consent and school scheduling delay Round 2 | Medium | High | Send consent forms in Week 4 and book sessions early | Shift Round 2 by one week and compress analysis |
-| R7 | The AI voice license does not allow distribution | Low | Medium | Check the terms before producing clips | Switch tools or use human recordings |
+| R7 | The TTS model or voice license does not allow distribution | Low | Medium | Kokoro-82M code and weights are Apache-2.0; record the model version and license for every clip in the manifest. espeak-ng (GPL) is used only for text-to-phoneme conversion at build time in Colab and does not ship in the app | Use human recordings |
 | R8 | Team availability drops (exams, internships) | Medium | Medium | Two people per critical task; buffer in Week 8 | Reassign tasks at the weekly check-in |
 
 ### 7.6 Configuration Management
