@@ -10,6 +10,8 @@ import com.playit.app.data.audio.VoContext
 import com.playit.app.data.speech.VoskRecognizer
 import com.playit.app.domain.manager.HeartManager
 import com.playit.app.domain.manager.SpeechValidator
+import com.playit.app.domain.manager.TutorAction
+import com.playit.app.domain.manager.TutorPolicy
 import com.playit.app.domain.model.Phoneme
 import com.playit.app.domain.repository.PhonemeRepository
 import com.playit.app.domain.model.SpeechErrorType
@@ -67,6 +69,14 @@ class SayItViewModel @Inject constructor(
     private val _hearts = MutableStateFlow(heartManager.currentHearts)
     val hearts: StateFlow<Int> = _hearts.asStateFlow()
 
+    internal var tutorPolicy: TutorPolicy = TutorPolicy()
+
+    private val _tutorAction = MutableStateFlow<TutorAction?>(null)
+    val tutorAction: StateFlow<TutorAction?> = _tutorAction.asStateFlow()
+
+    internal var attemptNumber: Int = 1
+        private set
+
     private val _attempts = MutableStateFlow<List<Boolean>>(emptyList())
     val attempts: StateFlow<List<Boolean>> = _attempts.asStateFlow()
 
@@ -94,6 +104,8 @@ class SayItViewModel @Inject constructor(
     private fun loadPhoneme() {
         val id = phonemeIdArg?.toIntOrNull() ?: 1
         viewModelScope.launch {
+            attemptNumber = 1
+            _tutorAction.value = null
             val p = phonemeRepository.getPhonemeById(id)
             if (p == null) {
                 _loadError.value = true
@@ -307,29 +319,61 @@ class SayItViewModel @Inject constructor(
         val profileId = sessionManager.activeProfileId.value ?: 1L
         val phonemeId = _phoneme.value?.id ?: 1
 
+        val action = tutorPolicy.next(attemptNumber, judgement)
+        _tutorAction.value = action
+
         _attempts.value = _attempts.value + isCorrect
 
-        viewModelScope.launch {
-            sayItAttemptRepository.saveAttempt(profileId, phonemeId, isCorrect)
+        val modelClip = if (isWordMode && targetWord != null) {
+            audioResolver.getWordPath(targetWord)
+        } else {
+            audioResolver.getPhonemePath(letter)
         }
 
-        if (isCorrect) {
-            _state.value = SayItState.Correct(transcript.ifBlank { targetWord ?: letter })
-            val sfx = audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME)
-            val vo = audioResolver.getRotatingCorrectVo()
-            audioPlayer.playSequence(listOf(sfx, vo))
-        } else {
-            heartManager.deductHeart()
-            _hearts.value = heartManager.currentHearts
-            _state.value = SayItState.Incorrect(
-                transcript = transcript.ifBlank { "Try again!" },
-                errorType = judgement.errorType
-            )
-
-            val sfxPop = audioResolver.getSfxPath(SfxEvent.INCORRECT_POP)
-            val sfxWhoosh = audioResolver.getSfxPath(SfxEvent.HEART_LOSS_WHOOSH)
-            val voEncourage = audioResolver.getRotatingEncourageVo()
-            audioPlayer.playSequence(listOf(sfxPop, sfxWhoosh, voEncourage))
+        when (action) {
+            is TutorAction.Praise -> {
+                viewModelScope.launch {
+                    sayItAttemptRepository.saveAttempt(profileId, phonemeId, true)
+                }
+                _state.value = SayItState.Correct(transcript.ifBlank { targetWord ?: letter })
+                val sfx = audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME)
+                val vo = audioResolver.getRotatingCorrectVo()
+                audioPlayer.playSequence(listOf(sfx, vo))
+            }
+            is TutorAction.Correct -> {
+                attemptNumber++
+                viewModelScope.launch {
+                    sayItAttemptRepository.saveAttempt(profileId, phonemeId, false)
+                }
+                _state.value = SayItState.Incorrect(
+                    transcript = transcript.ifBlank { "Try again!" },
+                    errorType = judgement.errorType
+                )
+                if (action.supportLevel == 1) {
+                    val fragmentId = when (action.errorType) {
+                        SpeechErrorType.LETTER_NAME -> "fb_letter_name"
+                        SpeechErrorType.ADDED_VOWEL -> "fb_added_vowel"
+                        else -> "fb_listen_again"
+                    }
+                    val fragmentPath = audioResolver.getTutorPath(fragmentId)
+                    val yourTurnPath = audioResolver.getTutorPath("car_your_turn")
+                    audioPlayer.playSequence(listOf(fragmentPath, modelClip, yourTurnPath))
+                } else {
+                    val watchLipsPath = audioResolver.getTutorPath("car_watch_my_lips")
+                    val yourTurnPath = audioResolver.getTutorPath("car_your_turn")
+                    audioPlayer.playSequence(listOf(watchLipsPath, modelClip, yourTurnPath))
+                }
+            }
+            is TutorAction.LeadAndMoveOn -> {
+                viewModelScope.launch {
+                    sayItAttemptRepository.saveAttempt(profileId, phonemeId, false)
+                    // TODO(card-06): mark NEEDS_PRACTICE
+                }
+                _state.value = SayItState.Correct(transcript.ifBlank { targetWord ?: letter })
+                val togetherPath = audioResolver.getTutorPath("car_lets_say_together")
+                val tryLaterPath = audioResolver.getTutorPath("fb_try_later")
+                audioPlayer.playSequence(listOf(togetherPath, modelClip, tryLaterPath))
+            }
         }
     }
 

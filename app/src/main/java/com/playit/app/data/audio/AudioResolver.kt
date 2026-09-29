@@ -89,6 +89,12 @@ class AudioResolver @Inject constructor() {
     }
 
     /**
+     * Resolves the asset path for a tutor VO fragment.
+     */
+    fun getTutorPath(id: String): String = "audio/vo/tutor/$id.wav"
+
+
+    /**
      * Rotates between vo_correct_01 and vo_correct_02.
      */
     fun getRotatingCorrectVo(): String {

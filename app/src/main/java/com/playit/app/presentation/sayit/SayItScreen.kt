@@ -175,7 +175,7 @@ fun SayItScreen(
             )
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            LessonTopBar(currentStep = LessonStep.SAY_IT, onBack = onBack, hearts = hearts)
+            LessonTopBar(currentStep = LessonStep.SAY_IT, onBack = onBack, hearts = null)
 
             Column(
                 modifier = Modifier

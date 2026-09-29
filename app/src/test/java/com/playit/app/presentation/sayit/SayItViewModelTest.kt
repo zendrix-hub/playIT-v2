@@ -5,6 +5,7 @@ import com.playit.app.data.audio.AudioPlayer
 import com.playit.app.data.audio.AudioResolver
 import com.playit.app.data.speech.VoskRecognizer
 import com.playit.app.domain.manager.SpeechValidator
+import com.playit.app.domain.manager.TutorAction
 import com.playit.app.domain.model.Phoneme
 import com.playit.app.domain.model.SpeechErrorType
 import com.playit.app.domain.model.SpeechJudgement
@@ -50,6 +51,7 @@ class SayItViewModelTest {
         every { audioResolver.getSfxPath(any()) } returns "sfx_path"
         every { audioResolver.getRotatingCorrectVo() } returns "correct_vo"
         every { audioResolver.getRotatingEncourageVo() } returns "encourage_vo"
+        every { audioResolver.getTutorPath(any()) } answers { "audio/vo/tutor/${firstArg<String>()}.wav" }
         every { speechValidator.validate(any(), any()) } returns false
         every { speechValidator.validateWord(any(), any()) } returns false
         every { speechValidator.grammarFor(any(), any()) } returns listOf("mouse")
@@ -158,7 +160,7 @@ class SayItViewModelTest {
     }
 
     @Test
-    fun evaluateSpeech_incorrectTranscript_deductsHeart() = runTest {
+    fun evaluateSpeech_incorrectTranscript_doesNotDeductHeart() = runTest {
         coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
         every { speechValidator.validateWord("cat", "mouse") } returns false
 
@@ -169,7 +171,7 @@ class SayItViewModelTest {
         viewModel.evaluateSpeech("cat")
         advanceUntilIdle()
 
-        assertEquals(initialHearts - 1, viewModel.hearts.value)
+        assertEquals(initialHearts, viewModel.hearts.value)
         coVerify { sayItAttemptRepository.saveAttempt(1L, 1, false) }
     }
 
@@ -459,5 +461,66 @@ class SayItViewModelTest {
 
         // Only the first tap within debounce window should trigger playAssetAudio
         verify(exactly = 1) { audioPlayer.playAssetAudio("audio/words/word_mouse.mp3", any()) }
+    }
+
+    @Test
+    fun firstLetterNameMiss_playsLetterNameCorrection() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        every { speechValidator.judgeWord("em", "mouse", "m") } returns
+            SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.LETTER_NAME, heard = "em")
+        every { audioResolver.getTutorPath("fb_letter_name") } returns "audio/vo/tutor/fb_letter_name.wav"
+        every { audioResolver.getWordPath("mouse") } returns "audio/words/word_mouse.mp3"
+        every { audioResolver.getTutorPath("car_your_turn") } returns "audio/vo/tutor/car_your_turn.wav"
+
+        createViewModel()
+        advanceUntilIdle()
+
+        viewModel.evaluateSpeech("em")
+        advanceUntilIdle()
+
+        verify {
+            audioPlayer.playSequence(
+                listOf(
+                    "audio/vo/tutor/fb_letter_name.wav",
+                    "audio/words/word_mouse.mp3",
+                    "audio/vo/tutor/car_your_turn.wav"
+                )
+            )
+        }
+        assertEquals(
+            TutorAction.Correct(SpeechErrorType.LETTER_NAME, 1),
+            viewModel.tutorAction.value
+        )
+    }
+
+    @Test
+    fun thirdMiss_emitsLeadAndMoveOn_andSavesIncorrect() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        every { speechValidator.judgeWord("cat", "mouse", "m") } returns
+            SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.OTHER_WORD, heard = "cat")
+        every { audioResolver.getTutorPath("car_lets_say_together") } returns "audio/vo/tutor/car_lets_say_together.wav"
+        every { audioResolver.getWordPath("mouse") } returns "audio/words/word_mouse.mp3"
+        every { audioResolver.getTutorPath("fb_try_later") } returns "audio/vo/tutor/fb_try_later.wav"
+
+        createViewModel()
+        advanceUntilIdle()
+
+        viewModel.evaluateSpeech("cat")
+        viewModel.evaluateSpeech("cat")
+        viewModel.evaluateSpeech("cat")
+        advanceUntilIdle()
+
+        assertEquals(TutorAction.LeadAndMoveOn, viewModel.tutorAction.value)
+        coVerify(exactly = 3) { sayItAttemptRepository.saveAttempt(1L, 1, false) }
+        verify {
+            audioPlayer.playSequence(
+                listOf(
+                    "audio/vo/tutor/car_lets_say_together.wav",
+                    "audio/words/word_mouse.mp3",
+                    "audio/vo/tutor/fb_try_later.wav"
+                )
+            )
+        }
+        assertTrue(viewModel.state.value is SayItState.Correct)
     }
 }
