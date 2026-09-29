@@ -1,17 +1,20 @@
 # Card 03: Tutor policy, prompt ladder, no hearts in Say It (FR-03)
 
-Status: draft
+Status: ready
 
 ## Why
-The adviser requires the lesson to work with no adult present. Today a wrong Say It attempt removes a heart and plays a generic "try again". A child alone gets punished for recognizer mistakes and never hears how to fix the error. The prompt ladder in spec §3.2 (Table 7) replaces this.
+The adviser requires the lesson to work with no adult present. Today a wrong Say It attempt removes a heart and plays a generic "try again". A child alone gets punished for recognizer mistakes and never hears how to fix the error. The prompt ladder in spec §3.2 (Table 7) and the state machine in §6.3 replace this.
+
+## Audio: do not add any
+The tutor clips (`fb_*`, `car_*`) are not released: the listening checklist is not filled in yet. Do not copy or add audio files. `AudioPlayer` already skips a missing asset (it calls `onComplete`), so the sequences below still play the model clip. The user copies the approved clips into `app/src/main/assets/audio/vo/tutor/` later, with no code change.
 
 ## Files
-- New: `domain/manager/TutorPolicy.kt` (pure Kotlin)
-- New: `app/src/test/.../domain/manager/TutorPolicyTest.kt`
-- Edit: `presentation/sayit/SayItViewModel.kt`, `presentation/sayit/SayItScreen.kt` (one line)
-- Edit: `data/audio/AudioResolver.kt` (one new function)
-- Edit: `app/src/test/.../presentation/sayit/SayItViewModelTest.kt`
-- Add: tutor fragments to `app/src/main/assets/audio/vo/tutor/` (copy from the audio pack, only the files marked OK in listening_checklist.csv)
+All paths are under `app/src/main/java/com/playit/app/` or `app/src/test/java/com/playit/app/`.
+- New: `domain/manager/TutorPolicy.kt` (pure Kotlin, no `android.*` imports)
+- New: test `domain/manager/TutorPolicyTest.kt`
+- Edit: `data/audio/AudioResolver.kt` and test `data/audio/AudioResolverTest.kt`
+- Edit: `presentation/sayit/SayItViewModel.kt` and test `presentation/sayit/SayItViewModelTest.kt`
+- Edit: `presentation/sayit/SayItScreen.kt` (top bar hearts and the Next button only)
 
 ## Changes
 1. `TutorPolicy.kt`:
@@ -31,16 +34,19 @@ The adviser requires the lesson to work with no adult present. Today a wrong Say
    ```
 2. `AudioResolver`: add `fun getTutorPath(id: String): String = "audio/vo/tutor/$id.wav"`.
 3. `SayItViewModel`:
-   - Remove the `heartManager.deductHeart()` call and the `_hearts` update from `evaluateSpeech()`. Keep the `hearts` flow so other code compiles.
-   - Track `attemptNumber` (1-based, reset when the phoneme loads) and expose `tutorAction: StateFlow<TutorAction?>`.
-   - After each judgement, call `tutorPolicy.next(attemptNumber, judgement)` and play one sequence with `audioPlayer.playSequence(...)`:
-     - Praise: existing correct chime + `getRotatingCorrectVo()`, as now.
-     - Correct, level 1: fragment by error type (LETTER_NAME → `fb_letter_name`, ADDED_VOWEL → `fb_added_vowel`, anything else → `fb_listen_again`), then the phoneme clip `getPhonemePath(letter)`, then `car_your_turn`.
-     - Correct, level 2: `car_watch_my_lips`, the phoneme clip, `car_your_turn`.
-     - LeadAndMoveOn: `car_lets_say_together`, the phoneme clip, `fb_try_later`. Then move to the same completion path a correct answer uses, but with `isCorrect = false` saved. Mastery tracking comes in a later card; leave a `// TODO(card-06): mark NEEDS_PRACTICE` comment.
-   - In word mode, use the key word clip `getWordPath(targetWord)` instead of the phoneme clip in the three sequences above.
-4. `SayItScreen`: pass `hearts = null` to `LessonTopBar` so no hearts show on Say It.
-5. Don't change `HeartManager` or other screens. Find It keeps hearts.
+   - In `evaluateSpeech()`, remove `heartManager.deductHeart()`, the `_hearts` update, and the `HEART_LOSS_WHOOSH` sound. Keep the `hearts` flow and the `heartManager` field so other code compiles.
+   - Add `private val tutorPolicy = TutorPolicy()` and `private var attemptNumber = 0`. Increment `attemptNumber` at the start of each `evaluateSpeech()`.
+   - Expose `tutorAction: StateFlow<TutorAction?>` and `canContinue: StateFlow<Boolean>`. When a phoneme loads, reset `attemptNumber` to 0, `tutorAction` to null, and `canContinue` to false.
+   - After the judgement, set `tutorAction` to `tutorPolicy.next(attemptNumber, judgement)`. Keep setting `SayItState.Correct` / `SayItState.Incorrect(transcript, errorType)` as now. Then play one `audioPlayer.playSequence(...)`, where `model` is `getWordPath(targetWord)` in word mode and `getPhonemePath(letter)` in legacy mode:
+     - Praise: `[getSfxPath(CORRECT_CHIME), getRotatingCorrectVo()]` (as now). Set `canContinue = true`.
+     - Correct, level 1: `[getSfxPath(INCORRECT_POP), getTutorPath(fb), model, getTutorPath("car_your_turn")]`, where `fb` is `fb_letter_name` for LETTER_NAME, `fb_added_vowel` for ADDED_VOWEL, and `fb_listen_again` for anything else.
+     - Correct, level 2: `[getSfxPath(INCORRECT_POP), getTutorPath("car_watch_my_lips"), model, getTutorPath("car_your_turn")]`.
+     - LeadAndMoveOn: `[getTutorPath("car_lets_say_together"), model, getTutorPath("fb_try_later")]`. Set `canContinue = true`. The attempt is already saved with `isCorrect = false`. Add the comment `// TODO(FR-NEW-REC): mark the letter NEEDS_PRACTICE and queue a recall check`.
+   - `startListening()` returns immediately when `canContinue` is true: after praise or lead-and-move-on there are no more scored attempts until the phoneme reloads.
+4. `SayItScreen`:
+   - Pass `hearts = null` to `LessonTopBar` so no hearts show on Say It. Remove the now-unused `hearts` collection line.
+   - Collect `canContinue` and use it for the "Next: Find It" button: `onClick = { if (canContinue) onNext(...) }` and `enabled = canContinue`.
+5. Don't change `HeartManager`, Find It, or Blend It. Find It keeps hearts.
 
 ## Tests
 `TutorPolicyTest`:
@@ -52,10 +58,24 @@ The adviser requires the lesson to work with no adult present. Today a wrong Say
 | `secondMiss_correctsAtLevel2` | next(2, ADDED_VOWEL miss) == Correct(ADDED_VOWEL, 2) |
 | `thirdMiss_leadsAndMovesOn` | next(3, any miss) == LeadAndMoveOn |
 
+`AudioResolverTest`: add `getTutorPath_returnsWavInTutorFolder` (`getTutorPath("car_your_turn") == "audio/vo/tutor/car_your_turn.wav"`).
+
 `SayItViewModelTest`:
+- In `setup()`, add `every { audioResolver.getTutorPath(any()) } answers { "tutor/${firstArg<String>()}.wav" }`. `audioResolver` is a strict mock, so every new call needs a stub. `getSfxPath` already returns `"sfx_path"` and `getWordPath` returns `"word_path"`.
 - Replace `evaluateSpeech_incorrectTranscript_deductsHeart` with `evaluateSpeech_incorrectTranscript_doesNotDeductHeart` (hearts unchanged).
-- Add `firstLetterNameMiss_playsLetterNameCorrection`: verify playSequence gets the `fb_letter_name` path, then the word clip, then `car_your_turn`.
-- Add `thirdMiss_emitsLeadAndMoveOn_andSavesIncorrect`.
+- Add:
+
+| Test | Assertion |
+|---|---|
+| `firstLetterNameMiss_playsLetterNameCorrection` | judgeWord("em","mouse","m") returns LETTER_NAME; after `evaluateSpeech("em")`, `playSequence(listOf("sfx_path", "tutor/fb_letter_name.wav", "word_path", "tutor/car_your_turn.wav"), any())` was called |
+| `secondMiss_playsWatchMyLips` | two misses; the second `playSequence` list is `["sfx_path", "tutor/car_watch_my_lips.wav", "word_path", "tutor/car_your_turn.wav"]` |
+| `thirdMiss_emitsLeadAndMoveOn_andSavesIncorrect` | three misses; `tutorAction` is LeadAndMoveOn, `canContinue` is true, `saveAttempt(1L, 1, false)` was called 3 times, hearts unchanged |
+| `correctAfterMiss_praises_andCanContinue` | a miss then a correct word; `tutorAction` is Praise(2) and `canContinue` is true |
+| `afterLeadAndMoveOn_startListeningIsIgnored` | after three misses, `startListening()` does not call `voskRecognizer.startListening` again |
+
+All other existing tests must still pass.
 
 ## Commit
 `feat(sayit): tutor policy prompt ladder; Say It no longer costs hearts (FR-03)`
+
+Decisions used: Say It never removes hearts (spec §3.4 [confirm], covered by AGENTS.md Decisions).

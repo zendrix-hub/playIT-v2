@@ -50,7 +50,7 @@ Write the question to `docs/tasks/QUESTIONS.md` (card, question, what you found,
 - Add or replace audio in `app/src/main/assets/` unless a card says so.
 - Use emojis in UI text.
 
-## Current queue (2026-09-29)
+## Current queue (2026-09-29, updated)
 The `Status:` line in each card is the source of truth; this table is a snapshot.
 
 | Card | Status | Note |
@@ -58,5 +58,5 @@ The `Status:` line in each card is the source of truth; this table is a snapshot
 | 00 | done | CI pending |
 | 01 | done | CI pending |
 | 02 | done | CI pending |
-| 03 | draft | Blocked on the user's listening checklist |
-| 04 | draft | After 03 |
+| 03 | ready | Adds no audio; tutor clips come after the listening checklist |
+| 04 | ready | Run in a new session after 03 is committed |
