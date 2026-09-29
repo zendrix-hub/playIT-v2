@@ -5,6 +5,8 @@ That file is the single source of truth for what PlayIT is, its architecture,
 folder structure, and current status — this file exists only so Antigravity
 finds it automatically at session start. Do not duplicate its content here;
 if something here and the bootstrap doc ever disagree, the bootstrap doc wins.
+The one exception is the "Hear It / Say It refactor" section below: for the
+areas it names, it wins over the bootstrap doc and the engineering-package docs.
 
 Re-read the bootstrap doc after any context reset, per its own §16.
 
@@ -26,11 +28,23 @@ Re-read the bootstrap doc after any context reset, per its own §16.
 - **Mockup vs Asset Creation Scope**: The prototype mockup (`playit-mockup.html`) is strictly for UI layout, styling, and animation improvements. Asset creation (illustrations, icons, character designs, audio) remains strictly governed by our original engineering package plan (`14_ASSET_MANIFEST.md`, `15_IMAGE_GENERATION_PROMPTS.md`, `16_ILLUSTRATION_STYLE_GUIDE.md`, anchor style sheet `images/_style-reference-sheet/anchor_letter-card.png`) and must NOT change based on the mockup unless explicitly stated by the user.
 - **Zero-Emoji Policy**: Emojis are strictly NOT needed and MUST NOT be used in UI text, button labels, speech bubbles, cards, or titles anywhere across child-facing and adult-facing screens. All visual icons must use clean Android Vector Graphics (`Icons.Filled.*`, `Icons.AutoMirrored.*`) or transparent production PNG assets (`images/rewards/`, `images/pictures/`, etc.). Never append or embed emojis (e.g., 🚀, 🎉, 🍎, 🔥, ⭐, 🔒) in text strings or button labels.
 
-## Hear It / Say It refactor (Sep 2026, adviser directive)
-- For Hear It, Say It, SpeechValidator, audio assets, and the tutoring flow, `docs/specs/hear-say-refactor.md` and `docs/tasks/` supersede the engineering-package docs where they conflict. Everything else keeps the bootstrap doc as the source of truth.
-- Work from one `docs/tasks/card-NN-*.md` per session. Change only the files the card lists.
-- [confirm] or [proposed] in the spec: use the spec default and note it in the commit body.
-- Say It never removes hearts. Letter names and added vowels are foils and are never accepted.
+## Hear It / Say It refactor (Sep 2026, adviser directive; adviser confirmation pending)
+
+Precedence
+- For Hear It, Say It, SpeechValidator, audio assets, and the tutoring flow, `docs/specs/hear-say-refactor.md` and `docs/tasks/` supersede the bootstrap doc and the engineering-package docs where they conflict. Everything else keeps the bootstrap doc as the source of truth.
+- `docs/specs/hear-say-refactor.md` wins over `docs/specs/week3-changeset.md`.
+- `docs/specs/validation-report.md` is reference only; do not implement from it.
+
+Decisions
+- [confirm] and [proposed] items covered by the decisions below use those decisions; note the decision in the commit body. Any other [confirm] or [proposed] item: stop and ask the user.
+- Say It never removes hearts (spec default). Letter names and added vowels are foils and are never accepted.
+- Say It judge targets: at least 80% agreement with teachers; false rejects at most 15% of teacher-correct attempts (spec defaults).
+- Say It is hybrid: the echo step stays in word mode ("mouse"); the recall check uses the pure sound only if the Vosk spike passes (`docs/spikes/vosk-foil-spike.md`).
+- Audio source is Kokoro-82M (Apache-2.0), run in Google Colab via `tools/audio/playit_audio.ipynb`. Claude writes and audits the pipeline; it does not generate or edit audio files. Only released clips are copied into `app/src/main/assets/audio/`.
+
+Workflow
+- One refactor step per session: work from one `docs/tasks/card-NN-*.md`. Change only the files the card lists, plus the card's own item in `13_MASTER_TASKS.md`.
+- Every card ticks its own item under "Hear It / Say It refactor" in `docs/engineering-package/13_MASTER_TASKS.md`, in the card's commit, once its tests pass.
 - Every change adds or updates a unit test; run `./gradlew testDebugUnitTest` before committing.
-- The app stays offline. Audio is produced outside the app (Kokoro, Apache-2.0) and only released clips are copied into `app/src/main/assets/audio/`.
-- Commit per card with the requirement ID in the message. Never push.
+- The app is offline only: no network calls. The offline rule applies to the app, not the Colab notebook.
+- After each step: tests pass, then commit on `refactor/hear-say-it`, one commit per card, with the requirement ID in the message. Never push; the user pushes.

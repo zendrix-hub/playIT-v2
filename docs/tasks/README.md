@@ -14,4 +14,4 @@ How to run a card with the agent:
 
 > Implement docs/tasks/card-NN-*.md exactly. Change only the files it lists. Make every test in its "Tests" section pass, run ./gradlew testDebugUnitTest, then commit with the message in "Commit". Do not push.
 
-Definition of done for every card: listed tests exist and pass, full unit test suite passes, no files changed outside the card's list, one commit.
+Definition of done for every card: listed tests exist and pass, full unit test suite passes, the card's item in `docs/engineering-package/13_MASTER_TASKS.md` is ticked, no other files changed outside the card's list, one commit.

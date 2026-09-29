@@ -1,5 +1,3 @@
-Superseded for audio by docs/specs/hear-say-refactor.md §2.3 (Kokoro, Sep 2026).
-
 # 20 — Icon Guide
 
 ## 1. Required Icons (see `14_ASSET_MANIFEST.md §3` for the count summary)
