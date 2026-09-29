@@ -1,5 +1,7 @@
 # Card 00: Agent rules, precedence, housekeeping
 
+Status: done
+
 ## Why
 The agent reads AGENTS.md, not CLAUDE.md, so the refactor decisions were invisible to it. AGENTS.md also says the engineering-package bootstrap doc wins every conflict; for this refactor the adviser's directive changes that.
 

@@ -37,7 +37,7 @@ Everything was generated in the af_heart voice. The machine check (Gate 1: lengt
 ## If agy gets stuck
 - A test fails twice: stop, and paste the error here.
 - It wants to change files outside the card: say no, and ask it to explain why.
-- It asks a [confirm] question: the answer is the spec default (already written in AGENTS.md after card 00).
+- It asks a [confirm] or [proposed] question: if the Decisions in AGENTS.md already cover it, use that decision; anything else means stop and ask (agy writes the question to docs/tasks/QUESTIONS.md).
 
 ## What the spike found (details in docs/spikes/vosk-foil-spike.md)
 Your Vosk model catches added vowels ("ma" at 0.85 confidence) but never recognizes a held "mmm". So Say It keeps word mode as the scored check. The pure-sound check only works for continuous sounds, by measuring how long the sound was held. Card 01 builds that in.

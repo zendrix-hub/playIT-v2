@@ -1,5 +1,7 @@
 # Card 01: Speech judge with error types (NFR-ASR-01)
 
+Status: done
+
 ## Why
 `SpeechValidator.validate()` accepts "em", "ma", "muh", "buh", anchor words, and anything that starts with the letter (the prefix rule). Those are exactly the errors teachers flagged. The app needs to reject them and say which error it heard, so Say It can correct the child with no adult present.
 

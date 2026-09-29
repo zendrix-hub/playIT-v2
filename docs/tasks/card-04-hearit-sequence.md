@@ -1,5 +1,7 @@
 # Card 04: Hear It modeling sequence (FR-02)
 
+Status: draft
+
 Run after cards 01 to 03 are reviewed.
 
 ## Why

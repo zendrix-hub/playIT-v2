@@ -252,9 +252,9 @@ Change: Say It now asks the child to utter the letter's example WORD (m → "Mou
 - [x] **Compilation & APK Generation**: Verified clean compilation via `./gradlew compileDebugKotlin` and assembled `app-debug.apk` (97 MB) into workspace root `./playit-debug.apk`.
 
 ## Hear It / Say It refactor
-Each card ticks its own item in its commit, once its tests pass.
+Each card ticks its own item in its commit (see `docs/tasks/AGY_RUNBOOK.md`). A tick means the card is committed; CI and phone-test results are in `docs/evidence-log.md`.
 - [x] Card 00: Agent rules, precedence, housekeeping
 - [x] Card 01: Speech judge returns error types; stop accepting letter names and added vowels (NFR-ASR-01)
-- [ ] Card 02: Scope the Vosk grammar to each letter's foils; carry the error type into Say It state (NFR-ASR-01, FR-03)
+- [x] Card 02: Scope the Vosk grammar to each letter's foils; carry the error type into Say It state (NFR-ASR-01, FR-03)
 - [ ] Card 03: Tutor policy: prompt ladder, no hearts in Say It, corrective audio (FR-03)
 - [ ] Card 04: Hear It modeling sequence (I do) (FR-02)
