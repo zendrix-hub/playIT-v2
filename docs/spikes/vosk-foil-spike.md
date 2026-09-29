@@ -30,5 +30,7 @@ Every candidate token exists in the model vocabulary except "sss" and "ssss". Th
 - Sound mode (recall checks) confirms a correct sound only for the 13 continuous sounds, only when Vosk reports no foil, and only when the sound was sustained for at least 400 ms. Stops are never judged by sound.
 - The sustain duration must come from the audio stream (`AudioCapture`), which is a later card.
 
+**Status (2026-09-29): the 400 ms rule is switched off** (`SpeechValidator.SOUND_MODE_ENABLED = false`). Held letter names can pass it: in this spike "em" came back empty and "es" came back [unk], so a child who holds a letter name ("emmm", "esss") for 400 ms or longer would be accepted as a correct pure sound. While the rule is off, `judgeSound` still reports foils and returns UNCONFIRMED for everything else. It stays off until the on-device test with children below shows that held letter names are caught.
+
 ## To repeat on-device
 Record 5 children × 4 Chapter 1 sounds × 3 productions (correct, added vowel, letter name). Run them through the grammar and fill in the same table. Report false-accept and false-reject rates against teacher judgment (SI-1).

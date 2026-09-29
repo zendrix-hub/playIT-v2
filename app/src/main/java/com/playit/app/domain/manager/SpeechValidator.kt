@@ -17,10 +17,23 @@ import javax.inject.Singleton
  * Strictly pure Kotlin — zero android.* imports per 02_ARCHITECTURE_SUMMARY.md §3.
  */
 @Singleton
-class SpeechValidator @Inject constructor() {
+class SpeechValidator internal constructor(
+    private val soundModeEnabled: Boolean
+) {
+
+    @Inject constructor() : this(SOUND_MODE_ENABLED)
 
     companion object {
         val CONTINUOUS = setOf("a", "e", "i", "o", "u", "f", "l", "m", "n", "r", "s", "v", "z")
+
+        /**
+         * Sound mode accepts a held continuous sound (>= 400 ms, no foil reported). Off until an
+         * on-device test with children shows held letter names are caught: in the spike, Vosk
+         * reported "em" and "es" as blank or [unk], which this rule would accept
+         * (docs/spikes/vosk-foil-spike.md). While off, judgeSound still reports foils and
+         * returns UNCONFIRMED for everything else.
+         */
+        const val SOUND_MODE_ENABLED = false
     }
 
     private val letterNames: Map<String, List<String>> = mapOf(
@@ -219,6 +232,7 @@ class SpeechValidator @Inject constructor() {
      * Checked in this order:
      * 1. Tokenize like validate(). Letter name foil -> LETTER_NAME. Added vowel foil -> ADDED_VOWEL.
      *    Substitution foil -> SUBSTITUTION. Seeded example word -> OTHER_WORD. All isCorrect = false.
+     * While sound mode is off (SOUND_MODE_ENABLED), steps 2-5 are skipped: UNCONFIRMED, false.
      * 2. If letter not in CONTINUOUS, return UNCONFIRMED, false (stops judged in word mode).
      * 3. If sustainedMs == null, return UNCONFIRMED, false.
      * 4. If sustainedMs >= 400 and transcript is blank or only [unk], return NONE, true.
@@ -250,6 +264,9 @@ class SpeechValidator @Inject constructor() {
             return SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.OTHER_WORD, heard = cleanText)
         }
 
+        if (!soundModeEnabled) {
+            return SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.UNCONFIRMED, heard = cleanText)
+        }
         if (cleanLetter !in CONTINUOUS) {
             return SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.UNCONFIRMED, heard = cleanText)
         }

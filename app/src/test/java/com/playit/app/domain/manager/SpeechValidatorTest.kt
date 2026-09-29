@@ -83,33 +83,56 @@ class SpeechValidatorTest {
     }
 
     @Test
-    fun judgeSound_sustainedContinuous_accepted() {
+    fun soundMode_isOffByDefault() {
+        assertFalse(SpeechValidator.SOUND_MODE_ENABLED)
+    }
+
+    @Test
+    fun judgeSound_soundModeOff_sustainedIsUnconfirmed() {
+        // Held letter names can come back blank or [unk], so a sustained sound alone must not pass.
         val case1 = speechValidator.judgeSound("", "m", 600)
+        assertFalse(case1.isCorrect)
+        assertEquals(SpeechErrorType.UNCONFIRMED, case1.errorType)
+
+        val case2 = speechValidator.judgeSound("[unk]", "s", 450)
+        assertFalse(case2.isCorrect)
+        assertEquals(SpeechErrorType.UNCONFIRMED, case2.errorType)
+
+        val case3 = speechValidator.judgeSound("", "m", 200)
+        assertFalse(case3.isCorrect)
+        assertEquals(SpeechErrorType.UNCONFIRMED, case3.errorType)
+    }
+
+    @Test
+    fun judgeSound_soundModeOn_sustainedContinuous_accepted() {
+        val soundMode = SpeechValidator(soundModeEnabled = true)
+
+        val case1 = soundMode.judgeSound("", "m", 600)
         assertTrue(case1.isCorrect)
         assertEquals(SpeechErrorType.NONE, case1.errorType)
 
-        val case2 = speechValidator.judgeSound("[unk]", "s", 450)
+        val case2 = soundMode.judgeSound("[unk]", "s", 450)
         assertTrue(case2.isCorrect)
         assertEquals(SpeechErrorType.NONE, case2.errorType)
     }
 
     @Test
-    fun judgeSound_tooShort_rejected() {
-        val result = speechValidator.judgeSound("", "m", 200)
+    fun judgeSound_soundModeOn_tooShort_rejected() {
+        val result = SpeechValidator(soundModeEnabled = true).judgeSound("", "m", 200)
         assertFalse(result.isCorrect)
         assertEquals(SpeechErrorType.NO_SPEECH, result.errorType)
     }
 
     @Test
     fun judgeSound_stop_neverAcceptedBySustain() {
-        val result = speechValidator.judgeSound("", "b", 800)
+        val result = SpeechValidator(soundModeEnabled = true).judgeSound("", "b", 800)
         assertFalse(result.isCorrect)
         assertEquals(SpeechErrorType.UNCONFIRMED, result.errorType)
     }
 
     @Test
     fun judgeSound_noDuration_unconfirmed() {
-        val result = speechValidator.judgeSound("", "m", null)
+        val result = SpeechValidator(soundModeEnabled = true).judgeSound("", "m", null)
         assertFalse(result.isCorrect)
         assertEquals(SpeechErrorType.UNCONFIRMED, result.errorType)
     }
