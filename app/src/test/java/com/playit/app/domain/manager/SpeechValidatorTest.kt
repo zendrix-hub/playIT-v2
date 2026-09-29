@@ -116,8 +116,8 @@ class SpeechValidatorTest {
 
     @Test
     fun validate_prefixRuleRemoved() {
-        assertFalse(speechValidator.validate("mo", "m"))
-        assertFalse(speechValidator.validate("muh", "m"))
+        // "nga" is not in the ng list; only the old prefix rule accepted it.
+        assertFalse(speechValidator.validate("nga", "ng"))
     }
 
     @Test

@@ -256,14 +256,14 @@ class SayItViewModel @Inject constructor(
             }
         }
 
+        // Stop early only on a correct result. A wrong partial can be the start of the
+        // target word ("ma" in "mouse", "a" in "apple"), so wrong answers are judged only
+        // on a final result or at the timeout.
         voskRecognizer.startListening(
-            onResult = { transcript ->
+            onResult = { transcript, isFinal ->
                 if (transcript.isNotBlank() && _state.value is SayItState.Listening) {
                     val judgement = judgeTranscript(transcript, targetWord, letter)
-                    if (judgement.isCorrect ||
-                        judgement.errorType == SpeechErrorType.LETTER_NAME ||
-                        judgement.errorType == SpeechErrorType.ADDED_VOWEL
-                    ) {
+                    if (judgement.isCorrect || isFinal) {
                         autoStopJob?.cancel()
                         voskRecognizer.stopListening()
                         evaluateSpeech(transcript)

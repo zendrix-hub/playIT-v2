@@ -297,33 +297,13 @@ class SayItViewModelTest {
     }
 
     @Test
-    fun onResult_letterName_stopsListeningEarly() = runTest {
+    fun onResult_partialFoil_keepsListening() = runTest {
+        // A wrong partial can be the start of the target word, so it must not end the attempt.
         coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
-        val callbackSlot = slot<(String) -> Unit>()
+        val callbackSlot = slot<(String, Boolean) -> Unit>()
         every { voskRecognizer.startListening(capture(callbackSlot)) } just Runs
         every { speechValidator.judgeWord("em", "mouse", "m") } returns
             SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.LETTER_NAME, heard = "em")
-
-        createViewModel()
-        advanceUntilIdle()
-
-        viewModel.startListening()
-        assertTrue(callbackSlot.isCaptured)
-
-        callbackSlot.captured.invoke("em")
-        advanceUntilIdle()
-
-        val state = viewModel.state.value
-        assertTrue(state is SayItState.Incorrect)
-        assertEquals(SpeechErrorType.LETTER_NAME, (state as SayItState.Incorrect).errorType)
-        verify { voskRecognizer.stopListening() }
-    }
-
-    @Test
-    fun onResult_addedVowel_stopsListeningEarly() = runTest {
-        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
-        val callbackSlot = slot<(String) -> Unit>()
-        every { voskRecognizer.startListening(capture(callbackSlot)) } just Runs
         every { speechValidator.judgeWord("ma", "mouse", "m") } returns
             SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.ADDED_VOWEL, heard = "ma")
 
@@ -333,13 +313,116 @@ class SayItViewModelTest {
         viewModel.startListening()
         assertTrue(callbackSlot.isCaptured)
 
-        callbackSlot.captured.invoke("ma")
+        callbackSlot.captured.invoke("em", false)
+        callbackSlot.captured.invoke("ma", false)
+
+        assertEquals(SayItState.Listening, viewModel.state.value)
+        assertTrue(viewModel.attempts.value.isEmpty())
+        verify(exactly = 0) { voskRecognizer.stopListening() }
+
+        // Drain the 3.8s auto-stop timer so runTest has no pending coroutines.
+        advanceUntilIdle()
+    }
+
+    @Test
+    fun onResult_partialAddedVowelThenFinalWord_isCorrect() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        val callbackSlot = slot<(String, Boolean) -> Unit>()
+        every { voskRecognizer.startListening(capture(callbackSlot)) } just Runs
+        every { speechValidator.judgeWord("ma", "mouse", "m") } returns
+            SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.ADDED_VOWEL, heard = "ma")
+        every { speechValidator.judgeWord("mouse", "mouse", "m") } returns
+            SpeechJudgement(isCorrect = true, errorType = SpeechErrorType.NONE, heard = "mouse")
+
+        createViewModel()
+        advanceUntilIdle()
+
+        val initialHearts = viewModel.hearts.value
+        viewModel.startListening()
+        callbackSlot.captured.invoke("ma", false)
+        assertEquals(SayItState.Listening, viewModel.state.value)
+
+        callbackSlot.captured.invoke("mouse", true)
+        advanceUntilIdle()
+
+        assertEquals(SayItState.Correct("mouse"), viewModel.state.value)
+        assertEquals(listOf(true), viewModel.attempts.value)
+        assertEquals(initialHearts, viewModel.hearts.value)
+        coVerify(exactly = 0) { sayItAttemptRepository.saveAttempt(any(), any(), false) }
+    }
+
+    @Test
+    fun onResult_partialLetterNameThenFinalWord_isCorrect() = runTest {
+        // "a" is both the letter name and the start of "apple".
+        coEvery { phonemeRepository.getPhonemeById(1) } returns
+            fakePhoneme(letter = "a", exampleWord = "apple")
+        val callbackSlot = slot<(String, Boolean) -> Unit>()
+        every { voskRecognizer.startListening(capture(callbackSlot)) } just Runs
+        every { speechValidator.judgeWord("a", "apple", "a") } returns
+            SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.LETTER_NAME, heard = "a")
+        every { speechValidator.judgeWord("apple", "apple", "a") } returns
+            SpeechJudgement(isCorrect = true, errorType = SpeechErrorType.NONE, heard = "apple")
+
+        createViewModel()
+        advanceUntilIdle()
+
+        val initialHearts = viewModel.hearts.value
+        viewModel.startListening()
+        callbackSlot.captured.invoke("a", false)
+        assertEquals(SayItState.Listening, viewModel.state.value)
+
+        callbackSlot.captured.invoke("apple", true)
+        advanceUntilIdle()
+
+        assertEquals(SayItState.Correct("apple"), viewModel.state.value)
+        assertEquals(listOf(true), viewModel.attempts.value)
+        assertEquals(initialHearts, viewModel.hearts.value)
+        coVerify(exactly = 0) { sayItAttemptRepository.saveAttempt(any(), any(), false) }
+    }
+
+    @Test
+    fun onResult_finalLetterName_setsIncorrectWithLetterName() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        val callbackSlot = slot<(String, Boolean) -> Unit>()
+        every { voskRecognizer.startListening(capture(callbackSlot)) } just Runs
+        every { speechValidator.judgeWord("em", "mouse", "m") } returns
+            SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.LETTER_NAME, heard = "em")
+
+        createViewModel()
+        advanceUntilIdle()
+
+        viewModel.startListening()
+        callbackSlot.captured.invoke("em", true)
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertTrue(state is SayItState.Incorrect)
+        assertEquals(SpeechErrorType.LETTER_NAME, (state as SayItState.Incorrect).errorType)
+        verify { voskRecognizer.stopListening() }
+    }
+
+    @Test
+    fun onResult_partialAddedVowelThenTimeout_setsIncorrectWithAddedVowel() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        val callbackSlot = slot<(String, Boolean) -> Unit>()
+        every { voskRecognizer.startListening(capture(callbackSlot)) } just Runs
+        every { voskRecognizer.stopListening() } returns "ma"
+        every { speechValidator.judgeWord("ma", "mouse", "m") } returns
+            SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.ADDED_VOWEL, heard = "ma")
+
+        createViewModel()
+        advanceUntilIdle()
+
+        viewModel.startListening()
+        callbackSlot.captured.invoke("ma", false)
+        assertEquals(SayItState.Listening, viewModel.state.value)
+
+        // The 3.8s auto-stop judges the last transcript.
         advanceUntilIdle()
 
         val state = viewModel.state.value
         assertTrue(state is SayItState.Incorrect)
         assertEquals(SpeechErrorType.ADDED_VOWEL, (state as SayItState.Incorrect).errorType)
-        verify { voskRecognizer.stopListening() }
     }
 
     @Test
