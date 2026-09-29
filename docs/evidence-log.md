@@ -1,6 +1,6 @@
 # Evidence log: Hear It / Say It refactor
 
-One row per commit. agy adds a row with each card (CI pending, phone test pending); the reviewer fills in the commit hash, CI run, and phone test.
+One row per code commit. agy adds a row with each card (CI pending, phone test pending); the reviewer fills in the commit hash, CI run, and phone test.
 
 | Card | Adviser finding | Requirement | Commit | CI run | Phone test |
 |---|---|---|---|---|---|
@@ -10,3 +10,5 @@ One row per commit. agy adds a row with each card (CI pending, phone test pendin
 | 02 (fix) | False rejects must stay at or below 15% of teacher-correct attempts (spec §5.5); stopping on a wrong partial could reject a correct word | NFR-ASR-01 | b92e909 | pending | pending |
 | 00 (fix) | Card 00 dropped rules from CLAUDE.md (review finding) | — | 5b8fd75 | pending | pending |
 | 01 (fix) | Vosk cannot confirm a pure sound, so held letter names could pass the 400 ms rule (spec §3.3, risk R2; vosk-foil-spike.md) | NFR-ASR-01 | a43237d | pending | pending |
+| — (runbook) | None: workflow docs (agy runbook, card status, evidence log, questions file) | — | f70620a | pending | pending |
+| 03, 04 (critique) | None: review of cards 03 and 04 before agy runs them | FR-03, FR-02 | 45ff484 | pending | pending |

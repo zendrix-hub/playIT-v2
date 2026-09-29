@@ -24,7 +24,7 @@ Re-read the bootstrap doc after any context reset, per its own §16.
   already been through conflict resolution there. Don't re-derive them from
   the raw source documents.
 - Update `13_MASTER_TASKS.md` in place as tasks complete — no need to ask
-  permission to check off a verified, completed task (bootstrap §17).
+  permission (bootstrap §17). Tick at commit time. A tick means committed; CI verifies it.
 - **Mockup vs Asset Creation Scope**: The prototype mockup (`playit-mockup.html`) is strictly for UI layout, styling, and animation improvements. Asset creation (illustrations, icons, character designs, audio) remains strictly governed by our original engineering package plan (`14_ASSET_MANIFEST.md`, `15_IMAGE_GENERATION_PROMPTS.md`, `16_ILLUSTRATION_STYLE_GUIDE.md`, anchor style sheet `images/_style-reference-sheet/anchor_letter-card.png`) and must NOT change based on the mockup unless explicitly stated by the user.
 - **Zero-Emoji Policy**: Emojis are strictly NOT needed and MUST NOT be used in UI text, button labels, speech bubbles, cards, or titles anywhere across child-facing and adult-facing screens. All visual icons must use clean Android Vector Graphics (`Icons.Filled.*`, `Icons.AutoMirrored.*`) or transparent production PNG assets (`images/rewards/`, `images/pictures/`, etc.). Never append or embed emojis (e.g., 🚀, 🎉, 🍎, 🔥, ⭐, 🔒) in text strings or button labels.
 
@@ -47,6 +47,6 @@ Workflow
 - Every card ticks its own item under "Hear It / Say It refactor" in `docs/engineering-package/13_MASTER_TASKS.md`, in the card's commit.
 - Every change adds or updates a unit test; run `./gradlew testDebugUnitTest` before committing. If there is no JDK or Android SDK, don't claim the tests pass: write "Unit tests not run locally; verify in CI" in the commit body. CI on the draft PR to `main` is the test gate.
 - The app is offline only: no network calls. The offline rule applies to the app, not the Colab notebook.
-- After each step, commit on `refactor/hear-say-it`, one commit per card, with the requirement ID in the message (the commit body format is in the runbook). Never push; the user pushes.
+- After each step, commit on `refactor/hear-say-it`, one commit per card (the commit body format is in the runbook). Every commit message includes the requirement ID if the card has one. Never push; the user pushes.
 
 For how to execute task cards, follow `docs/tasks/AGY_RUNBOOK.md`.
