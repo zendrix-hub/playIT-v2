@@ -8,7 +8,7 @@ Requires card 03 to be committed first (this card uses `AudioResolver.getTutorPa
 Hear It plays an intro, then the sound once. The spec's "I do" step (§2.1, Table 3) models the pure sound three times, gives the key word, and repeats the sound, so a child can learn without a teacher.
 
 ## Scope notes
-- Audio: do not add any. The carrier clips (`car_listen`, `car_this_letter_says`, `car_say_it_with_me`) are not released yet. `AudioPlayer` skips a missing asset, so until the user copies them into `app/src/main/assets/audio/vo/tutor/`, Hear It plays only the phoneme and key-word clips.
+- Audio: do not add any. Card 03's pre-step copies the approved carrier clips (`car_listen`, `car_this_letter_says`, `car_say_it_with_me`) into `app/src/main/assets/audio/vo/tutor/`. `AudioPlayer` skips a missing asset, so any clip marked FIX is silent and Hear It still plays the phoneme and key-word clips.
 - The ≤15 s sequence limit in spec §2.1 is [proposed] and not covered by AGENTS.md Decisions. Do not implement or test it.
 - The per-letter JSON LessonScript (spec §6.2) and the letter-reveal animation (`SHOW_LETTER`) are later work. The template lives in Kotlin for now.
 

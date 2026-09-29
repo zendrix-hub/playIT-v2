@@ -5,9 +5,6 @@ Status: ready
 ## Why
 The adviser requires the lesson to work with no adult present. Today a wrong Say It attempt removes a heart and plays a generic "try again". A child alone gets punished for recognizer mistakes and never hears how to fix the error. The prompt ladder in spec §3.2 (Table 7) and the state machine in §6.3 replace this.
 
-## Audio: do not add any
-The tutor clips (`fb_*`, `car_*`) are not released: the listening checklist is not filled in yet. Do not copy or add audio files. `AudioPlayer` already skips a missing asset (it calls `onComplete`), so the sequences below still play the model clip. The user copies the approved clips into `app/src/main/assets/audio/vo/tutor/` later, with no code change.
-
 ## Files
 All paths are under `app/src/main/java/com/playit/app/` or `app/src/test/java/com/playit/app/`.
 - New: `domain/manager/TutorPolicy.kt` (pure Kotlin, no `android.*` imports)
@@ -15,6 +12,15 @@ All paths are under `app/src/main/java/com/playit/app/` or `app/src/test/java/co
 - Edit: `data/audio/AudioResolver.kt` and test `data/audio/AudioResolverTest.kt`
 - Edit: `presentation/sayit/SayItViewModel.kt` and test `presentation/sayit/SayItViewModelTest.kt`
 - Edit: `presentation/sayit/SayItScreen.kt` (top bar hearts and the Next button only)
+- Add: `app/src/main/assets/audio/vo/tutor/<name>.wav`, only the approved carrier clips from the pre-step
+
+## Pre-step: copy approved tutor fragments
+1. Read `docs/audio-review/listening_checklist.csv` (columns `file`, `type`, `listen_for`, `OK_or_FIX`, `note`).
+2. If any row with `type` = `carrier` has a blank `OK_or_FIX`, stop. Write this question to `docs/tasks/QUESTIONS.md`: "Listening checklist not complete. Which carrier clips are approved?" Do not continue with the card.
+3. Otherwise, for every row where `type` is `carrier` and `OK_or_FIX` is `OK`, copy `docs/audio-review/<file>` into `app/src/main/assets/audio/vo/tutor/`, keeping the file name (`fragments/car_your_turn.wav` becomes `app/src/main/assets/audio/vo/tutor/car_your_turn.wav`). Create the folder if it doesn't exist.
+4. Copy only `carrier` rows. Do not copy `phoneme`, `keyword`, or `voice` clips. Do not copy carrier rows marked `FIX`.
+
+A clip marked `FIX` stays out of the app. `AudioPlayer` skips a missing asset (it calls `onComplete`), so its sequence still plays the model clip.
 
 ## Changes
 1. `TutorPolicy.kt`:

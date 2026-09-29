@@ -58,5 +58,5 @@ The `Status:` line in each card is the source of truth; this table is a snapshot
 | 00 | done | CI pending |
 | 01 | done | CI pending |
 | 02 | done | CI pending |
-| 03 | ready | Adds no audio; tutor clips come after the listening checklist |
+| 03 | ready | Pre-step copies approved carrier clips; stops if the listening checklist has blank carrier rows |
 | 04 | ready | Run in a new session after 03 is committed |
