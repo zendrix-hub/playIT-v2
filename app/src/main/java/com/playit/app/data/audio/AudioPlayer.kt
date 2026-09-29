@@ -233,6 +233,17 @@ class AudioPlayer @Inject constructor(
         }
 
         val currentPath = paths[index]
+
+        if (currentPath.startsWith("PAUSE_")) {
+            val pauseMs = currentPath.removePrefix("PAUSE_").toLongOrNull() ?: 500L
+            mainHandler.postDelayed({
+                if (isSequencePlaying) {
+                    playNextInSequence(paths, index + 1, onComplete)
+                }
+            }, pauseMs)
+            return
+        }
+
         val isSfx = currentPath.contains("/sfx_") || currentPath.startsWith("audio/ui/sfx_")
 
         if (isSfx && index + 1 < paths.size) {

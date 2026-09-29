@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.playit.app.data.audio.AudioPlayer
 import com.playit.app.data.audio.AudioResolver
 import com.playit.app.data.audio.VoContext
+import com.playit.app.domain.manager.HearItSequenceBuilder
 import com.playit.app.domain.model.Phoneme
 import com.playit.app.domain.repository.PhonemeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -65,12 +66,15 @@ class HearItViewModel @Inject constructor(
 
     fun playIntroThenPhonemeSound() {
         audioPlayer.stop()
-        _isPlaying.value = false
+        val letter = _phoneme.value?.letter ?: "m"
+        val word = _phoneme.value?.exampleWord ?: ""
+        val sequence = HearItSequenceBuilder.build(letter = letter, keyWord = word)
         _isPlayingPrompt.value = true
-        val introVo = audioResolver.getVoPath(VoContext.HEARIT_INTRO_01)
-        audioPlayer.playAssetAudio(introVo) {
+        _isPlaying.value = true
+        _playCount.value++
+        audioPlayer.playSequence(sequence) {
             _isPlayingPrompt.value = false
-            playPhonemeSound()
+            _isPlaying.value = false
         }
     }
 
@@ -80,12 +84,13 @@ class HearItViewModel @Inject constructor(
 
     fun playPhonemeSound() {
         audioPlayer.stop()
-        _isPlayingPrompt.value = false
         val letter = _phoneme.value?.letter ?: "m"
-        val path = audioResolver.getPhonemePath(letter) ?: _phoneme.value?.audioPath ?: "audio/phonemes/phoneme_m.mp3"
+        val word = _phoneme.value?.exampleWord ?: ""
+        val replaySequence = HearItSequenceBuilder.buildReplay(letter = letter, keyWord = word)
+        _isPlayingPrompt.value = false
         _isPlaying.value = true
         _playCount.value++
-        audioPlayer.playAssetAudio(path) {
+        audioPlayer.playSequence(replaySequence) {
             _isPlaying.value = false
         }
     }
