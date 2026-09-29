@@ -256,5 +256,5 @@ Each card ticks its own item in its commit (see `docs/tasks/AGY_RUNBOOK.md`). A 
 - [x] Card 00: Agent rules, precedence, housekeeping
 - [x] Card 01: Speech judge returns error types; stop accepting letter names and added vowels (NFR-ASR-01)
 - [x] Card 02: Scope the Vosk grammar to each letter's foils; carry the error type into Say It state (NFR-ASR-01, FR-03)
-- [ ] Card 03: Tutor policy: prompt ladder, no hearts in Say It, corrective audio (FR-03)
-- [ ] Card 04: Hear It modeling sequence (I do) (FR-02)
+- [x] Card 03: Tutor policy: prompt ladder, no hearts in Say It, corrective audio (FR-03)
+- [x] Card 04: Hear It modeling sequence (I do) (FR-02)
