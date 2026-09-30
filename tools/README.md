@@ -13,7 +13,7 @@ tools/
 ├── mcp servers.png           # Reference: Awesome MCP Servers (92K stars)
 ├── tool 1.png                # Reference: AI Media, Audio & Video Generation Suite
 ├── README.md                 # This guide
-├── audio/                    # Kokoro-82M audio pipeline (playit_audio.ipynb for Colab, kokoro_local.py)
+├── audio/                    # Kokoro-82M audio pipeline (kokoro_local.py, voice_candidates.py; playit_audio.ipynb as the Colab backup)
 ├── dictionary_validator.py   # Phonics Curriculum & CVC Discovery via Public APIs
 └── asset_pipeline_optimizer.py # Alpha Background Removal & 4-Benchmark Outline Styler
 ```
@@ -48,7 +48,7 @@ tools/
 
 ### A. Voice Studio (archived: `docs/archive/tools/elevenlabs_voice_studio.py`)
 
-> Superseded for audio by `docs/specs/hear-say-refactor.md` §2.3 (Kokoro, Sep 2026). The current pipeline is `tools/audio/playit_audio.ipynb`. The archived script is kept for reference only.
+> Superseded for audio by `docs/specs/hear-say-refactor.md` §2.3 (Kokoro, Sep 2026). The current pipeline is `tools/audio/kokoro_local.py` (run locally), with `tools/audio/playit_audio.ipynb` as the Colab backup. The archived script is kept for reference only.
 
 ```bash
 # 1. Synthesize using the natural Filipina English Neural Voice (Free, no API key required)
@@ -89,4 +89,4 @@ python tools/asset_pipeline_optimizer.py --input raw_character.png --out app/src
 
 ### D. Automated CI/CD (GitHub Actions)
 
-Located in [`.github/workflows/android_ci.yml`](../.github/workflows/android_ci.yml), this workflow automatically runs unit tests and compiles the fresh debug APK on every commit to `main`.
+Located in [`.github/workflows/android_ci.yml`](../.github/workflows/android_ci.yml), this workflow runs the unit tests and compiles a debug APK on every push to `main` and on every pull request to `main` (including each push to a branch with an open PR).

@@ -3,11 +3,14 @@
 AGENTS.md links here. Follow this for every card in `docs/tasks/`.
 
 ## Roles
-- agy implements cards, one per session.
-- Claude in WSL critiques each card before agy runs it, and reviews the diff after.
-- The Claude chat (capstone validator) writes cards and gives final acceptance.
-- GitHub CI is the test gate: `.github/workflows/android_ci.yml` runs `./gradlew testDebugUnitTest` on the draft PR from `refactor/hear-say-it` to `main`. It does not run on branch pushes alone.
-- The user pushes. agy never pushes.
+| Who | Does | Commits | Pushes |
+|---|---|---|---|
+| Claude (in WSL) | Specs, architecture, research, task cards, card critique, review of every agy commit, fix cards, evidence log. Owns the audio pipeline and runs it locally; review audio stays outside the repo. Gives technical acceptance. | Docs and `tools/` only, never app code | Its own commits |
+| agy | Implements one `ready` card per session | App code, tests, bookkeeping | Its own commits |
+| User | Starts agy sessions, asks Claude to pull and review, approves audio with a teacher, answers `QUESTIONS.md`, opens and merges the PR, gives final approval on [proposed] items with the adviser, gives the go signal for new cards | None | None |
+| GitHub CI | Test gate: `.github/workflows/android_ci.yml` runs `./gradlew testDebugUnitTest` on the draft PR from `refactor/hear-say-it` to `main`, and again on every push to the branch while the PR is open | None | None |
+
+Push rules for Claude and agy: push only to `origin refactor/hear-say-it`. Never push to `main`, never force-push, never rewrite pushed history.
 
 ## Session start
 1. Read AGENTS.md, docs/tasks/README.md, and the spec sections the card cites.
@@ -34,8 +37,7 @@ Make one commit per card, on `refactor/hear-say-it`. Include all of these in it:
    Tests run: local | CI only
    Decisions used: <list, or none>
    ```
-
-Never push.
+5. Push: `git push origin refactor/hear-say-it`. Then report the commit hash and subject so the user can ask Claude to review.
 
 ## Self-check before committing
 Cards 03 and 04 were first committed without most of these (see the evidence log rows "03 (fix)" and "04 (fix)"). Check every line before you run `git commit`:
@@ -49,15 +51,21 @@ Cards 03 and 04 were first committed without most of these (see the evidence log
 ## Audio gate
 Audio goes into `app/src/main/assets/` only when a card says so and only for rows marked `OK` in `docs/audio-review/listening_checklist.csv`. A blank `OK_or_FIX` cell means not approved. If a card needs audio that is not approved, write the code so a missing clip is skipped (`AudioPlayer` already does this), add no audio, and note it in the commit body.
 
+## Review and fix cards
+After agy pushes, the user asks Claude to pull and review. Claude checks the commit against the card, the spec, and the self-check above, and reads the CI result on the PR.
+- No findings: Claude sets the card to `Status: accepted` and fills in the evidence-log row (hash, CI run, review result).
+- Findings: Claude writes a fix card named after the card with a letter, e.g. `card-03b-tutor-policy-fixes.md`, with `Status: ready`. agy runs it like any other card. The original card stays `done` until its fix card is accepted.
+- A new card starts only after the previous one is accepted and the user gives the go signal.
+
 ## Stop and ask
-Write the question to `docs/tasks/QUESTIONS.md` (card, question, what you found, options), leave your changes uncommitted, and stop when:
+Write the question to `docs/tasks/QUESTIONS.md` (card, question, what you found, options). Commit and push only that file (`docs(tasks): question on card NN`), so Claude sees it on the next pull. Leave the card's other changes uncommitted, and stop. Do this when:
 - a [confirm] or [proposed] item isn't covered by the Decisions in AGENTS.md;
 - the card needs a file it doesn't list;
 - a test fails twice;
 - the card conflicts with the spec.
 
 ## Never
-- Push.
+- Push to `main`, force-push, or push another branch.
 - Edit `docs/specs/` unless a card says so.
 - Add or replace audio in `app/src/main/assets/` unless a card says so.
 - Use emojis in UI text.
@@ -73,4 +81,4 @@ The `Status:` line in each card is the source of truth; this table is a snapshot
 | 03 | done | CI pending. Tutor clips await the listening checklist; they are not approved for `assets/` yet |
 | 04 | done | CI pending |
 
-No card is ready. Cards 05 onward are proposals in `docs/proposals/2026-09-29-next-cards-and-story-hook.md` until they are written as cards and critiqued.
+No card is ready. Cards 00 to 04 become `accepted` after the first CI run on the PR and Claude's review. Cards 05 onward are proposals in `docs/proposals/2026-09-29-next-cards-and-story-hook.md` until they are written as cards and critiqued.

@@ -1,15 +1,18 @@
 # Task cards for the Hear It / Say It refactor
 
-Each card is one agent session. Work top to bottom. Do not start a card until the previous one is committed and reviewed.
+Each card is one agent session. Work top to bottom. Do not start a card until the previous one is accepted and the user gives the go signal. Claude writes and reviews the cards; agy implements them (roles: `AGY_RUNBOOK.md`).
 
 Every card has a `Status:` line under its title:
 
 | Status | Meaning |
 |---|---|
 | draft | Written, not yet critiqued. Do not run. |
-| critiqued | Claude in WSL has critiqued it; fixes or acceptance pending. Do not run. |
+| critiqued | Claude has critiqued it; fixes pending. Do not run. |
 | ready | Critique addressed; agy may run it. |
-| done | agy has committed it. CI and phone results are tracked in `docs/evidence-log.md`. |
+| done | agy has committed and pushed it. Waiting for Claude's review and CI. |
+| accepted | Claude reviewed it with no open findings and CI passed. CI and phone results are in `docs/evidence-log.md`. |
+
+Fix cards: when a review finds problems, Claude writes a fix card named after the card with a letter, e.g. `card-03b-tutor-policy-fixes.md`. It runs like any other card. The original card becomes `accepted` when its fix card is accepted.
 
 | Card | Goal | Requirement |
 |---|---|---|
@@ -23,4 +26,4 @@ How to run a card with the agent: agy follows `docs/tasks/AGY_RUNBOOK.md`. Start
 
 > Follow docs/tasks/AGY_RUNBOOK.md.
 
-Definition of done for every card: listed tests exist; the full unit test suite passes locally, or the commit body says "Unit tests not run locally; verify in CI" and CI passes; the card's item in `docs/engineering-package/13_MASTER_TASKS.md` is ticked; the card says `Status: done`; `docs/evidence-log.md` has its row; no files changed outside the card's list and those bookkeeping files; one commit.
+Definition of done for every card (agy's part): listed tests exist; the full unit test suite passes locally, or the commit body says "Unit tests not run locally; verify in CI" and CI passes; the card's item in `docs/engineering-package/13_MASTER_TASKS.md` is ticked; the card says `Status: done`; `docs/evidence-log.md` has its row; no files changed outside the card's list and those bookkeeping files; one commit, pushed to `refactor/hear-say-it`.

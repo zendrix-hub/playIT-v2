@@ -17,5 +17,7 @@ One row per code commit. agy adds a row with each card (CI pending, phone test p
 | — (bookkeeping) | None: ticked cards 03 and 04 in a separate commit instead of each card's own commit | — | 8f11cb3 | pending | pending |
 | 03 (fix) | Review of 467d52c: third miss shown as Correct, no canContinue gate, corrections missing INCORRECT_POP, four card tests missing; tutor clips copied although the listening checklist was blank | FR-03 | c06e8a3 | pending | pending |
 | 04 (fix) | Review of 68887ab: builder hardcoded asset paths in domain, blank key word not dropped, ear-button replay included "say it with me", no pauseMillis, unlisted JSON asset | FR-02 | d79bd68 | pending | pending |
-| — (runbook) | None: self-check before committing, audio gate, queue update, fix-commit hashes | — | docs(tasks): runbook self-check and audio gate after cards 03-04 review | pending | pending |
-| 03 (audio) | The 14 tutor clips from 467d52c were never approved (listening checklist blank), so they leave the app until the checklist marks them OK | FR-03 | chore(audio): remove unapproved tutor clips (FR-03) | pending | pending |
+| — (runbook) | None: self-check before committing, audio gate, queue update, fix-commit hashes | — | ebfdfe1 | pending | pending |
+| 03 (audio) | The 14 tutor clips from 467d52c were never approved (listening checklist blank), so they leave the app until the checklist marks them OK | FR-03 | 6e07d19 | pending | pending |
+| — (tools) | None: voice candidates script and 8 notebook candidates; the review batch stays outside the repo | NFR-AUD-01 | 2882507 | pending | n/a |
+| — (roles) | None: Sep 30 working agreement (Claude designs and reviews, agy implements and pushes, Claude runs the audio pipeline locally) | — | docs(agents): working agreement, agy pushes, Claude owns local audio pipeline | pending | n/a |

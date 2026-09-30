@@ -1,5 +1,7 @@
 # playIT handoff: Sep 28, 2026
 
+> Historical (Sep 28). Roles, card authorship and pushing now follow `docs/tasks/AGY_RUNBOOK.md` (Sep 30 working agreement).
+
 Two folders:
 - **audio_review/**: for listening at home. It does not go into the repo yet.
 - **repo_drop/**: copy into the repo tomorrow. It holds agy's task cards, the spike report, and the audio pipeline script.

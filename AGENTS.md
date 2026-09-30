@@ -40,13 +40,18 @@ Decisions
 - Say It never removes hearts (spec default). Letter names and added vowels are foils and are never accepted.
 - Say It judge targets: at least 80% agreement with teachers; false rejects at most 15% of teacher-correct attempts (spec defaults).
 - Say It is hybrid: the echo step stays in word mode ("mouse"); the recall check uses the pure sound only if the Vosk spike passes (`docs/spikes/vosk-foil-spike.md`).
-- Audio source is Kokoro-82M (Apache-2.0), run in Google Colab via `tools/audio/playit_audio.ipynb`. Claude writes and audits the pipeline; it does not generate or edit audio files. Only released clips are copied into `app/src/main/assets/audio/`.
+- Audio source is Kokoro-82M (Apache-2.0). Claude owns the pipeline and runs it locally in WSL (`tools/audio/kokoro_local.py`, `tools/audio/voice_candidates.py`); `tools/audio/playit_audio.ipynb` is the Colab backup and is kept in step with them. Review batches live outside the repo (`Documents/playIT-audio-batches/`). Only clips the user and a teacher mark OK in the listening checklist go into `app/src/main/assets/audio/`, and only through an agy card.
+
+Roles (details in `docs/tasks/AGY_RUNBOOK.md`)
+- Claude (in WSL) designs, researches, writes and critiques task cards, reviews every agy commit, writes fix cards, and gives technical acceptance. It commits only docs and `tools/`, never app code.
+- agy implements one ready card per session, commits, and pushes.
+- The user starts agy sessions, approves audio with a teacher, answers `docs/tasks/QUESTIONS.md`, merges the PR, and gives final approval on [proposed] items with the adviser.
 
 Workflow
 - One refactor step per session: work from one `docs/tasks/card-NN-*.md`. Change only the files the card lists, plus the bookkeeping files named in `docs/tasks/AGY_RUNBOOK.md` (`13_MASTER_TASKS.md`, `docs/evidence-log.md`, the card's `Status:` line).
 - Every card ticks its own item under "Hear It / Say It refactor" in `docs/engineering-package/13_MASTER_TASKS.md`, in the card's commit.
 - Every change adds or updates a unit test; run `./gradlew testDebugUnitTest` before committing. If there is no JDK or Android SDK, don't claim the tests pass: write "Unit tests not run locally; verify in CI" in the commit body. CI on the draft PR to `main` is the test gate.
-- The app is offline only: no network calls. The offline rule applies to the app, not the Colab notebook.
-- After each step, commit on `refactor/hear-say-it`, one commit per card (the commit body format is in the runbook). Every commit message includes the requirement ID if the card has one. Never push; the user pushes.
+- The app is offline only: no network calls. The offline rule applies to the app, not to the audio pipeline in `tools/audio/`.
+- After each step, commit on `refactor/hear-say-it`, one commit per card (the commit body format is in the runbook). Every commit message includes the requirement ID if the card has one. Push your commits to `origin refactor/hear-say-it`; never push to `main`, never force-push.
 
 For how to execute task cards, follow `docs/tasks/AGY_RUNBOOK.md`.
