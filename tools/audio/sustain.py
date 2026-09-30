@@ -98,3 +98,89 @@ def describe(y, sr, fmin=75, fmax=500):
     swell_db = rms_db.max() - np.median(rms_db[active][:5]) if active.any() else 0
     return (f"voiced {100 * len(v) / max(1, len(f0)):.0f}%, f0 {np.median(v) if len(v) else 0:.0f} Hz, "
             f"range {np.ptp(v) if len(v) else 0:.0f} Hz, swell {swell_db:.0f} dB")
+
+def noise_lengthen(seg, sr, factor, win_ms=40, keep_onset_ms=15, seed=0):
+    """Lengthens a voiceless fricative (/f s sh/) by overlap-adding random Hann windows taken
+    from its steady middle (PSOLA leaves voiceless stretches unchanged). Keeps the first
+    keep_onset_ms as is, so the onset still sounds like the original."""
+    rng = np.random.default_rng(seed)
+    seg = np.asarray(seg, dtype=np.float32)
+    target = int(len(seg) * factor)
+    n_on = min(int(keep_onset_ms / 1000 * sr), len(seg) // 3)
+    w = int(win_ms / 1000 * sr); hop = w // 2
+    lo, hi = int(0.2 * len(seg)), int(0.8 * len(seg)) - w
+    if hi <= lo:
+        return seg
+    body_len = max(0, target - n_on)
+    out = np.zeros(body_len + w, dtype=np.float32)
+    win = np.hanning(w).astype(np.float32)
+    for pos in range(0, body_len, hop):
+        a = rng.integers(lo, hi)
+        out[pos:pos + w] += seg[a:a + w] * win
+    rms_src = np.sqrt(np.mean(seg[lo:hi + w] ** 2)) + 1e-9
+    out = out[:body_len] * (rms_src / (np.sqrt(np.mean(out[:body_len] ** 2)) + 1e-9))
+    return np.concatenate([seg[:n_on], out])
+
+def slow_word(y, sr, factor, fricative_gain_db=0.0, fmin=75, fmax=500):
+    """Slows a word while keeping voiceless edges in proportion: the voiceless start and end
+    (e.g. /f/ and /sh/ of "fish") are noise-lengthened, the voiced middle is PSOLA-lengthened.
+    Stretching only the vowel makes a short /f/ sound like /v/ ("vish", 2026-09-30 review)."""
+    y = np.asarray(y, dtype=np.float32)
+    idx = np.where(np.abs(y) > 0.02 * np.max(np.abs(y)))[0]   # trim silence first, or it gets
+    y = y[idx[0]:idx[-1] + 1] if len(idx) else y              # stretched as part of the /f/
+    s = _snd(y, sr)
+    pitch = s.to_pitch_ac(time_step=0.005, pitch_floor=fmin, pitch_ceiling=fmax)
+    t, f0 = pitch.xs(), pitch.selected_array["frequency"]
+    voiced = np.where(f0 > 0)[0]
+    if len(voiced) == 0:
+        return y
+    a, b = int(t[voiced[0]] * sr), int(t[voiced[-1]] * sr)
+    head, mid, tail = y[:a], y[a:b], y[b:]
+    g = 10 ** (fricative_gain_db / 20)
+    mid_long = np.asarray(call(_snd(mid, sr), "Lengthen (overlap-add)", fmin, fmax, factor).values[0], dtype=np.float32)
+    parts = [noise_lengthen(head, sr, factor) * g if len(head) > sr * 0.03 else head * g, mid_long,
+             noise_lengthen(tail, sr, factor, keep_onset_ms=5) if len(tail) > sr * 0.03 else tail]
+    x = int(0.005 * sr)   # 5 ms crossfades between the pieces
+    out = parts[0]
+    for p in parts[1:]:
+        if len(out) > x and len(p) > x:
+            ramp = np.linspace(0, 1, x, dtype=np.float32)
+            out = np.concatenate([out[:-x], out[-x:] * (1 - ramp) + p[:x] * ramp, p[x:]])
+        else:
+            out = np.concatenate([out, p])
+    return out
+
+def voiceless_runs(y, sr, min_ms=20, fmin=75, fmax=500):
+    """(start, end) sample ranges where the clip is noisy but unvoiced (fricatives)."""
+    y = np.asarray(y, dtype=np.float32)
+    p = _snd(y, sr).to_pitch_ac(time_step=0.005, pitch_floor=fmin, pitch_ceiling=fmax)
+    fr = int(0.005 * sr); peak = np.max(np.abs(y)); runs, cur = [], None
+    for tt, f in zip(p.xs(), p.selected_array["frequency"]):
+        a = int(tt * sr)
+        noisy = f == 0 and np.sqrt(np.mean(y[max(0, a - fr):a + fr] ** 2)) > 0.02 * peak
+        if noisy and cur is None:
+            cur = a
+        if not noisy and cur is not None:
+            runs.append((cur, a)); cur = None
+    if cur is not None:
+        runs.append((cur, len(y)))
+    return [(a, b) for a, b in runs if (b - a) > min_ms / 1000 * sr]
+
+def splice_onset(word, fric, sr, fric_ms, gain_db=0.0, xfade_ms=8):
+    """Cross-splices a voiceless fricative in front of a word whose own onset is too weak
+    (Kokoro's "fish" is voiced from its first 2 ms, heard as "vish"). fric is the donor
+    fricative (e.g. the final /f/ of "leaf"); its steady middle is used for fric_ms."""
+    fric = np.asarray(fric, dtype=np.float32)
+    n = int(fric_ms / 1000 * sr)
+    if len(fric) < n:
+        fric = noise_lengthen(fric, sr, n / len(fric) + 0.01, keep_onset_ms=0)
+    mid = (len(fric) - n) // 2
+    f = fric[mid:mid + n] * 10 ** (gain_db / 20)
+    ramp_in = int(0.012 * sr)
+    f[:ramp_in] *= np.linspace(0, 1, ramp_in, dtype=np.float32)   # soft fricative onset
+    w = np.asarray(word, dtype=np.float32)
+    idx = np.where(np.abs(w) > 0.02 * np.max(np.abs(w)))[0]
+    w = w[idx[0]:idx[-1] + 1]
+    x = int(xfade_ms / 1000 * sr)
+    ramp = np.linspace(0, 1, x, dtype=np.float32)
+    return np.concatenate([f[:-x], f[-x:] * (1 - ramp) + w[:x] * ramp, w[x:]])
