@@ -70,15 +70,15 @@ Write the question to `docs/tasks/QUESTIONS.md` (card, question, what you found,
 - Add or replace audio in `app/src/main/assets/` unless a card says so.
 - Use emojis in UI text.
 
-## Current queue (2026-09-30)
+## Current queue (2026-09-30, after CI)
 The `Status:` line in each card is the source of truth; this table is a snapshot.
 
 | Card | Status | Note |
 |---|---|---|
-| 00 | done | CI pending |
-| 01 | done | CI pending |
-| 02 | done | CI pending |
-| 03 | done | CI pending. Tutor clips await the listening checklist; they are not approved for `assets/` yet |
-| 04 | done | CI pending |
+| 00 | accepted | CI green (draft PR #2) |
+| 01 | accepted | CI green; phone test pending |
+| 02 | accepted | CI green; phone test pending |
+| 03 | accepted | CI green; phone test pending. The tutor-script proposal (docs/proposals/2026-09-30-tutor-script.md) will need a fix card 03b once the user approves the script; it also covers the third-miss banner, which still says "Let's try again" |
+| 04 | accepted | CI green; phone test pending |
 
-No card is ready. Cards 00 to 04 become `accepted` after the first CI run on the PR and Claude's review. Cards 05 onward are proposals in `docs/proposals/2026-09-29-next-cards-and-story-hook.md` until they are written as cards and critiqued.
+No card is ready. Cards 05 onward are proposals in `docs/proposals/2026-09-29-next-cards-and-story-hook.md` and wait for the user's go signal.

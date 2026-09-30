@@ -1,6 +1,6 @@
 # Card 02: Scope the grammar and carry the error type (NFR-ASR-01, FR-03)
 
-Status: done
+Status: accepted
 
 ## Why
 Say It builds its Vosk grammar from the accepted list plus six unrelated decoys (cat, dog, sun, ball, yes, no). Near-misses such as "ma" have nowhere to land except the target, which inflates false accepts. Using each letter's foils lets Vosk report the actual error.
