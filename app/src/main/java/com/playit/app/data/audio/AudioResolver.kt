@@ -93,7 +93,6 @@ class AudioResolver @Inject constructor() {
      */
     fun getTutorPath(id: String): String = "audio/vo/tutor/$id.wav"
 
-
     /**
      * Rotates between vo_correct_01 and vo_correct_02.
      */

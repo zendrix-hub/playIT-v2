@@ -12,3 +12,7 @@ One row per code commit. agy adds a row with each card (CI pending, phone test p
 | 01 (fix) | Vosk cannot confirm a pure sound, so held letter names could pass the 400 ms rule (spec §3.3, risk R2; vosk-foil-spike.md) | NFR-ASR-01 | a43237d | pending | pending |
 | — (runbook) | None: workflow docs (agy runbook, card status, evidence log, questions file) | — | f70620a | pending | pending |
 | 03, 04 (critique) | None: review of cards 03 and 04 before agy runs them | FR-03, FR-02 | 45ff484 | pending | pending |
+| 03 | Say It removed a heart on every miss and played a generic "try again"; a child alone never heard how to fix the error (spec §3.2 Table 7, §6.3) | FR-03 | 467d52c | pending | pending |
+| 04 | Hear It played an intro and the sound once; the I-do step models the sound three times, the key word, and the sound again (spec §2.1 Table 3) | FR-02 | 68887ab | pending | pending |
+| — (bookkeeping) | None: ticked cards 03 and 04 in a separate commit instead of each card's own commit | — | 8f11cb3 | pending | pending |
+| 03 (fix) | Review of 467d52c: third miss shown as Correct, no canContinue gate, corrections missing INCORRECT_POP, four card tests missing; tutor clips copied although the listening checklist was blank | FR-03 | fix(sayit): card 03 review fixes, canContinue gate and missing tests (FR-03) | pending | pending |

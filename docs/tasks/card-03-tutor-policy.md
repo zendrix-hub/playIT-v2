@@ -1,6 +1,6 @@
 # Card 03: Tutor policy, prompt ladder, no hearts in Say It (FR-03)
 
-Status: ready
+Status: done
 
 ## Why
 The adviser requires the lesson to work with no adult present. Today a wrong Say It attempt removes a heart and plays a generic "try again". A child alone gets punished for recognizer mistakes and never hears how to fix the error. The prompt ladder in spec §3.2 (Table 7) and the state machine in §6.3 replace this.

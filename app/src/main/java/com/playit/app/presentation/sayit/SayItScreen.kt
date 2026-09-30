@@ -84,7 +84,7 @@ fun SayItScreen(
     val phoneme by viewModel.phoneme.collectAsStateWithLifecycle()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isModelInitializing by viewModel.isModelInitializing.collectAsStateWithLifecycle()
-    val hearts by viewModel.hearts.collectAsStateWithLifecycle()
+    val canContinue by viewModel.canContinue.collectAsStateWithLifecycle()
     val attempts by viewModel.attempts.collectAsStateWithLifecycle()
     val audioAmplitude by viewModel.audioAmplitude.collectAsStateWithLifecycle()
     val isNoisyEnvironment by viewModel.isNoisyEnvironment.collectAsStateWithLifecycle()
@@ -425,8 +425,8 @@ fun SayItScreen(
             Box(modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 24.dp, vertical = 12.dp)) {
                 GummyButton(
                     text = "Next: Find It",
-                    onClick = { if (state is SayItState.Correct) onNext(phoneme?.id?.toString() ?: "1") },
-                    enabled = state is SayItState.Correct,
+                    onClick = { if (canContinue) onNext(phoneme?.id?.toString() ?: "1") },
+                    enabled = canContinue,
                     backgroundColor = EmeraldLeaf,
                     shadowColor = EmeraldLeafShadow,
                     contentColor = Color.White,

@@ -42,6 +42,11 @@ class AudioResolverTest {
     }
 
     @Test
+    fun getTutorPath_returnsWavInTutorFolder() {
+        assertEquals("audio/vo/tutor/car_your_turn.wav", audioResolver.getTutorPath("car_your_turn"))
+    }
+
+    @Test
     fun getSfxPath_returnsCorrectPaths() {
         assertEquals("audio/ui/sfx_correct_chime.mp3", audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME))
         assertEquals("audio/ui/sfx_incorrect_pop.mp3", audioResolver.getSfxPath(SfxEvent.INCORRECT_POP))

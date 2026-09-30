@@ -69,13 +69,15 @@ class SayItViewModel @Inject constructor(
     private val _hearts = MutableStateFlow(heartManager.currentHearts)
     val hearts: StateFlow<Int> = _hearts.asStateFlow()
 
-    internal var tutorPolicy: TutorPolicy = TutorPolicy()
+    private val tutorPolicy = TutorPolicy()
+    private var attemptNumber = 0
 
     private val _tutorAction = MutableStateFlow<TutorAction?>(null)
     val tutorAction: StateFlow<TutorAction?> = _tutorAction.asStateFlow()
 
-    internal var attemptNumber: Int = 1
-        private set
+    /** True after praise or lead-and-move-on: no more scored attempts until the phoneme reloads. */
+    private val _canContinue = MutableStateFlow(false)
+    val canContinue: StateFlow<Boolean> = _canContinue.asStateFlow()
 
     private val _attempts = MutableStateFlow<List<Boolean>>(emptyList())
     val attempts: StateFlow<List<Boolean>> = _attempts.asStateFlow()
@@ -104,8 +106,9 @@ class SayItViewModel @Inject constructor(
     private fun loadPhoneme() {
         val id = phonemeIdArg?.toIntOrNull() ?: 1
         viewModelScope.launch {
-            attemptNumber = 1
+            attemptNumber = 0
             _tutorAction.value = null
+            _canContinue.value = false
             val p = phonemeRepository.getPhonemeById(id)
             if (p == null) {
                 _loadError.value = true
@@ -247,6 +250,7 @@ class SayItViewModel @Inject constructor(
 
     fun startListening() {
         if (_state.value is SayItState.Listening) return
+        if (_canContinue.value) return
 
         // Instantly silence any voiceover or phoneme audio so it never bleeds into the mic
         audioPlayer.stop()
@@ -310,6 +314,7 @@ class SayItViewModel @Inject constructor(
     }
 
     fun evaluateSpeech(transcript: String) {
+        attemptNumber++
         autoStopJob?.cancel()
         _audioAmplitude.value = 0f
         val targetWord = _targetWord.value
@@ -324,7 +329,20 @@ class SayItViewModel @Inject constructor(
 
         _attempts.value = _attempts.value + isCorrect
 
-        val modelClip = if (isWordMode && targetWord != null) {
+        viewModelScope.launch {
+            sayItAttemptRepository.saveAttempt(profileId, phonemeId, isCorrect)
+        }
+
+        if (isCorrect) {
+            _state.value = SayItState.Correct(transcript.ifBlank { targetWord ?: letter })
+        } else {
+            _state.value = SayItState.Incorrect(
+                transcript = transcript.ifBlank { "Try again!" },
+                errorType = judgement.errorType
+            )
+        }
+
+        val model = if (targetWord != null) {
             audioResolver.getWordPath(targetWord)
         } else {
             audioResolver.getPhonemePath(letter)
@@ -332,47 +350,40 @@ class SayItViewModel @Inject constructor(
 
         when (action) {
             is TutorAction.Praise -> {
-                viewModelScope.launch {
-                    sayItAttemptRepository.saveAttempt(profileId, phonemeId, true)
-                }
-                _state.value = SayItState.Correct(transcript.ifBlank { targetWord ?: letter })
                 val sfx = audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME)
                 val vo = audioResolver.getRotatingCorrectVo()
                 audioPlayer.playSequence(listOf(sfx, vo))
+                _canContinue.value = true
             }
             is TutorAction.Correct -> {
-                attemptNumber++
-                viewModelScope.launch {
-                    sayItAttemptRepository.saveAttempt(profileId, phonemeId, false)
-                }
-                _state.value = SayItState.Incorrect(
-                    transcript = transcript.ifBlank { "Try again!" },
-                    errorType = judgement.errorType
-                )
-                if (action.supportLevel == 1) {
-                    val fragmentId = when (action.errorType) {
+                val opener = if (action.supportLevel == 1) {
+                    when (action.errorType) {
                         SpeechErrorType.LETTER_NAME -> "fb_letter_name"
                         SpeechErrorType.ADDED_VOWEL -> "fb_added_vowel"
                         else -> "fb_listen_again"
                     }
-                    val fragmentPath = audioResolver.getTutorPath(fragmentId)
-                    val yourTurnPath = audioResolver.getTutorPath("car_your_turn")
-                    audioPlayer.playSequence(listOf(fragmentPath, modelClip, yourTurnPath))
                 } else {
-                    val watchLipsPath = audioResolver.getTutorPath("car_watch_my_lips")
-                    val yourTurnPath = audioResolver.getTutorPath("car_your_turn")
-                    audioPlayer.playSequence(listOf(watchLipsPath, modelClip, yourTurnPath))
+                    "car_watch_my_lips"
                 }
+                audioPlayer.playSequence(
+                    listOf(
+                        audioResolver.getSfxPath(SfxEvent.INCORRECT_POP),
+                        audioResolver.getTutorPath(opener),
+                        model,
+                        audioResolver.getTutorPath("car_your_turn")
+                    )
+                )
             }
             is TutorAction.LeadAndMoveOn -> {
-                viewModelScope.launch {
-                    sayItAttemptRepository.saveAttempt(profileId, phonemeId, false)
-                    // TODO(card-06): mark NEEDS_PRACTICE
-                }
-                _state.value = SayItState.Correct(transcript.ifBlank { targetWord ?: letter })
-                val togetherPath = audioResolver.getTutorPath("car_lets_say_together")
-                val tryLaterPath = audioResolver.getTutorPath("fb_try_later")
-                audioPlayer.playSequence(listOf(togetherPath, modelClip, tryLaterPath))
+                // TODO(FR-NEW-REC): mark the letter NEEDS_PRACTICE and queue a recall check
+                audioPlayer.playSequence(
+                    listOf(
+                        audioResolver.getTutorPath("car_lets_say_together"),
+                        model,
+                        audioResolver.getTutorPath("fb_try_later")
+                    )
+                )
+                _canContinue.value = true
             }
         }
     }
