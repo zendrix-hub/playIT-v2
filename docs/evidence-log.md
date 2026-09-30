@@ -21,4 +21,5 @@ One row per code commit. agy adds a row with each card (CI pending, phone test p
 | 03 (audio) | The 14 tutor clips from 467d52c were never approved (listening checklist blank), so they leave the app until the checklist marks them OK | FR-03 | 6e07d19 | pending | pending |
 | — (tools) | None: voice candidates script and 8 notebook candidates; the review batch stays outside the repo | NFR-AUD-01 | 2882507 | pending | n/a |
 | — (roles) | None: Sep 30 working agreement (Claude designs and reviews, agy implements and pushes, Claude runs the audio pipeline locally) | — | 87fda9f | pending | n/a |
-| — (tools) | None: round 2 voice candidates (6 more US voices, 3 heart/bella mixes) and a shared review page with in-page answers and CSV export | NFR-AUD-01 | feat(tools): review page with in-page answers; round 2 voice candidates (NFR-AUD-01) | pending | n/a |
+| — (tools) | None: round 2 voice candidates (6 more US voices, 3 heart/bella mixes) and a shared review page with in-page answers and CSV export | NFR-AUD-01 | c333902 | pending | n/a |
+| — (tools, proposal) | None: chosen voice heart 70 / bella 30 (round 2 review), held-sound lab for /m/, and a tutor-script draft built on spec §2.3 and §3.2 | NFR-AUD-01, FR-02, FR-03 | feat(tools): audio lab and tutor-script draft in the chosen voice (NFR-AUD-01) | pending | n/a |
