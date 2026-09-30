@@ -37,6 +37,18 @@ Make one commit per card, on `refactor/hear-say-it`. Include all of these in it:
 
 Never push.
 
+## Self-check before committing
+Cards 03 and 04 were first committed without most of these (see the evidence log rows "03 (fix)" and "04 (fix)"). Check every line before you run `git commit`:
+- [ ] Every test named in the card's Tests section exists, with the card's name.
+- [ ] Every item in the card's Changes section is done. Where the card gives code or a signature, the code matches it.
+- [ ] `git status` shows only the card's files and the bookkeeping files. Nothing extra (no new JSON, assets, or helpers the card doesn't list).
+- [ ] If the card has a pre-step with a stop condition, you checked it. A stop condition that is met means stop, not continue.
+- [ ] The card's `Status:` line says `done`, `13_MASTER_TASKS.md` is ticked, and `docs/evidence-log.md` has the row, all in this same commit.
+- [ ] The commit body has the `Card / Requirement / Tests run / Decisions used` lines, "Unit tests not run locally; verify in CI" if you did not run them, and the Co-Authored-By line if your tool adds one.
+
+## Audio gate
+Audio goes into `app/src/main/assets/` only when a card says so and only for rows marked `OK` in `docs/audio-review/listening_checklist.csv`. A blank `OK_or_FIX` cell means not approved. If a card needs audio that is not approved, write the code so a missing clip is skipped (`AudioPlayer` already does this), add no audio, and note it in the commit body.
+
 ## Stop and ask
 Write the question to `docs/tasks/QUESTIONS.md` (card, question, what you found, options), leave your changes uncommitted, and stop when:
 - a [confirm] or [proposed] item isn't covered by the Decisions in AGENTS.md;
@@ -50,7 +62,7 @@ Write the question to `docs/tasks/QUESTIONS.md` (card, question, what you found,
 - Add or replace audio in `app/src/main/assets/` unless a card says so.
 - Use emojis in UI text.
 
-## Current queue (2026-09-29, updated)
+## Current queue (2026-09-30)
 The `Status:` line in each card is the source of truth; this table is a snapshot.
 
 | Card | Status | Note |
@@ -58,5 +70,7 @@ The `Status:` line in each card is the source of truth; this table is a snapshot
 | 00 | done | CI pending |
 | 01 | done | CI pending |
 | 02 | done | CI pending |
-| 03 | ready | Pre-step copies approved carrier clips; stops if the listening checklist has blank carrier rows |
-| 04 | ready | Run in a new session after 03 is committed |
+| 03 | done | CI pending. Tutor clips await the listening checklist; they are not approved for `assets/` yet |
+| 04 | done | CI pending |
+
+No card is ready. Cards 05 onward are proposals in `docs/proposals/2026-09-29-next-cards-and-story-hook.md` until they are written as cards and critiqued.
