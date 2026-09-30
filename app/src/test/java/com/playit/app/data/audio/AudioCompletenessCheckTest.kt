@@ -7,7 +7,11 @@ import java.io.File
 
 class AudioCompletenessCheckTest {
 
-    private val assetsAudioDir = File("src/main/assets/audio")
+    private val assetsAudioDir = if (File("src/main/assets/audio").exists()) {
+        File("src/main/assets/audio")
+    } else {
+        File("app/src/main/assets/audio")
+    }
 
     private val requiredPhonemeLetters = listOf(
         "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
@@ -125,5 +129,45 @@ class AudioCompletenessCheckTest {
             }
         }
         assertTrue("Missing Say It word audio: $missing", missing.isEmpty())
+    }
+
+    @Test
+    fun keywordClips_existForAll26SeededWords() {
+        val seededWords = listOf(
+            "apple", "ball", "cat", "dog", "elephant", "fish", "goat", "hat", "insect",
+            "jug", "kite", "lion", "mouse", "nest", "orange", "pig", "queen", "rabbit",
+            "sun", "tiger", "umbrella", "van", "watch", "box", "yoyo", "zebra"
+        )
+        val keywordsDir = File(assetsAudioDir, "keywords")
+        val missingOrEmpty = mutableListOf<String>()
+        seededWords.forEach { word ->
+            val f = File(keywordsDir, "kw_$word.wav")
+            if (!f.exists() || f.length() == 0L) {
+                missingOrEmpty.add(f.path)
+            }
+        }
+        assertTrue("Missing or empty keyword clips: $missingOrEmpty", missingOrEmpty.isEmpty())
+    }
+
+    @Test
+    fun approvedTutorCarriers_exist() {
+        val tutorClips = listOf(
+            "car_listen",
+            "car_this_letter_says",
+            "car_say_it_with_me",
+            "car_your_turn",
+            "car_watch_my_lips",
+            "car_lets_say_together",
+            "fb_try_later"
+        )
+        val tutorDir = File(assetsAudioDir, "vo/tutor")
+        val missingOrEmpty = mutableListOf<String>()
+        tutorClips.forEach { id ->
+            val f = File(tutorDir, "$id.wav")
+            if (!f.exists() || f.length() == 0L) {
+                missingOrEmpty.add(f.path)
+            }
+        }
+        assertTrue("Missing or empty tutor carrier clips: $missingOrEmpty", missingOrEmpty.isEmpty())
     }
 }

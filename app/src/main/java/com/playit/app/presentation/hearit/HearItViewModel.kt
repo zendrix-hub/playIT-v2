@@ -96,7 +96,7 @@ class HearItViewModel @Inject constructor(
         val keyWordPath = if (exampleWord.isEmpty() || exampleWord.equals("PENDING_SME_REVIEW", ignoreCase = true)) {
             null
         } else {
-            audioResolver.getWordPath(exampleWord)
+            audioResolver.getKeyWordPath(exampleWord)
         }
         return HearItSequenceBuilder.build(
             template,

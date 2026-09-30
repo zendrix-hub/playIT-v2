@@ -75,6 +75,14 @@ class AudioResolver @Inject constructor() {
     }
 
     /**
+     * Resolves the asset path for a key word.
+     */
+    fun getKeyWordPath(word: String): String {
+        val clean = word.lowercase().trim().replace("-", "")
+        return "audio/keywords/kw_$clean.wav"
+    }
+
+    /**
      * Resolves the asset path for an SFX event.
      */
     fun getSfxPath(event: SfxEvent): String {
@@ -134,6 +142,8 @@ class AudioResolver @Inject constructor() {
         return when {
             assetPath.startsWith("audio/phonemes/") -> DevAudioCategory.PHONEME.assetPath
             assetPath.startsWith("audio/words/") -> DevAudioCategory.WORD.assetPath
+            assetPath.contains("audio/keywords/") -> DevAudioCategory.WORD.assetPath
+            assetPath.contains("audio/vo/tutor/") -> DevAudioCategory.VO.assetPath
             assetPath.contains("sfx_") -> DevAudioCategory.SFX.assetPath
             assetPath.contains("vo_") -> DevAudioCategory.VO.assetPath
             else -> DevAudioCategory.SFX.assetPath

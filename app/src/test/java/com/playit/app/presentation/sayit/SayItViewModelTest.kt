@@ -47,6 +47,7 @@ class SayItViewModelTest {
         every { sessionManager.activeProfileId } returns MutableStateFlow(1L)
         every { audioResolver.getPhonemePath(any()) } returns "test_path"
         every { audioResolver.getWordPath(any()) } returns "word_path"
+        every { audioResolver.getKeyWordPath(any()) } returns "word_path"
         every { audioResolver.getVoPath(any()) } returns "vo_path"
         every { audioResolver.getSfxPath(any()) } returns "sfx_path"
         every { audioResolver.getRotatingCorrectVo() } returns "correct_vo"
@@ -233,7 +234,7 @@ class SayItViewModelTest {
         val playedPaths = mutableListOf<String>()
         coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
         every { audioResolver.getVoPath(any()) } returns "vo_word_intro"
-        every { audioResolver.getWordPath("mouse") } returns "audio/words/word_mouse.mp3"
+        every { audioResolver.getKeyWordPath("mouse") } returns "audio/keywords/kw_mouse.wav"
         every { audioPlayer.playAssetAudio(any(), any()) } answers {
             playedPaths.add(firstArg())
             secondArg<(() -> Unit)?>()?.invoke()
@@ -242,7 +243,7 @@ class SayItViewModelTest {
         createViewModel()
         advanceUntilIdle()
 
-        assertEquals(listOf("vo_word_intro", "audio/words/word_mouse.mp3"), playedPaths)
+        assertEquals(listOf("vo_word_intro", "audio/keywords/kw_mouse.wav"), playedPaths)
     }
 
     @Test
@@ -430,7 +431,7 @@ class SayItViewModelTest {
     @Test
     fun playWordAudio_whenListening_stopsListeningAndPlaysAudio() = runTest {
         coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
-        every { audioResolver.getWordPath("mouse") } returns "audio/words/word_mouse.mp3"
+        every { audioResolver.getKeyWordPath("mouse") } returns "audio/keywords/kw_mouse.wav"
 
         createViewModel()
         advanceUntilIdle()
@@ -441,13 +442,13 @@ class SayItViewModelTest {
         viewModel.playWordAudio()
         assertEquals(SayItState.Idle, viewModel.state.value)
         verify { voskRecognizer.stopListening() }
-        verify { audioPlayer.playAssetAudio("audio/words/word_mouse.mp3", any()) }
+        verify { audioPlayer.playAssetAudio("audio/keywords/kw_mouse.wav", any()) }
     }
 
     @Test
     fun playWordAudio_rapidTaps_debounced() = runTest {
         coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
-        every { audioResolver.getWordPath("mouse") } returns "audio/words/word_mouse.mp3"
+        every { audioResolver.getKeyWordPath("mouse") } returns "audio/keywords/kw_mouse.wav"
 
         createViewModel()
         advanceUntilIdle()
@@ -460,7 +461,7 @@ class SayItViewModelTest {
         viewModel.playWordAudio()
 
         // Only the first tap within debounce window should trigger playAssetAudio
-        verify(exactly = 1) { audioPlayer.playAssetAudio("audio/words/word_mouse.mp3", any()) }
+        verify(exactly = 1) { audioPlayer.playAssetAudio("audio/keywords/kw_mouse.wav", any()) }
     }
 
     @Test

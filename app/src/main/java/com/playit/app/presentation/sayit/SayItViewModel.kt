@@ -206,7 +206,7 @@ class SayItViewModel @Inject constructor(
         }
         audioPlayer.stop()
         _isPlayingPrompt.value = false
-        val path = audioResolver.getWordPath(target)
+        val path = audioResolver.getKeyWordPath(target)
         _isPlayingPhoneme.value = true
         audioPlayer.playAssetAudio(path) {
             _isPlayingPhoneme.value = false
@@ -343,7 +343,7 @@ class SayItViewModel @Inject constructor(
         }
 
         val model = if (targetWord != null) {
-            audioResolver.getWordPath(targetWord)
+            audioResolver.getKeyWordPath(targetWord)
         } else {
             audioResolver.getPhonemePath(letter)
         }

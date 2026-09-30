@@ -35,6 +35,7 @@ class HearItViewModelTest {
         every { audioResolver.getPhonemePath(any()) } returns "test_path"
         every { audioResolver.getVoPath(any()) } returns "test_vo_path"
         every { audioResolver.getWordPath(any()) } returns "word_path"
+        every { audioResolver.getKeyWordPath(any()) } returns "word_path"
         every { audioResolver.getTutorPath(any()) } answers { "tutor/${firstArg<String>()}.wav" }
         every { audioPlayer.playAssetAudio(any(), any()) } answers {
             secondArg<(() -> Unit)?>()?.invoke()
@@ -97,7 +98,7 @@ class HearItViewModelTest {
         advanceUntilIdle()
 
         verify { audioPlayer.playSequence(expectedSequence, any()) }
-        verify { audioResolver.getWordPath("mouse") }
+        verify { audioResolver.getKeyWordPath("mouse") }
     }
 
     @Test
@@ -129,7 +130,7 @@ class HearItViewModelTest {
         advanceUntilIdle()
 
         verify { audioPlayer.playSequence(expectedSequence, any()) }
-        verify(exactly = 0) { audioResolver.getWordPath(any()) }
+        verify(exactly = 0) { audioResolver.getKeyWordPath(any()) }
     }
 
     @Test
