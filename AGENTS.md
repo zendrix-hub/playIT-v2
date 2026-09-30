@@ -40,7 +40,7 @@ Decisions
 - Say It never removes hearts (spec default). Letter names and added vowels are foils and are never accepted.
 - Say It judge targets: at least 80% agreement with teachers; false rejects at most 15% of teacher-correct attempts (spec defaults).
 - Say It is hybrid: the echo step stays in word mode ("mouse"); the recall check uses the pure sound only if the Vosk spike passes (`docs/spikes/vosk-foil-spike.md`).
-- Audio source is Kokoro-82M (Apache-2.0). Claude owns the pipeline and runs it locally in WSL (`tools/audio/kokoro_local.py`, `tools/audio/voice_candidates.py`); `tools/audio/playit_audio.ipynb` is the Colab backup and is kept in step with them. Review batches live outside the repo (`Documents/playIT-audio-batches/`). Only clips the user and a teacher mark OK in the listening checklist go into `app/src/main/assets/audio/`, and only through an agy card.
+- Audio source is Kokoro-82M (Apache-2.0). Claude owns the pipeline and runs it locally in WSL (`tools/audio/kokoro_local.py`, `tools/audio/voice_candidates.py`); `tools/audio/playit_audio.ipynb` is the Colab backup and is kept in step with them. Review batches live outside the repo (`Documents/playIT-audio-batches/`). A clip goes into `app/src/main/assets/audio/` only through an agy card, and only if the user marked it OK in a review page and it is listed in a `docs/audio-release/<date>/manifest.json`. A teacher audit of every shipped clip (and spec Gate 3 for phoneme clips) is required before merging to `main`.
 
 Roles (details in `docs/tasks/AGY_RUNBOOK.md`)
 - Claude (in WSL) designs, researches, writes and critiques task cards, reviews every agy commit, writes fix cards, and gives technical acceptance. It commits only docs and `tools/`, never app code.

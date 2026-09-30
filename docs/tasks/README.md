@@ -21,6 +21,7 @@ Fix cards: when a review finds problems, Claude writes a fix card named after th
 | 02 | Scope the Vosk grammar to each letter's foils; carry the error type into Say It state | NFR-ASR-01, FR-03 |
 | 03 | Tutor policy: prompt ladder, no hearts in Say It, corrective audio | FR-03 |
 | 04 | Hear It modeling sequence (I do) | FR-02 |
+| 05 | Approved Kokoro key words and tutor carriers into the app | NFR-AUD-01, FR-02 |
 
 How to run a card with the agent: agy follows `docs/tasks/AGY_RUNBOOK.md`. Start the session with:
 

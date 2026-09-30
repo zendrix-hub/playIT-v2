@@ -49,7 +49,7 @@ Cards 03 and 04 were first committed without most of these (see the evidence log
 - [ ] The commit body has the `Card / Requirement / Tests run / Decisions used` lines, "Unit tests not run locally; verify in CI" if you did not run them, and the Co-Authored-By line if your tool adds one.
 
 ## Audio gate
-Audio goes into `app/src/main/assets/` only when a card says so and only for rows marked `OK` in `docs/audio-review/listening_checklist.csv`. A blank `OK_or_FIX` cell means not approved. If a card needs audio that is not approved, write the code so a missing clip is skipped (`AudioPlayer` already does this), add no audio, and note it in the commit body.
+Audio goes into `app/src/main/assets/` only when a card says so, and only files listed in a `docs/audio-release/<date>/manifest.json` (clips the user approved in a review page), copied unchanged and checked against the manifest's SHA-256. Anything not in a release manifest is not approved. The teacher audit happens before merging to `main`. If a card needs audio that is not approved, write the code so a missing clip is skipped (`AudioPlayer` already does this), add no audio, and note it in the commit body.
 
 ## Review and fix cards
 After agy pushes, the user asks Claude to pull and review. Claude checks the commit against the card, the spec, and the self-check above, and reads the CI result on the PR.
@@ -80,5 +80,6 @@ The `Status:` line in each card is the source of truth; this table is a snapshot
 | 02 | accepted | CI green; phone test pending |
 | 03 | accepted | CI green; phone test pending. The tutor-script proposal (docs/proposals/2026-09-30-tutor-script.md) will need a fix card 03b once the user approves the script; it also covers the third-miss banner, which still says "Let's try again" |
 | 04 | accepted | CI green; phone test pending |
+| 05 | ready | Ships the 33 clips in docs/audio-release/2026-09-30 |
 
-No card is ready. Cards 05 onward are proposals in `docs/proposals/2026-09-29-next-cards-and-story-hook.md` and wait for the user's go signal.
+Card 05 (approved key words and tutor carriers) is ready. Cards 06 onward are proposals in `docs/proposals/2026-09-29-next-cards-and-story-hook.md` and wait for the user's go signal.
