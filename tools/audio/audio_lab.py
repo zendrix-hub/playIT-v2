@@ -292,9 +292,43 @@ def redo(k, a, vm, voice):
                       "wrong (speed, a sound, the voice). Export CSV when done.", rows, mode="score")
     print(f"wrote {len(rows)} clips to {out}")
 
+KW_SPEED = 0.95        # redo review 2026-09-30: 0.95 won for 6 of 7 key words and car_listen
+KW_SLOW_SPEED = 0.79   # slow model (attempt 2): 1.05 x 0.75 won for slow mouse
+
+def keywords(k, a, vm, voice):
+    """All 26 key words at KW_SPEED, plus fish variants (every fish take scored <= 2)."""
+    out = pathlib.Path(a.out); out.mkdir(parents=True, exist_ok=True)
+    rows = []
+    for letter, word in KEY_WORDS.items():
+        au = clean(*synth(k, word, voice, KW_SPEED))
+        sf.write(out / f"kw_{word}.wav", au, SR_OUT)
+        rows.append({"file": f"kw_{word}.wav", "group": "1. Key words at speed 0.95", "says": word,
+                     "listen_for": f"Clear word, starts with the {letter} sound?", "auto_check": ""})
+    fish = [("text 'fish', speed 0.95, af_heart", "fish", "af_heart", 0.95, False),
+            ("text 'Fish.', speed 0.95", "Fish.", voice, 0.95, False),
+            ("text 'Fish!', speed 0.95", "Fish!", voice, 0.95, False),
+            ("phonemes fˈɪʃ, speed 0.95", "fˈɪʃ", voice, 0.95, True),
+            ("phonemes fˈɪːʃ (longer vowel), speed 0.95", "fˈɪːʃ", voice, 0.95, True),
+            ("phonemes fːˈɪʃ (longer f), speed 0.95", "fːˈɪʃ", voice, 0.95, True)]
+    for i, (how, text, v, sp, ph) in enumerate(fish, 1):
+        vv = parse_candidate(v, k)[1] if isinstance(v, str) else v
+        au = clean(*synth(k, text, vv, sp, phonemes=ph))
+        sf.write(out / f"fish_v{i}.wav", au, SR_OUT)
+        rows.append({"file": f"fish_v{i}.wav", "group": "2. Fish variants", "says": "fish",
+                     "listen_for": "Clear 'fish': a hissy /f/ start and a 'sh' end?", "auto_check": how})
+    for word in ("mouse", "fish"):
+        au = clean(*synth(k, word, voice, KW_SLOW_SPEED))
+        sf.write(out / f"kwslow_{word}.wav", au, SR_OUT)
+        rows.append({"file": f"kwslow_{word}.wav", "group": "3. Slow key words (speed 0.79)", "says": f"{word} (slow)",
+                     "listen_for": "Slow but natural?", "auto_check": ""})
+    write_review_page(out, out.name, "playIT key words at the new speed",
+                      "All key words at speed 0.95 (your redo winner), fish variants, and the slow words. "
+                      "Mark OK or FIX, add a note for FIX. Export CSV when done.", rows, mode="okfix")
+    print(f"wrote {len(rows)} clips to {out}")
+
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("batch", choices=["heldsound", "heldsound2", "script", "redo"])
+    p.add_argument("batch", choices=["heldsound", "heldsound2", "script", "redo", "keywords"])
     p.add_argument("--items", default="", help="redo: comma list of fragment ids, words, or slow:<word>")
     p.add_argument("--out", required=True)
     p.add_argument("--voice", default=VOICE)
@@ -311,7 +345,7 @@ def main():
     if a.vosk:
         from vosk import Model, SetLogLevel; SetLogLevel(-1); vm = Model(a.vosk)
     _, voice = parse_candidate(a.voice, k)
-    {"heldsound": heldsound, "heldsound2": heldsound2, "script": script, "redo": redo}[a.batch](k, a, vm, voice)
+    {"heldsound": heldsound, "heldsound2": heldsound2, "script": script, "redo": redo, "keywords": keywords}[a.batch](k, a, vm, voice)
 
 if __name__ == "__main__":
     main()
