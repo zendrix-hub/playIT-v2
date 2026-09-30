@@ -34,6 +34,8 @@ class HearItViewModelTest {
         every { savedStateHandle.get<String>("phonemeId") } returns "1"
         every { audioResolver.getPhonemePath(any()) } returns "test_path"
         every { audioResolver.getVoPath(any()) } returns "test_vo_path"
+        every { audioResolver.getWordPath(any()) } returns "word_path"
+        every { audioResolver.getTutorPath(any()) } answers { "tutor/${firstArg<String>()}.wav" }
         every { audioPlayer.playAssetAudio(any(), any()) } answers {
             secondArg<(() -> Unit)?>()?.invoke()
         }
@@ -84,22 +86,27 @@ class HearItViewModelTest {
     }
 
     @Test
-    fun loadPhoneme_playsModelingSequenceWithBuilderOutputOnLoad() = runTest {
+    fun load_playsFullModelingSequence() = runTest {
         val fakePhoneme = Phoneme(id = 1, letter = "m", audioPath = "path", imagePath = "path", exampleWord = "mouse")
         coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme
-        val expectedSequence = HearItSequenceBuilder.build(letter = "m", keyWord = "mouse")
+        val expectedSequence = HearItSequenceBuilder.build(
+            HearItSequenceBuilder.TEMPLATE, "test_path", "word_path"
+        ) { "tutor/$it.wav" }
 
         viewModel = HearItViewModel(phonemeRepository, audioPlayer, audioResolver, savedStateHandle)
         advanceUntilIdle()
 
         verify { audioPlayer.playSequence(expectedSequence, any()) }
+        verify { audioResolver.getWordPath("mouse") }
     }
 
     @Test
-    fun playPhonemeSound_replaysFromCarThisLetterSaysOnward() = runTest {
+    fun playPhonemeSound_playsReplaySegment() = runTest {
         val fakePhoneme = Phoneme(id = 1, letter = "m", audioPath = "path", imagePath = "path", exampleWord = "mouse")
         coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme
-        val expectedReplaySequence = HearItSequenceBuilder.buildReplay(letter = "m", keyWord = "mouse")
+        val expectedReplaySequence = HearItSequenceBuilder.build(
+            HearItSequenceBuilder.replayTemplate(), "test_path", "word_path"
+        ) { "tutor/$it.wav" }
 
         viewModel = HearItViewModel(phonemeRepository, audioPlayer, audioResolver, savedStateHandle)
         advanceUntilIdle()
@@ -108,6 +115,21 @@ class HearItViewModelTest {
         advanceUntilIdle()
 
         verify { audioPlayer.playSequence(expectedReplaySequence, any()) }
+    }
+
+    @Test
+    fun load_pendingExampleWord_dropsKeyword() = runTest {
+        val fakePhoneme = Phoneme(id = 1, letter = "ng", audioPath = "path", imagePath = "path", exampleWord = "PENDING_SME_REVIEW")
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme
+        val expectedSequence = HearItSequenceBuilder.build(
+            HearItSequenceBuilder.TEMPLATE, "test_path", null
+        ) { "tutor/$it.wav" }
+
+        viewModel = HearItViewModel(phonemeRepository, audioPlayer, audioResolver, savedStateHandle)
+        advanceUntilIdle()
+
+        verify { audioPlayer.playSequence(expectedSequence, any()) }
+        verify(exactly = 0) { audioResolver.getWordPath(any()) }
     }
 
     @Test

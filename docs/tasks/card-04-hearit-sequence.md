@@ -1,6 +1,6 @@
 # Card 04: Hear It modeling sequence (FR-02)
 
-Status: ready
+Status: done
 
 Requires card 03 to be committed first (this card uses `AudioResolver.getTutorPath`).
 

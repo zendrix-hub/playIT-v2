@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.playit.app.data.audio.AudioPlayer
 import com.playit.app.data.audio.AudioResolver
-import com.playit.app.data.audio.VoContext
 import com.playit.app.domain.manager.HearItSequenceBuilder
 import com.playit.app.domain.model.Phoneme
 import com.playit.app.domain.repository.PhonemeRepository
@@ -52,7 +51,7 @@ class HearItViewModel @Inject constructor(
             }
             _loadError.value = false
             _phoneme.value = p
-            playIntroThenPhonemeSound()
+            playModelingSequence()
         }
     }
 
@@ -64,35 +63,47 @@ class HearItViewModel @Inject constructor(
     private val _isPlayingPrompt = MutableStateFlow(false)
     val isPlayingPrompt: StateFlow<Boolean> = _isPlayingPrompt.asStateFlow()
 
-    fun playIntroThenPhonemeSound() {
+    /** Full "I do" sequence (spec §2.1 Table 3): on load and on mascot tap. */
+    fun playModelingSequence() {
         audioPlayer.stop()
-        val letter = _phoneme.value?.letter ?: "m"
-        val word = _phoneme.value?.exampleWord ?: ""
-        val sequence = HearItSequenceBuilder.build(letter = letter, keyWord = word)
         _isPlayingPrompt.value = true
         _isPlaying.value = true
         _playCount.value++
-        audioPlayer.playSequence(sequence) {
+        audioPlayer.playSequence(buildSequence(HearItSequenceBuilder.TEMPLATE)) {
             _isPlayingPrompt.value = false
             _isPlaying.value = false
         }
     }
 
     fun playHearItIntroAudio() {
-        playIntroThenPhonemeSound()
+        playModelingSequence()
     }
 
+    /** Ear button and letter card tap: replays steps 3 to 6 of the sequence. */
     fun playPhonemeSound() {
         audioPlayer.stop()
-        val letter = _phoneme.value?.letter ?: "m"
-        val word = _phoneme.value?.exampleWord ?: ""
-        val replaySequence = HearItSequenceBuilder.buildReplay(letter = letter, keyWord = word)
         _isPlayingPrompt.value = false
         _isPlaying.value = true
         _playCount.value++
-        audioPlayer.playSequence(replaySequence) {
+        audioPlayer.playSequence(buildSequence(HearItSequenceBuilder.replayTemplate())) {
             _isPlaying.value = false
         }
+    }
+
+    private fun buildSequence(template: List<String>): List<String> {
+        val letter = _phoneme.value?.letter ?: "m"
+        val exampleWord = _phoneme.value?.exampleWord?.trim().orEmpty()
+        val keyWordPath = if (exampleWord.isEmpty() || exampleWord.equals("PENDING_SME_REVIEW", ignoreCase = true)) {
+            null
+        } else {
+            audioResolver.getWordPath(exampleWord)
+        }
+        return HearItSequenceBuilder.build(
+            template,
+            audioResolver.getPhonemePath(letter),
+            keyWordPath,
+            audioResolver::getTutorPath
+        )
     }
 
     override fun onCleared() {
