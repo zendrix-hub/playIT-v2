@@ -68,7 +68,10 @@ def hums(a):
     from sustain import describe, median_f0, psola_sustain, swell, voiced_core
     out = pathlib.Path(a.out); (out / "raw").mkdir(parents=True, exist_ok=True); (out / "shaped").mkdir(exist_ok=True)
     ref = out / "reference_voice.wav"
-    model = ChatterboxTurboTTS.from_pretrained(device="cpu")
+    # --ckpt: a local folder with only the files Turbo loads (from_pretrained would also fetch
+    # the unused 1 GB s3gen.safetensors).
+    model = (ChatterboxTurboTTS.from_local(a.ckpt, device="cpu") if a.ckpt
+             else ChatterboxTurboTTS.from_pretrained(device="cpu"))
     vm = None
     if a.vosk:
         from vosk import Model, SetLogLevel; SetLogLevel(-1); vm = Model(a.vosk)
@@ -121,6 +124,7 @@ def main():
     p.add_argument("--voices", default="voices-v1.0.bin")
     p.add_argument("--espeak-data", default=None)
     p.add_argument("--vosk", default=None)
+    p.add_argument("--ckpt", default=None, help="hums: local Chatterbox-Turbo checkpoint folder")
     a = p.parse_args()
     make_ref(a) if a.step == "ref" else hums(a)
 
