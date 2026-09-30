@@ -188,9 +188,114 @@ def script(k, a, vm, voice):
                       "not approved. Export CSV when done.", rows, mode="okfix")
     print(f"wrote {len(rows)} clips to {out}")
 
+CONTOURS = {  # (0..1 time, pitch factor); "expressive" is close to the app's older /m/ (range ~170 Hz)
+    "flat": ((0, 1.0), (1, 1.0)),
+    "arch": ((0, 0.96), (0.35, 1.10), (1, 0.92)),
+    "expressive": ((0, 0.92), (0.3, 1.30), (1, 0.86)),
+}
+
+def heldsound2(k, a, vm, voice):
+    """Round 2 for one voiced held sound: clean voiced core + PSOLA + contour + swell."""
+    import librosa
+    from sustain import describe, median_f0, psola_sustain, swell, voiced_core
+    letter = a.letter
+    ipa, _, _ = CONTINUOUS[letter]
+    out = pathlib.Path(a.out); (out / "context").mkdir(parents=True, exist_ok=True)
+    rows = []
+    ref = pathlib.Path(__file__).resolve().parents[2] / f"app/src/main/assets/audio/phonemes/phoneme_{letter}.mp3"
+    if ref.exists():
+        y, _ = librosa.load(ref, sr=SR_OUT)
+        sf.write(out / f"ref_app_{letter}.wav", y, SR_OUT)
+        rows.append({"file": f"ref_app_{letter}.wav", "group": "Reference: the app's current clip",
+                     "says": f"/{ipa}/ from the app today (Edge TTS 'Ana'; reference only, its license "
+                             "does not allow shipping)", "listen_for": "Score it too, as the bar to beat",
+                     "auto_check": describe(y, SR_OUT)})
+    seeds = []   # (label, take, prefer)
+    for ps in (f"{ipa}ːːː!", f"ˈ{ipa}ːːː!", f"{ipa}ːːː", f"ˈ{ipa}ːːː."):
+        for sp in (0.6, 0.7, 0.8, 0.9):
+            au, _ = synth(k, ps, voice, sp, phonemes=True)
+            seeds.append(("ipa", np.asarray(au, dtype=np.float32), "hnr"))
+    if letter == "m":
+        for ps in ("hˈʌm!", "hˈʌmː!", "hˈʌmːː."):
+            for sp in (0.7, 0.85):
+                au, _ = synth(k, ps, voice, sp, phonemes=True)
+                seeds.append(("hum", np.asarray(au, dtype=np.float32), "last"))
+    cores = {}
+    for label, take, prefer in seeds:
+        r = voiced_core(take, SR_OUT, win_ms=200 if label == "hum" else 250, prefer=prefer)
+        if r and (label not in cores or r[1] > cores[label][1]):
+            cores[label] = r
+    f0 = median_f0(cores["ipa"][0], SR_OUT)
+    plan = [("P1", "ipa", "flat", 1.0, 0), ("P2", "ipa", "arch", 1.0, 0),
+            ("P3", "ipa", "expressive", 1.0, 0), ("P4", "ipa", "expressive", 1.26, 0),
+            ("P5", "ipa", "arch", 1.0, 0.015)]
+    if "hum" in cores:
+        plan += [("H1", "hum", "arch", 1.0, 0), ("H2", "hum", "expressive", 1.0, 0)]
+    made = {}
+    for vid, src, contour, shift, vib in plan:
+        core = cores[src][0]
+        # Target pitch comes from the IPA core: a word-final coda (hum) often ends in creak,
+        # which halves its measured pitch.
+        y = psola_sustain(core, SR_OUT, target_ms=TARGET_MS, f0=f0 * shift,
+                          contour=CONTOURS[contour], vibrato_hz=5 if vib else 0, vibrato_depth=vib)
+        y = clean(swell(y, SR_OUT), SR_OUT)
+        made[vid] = y
+        f = f"ph_{letter}_{vid}.wav"
+        sf.write(out / f, y, SR_OUT)
+        how = (f"core from {'IPA takes' if src == 'ipa' else 'the end of a stressed hum'} "
+               f"(HNR {cores[src][1]:.0f} dB), PSOLA to 800 ms, {contour} pitch"
+               + (f" +{12 * np.log2(shift):.0f} semitones" if shift != 1 else "")
+               + (", gentle vibrato" if vib else "") + ", loudness swell")
+        rows.append({"file": f, "group": "New method: clean voiced core + PSOLA", "says": f"/{ipa}/ {vid}: {how}",
+                     "listen_for": "Clear, steady, natural hum; no 'em' or 'muh'",
+                     "auto_check": describe(y, SR_OUT) + ("; " + check(y, letter, vm) if vm else "")})
+        print(vid, rows[-1]["auto_check"])
+    # The same new sound inside two app sequences (P3), to judge it in context.
+    lines = {cid: clean(*synth(k, FRAGMENTS[cid][0], voice, FRAGMENTS[cid][1]))
+             for cid in ("car_listen", "car_this_letter_says", "car_say_it_with_me", "fb_almost_just", "fb_no_ah", "car_your_turn")}
+    word = KEY_WORDS[letter]
+    lines[f"kw_{word}"] = clean(*synth(k, word, voice, 0.85))
+    lines[f"ph_{letter}"] = made["P3"]
+    gap = np.zeros(int(GAP_S * SR_OUT), dtype=np.float32)
+    for name in ("hearit_sequence", "corr_added_vowel"):
+        parts = []
+        for cid in expand(name, letter, word):
+            parts += [np.zeros(int(int(cid[6:]) / 1000 * SR_OUT), dtype=np.float32)] if cid.startswith("PAUSE_") else [lines[cid], gap]
+        f = f"context/{name}_{letter}_P3.wav"
+        sf.write(out / f, np.concatenate(parts), SR_OUT)
+        rows.append({"file": f, "group": "In context (uses P3)", "says": " + ".join(expand(name, letter, word)),
+                     "listen_for": "Does the sound fit the voice and flow in the sequence?", "auto_check": ""})
+    write_review_page(out, out.name, f"playIT held-sound lab, round 2: /{ipa}/ ({letter})",
+                      "The new method keeps only the cleanest part of the voice and lengthens it with "
+                      "PSOLA, then adds a natural pitch and loudness shape. Score each 1-5, including the "
+                      "app's current clip as the bar to beat. Export CSV when done.", rows, mode="score")
+
+def redo(k, a, vm, voice):
+    """Alternate takes for lines and key words marked FIX: pick the best take of each."""
+    out = pathlib.Path(a.out); out.mkdir(parents=True, exist_ok=True)
+    items = [x for x in a.items.split(",") if x]
+    takes = [("mix, speed 0.80", voice, 0.80), ("mix, speed 0.95", voice, 0.95),
+             ("mix, speed 1.05", voice, 1.05), ("pure af_heart, speed 0.95", "af_heart", 0.95)]
+    rows = []
+    for item in items:
+        slow = item.startswith("slow:")
+        text = FRAGMENTS[item][0] if item in FRAGMENTS else item.split(":", 1)[-1]
+        for i, (label, v, sp) in enumerate(takes, 1):
+            au = clean(*synth(k, text, v, sp * (0.75 if slow else 1)))
+            f = f"{item.replace(':', '_')}_take{i}.wav"
+            sf.write(out / f, au, SR_OUT)
+            rows.append({"file": f, "group": f"{text}{' (slow)' if slow else ''}", "says": text,
+                         "listen_for": "Pick the best take: clear, natural, right sounds",
+                         "auto_check": label + (" x0.75 (slow)" if slow else "")})
+    write_review_page(out, out.name, "playIT redo: lines and key words marked FIX",
+                      "Four takes of each clip you marked FIX. Score each take 1-5 and note what is still "
+                      "wrong (speed, a sound, the voice). Export CSV when done.", rows, mode="score")
+    print(f"wrote {len(rows)} clips to {out}")
+
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("batch", choices=["heldsound", "script"])
+    p.add_argument("batch", choices=["heldsound", "heldsound2", "script", "redo"])
+    p.add_argument("--items", default="", help="redo: comma list of fragment ids, words, or slow:<word>")
     p.add_argument("--out", required=True)
     p.add_argument("--voice", default=VOICE)
     p.add_argument("--letter", default="m", help="heldsound: which continuous letter")
@@ -206,7 +311,7 @@ def main():
     if a.vosk:
         from vosk import Model, SetLogLevel; SetLogLevel(-1); vm = Model(a.vosk)
     _, voice = parse_candidate(a.voice, k)
-    (heldsound if a.batch == "heldsound" else script)(k, a, vm, voice)
+    {"heldsound": heldsound, "heldsound2": heldsound2, "script": script, "redo": redo}[a.batch](k, a, vm, voice)
 
 if __name__ == "__main__":
     main()

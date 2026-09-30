@@ -14,6 +14,7 @@ tools/
 ├── tool 1.png                # Reference: AI Media, Audio & Video Generation Suite
 ├── README.md                 # This guide
 ├── audio/                    # Kokoro-82M audio pipeline (kokoro_local.py, voice_candidates.py; playit_audio.ipynb as the Colab backup)
+├── dev/                      # WSL build env: setup_wsl_env.sh (JDK 17, Android SDK 34), gradlew_wsl.sh (runs Gradle with it)
 ├── dictionary_validator.py   # Phonics Curriculum & CVC Discovery via Public APIs
 └── asset_pipeline_optimizer.py # Alpha Background Removal & 4-Benchmark Outline Styler
 ```
