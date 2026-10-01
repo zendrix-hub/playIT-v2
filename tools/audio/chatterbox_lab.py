@@ -10,6 +10,10 @@ Run in its own venv (torch CPU), made as in tools/dev (see chatterbox_setup note
   2. hums (Chatterbox venv):    python chatterbox_lab.py hums --out <batch> [--vosk app/src/main/assets/vosk-model]
 Writes <batch>/index.html (review_page.py, score mode). Review audio only: nothing here goes
 into app/src/main/assets/.
+  3. held (Chatterbox venv), any held sound, after /m/ worked (user pick 2026-10-01: raw "Mmm!"):
+       python chatterbox_lab.py held --out <batch> --letters s,a,i --ref <reference_voice.wav> --ckpt ...
+     Writes <batch>/<letter>/cb_t<N>_s<seed>.wav and <batch>/rows_chatterbox.json; heldsound_batch.py
+     adds the Kokoro methods, the checks and the review page.
 """
 import argparse, pathlib
 import numpy as np
@@ -43,6 +47,48 @@ def vosk_words(a, vm, grammar):
     r = KaldiRecognizer(vm, 16000, json.dumps(grammar + ["[unk]"])); r.SetWords(True)
     r.AcceptWaveform((np.clip(x, -1, 1) * 32767).astype(np.int16).tobytes())
     return [(w["word"], round(w["conf"], 2)) for w in json.loads(r.FinalResult()).get("result", [])]
+
+# Interjection-style texts that a reader says as a held sound, not as a letter name. Vowels have no
+# unambiguous spelling, so heldsound_batch.py measures F1/F2 and names the nearest vowel.
+HELD_TEXTS = {
+    "s": ["Sssss.", "Sssssss...", "Sss!", "Ssss, ssss."],
+    "f": ["Fffff.", "Fffffff...", "Fff!"],
+    "v": ["Vvvvv.", "Vvvvvvv...", "Vvv!"],
+    "z": ["Zzzzz.", "Zzzzzzz...", "Zzz!"],
+    "n": ["Nnnnn.", "Nnnnnnn...", "Nnn!"],
+    "l": ["Lllll.", "Lllllll...", "Lll!"],
+    "r": ["Rrrrr.", "Rrrrrrr...", "Grrr!"],
+    "a": ["Aaaa!", "Aaaaaa...", "Aah!", "Aaa, aaa."],
+    "e": ["Ehhh.", "Ehhhhh...", "Eh!"],
+    "i": ["Ihhh.", "Ihhhhh...", "Ih!", "Ih, ih."],
+    "o": ["Ahhh.", "Ahhhhh...", "Ah!"],
+    "u": ["Uhhh.", "Uhhhhh...", "Uh!"],
+}
+HELD_SEEDS = [1, 2]
+
+def held(a):
+    import json
+    import librosa, soundfile as sf, torch
+    from chatterbox.tts_turbo import ChatterboxTurboTTS
+    out = pathlib.Path(a.out); out.mkdir(parents=True, exist_ok=True)
+    model = (ChatterboxTurboTTS.from_local(a.ckpt, device="cpu") if a.ckpt
+             else ChatterboxTurboTTS.from_pretrained(device="cpu"))
+    rows = []
+    for letter in a.letters.split(","):
+        (out / letter).mkdir(exist_ok=True)
+        for ti, text in enumerate(HELD_TEXTS[letter], 1):
+            for seed in HELD_SEEDS:
+                torch.manual_seed(seed)
+                wav = model.generate(text, audio_prompt_path=str(a.ref))
+                y = wav.squeeze(0).cpu().numpy().astype(np.float32)
+                if model.sr != SR:
+                    y = librosa.resample(y, orig_sr=model.sr, target_sr=SR)
+                f = f"{letter}/cb_t{ti}_s{seed}.wav"
+                sf.write(out / f, clean(y), SR)
+                rows.append({"file": f, "letter": letter, "method": "Chatterbox-Turbo", "text": text, "seed": seed})
+                print(f, text)
+    (out / "rows_chatterbox.json").write_text(json.dumps(rows, indent=1), encoding="utf-8")
+    print(f"wrote {len(rows)} Chatterbox takes to {out}")
 
 def make_ref(a):
     import soundfile as sf
@@ -117,16 +163,20 @@ def hums(a):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("step", choices=["ref", "hums"])
+    p.add_argument("step", choices=["ref", "hums", "held"])
     p.add_argument("--out", required=True)
     p.add_argument("--voice", default="af_heart*0.7+af_bella*0.3")
     p.add_argument("--model", default="kokoro-v1.0.onnx")
     p.add_argument("--voices", default="voices-v1.0.bin")
     p.add_argument("--espeak-data", default=None)
     p.add_argument("--vosk", default=None)
-    p.add_argument("--ckpt", default=None, help="hums: local Chatterbox-Turbo checkpoint folder")
+    p.add_argument("--ckpt", default=None, help="hums/held: local Chatterbox-Turbo checkpoint folder")
+    p.add_argument("--letters", default="s,a,i", help="held: comma-separated letters")
+    p.add_argument("--ref", default=None, help="held: voice reference wav (default <out>/reference_voice.wav)")
     a = p.parse_args()
-    make_ref(a) if a.step == "ref" else hums(a)
+    if a.step == "held" and a.ref is None:
+        a.ref = str(pathlib.Path(a.out) / "reference_voice.wav")
+    {"ref": make_ref, "hums": hums, "held": held}[a.step](a)
 
 if __name__ == "__main__":
     main()
