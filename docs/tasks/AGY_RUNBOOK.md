@@ -107,7 +107,15 @@ Code relay (agy session A), in this order:
 |---|---|---|---|
 | 1 | 06 | ready | Say It feedback text and debug "Heard:" overlay |
 | 2 | 07 | ready | Idle re-prompt and next-step cues. Revised 2026-10-01; its pre-step copies 3 UI clips from `docs/audio-release/2026-10-01/` |
-| 3+ | 09, 10, 07b, 11, 12, 03b | being written | Claude marks each `ready` and adds it here. Take the first `ready` one in this table's order |
+| 3 | 07b | ready (after 07 is accepted) | Avatar-only onboarding, parent rename, voiced map pop-up; copies the other 3 UI clips |
+| 4 | 11 | ready (after 07 is accepted) | Stars and hearts use real results |
+| 5 | 12 | ready (after 11 is accepted) | Find It distractors, gentle correction colour, no emoji test |
+| 6 | 09 | being written | Approved /m/ into the app; waits for the user's A/B pick |
+| 7 | 10 | being written | Screenshot tests; waits for Claude's local spike |
+| 8 | 03b | being written | Say It corrections from fragments; waits for the user's OK on the compositions |
+| 9 | 13 | being written | Approved batch-1 pictures into the app; waits for card 08's picks |
+
+Take the first card in this order whose status is `ready` and whose "after" card is `accepted`. Claude moves 09, 10 and 03b up as soon as they are ready.
 
 Images (agy session B, in parallel):
 
