@@ -326,9 +326,24 @@ def keywords(k, a, vm, voice):
                       "Mark OK or FIX, add a note for FIX. Export CSV when done.", rows, mode="okfix")
     print(f"wrote {len(rows)} clips to {out}")
 
+def ui(k, a, vm, voice):
+    """Spoken UI lines (tutor_script.UI_LINES) for the no-reading pass, OK/FIX review."""
+    from tutor_script import UI_LINES
+    out = pathlib.Path(a.out); out.mkdir(parents=True, exist_ok=True)
+    rows = []
+    for cid, (text, speed, source) in UI_LINES.items():
+        au = clean(*synth(k, text, voice, speed))
+        sf.write(out / f"{cid}.wav", au, SR_OUT)
+        rows.append({"file": f"{cid}.wav", "group": "Spoken UI lines (no-reading pass)", "says": text,
+                     "listen_for": f"Clear, friendly, natural for a 6-year-old? ({source})", "auto_check": ""})
+    write_review_page(out, out.name, "playIT spoken UI lines",
+                      "Lines that tell a child who cannot read what to tap next. Mark OK or FIX, add a note "
+                      "for FIX (wording, speed, tone). Export CSV when done.", rows, mode="okfix")
+    print(f"wrote {len(rows)} clips to {out}")
+
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("batch", choices=["heldsound", "heldsound2", "script", "redo", "keywords"])
+    p.add_argument("batch", choices=["heldsound", "heldsound2", "script", "redo", "keywords", "ui"])
     p.add_argument("--items", default="", help="redo: comma list of fragment ids, words, or slow:<word>")
     p.add_argument("--out", required=True)
     p.add_argument("--voice", default=VOICE)
@@ -345,7 +360,7 @@ def main():
     if a.vosk:
         from vosk import Model, SetLogLevel; SetLogLevel(-1); vm = Model(a.vosk)
     _, voice = parse_candidate(a.voice, k)
-    {"heldsound": heldsound, "heldsound2": heldsound2, "script": script, "redo": redo, "keywords": keywords}[a.batch](k, a, vm, voice)
+    {"heldsound": heldsound, "heldsound2": heldsound2, "script": script, "redo": redo, "keywords": keywords, "ui": ui}[a.batch](k, a, vm, voice)
 
 if __name__ == "__main__":
     main()

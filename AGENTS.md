@@ -39,6 +39,8 @@ Decisions
 - [confirm] and [proposed] items covered by the decisions below use those decisions; note the decision in the commit body. Any other [confirm] or [proposed] item: stop and ask the user (write the question to `docs/tasks/QUESTIONS.md`).
 - Say It never removes hearts (spec default). Letter names and added vowels are foils and are never accepted.
 - Say It judge targets: at least 80% agreement with teachers; false rejects at most 15% of teacher-correct attempts (spec defaults).
+- Idle re-prompt after 10 s of no interaction (spec Table 2 [proposed]; user decision 2026-10-01).
+- Onboarding is avatar-only: the child never has to type. A parent can add or change the name in the Parent Zone (user decision 2026-10-01).
 - Say It is hybrid: the echo step stays in word mode ("mouse"); the recall check uses the pure sound only if the Vosk spike passes (`docs/spikes/vosk-foil-spike.md`).
 - Audio source is Kokoro-82M (Apache-2.0). Claude owns the pipeline and runs it locally in WSL (`tools/audio/kokoro_local.py`, `tools/audio/voice_candidates.py`); `tools/audio/playit_audio.ipynb` is the Colab backup and is kept in step with them. Review batches live outside the repo (`Documents/playIT-audio-batches/`). A clip goes into `app/src/main/assets/audio/` only through an agy card, and only if the user marked it OK in a review page and it is listed in a `docs/audio-release/<date>/manifest.json`. A teacher audit of every shipped clip (and spec Gate 3 for phoneme clips) is required before merging to `main`.
 

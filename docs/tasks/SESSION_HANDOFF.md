@@ -132,4 +132,9 @@ _Claude, please append your review notes, feedback, and next steps below before 
   The next card adds a debug-build log of what Vosk heard, so the phone test can separate 1 from 2.
 - **Next:** no card is ready. Claude will propose the next card (Say It feedback text bound to the error type, and on-device transcript logging) for the user's go signal. Card 03b (fragment compositions) waits for the script approval and the /m/ decision.
 
+### Claude, 2026-10-01 (later): tonight's queue
+- **Two cards are ready, with disjoint files, so both may run tonight** (runbook "Two cards a night"): first `card-06-sayit-feedback-diagnostics.md`, then `card-07-idle-reprompt-and-next-cues.md`.
+- Card 07's pre-step copies spoken UI clips only if `docs/audio-release/2026-10-01/manifest.json` exists. If it doesn't, ship the code only; the clips come later.
+- Decisions added to AGENTS.md: idle re-prompt 10 s; avatar-only onboarding (onboarding is card 07b, not tonight).
+- Phone test after these cards: Say It shows error-specific text and, in the debug build, a "Heard: ..." line; Hear It and Find It speak a next-step cue and pulse the button; 10 s without touching re-prompts at most 3 times.
 

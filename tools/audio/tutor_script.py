@@ -43,6 +43,17 @@ FRAGMENTS = {
     "idle_reprompt":         ("Tap the ear to hear it again.", 0.9, "Table 2 idle [proposed 10 s]"),
 }
 
+# Spoken UI lines for the no-reading pass (NFR-IND-01; docs/proposals/2026-10-01-learning-ux.md).
+# 8 words or fewer; never rely on color ("the big button", and the button pulses on screen).
+UI_LINES = {
+    "ui_hearit_next":   ("Great listening! Tap the big button.", 0.95, "card 07: Hear It next step unlocked"),
+    "ui_findit_next":   ("You found them all! Tap the big button.", 0.95, "card 07: Find It complete"),
+    "ui_complete_next": ("You did it! Tap the big button.", 0.95, "card 07: letter / blend complete screens"),
+    "ui_node_start":    ("Tap the big button to start.", 0.95, "card 07b: map pop-up, unlocked node"),
+    "ui_node_locked":   ("Finish the letters before this one first.", 0.95, "card 07b: map pop-up, locked node"),
+    "ui_pick_avatar":   ("Pick your animal friend!", 0.95, "card 07b: avatar-only onboarding"),
+}
+
 # Per-letter cues. Only m (praise) and f (substitution) are written in the spec; the rest are
 # [proposed] drafts listed in the proposal for teachers, and fall back as shown.
 ARTICULATION_CUES = {"m": "cue_lips_together"}

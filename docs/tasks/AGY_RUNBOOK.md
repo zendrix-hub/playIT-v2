@@ -17,9 +17,15 @@ Push rules for Claude and agy: push only to `origin refactor/hear-say-it`. Never
 2. Pick the first `docs/tasks/card-NN-*.md` (lowest NN) whose header says `Status: ready`. Card status values are defined in docs/tasks/README.md.
 3. If no card is ready, say so and stop.
 
-## Execute one card only
+## Execute one card only (or two, see below)
 - Change only the files the card lists, plus the bookkeeping files: `docs/engineering-package/13_MASTER_TASKS.md`, `docs/evidence-log.md`, the card's own `Status:` line, and `docs/tasks/SESSION_HANDOFF.md` (session notes and phone-test results for Claude; facts only, quote code and commands instead of paraphrasing).
 - Write every test in the card's Tests section.
+
+## Two cards a night
+Allowed only when the queue below marks two cards `ready` and their Files lists share no file (bookkeeping files excepted). Run them in queue order:
+1. Run the first card completely: tests, commit, push, and an update to `SESSION_HANDOFF.md`.
+2. Start the second card in a fresh session from `Session start`, and give it its own commit and push.
+3. If the first card stops (stop-and-ask) or its local tests fail, do not start the second card.
 
 ## Tests
 - Run `./gradlew testDebugUnitTest`.
@@ -82,4 +88,7 @@ The `Status:` line in each card is the source of truth; this table is a snapshot
 | 04 | accepted | CI green; phone test pending |
 | 05 | accepted | 85a6ca2; CI green; phone test 2026-09-30: Hear It and Say It ladder pass, foil feedback not observable yet |
 
-No card is ready. Cards 06 onward are proposals in `docs/proposals/2026-09-29-next-cards-and-story-hook.md` and wait for the user's go signal.
+| 06 | ready | Say It feedback text and debug transcript overlay |
+| 07 | ready | Idle re-prompt (10 s) and spoken next-step cues; Files disjoint from card 06, so 06 and 07 may run the same night |
+
+Cards 06 and 07 come from `docs/proposals/2026-10-01-learning-ux.md`, which also lists the next cards (07b onward). They wait for the user's go signal.
