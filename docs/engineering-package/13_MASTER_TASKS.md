@@ -259,7 +259,7 @@ Each card ticks its own item in its commit (see `docs/tasks/AGY_RUNBOOK.md`). A 
 - [x] Card 03: Tutor policy: prompt ladder, no hearts in Say It, corrective audio (FR-03)
 - [x] Card 04: Hear It modeling sequence (I do) (FR-02)
 - [x] Card 05: Approved key words and tutor carriers into the app (NFR-AUD-01, FR-02)
-- [ ] Card 06: Say It feedback text follows the error type; debug transcript overlay (FR-03, NFR-ASR-01)
+- [x] Card 06: Say It feedback text follows the error type; debug transcript overlay (FR-03, NFR-ASR-01)
 - [ ] Card 07: Idle re-prompt (10 s) and spoken next-step cues (NFR-IND-01)
 - [ ] Card 07b: Avatar-only onboarding, parent rename, voiced map pop-up (NFR-IND-01)
 - [ ] Card 08: Image batch 1, Find It and key-word pictures picked by the user (asset card; Claude ticks it from picks.json) (FR-05)

@@ -1,6 +1,6 @@
 # Card 06: Say It feedback text and on-device diagnostics (FR-03, NFR-ASR-01)
 
-Status: ready
+Status: done
 
 ## Why
 In the 2026-09-30 phone test, saying "em" or "muh" gave no visible correction. Two causes are possible, and the app cannot tell them apart:

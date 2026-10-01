@@ -568,4 +568,55 @@ class SayItViewModelTest {
         verify(exactly = 0) { voskRecognizer.startListening(any()) }
         assertFalse(viewModel.state.value is SayItState.Listening)
     }
+
+    @Test
+    fun evaluateSpeech_setsLastHeard() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        every { speechValidator.judgeWord("em", "mouse", "m") } returns
+            SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.LETTER_NAME, heard = "em")
+
+        createViewModel()
+        advanceUntilIdle()
+
+        viewModel.evaluateSpeech("em")
+        advanceUntilIdle()
+
+        assertEquals(
+            HeardAttempt("em", SpeechErrorType.LETTER_NAME, false, 1),
+            viewModel.lastHeard.value
+        )
+    }
+
+    @Test
+    fun lastHeard_tracksAttemptNumber() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+
+        createViewModel()
+        advanceUntilIdle()
+
+        viewModel.evaluateSpeech("cat")
+        viewModel.evaluateSpeech("cat")
+        advanceUntilIdle()
+
+        assertEquals(2, viewModel.lastHeard.value?.attempt)
+    }
+
+    @Test
+    fun loadPhoneme_resetsLastHeard() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+
+        createViewModel()
+        advanceUntilIdle()
+
+        assertNull(viewModel.lastHeard.value)
+
+        viewModel.evaluateSpeech("cat")
+        assertNotNull(viewModel.lastHeard.value)
+
+        viewModel.retry()
+        advanceUntilIdle()
+
+        assertNull(viewModel.lastHeard.value)
+    }
 }
+

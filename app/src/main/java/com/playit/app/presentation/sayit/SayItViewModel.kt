@@ -37,6 +37,13 @@ sealed class SayItState {
     ) : SayItState()
 }
 
+data class HeardAttempt(
+    val transcript: String,
+    val errorType: SpeechErrorType,
+    val isCorrect: Boolean,
+    val attempt: Int
+)
+
 @HiltViewModel
 class SayItViewModel @Inject constructor(
     private val phonemeRepository: PhonemeRepository,
@@ -75,6 +82,9 @@ class SayItViewModel @Inject constructor(
     private val _tutorAction = MutableStateFlow<TutorAction?>(null)
     val tutorAction: StateFlow<TutorAction?> = _tutorAction.asStateFlow()
 
+    private val _lastHeard = MutableStateFlow<HeardAttempt?>(null)
+    val lastHeard: StateFlow<HeardAttempt?> = _lastHeard.asStateFlow()
+
     /** True after praise or lead-and-move-on: no more scored attempts until the phoneme reloads. */
     private val _canContinue = MutableStateFlow(false)
     val canContinue: StateFlow<Boolean> = _canContinue.asStateFlow()
@@ -109,6 +119,7 @@ class SayItViewModel @Inject constructor(
             attemptNumber = 0
             _tutorAction.value = null
             _canContinue.value = false
+            _lastHeard.value = null
             val p = phonemeRepository.getPhonemeById(id)
             if (p == null) {
                 _loadError.value = true
@@ -321,6 +332,12 @@ class SayItViewModel @Inject constructor(
         val letter = _phoneme.value?.letter?.lowercase() ?: "m"
         val judgement = judgeTranscript(transcript, targetWord, letter)
         val isCorrect = judgement.isCorrect
+        _lastHeard.value = HeardAttempt(
+            transcript = transcript,
+            errorType = judgement.errorType,
+            isCorrect = isCorrect,
+            attempt = attemptNumber
+        )
         val profileId = sessionManager.activeProfileId.value ?: 1L
         val phonemeId = _phoneme.value?.id ?: 1
 

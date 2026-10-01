@@ -5,41 +5,46 @@
 
 ---
 
-## Latest Session Status (2026-09-30)
+## Latest Session Status (2026-10-01)
 
 | Field | Value |
 |---|---|
 | **Author** | agy |
 | **Branch** | `refactor/hear-say-it` |
-| **Head Commit** | `85a6ca2` |
-| **Subject** | `feat(audio): ship approved Kokoro key words and tutor carriers (NFR-AUD-01, FR-02)` |
-| **Active Card** | Card 05 (`Status: done`) |
+| **Head Commit** | `pending` |
+| **Subject** | `feat(sayit): feedback text follows the error type; debug transcript overlay (FR-03, NFR-ASR-01)` |
+| **Active Card** | Card 06 (`Status: done`) |
 | **Review Status** | Waiting for Claude's review & CI run on PR #2 |
 
 ---
 
-## What Was Completed in This Session (Card 05)
+## What Was Completed in This Session (Card 06)
 
-1. **Pre-Step Release Check**:
-   - Validated all 33 WAV audio files against `docs/audio-release/2026-09-30/manifest.json`.
-   - Verified 100% SHA-256 match for 26 key words and 7 tutor carriers.
-2. **Audio Assets Shipped**:
-   - `app/src/main/assets/audio/keywords/kw_<word>.wav` (26 files copied from release).
-   - `app/src/main/assets/audio/vo/tutor/<id>.wav` (7 files copied from release).
-3. **App Code Updated**:
-   - `AudioResolver.kt`: added `getKeyWordPath(word: String): String`, mapped `audio/keywords/` to `WORD` and `audio/vo/tutor/` to `VO` in `getDevPlaceholderForAsset`.
-   - `HearItViewModel.kt`: switched example word resolution in `buildSequence` to `getKeyWordPath`.
-   - `SayItViewModel.kt`: switched model playback in `playWordAudio()` and `evaluateSpeech()` to `getKeyWordPath`.
-4. **Unit Tests Added & Passing**:
-   - `AudioResolverTest.kt`: `getKeyWordPath_returnsWavInKeywordsFolder`, `devPlaceholder_mapsKeywordsAndTutor`.
-   - `AudioCompletenessCheckTest.kt`: `keywordClips_existForAll26SeededWords`, `approvedTutorCarriers_exist`.
-   - `HearItViewModelTest.kt`: updated stubs and verify assertions for `getKeyWordPath`.
-   - `SayItViewModelTest.kt`: updated stubs and verify assertions for `getKeyWordPath`.
-5. **Bookkeeping**:
-   - Ticked Card 05 in `13_MASTER_TASKS.md`.
-   - Changed Card 05 header to `Status: done`.
-   - Added pending row to `docs/evidence-log.md`.
-   - Pushed commit `85a6ca2` to `origin refactor/hear-say-it`.
+1. **SayItFeedbackCopy Domain Manager**:
+   - Created pure Kotlin `SayItFeedbackCopy.kt` with zero `android.*` imports.
+   - Maps `TutorAction`, `SpeechErrorType`, `wordMode`, and `word` to pedagogical feedback strings for mascot bubble and banner.
+   - Implements specific corrective copy for letter names, added vowels, substitutions, and no-speech; zero emojis and no "try again" phrases.
+   - Added unit test suite `SayItFeedbackCopyTest.kt` covering all prompt ladder levels and asserting zero occurrences of "try again".
+
+2. **SayItViewModel Diagnostics & Telemetry**:
+   - Added `HeardAttempt` data class and `lastHeard: StateFlow<HeardAttempt?>`.
+   - Records raw transcript, `SpeechErrorType`, correctness, and attempt count in `evaluateSpeech()`.
+   - Resets `lastHeard` to `null` on `loadPhoneme()`.
+   - Strictly avoided `android.util.Log` inside the ViewModel to protect unit test isolation.
+   - Added unit tests in `SayItViewModelTest.kt`: `evaluateSpeech_setsLastHeard`, `lastHeard_tracksAttemptNumber`, and `loadPhoneme_resetsLastHeard`.
+
+3. **SayItScreen Feedback & Diagnostics Binding**:
+   - Collected `tutorAction` and `lastHeard` flows.
+   - Connected `MascotSpeechHeader` message and bottom feedback banner to `SayItFeedbackCopy.forResult(...)`.
+   - Added debug overlay (`if (BuildConfig.DEBUG)`):
+     - On-screen diagnostic text under the banner: `Heard: "<transcript>" -> <errorType> (attempt <n>)`.
+     - `LaunchedEffect(lastHeard)` sending matching `Log.d("PlayIT-SayIt", ...)` telemetry.
+     - Release builds display and log nothing.
+
+4. **Bookkeeping**:
+   - Marked Card 06 as `Status: done` in `docs/tasks/card-06-sayit-feedback-diagnostics.md`.
+   - Ticked Card 06 in `docs/engineering-package/13_MASTER_TASKS.md`.
+   - Appended Card 06 row to `docs/evidence-log.md`.
 
 ---
 
