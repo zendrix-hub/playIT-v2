@@ -113,4 +113,4 @@ Images (agy session B, in parallel):
 
 | Card | Status | Note |
 |---|---|---|
-| 08 | being written | Asset card: Find It pictures, batch 1. Starts when it says `ready` |
+| 08 | ready | Asset card: 29 Find It and key-word pictures, in rounds until the user picks one per item. Writes only to `Documents\playIT-image-batches\2026-10-01-findit-batch-01\` |

@@ -25,6 +25,13 @@ Fix cards: when a review finds problems, Claude writes a fix card named after th
 | 06 | Say It feedback text follows the error type; debug transcript overlay | FR-03, NFR-ASR-01 |
 | 07 | Idle re-prompt (10 s) and spoken next-step cues | NFR-IND-01 |
 | 07b | Avatar-only onboarding, parent rename, voiced map pop-up (after 07 is accepted) | NFR-IND-01 |
+| 08 | Asset card (agy image session): 29 Find It and key-word pictures, regenerated in rounds until the user picks one per item | FR-05 |
+| 09 | The approved held /m/ replaces the Edge-TTS clip | NFR-AUD-01, FR-02 |
+| 10 | Screenshot tests (Roborazzi) so Claude can see every changed screen; CI artifact | — |
+| 11 | Stars and hearts: real inputs to the star math, 5-heart display, Blend It at 0 hearts | FR-04, FR-06, FR-13 |
+| 12 | Policy fixes: Find It distractors, gentle correction colour (no red, no buzzer), no emoji in the PDF | FR-05, FR-12 |
+| 13 | Approved batch-1 pictures into the app; "Up" gets its own picture | FR-05 |
+| 03b | Say It corrections built from fragments around the sound (spec §2.3) | FR-03 |
 
 How to run a card with the agent: agy follows `docs/tasks/AGY_RUNBOOK.md`. Start the session with:
 

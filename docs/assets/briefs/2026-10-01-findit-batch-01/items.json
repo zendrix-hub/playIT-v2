@@ -1,0 +1,249 @@
+{
+ "batch": "2026-10-01-findit-batch-01",
+ "size": "1024x1024",
+ "variants_per_round": 2,
+ "style_prompt": "Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark.",
+ "style_refs": [
+  "app/src/main/assets/images/pictures/picture_mouse.png",
+  "app/src/main/assets/images/pictures/picture_cat.png",
+  "app/src/main/assets/images/pictures/picture_duck.png",
+  "app/src/main/assets/images/pictures/picture_pig.png",
+  "app/src/main/assets/images/pictures/picture_gift.png",
+  "app/src/main/assets/images/pictures/picture_sun.png"
+ ],
+ "app_folder": "app/src/main/assets/images/pictures",
+ "items": [
+  {
+   "id": "picture_ant",
+   "word": "ant",
+   "letter": "a",
+   "why": "placeholder (4 colours, harsh red)",
+   "subject": "a friendly dark-brown ant standing on six short legs, two antennae, kawaii face",
+   "prompt": "A friendly dark-brown ant standing on six short legs, two antennae, kawaii face. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_axe",
+   "word": "axe",
+   "letter": "a",
+   "why": "placeholder (3 colours)",
+   "subject": "a small wooden axe with a rounded grey head and a short handle, toy-like and safe-looking",
+   "prompt": "A small wooden axe with a rounded grey head and a short handle, toy-like and safe-looking. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_egg",
+   "word": "egg",
+   "letter": "e",
+   "why": "placeholder (3 colours)",
+   "subject": "one whole white egg, standing upright, with a small white highlight",
+   "prompt": "One whole white egg, standing upright, with a small white highlight. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_envelope",
+   "word": "envelope",
+   "letter": "e",
+   "why": "placeholder (3 colours)",
+   "subject": "a closed paper envelope seen from the front, flap folded down, light cream paper",
+   "prompt": "A closed paper envelope seen from the front, flap folded down, light cream paper. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_igloo",
+   "word": "igloo",
+   "letter": "i",
+   "why": "placeholder (4 colours)",
+   "subject": "an igloo made of ice blocks, light blue-white, with a round dark doorway",
+   "prompt": "An igloo made of ice blocks, light blue-white, with a round dark doorway. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_ink",
+   "word": "ink",
+   "letter": "i",
+   "why": "placeholder (5 colours)",
+   "subject": "a small glass bottle of dark-blue ink with a drop of ink beside it",
+   "prompt": "A small glass bottle of dark-blue ink with a drop of ink beside it. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_king",
+   "word": "king",
+   "letter": "k",
+   "why": "placeholder: shows only a crown (reads as \"crown\")",
+   "subject": "a friendly cartoon king, head and shoulders, wearing a gold crown and a red-purple robe with white trim, kind smile",
+   "prompt": "A friendly cartoon king, head and shoulders, wearing a gold crown and a red-purple robe with white trim, kind smile. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_map",
+   "word": "map",
+   "letter": "m",
+   "why": "placeholder (4 colours, harsh red)",
+   "subject": "a folded paper treasure map with a dotted orange path and a small X, cream paper, a green island shape",
+   "prompt": "A folded paper treasure map with a dotted orange path and a small X, cream paper, a green island shape. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_net",
+   "word": "net",
+   "letter": "n",
+   "why": "placeholder (3 colours)",
+   "subject": "a butterfly net with a wooden handle and a round rim with a mesh bag",
+   "prompt": "A butterfly net with a wooden handle and a round rim with a mesh bag. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_nut",
+   "word": "nut",
+   "letter": "n",
+   "why": "placeholder (3 colours)",
+   "subject": "one brown nut like an acorn with its cap, rounded",
+   "prompt": "One brown nut like an acorn with its cap, rounded. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_owl",
+   "word": "owl",
+   "letter": "o",
+   "why": "placeholder (5 colours)",
+   "subject": "a brown owl, front view, big round eyes, small beak, folded wings, kawaii face",
+   "prompt": "A brown owl, front view, big round eyes, small beak, folded wings, kawaii face. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_ox",
+   "word": "ox",
+   "letter": "o",
+   "why": "placeholder (5 colours)",
+   "subject": "a friendly brown ox, front view, two curved horns, kawaii face",
+   "prompt": "A friendly brown ox, front view, two curved horns, kawaii face. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_quilt",
+   "word": "quilt",
+   "letter": "q",
+   "why": "placeholder (6 colours)",
+   "subject": "a folded patchwork quilt with soft colourful squares and stitching lines",
+   "prompt": "A folded patchwork quilt with soft colourful squares and stitching lines. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_six",
+   "word": "six",
+   "letter": "s",
+   "why": "placeholder (2 colours)",
+   "subject": "the number 6 as a chunky rounded blue numeral, with six small dots beside it",
+   "prompt": "The number 6 as a chunky rounded blue numeral, with six small dots beside it. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_snake",
+   "word": "snake",
+   "letter": "s",
+   "why": "placeholder (5 colours)",
+   "subject": "a green snake in a gentle S-shaped coil, friendly face, small tongue",
+   "prompt": "A green snake in a gentle S-shaped coil, friendly face, small tongue. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_star",
+   "word": "star",
+   "letter": "s",
+   "why": "placeholder (3 colours); 16 says no sharp points",
+   "subject": "a yellow five-pointed star with rounded points",
+   "prompt": "A yellow five-pointed star with rounded points. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_top",
+   "word": "top",
+   "letter": "t",
+   "why": "placeholder: a red diamond that does not read as a toy",
+   "subject": "a wooden spinning top toy with coloured stripes and a pointed tip, slightly tilted as if spinning",
+   "prompt": "A wooden spinning top toy with coloured stripes and a pointed tip, slightly tilted as if spinning. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_uncle",
+   "word": "uncle",
+   "letter": "u",
+   "why": "placeholder (3 colours)",
+   "subject": "a friendly Filipino man in his forties, head and shoulders, short black hair, small mustache, waving, simple polo shirt",
+   "prompt": "A friendly Filipino man in his forties, head and shoulders, short black hair, small mustache, waving, simple polo shirt. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_vase",
+   "word": "vase",
+   "letter": "v",
+   "why": "placeholder (4 colours)",
+   "subject": "a round ceramic vase with two flowers in it",
+   "prompt": "A round ceramic vase with two flowers in it. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_vest",
+   "word": "vest",
+   "letter": "v",
+   "why": "placeholder (3 colours)",
+   "subject": "a sleeveless vest with buttons, seen from the front",
+   "prompt": "A sleeveless vest with buttons, seen from the front. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_wing",
+   "word": "wing",
+   "letter": "w",
+   "why": "placeholder (2 colours)",
+   "subject": "one feathered bird wing, spread open, soft blue and white feathers",
+   "prompt": "One feathered bird wing, spread open, soft blue and white feathers. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_worm",
+   "word": "worm",
+   "letter": "w",
+   "why": "placeholder (3 colours)",
+   "subject": "a pink earthworm curved in a wave, friendly face",
+   "prompt": "A pink earthworm curved in a wave, friendly face. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_yak",
+   "word": "yak",
+   "letter": "y",
+   "why": "placeholder (5 colours)",
+   "subject": "a shaggy brown yak with long fur and two curved horns, kawaii face",
+   "prompt": "A shaggy brown yak with long fur and two curved horns, kawaii face. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_yarn",
+   "word": "yarn",
+   "letter": "y",
+   "why": "placeholder (3 colours)",
+   "subject": "a round ball of pink yarn with one loose strand",
+   "prompt": "A round ball of pink yarn with one loose strand. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_apple",
+   "word": "apple",
+   "letter": "a",
+   "why": "KEY WORD for a: today it looks like an orange and is nearly identical to picture_orange",
+   "subject": "one red apple with a brown stem and a green leaf, clearly an apple, not an orange",
+   "prompt": "One red apple with a brown stem and a green leaf, clearly an apple, not an orange. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_goat",
+   "word": "goat",
+   "letter": "g",
+   "why": "KEY WORD for g: today it looks like a green rabbit",
+   "subject": "a white goat, side view, small curved horns, a little beard, four legs, kawaii face",
+   "prompt": "A white goat, side view, small curved horns, a little beard, four legs, kawaii face. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_tiger",
+   "word": "tiger",
+   "letter": "t",
+   "why": "KEY WORD for t: today it has no stripes",
+   "subject": "an orange tiger with black stripes, sitting, kawaii face",
+   "prompt": "An orange tiger with black stripes, sitting, kawaii face. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_zebra",
+   "word": "zebra",
+   "letter": "z",
+   "why": "KEY WORD for z: today it has no stripes",
+   "subject": "a zebra with clear black-and-white stripes, side view, standing, kawaii face",
+   "prompt": "A zebra with clear black-and-white stripes, side view, standing, kawaii face. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_up",
+   "word": "up",
+   "letter": "u",
+   "why": "NEW: \"Up\" shows blendword_sub.png (a submarine)",
+   "subject": "a blue balloon floating up on a string, with a big chunky arrow pointing up beside it",
+   "prompt": "A blue balloon floating up on a string, with a big chunky arrow pointing up beside it. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes with no sharp points, flat colours with one soft shade and a small white highlight, bright friendly colours but no pure red, simple enough to recognise at thumbnail size. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no shadow, no ground, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  }
+ ]
+}

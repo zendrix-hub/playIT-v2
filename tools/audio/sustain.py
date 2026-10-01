@@ -72,6 +72,18 @@ def psola_sustain(core, sr, target_ms=800, f0=None, contour=((0, 1.0), (1, 1.0))
     out = call(man, "Get resynthesis (overlap-add)")
     return np.asarray(out.values[0], dtype=np.float32)
 
+def stretch_keep_pitch(y, sr, target_ms, fmin=75, fmax=500):
+    """Time-stretches y to target_ms with PSOLA, keeping its own pitch contour (only the duration
+    tier is replaced, so a rise-fall "Mmm!" stays a rise-fall, just slower)."""
+    s = _snd(y, sr)
+    dur = s.get_total_duration()
+    man = call(s, "To Manipulation", 0.01, fmin, fmax)
+    dtier = call("Create DurationTier", "dur", 0, dur)
+    call(dtier, "Add point", 0, target_ms / 1000 / dur)
+    call([man, dtier], "Replace duration tier")
+    out = call(man, "Get resynthesis (overlap-add)")
+    return np.asarray(out.values[0], dtype=np.float32)
+
 def swell(y, sr, attack_ms=90, peak_at=0.35, end_db=-7.0, release_ms=70):
     """Natural loudness shape: quick rise, peak at peak_at of the clip, gentle decay to end_db,
     then a short release. The app's older /m/ swells about 13 dB; this is gentler."""
