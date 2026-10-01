@@ -28,15 +28,15 @@ Repeat A2 and A3 **three times each**. What we learn from them:
 
 | # | Do | Expected |
 |---|---|---|
-| B1 | Open Hear It for M and let the sequence finish | You hear "Great listening! Tap the big button." (if the UI clips shipped) and the Next button pulses |
+| B1 | Open Hear It for M and let the sequence finish | While the sequence plays, "Next: Say It" stays disabled. When it ends, you hear "Great listening! Tap the big button." and the Next button unlocks and pulses |
 | B2 | On Hear It, don't touch anything for 10 s | The cue repeats; after 3 repeats it stops |
 | B3 | On Hear It, touch the screen every 5 s for 30 s | No re-prompt while you keep touching |
 | B4 | In Find It, find all 3 pictures | Chime, praise, then "You found them all! Tap the big button."; "Complete Lesson" pulses |
 | B5 | In Find It, wait 10 s before tapping anything | The Find It instruction replays |
-| B6 | Finish a letter (complete screen) | Fanfare, lines, then "You did it! Tap the big button."; "Continue to Map" pulses |
+| B6 | Finish a letter (complete screen), then wait 10 s | Fanfare, lines, then "You did it! Tap the big button."; "Continue to Map" pulses. The 10 s re-prompt never cuts into the fanfare or lines |
 | B7 | Turn on reduced motion (if available) and repeat B1 | The pulse is much smaller |
 
-If the UI clips were not shipped tonight, B1, B4 and B6 have no voice cue, but the pulse must still appear.
+The UI clips ship with card 07 (release `docs/audio-release/2026-10-01/`). If a cue is silent, check that `app/src/main/assets/audio/vo/ui/` has the three clips.
 
 ## Results (copy and fill in)
 | # | What you heard or saw | "Heard:" line (A only) | Pass / Fail | Note |

@@ -210,6 +210,13 @@ Say It no longer removes hearts. Hearts stay in Find It, where a wrong tap is th
 
 **Source.** Adviser review of AI-generated audio.
 
+**Amendment (2026-10-01, user decision; adviser confirmation pending).**
+- Kokoro phoneme input failed every listening review for the held /m/: 8 methods scored 1/5 on 2026-09-30, and PSOLA round 2 was also rejected.
+- Continuous sounds may therefore also come from Chatterbox-Turbo (MIT license), voice-cloned from a Kokoro reference clip so the voice matches the other lines. The user picks per clip, by ear.
+- The text input is an interjection such as "Mmm!", not a letter name, so the rule against asking an AI voice to say a letter alone still holds.
+- The first released Chatterbox clip is /m/ (`Documents/playIT-audio-batches/2026-09-30-routeA-chatterbox-m/raw/t3_s3.wav`, scored 5/5).
+- All three gates in Table 6 still apply, and the manifest records the tool as `chatterbox-turbo` with its version.
+
 ### 5.3 FR-03 Say It: Tutoring Loop · Modified · P1
 
 **Requirement.** After the modeling sequence, the system shall run a we-do step ("Say it with me," twice, not scored) and then a you-do step. In the you-do step, the microphone shall open automatically after "Your turn!" **[proposed]** and wait up to 5 s. The mic shall always show one of four states (Idle, Listening, Processing, Result), and while Listening a ripple shall follow the live input level. The system shall respond to each attempt with the prompt ladder in Table 7 and the corrections in Section 3.2. Say It shall not remove hearts **[confirm]**.

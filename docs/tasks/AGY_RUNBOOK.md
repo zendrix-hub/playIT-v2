@@ -14,7 +14,9 @@ Push rules for Claude and agy: push only to `origin refactor/hear-say-it`. Never
 
 ## Session start
 1. Read AGENTS.md, docs/tasks/README.md, and the spec sections the card cites.
-2. Pick the first `docs/tasks/card-NN-*.md` (lowest NN) whose header says `Status: ready`. Card status values are defined in docs/tasks/README.md.
+2. Pick the first `ready` card in the order of the "Current queue" table at the end of this file (a fix card `card-NNb` comes first). Card status values are defined in docs/tasks/README.md.
+   - A code session takes only code cards.
+   - An image session takes only asset cards (their header says `Type: asset`).
 3. If no card is ready, say so and stop.
 
 ## Execute one card only (or two, see below)
@@ -26,6 +28,26 @@ Allowed only when the queue below marks two cards `ready` and their Files lists 
 1. Run the first card completely: tests, commit, push, and an update to `SESSION_HANDOFF.md`.
 2. Start the second card in a fresh session from `Session start`, and give it its own commit and push.
 3. If the first card stops (stop-and-ask) or its local tests fail, do not start the second card.
+
+## Relay mode (user decision 2026-10-01)
+On a relay night agy runs cards one after another, and Claude reviews each one before the next starts:
+1. agy runs one card completely (tests, commit, push, `SESSION_HANDOFF.md` note), reports the hash, and stops.
+2. The user tells Claude "pull and review". Claude either sets the card to `accepted` or writes its fix card `card-NNb-*.md` with `Status: ready`, and pushes.
+3. The user starts a fresh agy session. agy pulls first, then takes the first `ready` card in the queue below (a fix card always comes before new cards).
+
+In relay mode two cards may touch the same file, because each starts from reviewed code. Never start a card while the previous one is `done` but not yet reviewed.
+
+## Pull before you start, and if your push is rejected
+- Start every session with `git pull origin refactor/hear-say-it`. Claude pushes docs (cards, releases, reviews) between your sessions.
+- If `git push` is rejected because Claude pushed meanwhile, run `git pull --rebase origin refactor/hear-say-it` and push again. Your commit is not pushed yet, so rebasing it rewrites nothing shared. If the rebase has a conflict in a file outside your card, stop and ask.
+
+## Asset cards (images)
+An asset card generates images with agy's built-in image model (Nano Banana Pro). It runs in its own agy session, alongside the code relay. The card says which files to read.
+- It writes only into its batch folder outside the repo, `C:\Users\riva.zn\Documents\playIT-image-batches\<batch>\`. It never writes into `app/`, never commits, and never pushes.
+- It works in rounds until the user has picked an image for every item; the card describes the loop. Claude sets the card's status from the batch folder (`picks.json`).
+
+## Image gate
+Images go into `app/src/main/assets/images/` only when a card says so, and only files listed in a `docs/image-release/<date>/manifest.json`. Those are images the user approved on a review page, after Claude's cutout and checks. Copy them unchanged and check them against the manifest's SHA-256, as with audio. Anything not in an image release manifest is not approved.
 
 ## Tests
 - Run `./gradlew testDebugUnitTest`.
@@ -76,19 +98,19 @@ Write the question to `docs/tasks/QUESTIONS.md` (card, question, what you found,
 - Add or replace audio in `app/src/main/assets/` unless a card says so.
 - Use emojis in UI text.
 
-## Current queue (2026-09-30, after CI)
-The `Status:` line in each card is the source of truth; this table is a snapshot.
+## Current queue (2026-10-01, relay night)
+The `Status:` line in each card is the source of truth; this table is a snapshot. Cards 00-05 are accepted (CI green on draft PR #2; see `docs/evidence-log.md`).
+
+Code relay (agy session A), in this order:
+
+| Order | Card | Status | Note |
+|---|---|---|---|
+| 1 | 06 | ready | Say It feedback text and debug "Heard:" overlay |
+| 2 | 07 | ready | Idle re-prompt and next-step cues. Revised 2026-10-01; its pre-step copies 3 UI clips from `docs/audio-release/2026-10-01/` |
+| 3+ | 09, 10, 07b, 11, 12, 03b | being written | Claude marks each `ready` and adds it here. Take the first `ready` one in this table's order |
+
+Images (agy session B, in parallel):
 
 | Card | Status | Note |
 |---|---|---|
-| 00 | accepted | CI green (draft PR #2) |
-| 01 | accepted | CI green; phone test pending |
-| 02 | accepted | CI green; phone test pending |
-| 03 | accepted | CI green; phone test pending. The tutor-script proposal (docs/proposals/2026-09-30-tutor-script.md) will need a fix card 03b once the user approves the script; it also covers the third-miss banner, which still says "Let's try again" |
-| 04 | accepted | CI green; phone test pending |
-| 05 | accepted | 85a6ca2; CI green; phone test 2026-09-30: Hear It and Say It ladder pass, foil feedback not observable yet |
-
-| 06 | ready | Say It feedback text and debug transcript overlay |
-| 07 | ready | Idle re-prompt (10 s) and spoken next-step cues; Files disjoint from card 06, so 06 and 07 may run the same night |
-
-Cards 06 and 07 come from `docs/proposals/2026-10-01-learning-ux.md`, which also lists the next cards (07b onward). They wait for the user's go signal.
+| 08 | being written | Asset card: Find It pictures, batch 1. Starts when it says `ready` |

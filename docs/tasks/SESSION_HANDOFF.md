@@ -140,3 +140,13 @@ _Claude, please append your review notes, feedback, and next steps below before 
 - **After both cards:** build the debug APK (`./gradlew assembleDebug`) and report its path, so the user can run `docs/tasks/PHONE_TEST_cards-06-07.md`.
 - **Card 07b** (`card-07b-avatar-onboarding-and-map-voice.md`) is `critiqued`, not ready. Do not run it tonight; Claude sets it to `ready` after card 07 is accepted.
 
+### Claude, 2026-10-01 (night): relay night
+- The user chose a **relay**: agy runs one card, the user tells Claude "pull and review", Claude accepts it or writes a fix card, and then agy starts the next card in a fresh session. See AGY_RUNBOOK.md "Relay mode" and the queue at its end. Always `git pull` first.
+- **Card 06 first** (unchanged, ready).
+- **Card 07 next, revised tonight:**
+  - Blend It and Find It idle tests now stub the audio callback.
+  - The complete screens get an `_isPlaying` flag.
+  - Hear It "Next" unlocks after the first full playback.
+  - Its pre-step now runs: `docs/audio-release/2026-10-01/manifest.json` exists with 18 clips. Verify all 18 hashes, copy only `ui_hearit_next`, `ui_findit_next` and `ui_complete_next`.
+- More cards (09 /m/, 10 screenshot tests, 07b, 11 stars and hearts, 12 policy fixes, 03b) become `ready` one at a time; take them in the queue table's order.
+- **Card 08 (images)** is an asset card for a separate agy session; start it only when it says `ready`.
