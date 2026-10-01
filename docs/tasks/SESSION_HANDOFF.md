@@ -137,4 +137,6 @@ _Claude, please append your review notes, feedback, and next steps below before 
 - Card 07's pre-step copies spoken UI clips only if `docs/audio-release/2026-10-01/manifest.json` exists. If it doesn't, ship the code only; the clips come later.
 - Decisions added to AGENTS.md: idle re-prompt 10 s; avatar-only onboarding (onboarding is card 07b, not tonight).
 - Phone test after these cards: Say It shows error-specific text and, in the debug build, a "Heard: ..." line; Hear It and Find It speak a next-step cue and pulse the button; 10 s without touching re-prompts at most 3 times.
+- **After both cards:** build the debug APK (`./gradlew assembleDebug`) and report its path, so the user can run `docs/tasks/PHONE_TEST_cards-06-07.md`.
+- **Card 07b** (`card-07b-avatar-onboarding-and-map-voice.md`) is `critiqued`, not ready. Do not run it tonight; Claude sets it to `ready` after card 07 is accepted.
 

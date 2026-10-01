@@ -24,6 +24,7 @@ Fix cards: when a review finds problems, Claude writes a fix card named after th
 | 05 | Approved Kokoro key words and tutor carriers into the app | NFR-AUD-01, FR-02 |
 | 06 | Say It feedback text follows the error type; debug transcript overlay | FR-03, NFR-ASR-01 |
 | 07 | Idle re-prompt (10 s) and spoken next-step cues | NFR-IND-01 |
+| 07b | Avatar-only onboarding, parent rename, voiced map pop-up (after 07 is accepted) | NFR-IND-01 |
 
 How to run a card with the agent: agy follows `docs/tasks/AGY_RUNBOOK.md`. Start the session with:
 
