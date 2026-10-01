@@ -69,7 +69,7 @@
 ### Manual Verification Checklist & Phone Observations:
 | Area | Verification Target | Expected Behavior | Observed Result |
 |---|---|---|---|
-| **Hear It (FR-02)** | Modeling Sequence | Attention ("Look at Lily") -> Card flip reveal -> Pure sound 3x (`/m/`) -> Key word ("Mouse") -> Pure sound -> Hand-off ("Now your turn") | **PASS** — Sequence plays cleanly with Kokoro clips. |
+| **Hear It (FR-02)** | Modeling Sequence | "Listen!" -> "This letter says..." -> /m/ x3 with 500 ms pauses -> key word "mouse" (Kokoro) -> /m/ -> "Say it with me!" (the /m/ is still the old Edge clip until the held-sound card) | **PASS** — Sequence plays cleanly with Kokoro clips. |
 | **Hear It (FR-02)** | Replay Ear Button | Tap ear button on bottom right | **PASS** — Repeats sequence cleanly without overlap or crash. |
 | **Say It (FR-03)** | Target Word Tap | Tap letter card speaker icon | **PASS** — Plays Kokoro key word clip (`kw_mouse.wav`), debounces rapid taps. |
 | **Say It (NFR-ASR-01)** | Letter Name Foil | Utter letter name (e.g. "em" / `/ɛm/`) | **NOT EXECUTED / NO FEEDBACK** — Saying "em" did not trigger corrective feedback. See root cause analysis below. |
@@ -100,7 +100,7 @@ During tonight's test, uttering letter names ("em") and added vowels ("muh") did
    - Neither the mascot bubble nor the bottom banner binds to `SayItState.Incorrect.errorType` (`LETTER_NAME`, `ADDED_VOWEL`, `SUBSTITUTION`). Thus, the child receives no visual cue that a foil was recognized.
 
 3. **Vosk Grammar & Short Foil Acoustic Matching**:
-   - In Word Mode ("mouse"), `speechValidator.grammarFor("m", "mouse")` scopes the grammar to: `["mouse", "em", "muh", "mm", "mmm", "ma", "me", "moo", "um", "am", "s", "n"]`.
+   - In Word Mode ("mouse"), `speechValidator.grammarFor("m", "mouse")` returns `["mouse", "m", "em", "ma", "muh"]`; VoskRecognizer appends `[unk]`. (Corrected by Claude 2026-10-01: the earlier 12-word list here did not match the code.) All five words are in the Vosk model vocabulary, so a miss is acoustic, not a missing word.
    - If the acoustic model does not register the child's short utterance against "em" or "muh", it falls back to `[unk]` or empty string, which `judgeWord` classifies as `NO_SPEECH` / `OTHER_WORD` instead of `LETTER_NAME` or `ADDED_VOWEL`.
 
 ---
@@ -122,5 +122,14 @@ During tonight's test, uttering letter names ("em") and added vowels ("muh") did
 
 ## Directives for Next Session (Reserved for Claude)
 _Claude, please append your review notes, feedback, and next steps below before agy begins the next session._
+
+### Claude review, 2026-10-01
+- **Card 05 (85a6ca2): accepted.** The code matches the card. All 33 shipped clips match the manifest SHA-256 and nothing else was added under assets. The tests named in the card exist. CI is green (run 36711346769) and the local run is green. The `AudioCompletenessCheckTest` path fallback (works from the repo root or the module) is outside the card's text but harmless; kept.
+- **This file (8e78bd5, 4316222):** kept as the session bridge and added to the runbook's bookkeeping files. Rule: facts only. Quote code and commands, don't paraphrase them; two statements here did not match the code and are corrected above.
+- **Phone test, 2026-09-30:** recorded in the evidence log. The "em"/"muh" finding has two possible causes, and the app cannot tell them apart yet:
+  1. Vosk heard the foil, but the correction clips are not shipped (fragments still pending the user's script approval), so the child heard only pop -> "mouse" -> "Your turn!", while the banner showed the generic "Good try! Let's try again."
+  2. Vosk did not hear the foil (acoustic; the Sep 28 spike already saw "em" come back empty).
+  The next card adds a debug-build log of what Vosk heard, so the phone test can separate 1 from 2.
+- **Next:** no card is ready. Claude will propose the next card (Say It feedback text bound to the error type, and on-device transcript logging) for the user's go signal. Card 03b (fragment compositions) waits for the script approval and the /m/ decision.
 
 

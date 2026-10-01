@@ -1,6 +1,6 @@
 # Card 05: Approved key words and tutor carriers into the app (NFR-AUD-01, FR-02)
 
-Status: done
+Status: accepted
 
 ## Why
 The app's key words and phonemes are Edge-TTS clips (`scripts/upgrade_neural_audio_pipeline.py`), which have no redistribution rights. Card 03's tutor clips were removed because they were never approved (6e07d19), so Hear It and Say It currently skip every tutor line. The user approved 26 key words and 7 carrier lines in the chosen Kokoro voice on 2026-09-30. This card ships exactly those clips and points Hear It and Say It at them. Held sounds (phonemes), the correction fragments, and Blend It words are not part of this card.

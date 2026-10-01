@@ -18,7 +18,7 @@ Push rules for Claude and agy: push only to `origin refactor/hear-say-it`. Never
 3. If no card is ready, say so and stop.
 
 ## Execute one card only
-- Change only the files the card lists, plus the bookkeeping files: `docs/engineering-package/13_MASTER_TASKS.md`, `docs/evidence-log.md`, and the card's own `Status:` line.
+- Change only the files the card lists, plus the bookkeeping files: `docs/engineering-package/13_MASTER_TASKS.md`, `docs/evidence-log.md`, the card's own `Status:` line, and `docs/tasks/SESSION_HANDOFF.md` (session notes and phone-test results for Claude; facts only, quote code and commands instead of paraphrasing).
 - Write every test in the card's Tests section.
 
 ## Tests
@@ -80,6 +80,6 @@ The `Status:` line in each card is the source of truth; this table is a snapshot
 | 02 | accepted | CI green; phone test pending |
 | 03 | accepted | CI green; phone test pending. The tutor-script proposal (docs/proposals/2026-09-30-tutor-script.md) will need a fix card 03b once the user approves the script; it also covers the third-miss banner, which still says "Let's try again" |
 | 04 | accepted | CI green; phone test pending |
-| 05 | ready | Ships the 33 clips in docs/audio-release/2026-09-30 |
+| 05 | accepted | 85a6ca2; CI green; phone test 2026-09-30: Hear It and Say It ladder pass, foil feedback not observable yet |
 
-Card 05 (approved key words and tutor carriers) is ready. Cards 06 onward are proposals in `docs/proposals/2026-09-29-next-cards-and-story-hook.md` and wait for the user's go signal.
+No card is ready. Cards 06 onward are proposals in `docs/proposals/2026-09-29-next-cards-and-story-hook.md` and wait for the user's go signal.
