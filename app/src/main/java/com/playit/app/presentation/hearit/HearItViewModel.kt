@@ -8,6 +8,7 @@ import com.playit.app.data.audio.AudioResolver
 import com.playit.app.domain.manager.HearItSequenceBuilder
 import com.playit.app.domain.model.Phoneme
 import com.playit.app.domain.repository.PhonemeRepository
+import com.playit.app.presentation.components.IdleTimer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,6 +37,34 @@ class HearItViewModel @Inject constructor(
 
     private val _loadError = MutableStateFlow(false)
     val loadError: StateFlow<Boolean> = _loadError.asStateFlow()
+
+    private var firstPlaybackDone = false
+
+    private val _nextHighlighted = MutableStateFlow(false)
+    val nextHighlighted: StateFlow<Boolean> = _nextHighlighted.asStateFlow()
+
+    private val idleTimer = IdleTimer(
+        scope = viewModelScope,
+        isBusy = { _isPlaying.value || _isPlayingPrompt.value }
+    ) {
+        if (_nextHighlighted.value) {
+            audioPlayer.playAssetAudio(audioResolver.getUiPath("ui_hearit_next"))
+        } else {
+            playModelingSequence()
+        }
+    }
+
+    fun onScreenVisible() {
+        idleTimer.start()
+    }
+
+    fun onScreenHidden() {
+        idleTimer.stop()
+    }
+
+    fun onUserInteraction() {
+        idleTimer.touch()
+    }
 
     init {
         loadPhoneme()
@@ -72,6 +101,11 @@ class HearItViewModel @Inject constructor(
         audioPlayer.playSequence(buildSequence(HearItSequenceBuilder.TEMPLATE)) {
             _isPlayingPrompt.value = false
             _isPlaying.value = false
+            if (!firstPlaybackDone) {
+                firstPlaybackDone = true
+                _nextHighlighted.value = true
+                audioPlayer.playAssetAudio(audioResolver.getUiPath("ui_hearit_next"))
+            }
         }
     }
 
@@ -87,6 +121,11 @@ class HearItViewModel @Inject constructor(
         _playCount.value++
         audioPlayer.playSequence(buildSequence(HearItSequenceBuilder.replayTemplate())) {
             _isPlaying.value = false
+            if (!firstPlaybackDone) {
+                firstPlaybackDone = true
+                _nextHighlighted.value = true
+                audioPlayer.playAssetAudio(audioResolver.getUiPath("ui_hearit_next"))
+            }
         }
     }
 
@@ -108,6 +147,7 @@ class HearItViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
+        idleTimer.stop()
         audioPlayer.stop()
     }
 }

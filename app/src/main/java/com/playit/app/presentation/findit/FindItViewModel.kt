@@ -14,6 +14,7 @@ import com.playit.app.domain.model.Phoneme
 import com.playit.app.domain.repository.FindItAttemptRepository
 import com.playit.app.domain.repository.PhonemeRepository
 import com.playit.app.navigation.SessionManager
+import com.playit.app.presentation.components.IdleTimer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -68,6 +69,32 @@ class FindItViewModel @Inject constructor(
 
     private val _loadError = MutableStateFlow(false)
     val loadError: StateFlow<Boolean> = _loadError.asStateFlow()
+
+    private val _nextHighlighted = MutableStateFlow(false)
+    val nextHighlighted: StateFlow<Boolean> = _nextHighlighted.asStateFlow()
+
+    private val idleTimer = IdleTimer(
+        scope = viewModelScope,
+        isBusy = { _isPlaying.value || _isPlayingPrompt.value }
+    ) {
+        if (_nextHighlighted.value) {
+            audioPlayer.playAssetAudio(audioResolver.getUiPath("ui_findit_next"))
+        } else {
+            playFindItIntroAudio()
+        }
+    }
+
+    fun onScreenVisible() {
+        idleTimer.start()
+    }
+
+    fun onScreenHidden() {
+        idleTimer.stop()
+    }
+
+    fun onUserInteraction() {
+        idleTimer.touch()
+    }
 
     init {
         loadGrid()
@@ -158,8 +185,10 @@ class FindItViewModel @Inject constructor(
 
             if (newFound.size >= 3) {
                 _state.value = FindItState.Completed(target.letter)
+                _nextHighlighted.value = true
                 val vo = audioResolver.getRotatingCorrectVo()
-                audioPlayer.playSequence(listOf(sfx, vo))
+                val nextCue = audioResolver.getUiPath("ui_findit_next")
+                audioPlayer.playSequence(listOf(sfx, vo, nextCue))
             } else {
                 _state.value = FindItState.FoundOne(item, newFound.size)
                 audioPlayer.playAssetAudio(sfx)
@@ -185,12 +214,14 @@ class FindItViewModel @Inject constructor(
     fun restartSession() {
         heartManager.resetForRestart()
         _hearts.value = heartManager.currentHearts
+        _nextHighlighted.value = false
         _state.value = FindItState.Idle
         loadGrid()
     }
 
     override fun onCleared() {
         super.onCleared()
+        idleTimer.stop()
         audioPlayer.stop()
     }
 }

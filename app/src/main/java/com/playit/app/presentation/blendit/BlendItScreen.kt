@@ -23,9 +23,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import com.playit.app.presentation.components.resetsIdle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -81,9 +83,17 @@ fun BlendItScreen(
         }
     }
 
+    DisposableEffect(Unit) {
+        viewModel.onScreenVisible()
+        onDispose {
+            viewModel.onScreenHidden()
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .resetsIdle { viewModel.onUserInteraction() }
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(

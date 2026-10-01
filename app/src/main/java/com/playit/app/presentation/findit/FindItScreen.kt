@@ -24,6 +24,7 @@ import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
@@ -42,6 +43,8 @@ import com.playit.app.presentation.components.LessonStep
 import com.playit.app.presentation.components.LessonTopBar
 import com.playit.app.presentation.components.MascotSpeechHeader
 import com.playit.app.presentation.components.MascotState
+import com.playit.app.presentation.components.breathingPulse
+import com.playit.app.presentation.components.resetsIdle
 import com.playit.app.presentation.theme.*
 
 @Composable
@@ -58,12 +61,21 @@ fun FindItScreen(
     val hearts by viewModel.hearts.collectAsStateWithLifecycle()
     val isPlaying by viewModel.isPlaying.collectAsStateWithLifecycle()
     val isPlayingPrompt by viewModel.isPlayingPrompt.collectAsStateWithLifecycle()
+    val nextHighlighted by viewModel.nextHighlighted.collectAsStateWithLifecycle()
+
+    DisposableEffect(Unit) {
+        viewModel.onScreenVisible()
+        onDispose {
+            viewModel.onScreenHidden()
+        }
+    }
 
     val targetLetter = targetPhoneme?.letter?.uppercase() ?: "M"
 
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .resetsIdle { viewModel.onUserInteraction() }
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
@@ -316,6 +328,7 @@ fun FindItScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(64.dp)
+                            .breathingPulse(enabled = nextHighlighted)
                     )
                 }
             }

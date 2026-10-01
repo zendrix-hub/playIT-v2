@@ -18,11 +18,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.playit.app.presentation.components.breathingPulse
+import com.playit.app.presentation.components.resetsIdle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -47,12 +50,21 @@ fun BlendItCompleteScreen(
     onReturnToMap: () -> Unit
 ) {
     val starsEarned by viewModel.starsEarned.collectAsStateWithLifecycle()
+    val nextHighlighted by viewModel.nextHighlighted.collectAsStateWithLifecycle()
     
     var isPlaying by remember { mutableStateOf(true) }
+
+    DisposableEffect(Unit) {
+        viewModel.onScreenVisible()
+        onDispose {
+            viewModel.onScreenHidden()
+        }
+    }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .resetsIdle { viewModel.onUserInteraction() }
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
@@ -165,6 +177,7 @@ fun BlendItCompleteScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(64.dp)
+                        .breathingPulse(enabled = nextHighlighted)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxSize(),

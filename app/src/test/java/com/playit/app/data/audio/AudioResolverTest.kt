@@ -115,5 +115,15 @@ class AudioResolverTest {
         assertEquals(DevAudioCategory.WORD.assetPath, audioResolver.getDevPlaceholderForAsset("audio/keywords/kw_mouse.wav"))
         assertEquals(DevAudioCategory.VO.assetPath, audioResolver.getDevPlaceholderForAsset("audio/vo/tutor/car_listen.wav"))
     }
+
+    @Test
+    fun getUiPath_returnsWavInUiFolder() {
+        assertEquals("audio/vo/ui/ui_hearit_next.wav", audioResolver.getUiPath("ui_hearit_next"))
+    }
+
+    @Test
+    fun devPlaceholder_mapsUiLines() {
+        assertEquals(DevAudioCategory.VO.assetPath, audioResolver.getDevPlaceholderForAsset("audio/vo/ui/ui_hearit_next.wav"))
+    }
 }
 

@@ -102,6 +102,11 @@ class AudioResolver @Inject constructor() {
     fun getTutorPath(id: String): String = "audio/vo/tutor/$id.wav"
 
     /**
+     * Resolves the asset path for a spoken UI cue line.
+     */
+    fun getUiPath(id: String): String = "audio/vo/ui/$id.wav"
+
+    /**
      * Rotates between vo_correct_01 and vo_correct_02.
      */
     fun getRotatingCorrectVo(): String {
@@ -144,6 +149,7 @@ class AudioResolver @Inject constructor() {
             assetPath.startsWith("audio/words/") -> DevAudioCategory.WORD.assetPath
             assetPath.contains("audio/keywords/") -> DevAudioCategory.WORD.assetPath
             assetPath.contains("audio/vo/tutor/") -> DevAudioCategory.VO.assetPath
+            assetPath.contains("audio/vo/ui/") -> DevAudioCategory.VO.assetPath
             assetPath.contains("sfx_") -> DevAudioCategory.SFX.assetPath
             assetPath.contains("vo_") -> DevAudioCategory.VO.assetPath
             else -> DevAudioCategory.SFX.assetPath

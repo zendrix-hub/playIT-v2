@@ -52,6 +52,7 @@ class LetterCompleteViewModelTest {
         every { sessionManager.activeProfileId } returns MutableStateFlow(1L)
         every { audioResolver.getSfxPath(any()) } returns "sfx_path.mp3"
         every { audioResolver.getVoPath(any()) } returns "vo_path.mp3"
+        every { audioResolver.getUiPath(any()) } answers { "ui/${firstArg<String>()}.wav" }
         coEvery { phonemeRepository.getPhonemeById(1) } returns testPhoneme
     }
 
@@ -81,7 +82,7 @@ class LetterCompleteViewModelTest {
             )
         }
         coVerify { streakTracker.recordActivity(1L) }
-        verify { audioPlayer.playSequence(any()) }
+        verify { audioPlayer.playSequence(any(), any()) }
     }
 
     @Test
@@ -156,5 +157,38 @@ class LetterCompleteViewModelTest {
         assertFalse(viewModel.loadError.value)
         assertEquals(testPhoneme, viewModel.phoneme.value)
         coVerify(exactly = 1) { lessonProgressRepository.saveProgress(any()) }
+    }
+
+    @Test
+    fun completion_appendsNextCue() = runTest {
+        viewModel = LetterCompleteViewModel(
+            phonemeRepository, lessonProgressRepository, streakTracker,
+            sessionManager, audioPlayer, audioResolver, savedStateHandle
+        )
+        advanceUntilIdle()
+
+        verify {
+            audioPlayer.playSequence(
+                match { it.lastOrNull() == "ui/ui_complete_next.wav" },
+                any()
+            )
+        }
+        assertTrue(viewModel.nextHighlighted.value)
+    }
+
+    @Test
+    fun idle_waitsForCompletionSequence() = runTest {
+        viewModel = LetterCompleteViewModel(
+            phonemeRepository, lessonProgressRepository, streakTracker,
+            sessionManager, audioPlayer, audioResolver, savedStateHandle
+        )
+        advanceUntilIdle()
+
+        viewModel.onScreenVisible()
+        advanceTimeBy(30_000)
+
+        verify(exactly = 0) {
+            audioPlayer.playAssetAudio("ui/ui_complete_next.wav", any())
+        }
     }
 }

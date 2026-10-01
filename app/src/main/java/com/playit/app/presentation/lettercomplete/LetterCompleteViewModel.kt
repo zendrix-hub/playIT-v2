@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.playit.app.presentation.components.IdleTimer
 import javax.inject.Inject
 
 @HiltViewModel
@@ -43,6 +44,30 @@ class LetterCompleteViewModel @Inject constructor(
 
     private val _loadError = MutableStateFlow(false)
     val loadError: StateFlow<Boolean> = _loadError.asStateFlow()
+
+    private val _isPlaying = MutableStateFlow(false)
+    val isPlaying: StateFlow<Boolean> = _isPlaying.asStateFlow()
+
+    private val _nextHighlighted = MutableStateFlow(false)
+    val nextHighlighted: StateFlow<Boolean> = _nextHighlighted.asStateFlow()
+
+    private val idleTimer = IdleTimer(
+        scope = viewModelScope,
+        isBusy = { _isPlaying.value },
+        onIdle = { audioPlayer.playAssetAudio(audioResolver.getUiPath("ui_complete_next")) }
+    )
+
+    fun onScreenVisible() {
+        idleTimer.start()
+    }
+
+    fun onScreenHidden() {
+        idleTimer.stop()
+    }
+
+    fun onUserInteraction() {
+        idleTimer.touch()
+    }
 
     init {
         completeLesson()
@@ -83,18 +108,24 @@ class LetterCompleteViewModel @Inject constructor(
             )
             streakTracker.recordActivity(profileId)
 
-            // Play completion fanfare + complete VO line, followed by unlock chime + unlock VO
+            // Play completion fanfare + complete VO line, followed by unlock chime + unlock VO + next cue
             val fanfareSfx = audioResolver.getSfxPath(SfxEvent.LEVEL_COMPLETE_FANFARE)
             val completeVo = audioResolver.getVoPath(VoContext.COMPLETE_01)
             val unlockSfx = audioResolver.getSfxPath(SfxEvent.NODE_UNLOCK_CHIME)
             val unlockVo = audioResolver.getVoPath(VoContext.UNLOCK_01)
+            val nextCue = audioResolver.getUiPath("ui_complete_next")
 
-            audioPlayer.playSequence(listOf(fanfareSfx, completeVo, unlockSfx, unlockVo))
+            _nextHighlighted.value = true
+            _isPlaying.value = true
+            audioPlayer.playSequence(listOf(fanfareSfx, completeVo, unlockSfx, unlockVo, nextCue)) {
+                _isPlaying.value = false
+            }
         }
     }
 
     override fun onCleared() {
         super.onCleared()
+        idleTimer.stop()
         audioPlayer.stop()
     }
 }

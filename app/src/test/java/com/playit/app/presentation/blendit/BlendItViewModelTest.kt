@@ -55,6 +55,7 @@ class BlendItViewModelTest {
         every { audioResolver.getRotatingEncourageVo() } returns "encourage_vo.mp3"
         every { audioResolver.getRotatingHintVo() } returns "hint_vo.mp3"
         every { audioResolver.getVoPath(any()) } returns "vo_path.mp3"
+        every { audioResolver.getUiPath(any()) } answers { "ui/${firstArg<String>()}.wav" }
     }
 
     @After
@@ -198,5 +199,25 @@ class BlendItViewModelTest {
         assertEquals(5, viewModel.hearts.value)
         assertEquals(0, viewModel.currentWordIndex.value)
         assertEquals(BlendItUiState.Idle, viewModel.uiState.value)
+    }
+
+    @Test
+    fun idle_replaysIntro() = runTest {
+        every { audioPlayer.playAssetAudio(any(), any()) } answers {
+            secondArg<(() -> Unit)?>()?.invoke()
+        }
+
+        viewModel = BlendItViewModel(
+            blendItWordRepository, blendItAttemptRepository, blendItWordSelector,
+            sessionManager, audioPlayer, audioResolver, savedStateHandle
+        )
+        advanceUntilIdle()
+
+        clearMocks(audioPlayer, answers = false)
+
+        viewModel.onScreenVisible()
+        advanceTimeBy(10_001)
+
+        verify(exactly = 1) { audioPlayer.playAssetAudio("vo_path.mp3", any()) }
     }
 }

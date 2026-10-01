@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import com.playit.app.presentation.components.IdleTimer
 import javax.inject.Inject
 
 sealed class BlendItUiState {
@@ -109,6 +110,27 @@ class BlendItViewModel @Inject constructor(
 
     private val _isPlayingPrompt = MutableStateFlow(false)
     val isPlayingPrompt: StateFlow<Boolean> = _isPlayingPrompt.asStateFlow()
+
+    private val _nextHighlighted = MutableStateFlow(false)
+    val nextHighlighted: StateFlow<Boolean> = _nextHighlighted.asStateFlow()
+
+    private val idleTimer = IdleTimer(
+        scope = viewModelScope,
+        isBusy = { _isPlayingPrompt.value },
+        onIdle = { playBlendItIntroAudio() }
+    )
+
+    fun onScreenVisible() {
+        idleTimer.start()
+    }
+
+    fun onScreenHidden() {
+        idleTimer.stop()
+    }
+
+    fun onUserInteraction() {
+        idleTimer.touch()
+    }
 
     private fun setupWordAtIndex(index: Int) {
         val wordObj = _words.value.getOrNull(index) ?: return
@@ -312,6 +334,7 @@ class BlendItViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
+        idleTimer.stop()
         audioPlayer.stop()
     }
 }

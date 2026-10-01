@@ -37,6 +37,7 @@ class HearItViewModelTest {
         every { audioResolver.getWordPath(any()) } returns "word_path"
         every { audioResolver.getKeyWordPath(any()) } returns "word_path"
         every { audioResolver.getTutorPath(any()) } answers { "tutor/${firstArg<String>()}.wav" }
+        every { audioResolver.getUiPath(any()) } answers { "ui/${firstArg<String>()}.wav" }
         every { audioPlayer.playAssetAudio(any(), any()) } answers {
             secondArg<(() -> Unit)?>()?.invoke()
         }
@@ -146,5 +147,77 @@ class HearItViewModelTest {
 
         viewModel.playPhonemeSound()
         assertEquals(2, viewModel.playCount.value)
+    }
+
+    @Test
+    fun firstSequenceEnd_playsNextCue_andHighlights() = runTest {
+        val fakePhoneme = Phoneme(id = 1, letter = "m", audioPath = "path", imagePath = "path", exampleWord = "mouse")
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme
+
+        viewModel = HearItViewModel(phonemeRepository, audioPlayer, audioResolver, savedStateHandle)
+        advanceUntilIdle()
+
+        assertTrue(viewModel.nextHighlighted.value)
+        verify(exactly = 1) { audioPlayer.playAssetAudio("ui/ui_hearit_next.wav", any()) }
+    }
+
+    @Test
+    fun idle_afterHighlight_playsNextCue() = runTest {
+        val fakePhoneme = Phoneme(id = 1, letter = "m", audioPath = "path", imagePath = "path", exampleWord = "mouse")
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme
+
+        viewModel = HearItViewModel(phonemeRepository, audioPlayer, audioResolver, savedStateHandle)
+        advanceUntilIdle()
+
+        viewModel.onScreenVisible()
+        advanceTimeBy(10_001)
+
+        verify(exactly = 2) { audioPlayer.playAssetAudio("ui/ui_hearit_next.wav", any()) }
+    }
+
+    @Test
+    fun noIdlePrompt_withoutScreenVisible() = runTest {
+        val fakePhoneme = Phoneme(id = 1, letter = "m", audioPath = "path", imagePath = "path", exampleWord = "mouse")
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme
+
+        viewModel = HearItViewModel(phonemeRepository, audioPlayer, audioResolver, savedStateHandle)
+        advanceUntilIdle()
+
+        advanceTimeBy(60_000)
+        verify(exactly = 1) { audioPlayer.playAssetAudio("ui/ui_hearit_next.wav", any()) }
+    }
+
+    @Test
+    fun nextStaysOff_whileFirstSequencePlays() = runTest {
+        val fakePhoneme = Phoneme(id = 1, letter = "m", audioPath = "path", imagePath = "path", exampleWord = "mouse")
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme
+        every { audioPlayer.playSequence(any(), any()) } just Runs
+
+        viewModel = HearItViewModel(phonemeRepository, audioPlayer, audioResolver, savedStateHandle)
+        advanceUntilIdle()
+
+        assertFalse(viewModel.nextHighlighted.value)
+        verify(exactly = 0) { audioPlayer.playAssetAudio("ui/ui_hearit_next.wav", any()) }
+    }
+
+    @Test
+    fun replayEnd_alsoUnlocks() = runTest {
+        val fakePhoneme = Phoneme(id = 1, letter = "m", audioPath = "path", imagePath = "path", exampleWord = "mouse")
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme
+        var n = 0
+        every { audioPlayer.playSequence(any(), any()) } answers {
+            n++
+            if (n >= 2) secondArg<(() -> Unit)?>()?.invoke()
+        }
+
+        viewModel = HearItViewModel(phonemeRepository, audioPlayer, audioResolver, savedStateHandle)
+        advanceUntilIdle()
+
+        assertFalse(viewModel.nextHighlighted.value)
+        viewModel.playPhonemeSound()
+        advanceUntilIdle()
+
+        assertTrue(viewModel.nextHighlighted.value)
+        verify(exactly = 1) { audioPlayer.playAssetAudio("ui/ui_hearit_next.wav", any()) }
     }
 }

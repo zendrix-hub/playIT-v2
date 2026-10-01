@@ -1,6 +1,6 @@
 # Card 07: Idle re-prompt and spoken "what to tap next" cues (NFR-IND-01)
 
-Status: ready
+Status: done
 
 Revised by Claude on 2026-10-01, before the first run. The code check found three gaps; this text includes their fixes:
 1. The Blend It idle test could never pass: its relaxed audio mock never calls back, so `isPlayingPrompt` stays true.

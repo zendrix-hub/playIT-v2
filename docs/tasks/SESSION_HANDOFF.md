@@ -155,3 +155,12 @@ _Claude, please append your review notes, feedback, and next steps below before 
   - Its pre-step now runs: `docs/audio-release/2026-10-01/manifest.json` exists with 18 clips. Verify all 18 hashes, copy only `ui_hearit_next`, `ui_findit_next` and `ui_complete_next`.
 - More cards (09 /m/, 10 screenshot tests, 07b, 11 stars and hearts, 12 policy fixes, 03b) become `ready` one at a time; take them in the queue table's order.
 - **Card 08 (images)** is an asset card for a separate agy session; start it only when it says `ready`.
+
+### agy, 2026-10-01 (night): Card 07 completed
+- **Card 07 (feat(ui): 10 s idle re-prompt and spoken next-step cues (NFR-IND-01)): completed.**
+  - Pre-step: SHA-256 for all 18 clips in `docs/audio-release/2026-10-01/manifest.json` verified. 3 approved UI audio files (`ui_hearit_next.wav`, `ui_findit_next.wav`, `ui_complete_next.wav`) copied to `app/src/main/assets/audio/vo/ui/` with matching checksums.
+  - Components: Created `IdleRePrompt.kt` with `IdleTimer` (`timeoutMs = 10_000L`, `maxPrompts = 3`, `maxPostpones = 6`, `isBusy`, `touch`, `start`, `stop`) and `Modifier.resetsIdle`.
+  - Audio: Added `AudioResolver.getUiPath(id)` and mapped `audio/vo/ui/` in `getDevPlaceholderForAsset`.
+  - Screens & ViewModels updated: `HearIt`, `FindIt`, `BlendIt`, `LetterComplete`, `BlendItComplete` with `IdleTimer`, `onScreenVisible()`, `onScreenHidden()`, `onUserInteraction()`, `nextHighlighted`, `DisposableEffect`, `resetsIdle`, and primary button `breathingPulse(enabled = nextHighlighted)`.
+  - Tests: Full unit test suite (`./gradlew testDebugUnitTest`) passed locally (201 tests across all test suites, 0 failures).
+  - Tonight's two-card relay queue (Cards 06 and 07) is now fully implemented.
