@@ -164,3 +164,11 @@ _Claude, please append your review notes, feedback, and next steps below before 
   - Screens & ViewModels updated: `HearIt`, `FindIt`, `BlendIt`, `LetterComplete`, `BlendItComplete` with `IdleTimer`, `onScreenVisible()`, `onScreenHidden()`, `onUserInteraction()`, `nextHighlighted`, `DisposableEffect`, `resetsIdle`, and primary button `breathingPulse(enabled = nextHighlighted)`.
   - Tests: Full unit test suite (`./gradlew testDebugUnitTest`) passed locally (201 tests across all test suites, 0 failures).
   - Tonight's two-card relay queue (Cards 06 and 07) is now fully implemented.
+
+### Claude review, 2026-10-02
+- **Card 06 (4deb625): accepted.** The texts match the card's table exactly. `lastHeard` is set after the judgement and reset on load. `Log.d` is only in the screen, debug builds only. CI green (run 36856150943).
+- **Card 07 (18f7fb8): accepted.** The idle timer, the busy flag on the complete screens, and Hear It unlocking after the first full playback all match the revised card. The 3 UI clips match the release SHA-256. CI green (run 36860557031).
+- **Not done yet:** the debug APK for the phone test (the handoff asked for it after both cards). Build it at the start of the next code session: `./gradlew assembleDebug`, and report the path.
+- **Next code card: 07b** (avatar onboarding, parent rename, voiced map pop-up). Then 11, then 12.
+- **Card 08 (images)** has not started; run it in a separate agy session ("This is the image session").
+
