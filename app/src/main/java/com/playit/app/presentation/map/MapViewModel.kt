@@ -79,8 +79,13 @@ class MapViewModel @Inject constructor(
 
     fun onLockedNodeTapped() {
         val sfx = audioResolver.getSfxPath(SfxEvent.INCORRECT_POP)
-        val vo = audioResolver.getRotatingEncourageVo()
+        val vo = audioResolver.getUiPath("ui_node_locked")
         audioPlayer.playSequence(listOf(sfx, vo))
+    }
+
+    fun onUnlockedNodeTapped() {
+        val vo = audioResolver.getUiPath("ui_node_start")
+        audioPlayer.playAssetAudio(vo)
     }
 
     fun clearSession() {

@@ -25,13 +25,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.presentation.theme.*
 
+val AVATAR_NAMES = listOf("Cat", "Monkey", "Bunny", "Bear", "Frog", "Owl")
+
 @Composable
 fun AvatarPicker(
     selectedAvatarId: Int,
     onAvatarSelect: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val avatarNames = listOf("Cat", "Monkey", "Bunny", "Bear", "Frog", "Owl")
 
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
@@ -62,7 +63,7 @@ fun AvatarPicker(
                 ) {
                     rowRange.forEach { avatarId ->
                         val isSelected = avatarId == selectedAvatarId
-                        val avatarName = avatarNames.getOrElse(avatarId - 1) { "Friend" }
+                        val avatarName = AVATAR_NAMES.getOrElse(avatarId - 1) { "Friend" }
 
                         val scale by animateFloatAsState(
                             targetValue = if (isSelected) 1.12f else 1.0f,

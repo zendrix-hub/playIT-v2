@@ -1,6 +1,6 @@
 # Card 07b: Avatar-only onboarding, parent rename, voiced map pop-up (NFR-IND-01)
 
-Status: ready
+Status: done
 
 Runs after card 07 is accepted (it uses `AudioResolver.getUiPath`, which card 07 adds). In the relay, take it only when card 07 is `accepted`.
 

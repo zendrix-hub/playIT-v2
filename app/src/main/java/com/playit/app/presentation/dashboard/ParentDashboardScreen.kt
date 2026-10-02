@@ -181,7 +181,12 @@ fun ParentDashboardScreen(
                             .fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        item { LearnerHeroCard(data = dashboardData) }
+                        item {
+                            LearnerHeroCard(
+                                data = dashboardData,
+                                onRename = { viewModel.renameProfile(dashboardData.profile, it) }
+                            )
+                        }
                         item { MasteredSoundsShelf(letterPerformances = dashboardData.letterPerformances) }
                         item { PracticeFocusSection(atRiskLetters = dashboardData.atRiskLetters) }
                         item {

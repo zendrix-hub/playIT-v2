@@ -158,4 +158,41 @@ class ParentDashboardViewModelTest {
         viewModel.resetExportStatus()
         assertTrue(viewModel.uiState.value.exportStatus is ExportStatus.Idle)
     }
+
+    @Test
+    fun renameProfile_updatesTrimmedName() = runTest {
+        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter)
+
+        viewModel.renameProfile(sampleProfile1, " Maya ")
+        advanceUntilIdle()
+
+        coVerify { profileRepository.updateProfile(sampleProfile1.copy(name = "Maya")) }
+    }
+
+    @Test
+    fun renameProfile_blankOrTooLong_isIgnored() = runTest {
+        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter)
+
+        viewModel.renameProfile(sampleProfile1, "   ")
+        viewModel.renameProfile(sampleProfile1, "12345678901234567")
+        advanceUntilIdle()
+
+        coVerify(exactly = 0) { profileRepository.updateProfile(any()) }
+    }
+
+    @Test
+    fun rename_refreshesSelectedProfile() = runTest {
+        coEvery { reportGenerator.generateDashboardData(any()) } returns sampleDashboardData
+
+        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter)
+        profilesFlow.emit(listOf(sampleProfile1))
+        advanceUntilIdle()
+        assertEquals("Maya", viewModel.uiState.value.selectedProfile?.name)
+
+        val renamedProfile = sampleProfile1.copy(name = "Zoe")
+        profilesFlow.emit(listOf(renamedProfile))
+        advanceUntilIdle()
+
+        assertEquals("Zoe", viewModel.uiState.value.selectedProfile?.name)
+    }
 }
