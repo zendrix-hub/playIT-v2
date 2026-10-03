@@ -251,5 +251,21 @@ Change: Say It now asks the child to utter the letter's example WORD (m → "Mou
 - [x] **Zero-Emoji Policy Compliance**: Ensured zero emojis in UI text, buttons, titles, and speech bubbles; exclusively used Material vector graphics and transparent asset renders.
 - [x] **Compilation & APK Generation**: Verified clean compilation via `./gradlew compileDebugKotlin` and assembled `app-debug.apk` (97 MB) into workspace root `./playit-debug.apk`.
 
-
-
+## Hear It / Say It refactor
+Each card ticks its own item in its commit (see `docs/tasks/AGY_RUNBOOK.md`). A tick means the card is committed; CI and phone-test results are in `docs/evidence-log.md`.
+- [x] Card 00: Agent rules, precedence, housekeeping
+- [x] Card 01: Speech judge returns error types; stop accepting letter names and added vowels (NFR-ASR-01)
+- [x] Card 02: Scope the Vosk grammar to each letter's foils; carry the error type into Say It state (NFR-ASR-01, FR-03)
+- [x] Card 03: Tutor policy: prompt ladder, no hearts in Say It, corrective audio (FR-03)
+- [x] Card 04: Hear It modeling sequence (I do) (FR-02)
+- [x] Card 05: Approved key words and tutor carriers into the app (NFR-AUD-01, FR-02)
+- [x] Card 06: Say It feedback text follows the error type; debug transcript overlay (FR-03, NFR-ASR-01)
+- [x] Card 07: Idle re-prompt (10 s) and spoken next-step cues (NFR-IND-01)
+- [x] Card 07b: Avatar-only onboarding, parent rename, voiced map pop-up (NFR-IND-01)
+- [x] Card 08: Image batch 1, Find It and key-word pictures picked by the user (asset card; Claude ticks it from picks.json) (FR-05)
+- [ ] Card 09: Approved held /m/ replaces the Edge-TTS clip (NFR-AUD-01, FR-02)
+- [ ] Card 10: Screenshot tests for changed screens (Roborazzi), uploaded by CI
+- [x] Card 11: Stars and hearts use real results (FR-04, FR-06, FR-13)
+- [x] Card 12: Find It distractors, gentle correction colour, no emoji in the PDF (FR-05, FR-12)
+- [ ] Card 13: Approved batch-1 pictures in the app (FR-05)
+- [ ] Card 03b: Say It corrections from fragments around the sound (FR-03)

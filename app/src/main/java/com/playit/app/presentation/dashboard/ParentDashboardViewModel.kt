@@ -17,6 +17,8 @@ import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
 
+const val MAX_NAME_LENGTH = 16
+
 sealed interface ExportStatus {
     object Idle : ExportStatus
     object Exporting : ExportStatus
@@ -50,7 +52,9 @@ class ParentDashboardViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 profileRepository.getAllProfiles().collectLatest { profiles ->
-                    val currentSelected = _uiState.value.selectedProfile ?: profiles.firstOrNull()
+                    val currentSelected = _uiState.value.selectedProfile
+                        ?.let { sel -> profiles.firstOrNull { it.id == sel.id } }
+                        ?: profiles.firstOrNull()
                     _uiState.value = _uiState.value.copy(
                         profiles = profiles,
                         selectedProfile = currentSelected
@@ -109,5 +113,15 @@ class ParentDashboardViewModel @Inject constructor(
 
     fun resetExportStatus() {
         _uiState.value = _uiState.value.copy(exportStatus = ExportStatus.Idle)
+    }
+
+    fun renameProfile(profile: Profile, newName: String) {
+        val trimmed = newName.trim()
+        if (trimmed.isBlank() || trimmed.length > MAX_NAME_LENGTH) {
+            return
+        }
+        viewModelScope.launch {
+            profileRepository.updateProfile(profile.copy(name = trimmed))
+        }
     }
 }

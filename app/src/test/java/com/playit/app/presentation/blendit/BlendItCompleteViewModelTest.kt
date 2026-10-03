@@ -35,9 +35,13 @@ class BlendItCompleteViewModelTest {
         Dispatchers.setMain(testDispatcher)
 
         every { savedStateHandle.get<String>("groupId") } returns "1"
+        every { savedStateHandle.get<String>("heartsLost") } returns null
+        every { savedStateHandle.get<String>("wordsCorrect") } returns null
+        every { savedStateHandle.get<String>("totalWords") } returns null
         every { sessionManager.activeProfileId } returns MutableStateFlow(1L)
         every { audioResolver.getSfxPath(any()) } returns "sfx_path.mp3"
         every { audioResolver.getVoPath(any()) } returns "vo_path.mp3"
+        every { audioResolver.getUiPath(any()) } answers { "ui/${firstArg<String>()}.wav" }
     }
 
     @After
@@ -62,6 +66,60 @@ class BlendItCompleteViewModelTest {
             )
         }
         coVerify { streakTracker.recordActivity(1L) }
-        verify { audioPlayer.playSequence(any()) }
+        verify { audioPlayer.playSequence(any(), any()) }
+    }
+
+    @Test
+    fun completion_appendsNextCue() = runTest {
+        viewModel = BlendItCompleteViewModel(
+            blendItProgressRepository, streakTracker, sessionManager,
+            audioPlayer, audioResolver, savedStateHandle
+        )
+        advanceUntilIdle()
+
+        verify {
+            audioPlayer.playSequence(
+                match { it.lastOrNull() == "ui/ui_complete_next.wav" },
+                any()
+            )
+        }
+        assertTrue(viewModel.nextHighlighted.value)
+    }
+
+    @Test
+    fun idle_waitsForCompletionSequence() = runTest {
+        viewModel = BlendItCompleteViewModel(
+            blendItProgressRepository, streakTracker, sessionManager,
+            audioPlayer, audioResolver, savedStateHandle
+        )
+        advanceUntilIdle()
+
+        viewModel.onScreenVisible()
+        advanceTimeBy(30_000)
+
+        verify(exactly = 0) {
+            audioPlayer.playAssetAudio("ui/ui_complete_next.wav", any())
+        }
+    }
+
+    @Test
+    fun starsUseNavResults() = runTest {
+        every { savedStateHandle.get<String>("groupId") } returns "1"
+        every { savedStateHandle.get<String>("heartsLost") } returns "1"
+        every { savedStateHandle.get<String>("wordsCorrect") } returns "4"
+        every { savedStateHandle.get<String>("totalWords") } returns "5"
+
+        viewModel = BlendItCompleteViewModel(
+            blendItProgressRepository, streakTracker, sessionManager,
+            audioPlayer, audioResolver, savedStateHandle
+        )
+        advanceUntilIdle()
+
+        assertEquals(2, viewModel.starsEarned.value)
+        coVerify {
+            blendItProgressRepository.saveProgress(
+                match { it.groupId == 1 && it.profileId == 1L && it.starsEarned == 2 && it.heartsLost == 1 }
+            )
+        }
     }
 }

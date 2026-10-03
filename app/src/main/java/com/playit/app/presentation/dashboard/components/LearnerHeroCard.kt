@@ -5,29 +5,132 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.playit.app.domain.model.ProfileDashboardData
+import com.playit.app.presentation.components.GummyButton
+import com.playit.app.presentation.components.GummyTextField
 import com.playit.app.presentation.profile.components.AvatarCircle
 import com.playit.app.presentation.theme.*
 
 @Composable
 fun LearnerHeroCard(
     data: ProfileDashboardData,
+    onRename: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    var showRenameDialog by remember { mutableStateOf(false) }
+    var newName by remember { mutableStateOf("") }
+
     val masteryFraction = if (data.totalLettersCount > 0) {
         (data.completedLettersCount.toFloat() / data.totalLettersCount.toFloat()).coerceIn(0f, 1f)
     } else 0f
+
+    if (showRenameDialog) {
+        Dialog(onDismissRequest = { showRenameDialog = false }) {
+            Surface(
+                shape = DialogShape,
+                color = SurfaceCard,
+                border = BorderStroke(2.5.dp, ModernBorder),
+                shadowElevation = 12.dp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Rename Learner",
+                        fontFamily = LexendFontFamily,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = TextMidnight
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    GummyTextField(
+                        value = newName,
+                        onValueChange = { input ->
+                            val filtered = input.filter {
+                                it.isLetter() || it.isWhitespace() || it == '-' || it == '\''
+                            }
+                            if (filtered.length <= 16) {
+                                newName = filtered
+                            }
+                        },
+                        label = "Learner's Name",
+                        placeholder = "Enter new name...",
+                        maxLength = 16,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        TextButton(
+                            onClick = { showRenameDialog = false },
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp)
+                        ) {
+                            Text(
+                                text = "Cancel",
+                                fontFamily = LexendFontFamily,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = TextMuted
+                            )
+                        }
+
+                        GummyButton(
+                            text = "Save",
+                            backgroundColor = EmeraldLeaf,
+                            shadowColor = EmeraldLeafShadow,
+                            contentColor = Color.White,
+                            enabled = newName.trim().isNotBlank() && newName.trim().length <= 16,
+                            onClick = {
+                                val trimmed = newName.trim()
+                                if (trimmed.isNotBlank() && trimmed.length <= 16) {
+                                    onRename(trimmed)
+                                    showRenameDialog = false
+                                }
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -52,13 +155,32 @@ fun LearnerHeroCard(
                 Spacer(modifier = Modifier.width(14.dp))
 
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = data.profile.name,
-                        fontFamily = LexendFontFamily,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = TextMidnight
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = data.profile.name,
+                            fontFamily = LexendFontFamily,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = TextMidnight
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        IconButton(
+                            onClick = {
+                                newName = data.profile.name
+                                showRenameDialog = true
+                            },
+                            modifier = Modifier.size(48.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Edit,
+                                contentDescription = "Edit name",
+                                tint = TextMuted,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
                     Text(
                         text = "Marungko Phonics Explorer",
                         fontFamily = LexendFontFamily,

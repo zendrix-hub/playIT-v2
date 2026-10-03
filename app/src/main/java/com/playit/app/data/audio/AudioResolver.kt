@@ -75,6 +75,14 @@ class AudioResolver @Inject constructor() {
     }
 
     /**
+     * Resolves the asset path for a key word.
+     */
+    fun getKeyWordPath(word: String): String {
+        val clean = word.lowercase().trim().replace("-", "")
+        return "audio/keywords/kw_$clean.wav"
+    }
+
+    /**
      * Resolves the asset path for an SFX event.
      */
     fun getSfxPath(event: SfxEvent): String {
@@ -87,6 +95,16 @@ class AudioResolver @Inject constructor() {
     fun getVoPath(vo: VoContext): String {
         return "audio/ui/vo_${vo.filenameSuffix}.mp3"
     }
+
+    /**
+     * Resolves the asset path for a tutor VO fragment.
+     */
+    fun getTutorPath(id: String): String = "audio/vo/tutor/$id.wav"
+
+    /**
+     * Resolves the asset path for a spoken UI cue line.
+     */
+    fun getUiPath(id: String): String = "audio/vo/ui/$id.wav"
 
     /**
      * Rotates between vo_correct_01 and vo_correct_02.
@@ -129,6 +147,9 @@ class AudioResolver @Inject constructor() {
         return when {
             assetPath.startsWith("audio/phonemes/") -> DevAudioCategory.PHONEME.assetPath
             assetPath.startsWith("audio/words/") -> DevAudioCategory.WORD.assetPath
+            assetPath.contains("audio/keywords/") -> DevAudioCategory.WORD.assetPath
+            assetPath.contains("audio/vo/tutor/") -> DevAudioCategory.VO.assetPath
+            assetPath.contains("audio/vo/ui/") -> DevAudioCategory.VO.assetPath
             assetPath.contains("sfx_") -> DevAudioCategory.SFX.assetPath
             assetPath.contains("vo_") -> DevAudioCategory.VO.assetPath
             else -> DevAudioCategory.SFX.assetPath

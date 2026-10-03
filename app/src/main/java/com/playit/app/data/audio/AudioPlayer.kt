@@ -7,6 +7,7 @@ import android.media.SoundPool
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.playit.app.domain.manager.HearItSequenceBuilder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -233,6 +234,17 @@ class AudioPlayer @Inject constructor(
         }
 
         val currentPath = paths[index]
+
+        val pauseMs = HearItSequenceBuilder.pauseMillis(currentPath)
+        if (pauseMs != null) {
+            mainHandler.postDelayed({
+                if (isSequencePlaying) {
+                    playNextInSequence(paths, index + 1, onComplete)
+                }
+            }, pauseMs)
+            return
+        }
+
         val isSfx = currentPath.contains("/sfx_") || currentPath.startsWith("audio/ui/sfx_")
 
         if (isSfx && index + 1 < paths.size) {

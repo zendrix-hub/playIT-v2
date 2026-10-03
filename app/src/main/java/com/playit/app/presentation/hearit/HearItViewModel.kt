@@ -5,9 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.playit.app.data.audio.AudioPlayer
 import com.playit.app.data.audio.AudioResolver
-import com.playit.app.data.audio.VoContext
+import com.playit.app.domain.manager.HearItSequenceBuilder
 import com.playit.app.domain.model.Phoneme
 import com.playit.app.domain.repository.PhonemeRepository
+import com.playit.app.presentation.components.IdleTimer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,6 +38,34 @@ class HearItViewModel @Inject constructor(
     private val _loadError = MutableStateFlow(false)
     val loadError: StateFlow<Boolean> = _loadError.asStateFlow()
 
+    private var firstPlaybackDone = false
+
+    private val _nextHighlighted = MutableStateFlow(false)
+    val nextHighlighted: StateFlow<Boolean> = _nextHighlighted.asStateFlow()
+
+    private val idleTimer = IdleTimer(
+        scope = viewModelScope,
+        isBusy = { _isPlaying.value || _isPlayingPrompt.value }
+    ) {
+        if (_nextHighlighted.value) {
+            audioPlayer.playAssetAudio(audioResolver.getUiPath("ui_hearit_next"))
+        } else {
+            playModelingSequence()
+        }
+    }
+
+    fun onScreenVisible() {
+        idleTimer.start()
+    }
+
+    fun onScreenHidden() {
+        idleTimer.stop()
+    }
+
+    fun onUserInteraction() {
+        idleTimer.touch()
+    }
+
     init {
         loadPhoneme()
     }
@@ -51,7 +80,7 @@ class HearItViewModel @Inject constructor(
             }
             _loadError.value = false
             _phoneme.value = p
-            playIntroThenPhonemeSound()
+            playModelingSequence()
         }
     }
 
@@ -63,35 +92,62 @@ class HearItViewModel @Inject constructor(
     private val _isPlayingPrompt = MutableStateFlow(false)
     val isPlayingPrompt: StateFlow<Boolean> = _isPlayingPrompt.asStateFlow()
 
-    fun playIntroThenPhonemeSound() {
+    /** Full "I do" sequence (spec §2.1 Table 3): on load and on mascot tap. */
+    fun playModelingSequence() {
         audioPlayer.stop()
-        _isPlaying.value = false
         _isPlayingPrompt.value = true
-        val introVo = audioResolver.getVoPath(VoContext.HEARIT_INTRO_01)
-        audioPlayer.playAssetAudio(introVo) {
+        _isPlaying.value = true
+        _playCount.value++
+        audioPlayer.playSequence(buildSequence(HearItSequenceBuilder.TEMPLATE)) {
             _isPlayingPrompt.value = false
-            playPhonemeSound()
+            _isPlaying.value = false
+            if (!firstPlaybackDone) {
+                firstPlaybackDone = true
+                _nextHighlighted.value = true
+                audioPlayer.playAssetAudio(audioResolver.getUiPath("ui_hearit_next"))
+            }
         }
     }
 
     fun playHearItIntroAudio() {
-        playIntroThenPhonemeSound()
+        playModelingSequence()
     }
 
+    /** Ear button and letter card tap: replays steps 3 to 6 of the sequence. */
     fun playPhonemeSound() {
         audioPlayer.stop()
         _isPlayingPrompt.value = false
-        val letter = _phoneme.value?.letter ?: "m"
-        val path = audioResolver.getPhonemePath(letter) ?: _phoneme.value?.audioPath ?: "audio/phonemes/phoneme_m.mp3"
         _isPlaying.value = true
         _playCount.value++
-        audioPlayer.playAssetAudio(path) {
+        audioPlayer.playSequence(buildSequence(HearItSequenceBuilder.replayTemplate())) {
             _isPlaying.value = false
+            if (!firstPlaybackDone) {
+                firstPlaybackDone = true
+                _nextHighlighted.value = true
+                audioPlayer.playAssetAudio(audioResolver.getUiPath("ui_hearit_next"))
+            }
         }
+    }
+
+    private fun buildSequence(template: List<String>): List<String> {
+        val letter = _phoneme.value?.letter ?: "m"
+        val exampleWord = _phoneme.value?.exampleWord?.trim().orEmpty()
+        val keyWordPath = if (exampleWord.isEmpty() || exampleWord.equals("PENDING_SME_REVIEW", ignoreCase = true)) {
+            null
+        } else {
+            audioResolver.getKeyWordPath(exampleWord)
+        }
+        return HearItSequenceBuilder.build(
+            template,
+            audioResolver.getPhonemePath(letter),
+            keyWordPath,
+            audioResolver::getTutorPath
+        )
     }
 
     override fun onCleared() {
         super.onCleared()
+        idleTimer.stop()
         audioPlayer.stop()
     }
 }

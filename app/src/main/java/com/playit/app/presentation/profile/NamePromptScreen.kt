@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.presentation.components.GummyBackButton
 import com.playit.app.presentation.components.GummyButton
-import com.playit.app.presentation.components.GummyTextField
 import com.playit.app.presentation.components.MascotSpeechHeader
 import com.playit.app.presentation.components.MascotState
 import com.playit.app.presentation.profile.components.AvatarPicker
@@ -30,16 +29,15 @@ fun NamePromptScreen(
     onProfileCreated: (Long) -> Unit,
     onBack: () -> Unit
 ) {
-    val name by viewModel.nameInput.collectAsStateWithLifecycle()
     val selectedAvatarId by viewModel.selectedAvatarId.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isPlayingIntro by viewModel.isPlayingIntro.collectAsStateWithLifecycle()
+    val hasSelectedAvatar = remember { mutableStateOf(false) }
 
-    val isNameValid = name.trim().isNotBlank()
     val mascotState = when {
         // Error takes priority: don't let Lily celebrate next to an error banner.
         uiState is ProfileUiState.Error -> MascotState.POINTING
-        isNameValid -> MascotState.CELEBRATING
+        hasSelectedAvatar.value -> MascotState.CELEBRATING
         else -> MascotState.POINTING
     }
 
@@ -131,7 +129,7 @@ fun NamePromptScreen(
 
             // Companion Mascot Dialogue
             MascotSpeechHeader(
-                message = "What is your name? Let's choose your friendly animal avatar!",
+                message = "Pick your animal friend!",
                 mascotState = mascotState,
                 isPlayingAudio = isPlayingIntro,
                 onMascotTap = { viewModel.playNamePromptIntro() },
@@ -147,23 +145,12 @@ fun NamePromptScreen(
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                GummyTextField(
-                    value = name,
-                    onValueChange = { input ->
-                        // Zero-emoji policy: filter to letters, whitespace, hyphens, and apostrophes
-                        val filtered = input.filter {
-                            it.isLetter() || it.isWhitespace() || it == '-' || it == '\''
-                        }
-                        if (filtered.length <= 16) viewModel.onNameChanged(filtered)
-                    },
-                    label = "Child's Name",
-                    placeholder = "Enter your name...",
-                    modifier = Modifier.fillMaxWidth()
-                )
-
                 AvatarPicker(
                     selectedAvatarId = selectedAvatarId,
-                    onAvatarSelect = { viewModel.onAvatarSelected(it) }
+                    onAvatarSelect = {
+                        hasSelectedAvatar.value = true
+                        viewModel.onAvatarSelected(it)
+                    }
                 )
 
                 if (uiState is ProfileUiState.Error) {
@@ -191,13 +178,12 @@ fun NamePromptScreen(
 
             GummyButton(
                 text = if (uiState is ProfileUiState.Loading) "Creating..." else "Let's Play",
-                onClick = { viewModel.createProfile(name.trim(), selectedAvatarId) },
+                onClick = { viewModel.createProfile("", selectedAvatarId) },
                 backgroundColor = EmeraldLeaf,
                 shadowColor = EmeraldLeafShadow,
                 contentColor = Color.White,
-                enabled = isNameValid && uiState !is ProfileUiState.Loading,
+                enabled = uiState !is ProfileUiState.Loading,
                 fontSize = 24,
-                isSquashed = isNameValid,
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 64.dp)

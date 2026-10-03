@@ -18,6 +18,7 @@ import com.playit.app.data.audio.AudioPlayer
 import com.playit.app.data.audio.AudioResolver
 import com.playit.app.data.audio.SfxEvent
 import com.playit.app.data.audio.VoContext
+import com.playit.app.presentation.profile.components.AVATAR_NAMES
 
 sealed class ProfileUiState {
     object Idle : ProfileUiState()
@@ -102,7 +103,7 @@ class ProfileViewModel @Inject constructor(
 
     fun playNamePromptIntro() {
         _isPlayingIntro.value = true
-        audioPlayer.playAssetAudio(audioResolver.getVoPath(VoContext.NAMEPROMPT_INTRO)) {
+        audioPlayer.playAssetAudio(audioResolver.getUiPath("ui_pick_avatar")) {
             _isPlayingIntro.value = false
         }
     }
@@ -117,15 +118,11 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun createProfile(name: String, avatarResId: Int) {
-        val trimmedName = name.trim()
-        if (trimmedName.isBlank()) {
-            _uiState.value = ProfileUiState.Error("Please enter a valid name.")
-            return
-        }
+        val finalName = name.trim().ifBlank { AVATAR_NAMES.getOrElse(avatarResId - 1) { "Friend" } }
 
         viewModelScope.launch {
             _uiState.value = ProfileUiState.Loading
-            val result = profileRepository.createProfile(trimmedName, avatarResId)
+            val result = profileRepository.createProfile(finalName, avatarResId)
             result.onSuccess { newId ->
                 sessionManager.setActiveProfile(newId)
                 _uiState.value = ProfileUiState.Created(newId)

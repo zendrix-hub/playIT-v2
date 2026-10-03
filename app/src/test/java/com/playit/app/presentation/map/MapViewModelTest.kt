@@ -80,6 +80,7 @@ class MapViewModelTest {
         every { audioResolver.getSfxPath(any()) } returns "sfx.mp3"
         every { audioResolver.getVoPath(any()) } returns "vo.mp3"
         every { audioResolver.getRotatingEncourageVo() } returns "encourage.mp3"
+        every { audioResolver.getUiPath(any()) } answers { "ui/${firstArg<String>()}.wav" }
     }
 
     @After
@@ -178,7 +179,33 @@ class MapViewModelTest {
         verify { audioPlayer.playSequence(listOf("sfx.mp3", "vo.mp3")) }
 
         viewModel.onLockedNodeTapped()
-        verify { audioPlayer.playSequence(listOf("sfx.mp3", "encourage.mp3")) }
+        verify { audioPlayer.playSequence(listOf("sfx.mp3", "ui/ui_node_locked.wav")) }
+    }
+
+    @Test
+    fun lockedNode_playsLockedCue() {
+        viewModel = MapViewModel(
+            phonemeRepository, letterGroupRepository, letterGroupMemberRepository,
+            lessonProgressRepository, profileRepository, achievementRepository,
+            sessionManager, unlockManager, groupUnlockManager, streakTracker,
+            audioPlayer, audioResolver
+        )
+
+        viewModel.onLockedNodeTapped()
+        verify { audioPlayer.playSequence(listOf("sfx.mp3", "ui/ui_node_locked.wav")) }
+    }
+
+    @Test
+    fun unlockedNode_playsStartCue() {
+        viewModel = MapViewModel(
+            phonemeRepository, letterGroupRepository, letterGroupMemberRepository,
+            lessonProgressRepository, profileRepository, achievementRepository,
+            sessionManager, unlockManager, groupUnlockManager, streakTracker,
+            audioPlayer, audioResolver
+        )
+
+        viewModel.onUnlockedNodeTapped()
+        verify { audioPlayer.playAssetAudio("ui/ui_node_start.wav") }
     }
 
     @Test

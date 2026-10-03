@@ -36,17 +36,22 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
+import android.util.Log
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Mic
 import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.playit.app.BuildConfig
+import com.playit.app.domain.manager.SayItFeedbackCopy
+import com.playit.app.domain.model.SpeechErrorType
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -84,7 +89,7 @@ fun SayItScreen(
     val phoneme by viewModel.phoneme.collectAsStateWithLifecycle()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isModelInitializing by viewModel.isModelInitializing.collectAsStateWithLifecycle()
-    val hearts by viewModel.hearts.collectAsStateWithLifecycle()
+    val canContinue by viewModel.canContinue.collectAsStateWithLifecycle()
     val attempts by viewModel.attempts.collectAsStateWithLifecycle()
     val audioAmplitude by viewModel.audioAmplitude.collectAsStateWithLifecycle()
     val isNoisyEnvironment by viewModel.isNoisyEnvironment.collectAsStateWithLifecycle()
@@ -97,6 +102,27 @@ fun SayItScreen(
     val displayWord = targetWord?.replaceFirstChar { it.uppercase() }
     val isListening = state is SayItState.Listening
     var permissionDeniedMessage by remember { mutableStateOf(false) }
+
+    val tutorAction by viewModel.tutorAction.collectAsStateWithLifecycle()
+    val lastHeard by viewModel.lastHeard.collectAsStateWithLifecycle()
+
+    if (BuildConfig.DEBUG) {
+        LaunchedEffect(lastHeard) {
+            lastHeard?.let {
+                Log.d("PlayIT-SayIt", "Heard: \"${it.transcript}\" -> ${it.errorType} (attempt ${it.attempt})")
+            }
+        }
+    }
+
+    val currentFeedbackCopy = if ((state is SayItState.Correct || state is SayItState.Incorrect) && tutorAction != null) {
+        val errorType = (state as? SayItState.Incorrect)?.errorType ?: SpeechErrorType.NONE
+        SayItFeedbackCopy.forResult(
+            action = tutorAction!!,
+            errorType = errorType,
+            wordMode = wordMode,
+            word = targetWord
+        )
+    } else null
 
     if (loadError) {
         Box(
@@ -175,7 +201,7 @@ fun SayItScreen(
             )
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            LessonTopBar(currentStep = LessonStep.SAY_IT, onBack = onBack, hearts = hearts)
+            LessonTopBar(currentStep = LessonStep.SAY_IT, onBack = onBack, hearts = null)
 
             Column(
                 modifier = Modifier
@@ -192,8 +218,9 @@ fun SayItScreen(
                         isNoisyEnvironment -> "It's a little noisy right now. Let's find a quiet spot to practice!"
                         state is SayItState.Listening ->
                             if (wordMode) "Listening... Say $displayWord!" else "Listening... Say /${phoneme?.letter ?: "m"}/ into the microphone!"
-                        state is SayItState.Correct -> "Yes! That's it! Great job!"
-                        state is SayItState.Incorrect -> "Good try! Let's listen again."
+                        currentFeedbackCopy != null -> currentFeedbackCopy.mascot
+                        state is SayItState.Correct -> "Yes! You said it!"
+                        state is SayItState.Incorrect -> "Good try! Listen again."
                         wordMode -> "Now it's your turn! Say the whole word clearly into the microphone!"
                         else -> "Now it's your turn. Say the sound clearly into the microphone!"
                     },
@@ -400,22 +427,39 @@ fun SayItScreen(
                     exit = fadeOut() + slideOutVertically(targetOffsetY = { 20 })
                 ) {
                     val isCorrect = state is SayItState.Correct
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 6.dp)
-                            .background(color = if (isCorrect) EmeraldLeaf else ApricotGlow, shape = Squircle16)
-                            .border(2.5.dp, ModernBorder, Squircle16)
-                            .padding(vertical = 10.dp, horizontal = 16.dp),
-                        contentAlignment = Alignment.Center
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            text = if (isCorrect) "Awesome pronunciation!" else "Good try! Let's try again.",
-                            color = if (isCorrect) Color.White else TextMidnight,
-                            fontWeight = FontWeight.Black,
-                            fontFamily = LexendFontFamily,
-                            fontSize = 24.sp
-                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 6.dp)
+                                .background(color = if (isCorrect) EmeraldLeaf else ApricotGlow, shape = Squircle16)
+                                .border(2.5.dp, ModernBorder, Squircle16)
+                                .padding(vertical = 10.dp, horizontal = 16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = currentFeedbackCopy?.banner
+                                    ?: if (isCorrect) "Great listening!" else "Listen again",
+                                color = if (isCorrect) Color.White else TextMidnight,
+                                fontWeight = FontWeight.Black,
+                                fontFamily = LexendFontFamily,
+                                fontSize = 24.sp
+                            )
+                        }
+
+                        if (BuildConfig.DEBUG && lastHeard != null) {
+                            Text(
+                                text = "Heard: \"${lastHeard?.transcript}\" -> ${lastHeard?.errorType} (attempt ${lastHeard?.attempt})",
+                                color = TextMidnight.copy(alpha = 0.7f),
+                                fontWeight = FontWeight.Medium,
+                                fontFamily = LexendFontFamily,
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+                        }
                     }
                 }
 
@@ -425,8 +469,8 @@ fun SayItScreen(
             Box(modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 24.dp, vertical = 12.dp)) {
                 GummyButton(
                     text = "Next: Find It",
-                    onClick = { if (state is SayItState.Correct) onNext(phoneme?.id?.toString() ?: "1") },
-                    enabled = state is SayItState.Correct,
+                    onClick = { if (canContinue) onNext(phoneme?.id?.toString() ?: "1") },
+                    enabled = canContinue,
                     backgroundColor = EmeraldLeaf,
                     shadowColor = EmeraldLeafShadow,
                     contentColor = Color.White,

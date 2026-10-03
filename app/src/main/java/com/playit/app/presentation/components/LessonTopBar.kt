@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import com.playit.app.domain.model.GameplayConstants
 import com.playit.app.presentation.theme.*
 
 enum class LessonStep(val stepIndex: Int) {
@@ -42,7 +43,7 @@ fun LessonTopBar(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     hearts: Int? = null,
-    maxHearts: Int = 3
+    maxHearts: Int = GameplayConstants.STARTING_HEARTS
 ) {
     Row(
         modifier = modifier

@@ -42,6 +42,11 @@ class AudioResolverTest {
     }
 
     @Test
+    fun getTutorPath_returnsWavInTutorFolder() {
+        assertEquals("audio/vo/tutor/car_your_turn.wav", audioResolver.getTutorPath("car_your_turn"))
+    }
+
+    @Test
     fun getSfxPath_returnsCorrectPaths() {
         assertEquals("audio/ui/sfx_correct_chime.mp3", audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME))
         assertEquals("audio/ui/sfx_incorrect_pop.mp3", audioResolver.getSfxPath(SfxEvent.INCORRECT_POP))
@@ -97,6 +102,28 @@ class AudioResolverTest {
         assertEquals("audio/_dev_placeholder/word_beep.wav", audioResolver.getDevPlaceholderForAsset("audio/words/word_apple.mp3"))
         assertEquals("audio/_dev_placeholder/vo_tone.wav", audioResolver.getDevPlaceholderForAsset("audio/ui/vo_welcome_01.mp3"))
         assertEquals("audio/_dev_placeholder/sfx_chime.wav", audioResolver.getDevPlaceholderForAsset("audio/ui/sfx_correct_chime.mp3"))
+    }
+
+    @Test
+    fun getKeyWordPath_returnsWavInKeywordsFolder() {
+        assertEquals("audio/keywords/kw_mouse.wav", audioResolver.getKeyWordPath("Mouse"))
+        assertEquals("audio/keywords/kw_yoyo.wav", audioResolver.getKeyWordPath("Yo-yo"))
+    }
+
+    @Test
+    fun devPlaceholder_mapsKeywordsAndTutor() {
+        assertEquals(DevAudioCategory.WORD.assetPath, audioResolver.getDevPlaceholderForAsset("audio/keywords/kw_mouse.wav"))
+        assertEquals(DevAudioCategory.VO.assetPath, audioResolver.getDevPlaceholderForAsset("audio/vo/tutor/car_listen.wav"))
+    }
+
+    @Test
+    fun getUiPath_returnsWavInUiFolder() {
+        assertEquals("audio/vo/ui/ui_hearit_next.wav", audioResolver.getUiPath("ui_hearit_next"))
+    }
+
+    @Test
+    fun devPlaceholder_mapsUiLines() {
+        assertEquals(DevAudioCategory.VO.assetPath, audioResolver.getDevPlaceholderForAsset("audio/vo/ui/ui_hearit_next.wav"))
     }
 }
 

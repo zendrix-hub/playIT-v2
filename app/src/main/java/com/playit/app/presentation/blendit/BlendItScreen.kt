@@ -23,9 +23,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import com.playit.app.presentation.components.resetsIdle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +38,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.presentation.components.BlendItCard
+import com.playit.app.presentation.components.CelebrationOverlay
+import com.playit.app.presentation.components.CelebrationType
 import com.playit.app.presentation.components.GummyContainer
 import com.playit.app.presentation.components.LessonStep
 import com.playit.app.presentation.components.LessonTopBar
@@ -48,7 +52,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun BlendItScreen(
     viewModel: BlendItViewModel,
-    onSessionComplete: (Int) -> Unit,
+    onSessionComplete: (BlendItResult) -> Unit,
     onBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -66,7 +70,7 @@ fun BlendItScreen(
     LaunchedEffect(uiState) {
         if (uiState is BlendItUiState.SessionComplete) {
             delay(800L) // allow completion chime and celebration animation to play
-            onSessionComplete(viewModel.groupId)
+            onSessionComplete(viewModel.result())
         }
     }
 
@@ -81,9 +85,17 @@ fun BlendItScreen(
         }
     }
 
+    DisposableEffect(Unit) {
+        viewModel.onScreenVisible()
+        onDispose {
+            viewModel.onScreenHidden()
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .resetsIdle { viewModel.onUserInteraction() }
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
@@ -193,7 +205,7 @@ fun BlendItScreen(
                             strokeColor = when {
                                 isHighlighted -> SunnyGold
                                 uiState is BlendItUiState.WordCorrect -> EmeraldLeaf
-                                uiState is BlendItUiState.WordIncorrect -> CoralBerry
+                                uiState is BlendItUiState.WordIncorrect -> GentleCorrectionOrange
                                 else -> ModernBorderSoft
                             },
                             depthHeight = if (isHighlighted) 6.dp else 4.dp,
@@ -307,5 +319,11 @@ fun BlendItScreen(
                 }
             }
         }
+
+        CelebrationOverlay(
+            type = CelebrationType.STAR_BURST,
+            isPlaying = uiState is BlendItUiState.HeartDepleted,
+            onFinished = { viewModel.restartSession() }
+        )
     }
 }

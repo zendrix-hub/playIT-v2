@@ -29,12 +29,15 @@ import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.playit.app.presentation.components.breathingPulse
+import com.playit.app.presentation.components.resetsIdle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -74,8 +77,16 @@ fun HearItScreen(
     val isPlaying by viewModel.isPlaying.collectAsStateWithLifecycle()
     val isPlayingPrompt by viewModel.isPlayingPrompt.collectAsStateWithLifecycle()
     val playCount by viewModel.playCount.collectAsStateWithLifecycle()
+    val nextHighlighted by viewModel.nextHighlighted.collectAsStateWithLifecycle()
     val loadError by viewModel.loadError.collectAsStateWithLifecycle()
     val targetLetter = phoneme?.letter?.uppercase() ?: "M"
+
+    DisposableEffect(Unit) {
+        viewModel.onScreenVisible()
+        onDispose {
+            viewModel.onScreenHidden()
+        }
+    }
 
     if (loadError) {
         Box(
@@ -118,7 +129,7 @@ fun HearItScreen(
     )
 
     // Unlock-pop on transition from locked -> unlocked state
-    val isUnlocked = playCount > 0
+    val isUnlocked = nextHighlighted
     var wasUnlocked by remember { mutableStateOf(isUnlocked) }
     val unlockScale = remember { Animatable(1f) }
     LaunchedEffect(isUnlocked) {
@@ -144,6 +155,7 @@ fun HearItScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .resetsIdle { viewModel.onUserInteraction() }
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
@@ -286,6 +298,7 @@ fun HearItScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(64.dp)
+                        .breathingPulse(enabled = nextHighlighted)
                         .graphicsLayer {
                             scaleX = unlockScale.value
                             scaleY = unlockScale.value

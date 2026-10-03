@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import com.playit.app.presentation.components.IdleTimer
 import javax.inject.Inject
 
 sealed class BlendItUiState {
@@ -32,6 +33,13 @@ sealed class BlendItUiState {
     object HeartDepleted : BlendItUiState() // Triggers standard 3-heart restart dialog
     object SessionComplete : BlendItUiState()
 }
+
+data class BlendItResult(
+    val groupId: Int,
+    val heartsLost: Int,
+    val wordsCorrect: Int,
+    val totalWords: Int
+)
 
 @HiltViewModel
 class BlendItViewModel @Inject constructor(
@@ -58,6 +66,16 @@ class BlendItViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     val heartManager = HeartManager()
+
+    private var wordsSolvedFirstTry: Int = 0
+    private var consecutiveCorrectWords: Int = 0
+
+    fun result(): BlendItResult = BlendItResult(
+        groupId = groupId,
+        heartsLost = heartManager.sessionHeartsLost,
+        wordsCorrect = wordsSolvedFirstTry,
+        totalWords = _words.value.size
+    )
 
     private val _hearts = MutableStateFlow(heartManager.currentHearts)
     val hearts: StateFlow<Int> = _hearts.asStateFlow()
@@ -109,6 +127,27 @@ class BlendItViewModel @Inject constructor(
 
     private val _isPlayingPrompt = MutableStateFlow(false)
     val isPlayingPrompt: StateFlow<Boolean> = _isPlayingPrompt.asStateFlow()
+
+    private val _nextHighlighted = MutableStateFlow(false)
+    val nextHighlighted: StateFlow<Boolean> = _nextHighlighted.asStateFlow()
+
+    private val idleTimer = IdleTimer(
+        scope = viewModelScope,
+        isBusy = { _isPlayingPrompt.value },
+        onIdle = { playBlendItIntroAudio() }
+    )
+
+    fun onScreenVisible() {
+        idleTimer.start()
+    }
+
+    fun onScreenHidden() {
+        idleTimer.stop()
+    }
+
+    fun onUserInteraction() {
+        idleTimer.touch()
+    }
 
     private fun setupWordAtIndex(index: Int) {
         val wordObj = _words.value.getOrNull(index) ?: return
@@ -209,6 +248,13 @@ class BlendItViewModel @Inject constructor(
         }
 
         if (isCorrect) {
+            if (_wrongAttemptsForCurrentWord.value == 0) {
+                wordsSolvedFirstTry++
+            }
+            consecutiveCorrectWords++
+            heartManager.checkRecovery(consecutiveCorrectWords)
+            _hearts.value = heartManager.currentHearts
+
             _uiState.value = BlendItUiState.WordCorrect
             soundOutJob?.cancel()
             soundOutJob = viewModelScope.launch {
@@ -242,15 +288,16 @@ class BlendItViewModel @Inject constructor(
                 }
             }
         } else {
+            consecutiveCorrectWords = 0
             val isGameOver = heartManager.deductHeart()
             _hearts.value = heartManager.currentHearts
-            _totalHeartsLost.value = heartManager.heartsLost
+            _totalHeartsLost.value = heartManager.sessionHeartsLost
             _wrongAttemptsForCurrentWord.value += 1
 
-            val sfxBuzz = audioResolver.getSfxPath(SfxEvent.BLENDIT_BUZZ)
+            val sfxPop = audioResolver.getSfxPath(SfxEvent.INCORRECT_POP)
             val sfxWhoosh = audioResolver.getSfxPath(SfxEvent.HEART_LOSS_WHOOSH)
             val voEncourage = audioResolver.getRotatingEncourageVo()
-            audioPlayer.playSequence(listOf(sfxBuzz, sfxWhoosh, voEncourage))
+            audioPlayer.playSequence(listOf(sfxPop, sfxWhoosh, voEncourage))
 
             if (isGameOver) {
                 _uiState.value = BlendItUiState.HeartDepleted
@@ -304,14 +351,17 @@ class BlendItViewModel @Inject constructor(
     }
 
     fun restartSession() {
-        heartManager.reset()
+        wordsSolvedFirstTry = 0
+        consecutiveCorrectWords = 0
+        heartManager.resetForRestart()
         _hearts.value = heartManager.currentHearts
-        _totalHeartsLost.value = 0
+        _totalHeartsLost.value = heartManager.sessionHeartsLost
         setupWordAtIndex(0)
     }
 
     override fun onCleared() {
         super.onCleared()
+        idleTimer.stop()
         audioPlayer.stop()
     }
 }

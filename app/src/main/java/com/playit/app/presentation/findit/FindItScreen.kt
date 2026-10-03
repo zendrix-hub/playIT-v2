@@ -24,6 +24,7 @@ import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
@@ -42,12 +43,14 @@ import com.playit.app.presentation.components.LessonStep
 import com.playit.app.presentation.components.LessonTopBar
 import com.playit.app.presentation.components.MascotSpeechHeader
 import com.playit.app.presentation.components.MascotState
+import com.playit.app.presentation.components.breathingPulse
+import com.playit.app.presentation.components.resetsIdle
 import com.playit.app.presentation.theme.*
 
 @Composable
 fun FindItScreen(
     viewModel: FindItViewModel,
-    onNext: (String) -> Unit,
+    onNext: (phonemeId: String, heartsLost: Int) -> Unit,
     onBack: () -> Unit
 ) {
     val targetPhoneme by viewModel.targetPhoneme.collectAsStateWithLifecycle()
@@ -58,12 +61,21 @@ fun FindItScreen(
     val hearts by viewModel.hearts.collectAsStateWithLifecycle()
     val isPlaying by viewModel.isPlaying.collectAsStateWithLifecycle()
     val isPlayingPrompt by viewModel.isPlayingPrompt.collectAsStateWithLifecycle()
+    val nextHighlighted by viewModel.nextHighlighted.collectAsStateWithLifecycle()
+
+    DisposableEffect(Unit) {
+        viewModel.onScreenVisible()
+        onDispose {
+            viewModel.onScreenHidden()
+        }
+    }
 
     val targetLetter = targetPhoneme?.letter?.uppercase() ?: "M"
 
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .resetsIdle { viewModel.onUserInteraction() }
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
@@ -187,12 +199,12 @@ fun FindItScreen(
                                         (state as FindItState.Incorrect).selectedItem.id == item.id
                                 val borderColor = when {
                                     isFound -> EmeraldLeaf
-                                    isIncorrectSelection -> CoralBerry
+                                    isIncorrectSelection -> GentleCorrectionOrange
                                     else -> ModernBorderSoft
                                 }
                                 val faceColor = when {
                                     isFound -> EmeraldLeaf.copy(alpha = 0.15f)
-                                    isIncorrectSelection -> CoralBerry.copy(alpha = 0.12f)
+                                    isIncorrectSelection -> GentleCorrectionOrange.copy(alpha = 0.12f)
                                     else -> SurfaceCard
                                 }
                                 Box(modifier = Modifier.weight(1f)) {
@@ -227,12 +239,12 @@ fun FindItScreen(
                                         (state as FindItState.Incorrect).selectedItem.id == item.id
                                 val borderColor = when {
                                     isFound -> EmeraldLeaf
-                                    isIncorrectSelection -> CoralBerry
+                                    isIncorrectSelection -> GentleCorrectionOrange
                                     else -> ModernBorderSoft
                                 }
                                 val faceColor = when {
                                     isFound -> EmeraldLeaf.copy(alpha = 0.15f)
-                                    isIncorrectSelection -> CoralBerry.copy(alpha = 0.12f)
+                                    isIncorrectSelection -> GentleCorrectionOrange.copy(alpha = 0.12f)
                                     else -> SurfaceCard
                                 }
                                 Box(modifier = Modifier.weight(1f)) {
@@ -267,12 +279,12 @@ fun FindItScreen(
                                      (state as FindItState.Incorrect).selectedItem.id == item.id
                             val borderColor = when {
                                 isFound -> EmeraldLeaf
-                                isIncorrectSelection -> CoralBerry
+                                isIncorrectSelection -> GentleCorrectionOrange
                                 else -> ModernBorderSoft
                             }
                             val faceColor = when {
                                 isFound -> EmeraldLeaf.copy(alpha = 0.15f)
-                                isIncorrectSelection -> CoralBerry.copy(alpha = 0.12f)
+                                isIncorrectSelection -> GentleCorrectionOrange.copy(alpha = 0.12f)
                                 else -> SurfaceCard
                             }
                             Box(
@@ -309,13 +321,14 @@ fun FindItScreen(
                 ) {
                     GummyButton(
                         text = "Complete Lesson",
-                        onClick = { onNext(targetPhoneme?.id?.toString() ?: "1") },
+                        onClick = { onNext(targetPhoneme?.id?.toString() ?: "1", viewModel.sessionHeartsLost) },
                         backgroundColor = EmeraldLeaf,
                         shadowColor = EmeraldLeafShadow,
                         contentColor = Color.White,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(64.dp)
+                            .breathingPulse(enabled = nextHighlighted)
                     )
                 }
             }

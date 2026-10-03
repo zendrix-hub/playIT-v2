@@ -77,9 +77,11 @@ class VoskRecognizer @Inject constructor(
 
     /**
      * Starts listening using Android's native SpeechService with RecognitionListener callbacks.
+     * [onResult] receives each non-blank hypothesis; isFinal is false for partial results and
+     * true for end-of-utterance results.
      */
     fun startListening(
-        onResult: (String) -> Unit
+        onResult: (text: String, isFinal: Boolean) -> Unit
     ) {
         val currentModel = model ?: run {
             Log.w(TAG, "Cannot start listening: Vosk model not loaded yet")
@@ -112,7 +114,7 @@ class VoskRecognizer @Inject constructor(
                     val text = parseResult(hypothesis, "partial")
                     if (text.isNotBlank()) {
                         lastRecognizedText = text
-                        onResult(text)
+                        onResult(text, false)
                     }
                 }
 
@@ -121,7 +123,7 @@ class VoskRecognizer @Inject constructor(
                     val text = parseResult(hypothesis, "text")
                     if (text.isNotBlank()) {
                         lastRecognizedText = text
-                        onResult(text)
+                        onResult(text, true)
                     }
                 }
 
@@ -130,7 +132,7 @@ class VoskRecognizer @Inject constructor(
                     val text = parseResult(hypothesis, "text")
                     if (text.isNotBlank()) {
                         lastRecognizedText = text
-                        onResult(text)
+                        onResult(text, true)
                     }
                 }
 

@@ -425,6 +425,7 @@ fun MapScreen(
                                         onClick = {
                                             if (node.isUnlocked) {
                                                 selectedNodeForAction = node
+                                                viewModel.onUnlockedNodeTapped()
                                             } else {
                                                 shakenNodeId = node.id
                                                 selectedNodeForAction = node
@@ -439,6 +440,7 @@ fun MapScreen(
                                         onClick = {
                                             if (node.isUnlocked) {
                                                 selectedNodeForAction = node
+                                                viewModel.onUnlockedNodeTapped()
                                             } else {
                                                 shakenNodeId = node.id
                                                 selectedNodeForAction = node
