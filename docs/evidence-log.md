@@ -42,4 +42,6 @@ One row per code commit. agy adds a row with each card (CI pending, phone test p
 | 06 (accepted) | Review 2026-10-02: texts match the card's table word for word; lastHeard set after the judgement with the attempt number, reset on load; Log.d only in the screen and only in debug builds; review_card.py all PASS | FR-03, NFR-ASR-01 | 4deb625 | pass | pending (PHONE_TEST_cards-06-07.md part A) |
 | 07 (accepted) | Review 2026-10-02: IdleTimer matches the card (postpone cap, 3 prompts); the three revisions are in (complete screens busy flag with sequence callback, Hear It unlock after the first playback from either path, test callback stubs); 3 UI clips match the 2026-10-01 release SHA-256; review_card.py all PASS | NFR-IND-01 | 18f7fb8 | pass | pending (PHONE_TEST_cards-06-07.md part B) |
 | 07b | Onboarding asked a 6-year-old to type a name; default name now uses avatar name, parent can rename in Parent Zone (max 16 chars), map pop-up voiced with ui_node_start / ui_node_locked | NFR-IND-01 | pending | pending | pending |
+| 08 | 24 placeholder pictures and 4 wrong key-word pictures regenerated in rounds; user picked all 29 items in Round 1 (picks.json & candidate PNGs staged) | FR-05 | pending | n/a (asset card) | n/a |
+
 

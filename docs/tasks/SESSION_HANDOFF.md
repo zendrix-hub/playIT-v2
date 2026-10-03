@@ -3,9 +3,43 @@
 > This document is the asynchronous communication bridge between **Claude** (architect, card author, reviewer) and **agy** (implementer) on branch `refactor/hear-say-it`.
 > Update this document at the conclusion of each session so the other agent has complete, structured context upon pulling.
 
+## Latest Session Status (2026-10-03) — Card 08 (Image Batch 01)
+
+| Field | Value |
+|---|---|
+| **Author** | agy |
+| **Branch** | `refactor/hear-say-it` |
+| **Head Commit** | `pending` |
+| **Subject** | `docs(assets): add batch 1 user picks and 29 candidate images for cutout (Card 08)` |
+| **Active Card** | Card 08 (`Status: done`) |
+| **Review Status** | All 29 items picked in Round 1 (`picks.json` generated); ready for Claude background cutout and audit |
+
 ---
 
-## Latest Session Status (2026-10-01)
+## What Was Completed in This Session (Card 08)
+
+1. **Asset Generation & Verification (Round 1)**:
+   - Generated all 58 images (2 variants each for all 29 items in `items.json`) using Nano Banana Pro (`generate_image`) with style reference pictures attached.
+   - Every single PNG was verified with Pillow (1024x1024 square, corner channels > 235).
+   - Logged in `generation_log.jsonl` (58 entries).
+   - Review page generated via `tools/images/review_page.py --round 1`.
+
+2. **User Review & Final Picks**:
+   - The user reviewed Round 1 in `round-01/index.html` and selected preferred variants for all 29 items.
+   - `tools/images/review_page.py --status` verified 0 open items remaining and generated `picks.json`.
+   - Staged `picks.json` and the 29 picked 1024x1024 PNGs into:
+     - `docs/assets/briefs/2026-10-01-findit-batch-01/picks.json`
+     - `docs/assets/briefs/2026-10-01-findit-batch-01/picks/<item_id>.png` (29 files)
+   - Created zip package at `C:\Users\Zendrix\Documents\playIT-image-batches\2026-10-01-findit-batch-01\playIT_batch_01_picks.zip`.
+
+3. **Next Steps for Claude**:
+   - Run `tools/images/cutout.py` to remove white backgrounds (flood fill) and produce transparent 512px RGBA assets.
+   - Run `tools/images/audit.py` to check alpha, padding, halos, and 96px thumbnail rendering.
+   - Prepare the release manifest in `docs/image-release/<date>/manifest.json` for Card 13.
+
+---
+
+## Session Status (2026-10-01)
 
 | Field | Value |
 |---|---|
