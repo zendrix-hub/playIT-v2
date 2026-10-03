@@ -88,4 +88,21 @@ class HeartManagerTest {
         assertFalse(heartManager.checkRecovery(consecutiveCorrect = 3))
         assertEquals(3, heartManager.getHearts())
     }
+
+    @Test
+    fun sessionHeartsLost_survivesRestart() {
+        repeat(5) { heartManager.deductHeart() }
+        heartManager.resetForRestart()
+        assertEquals(3, heartManager.currentHearts)
+        assertEquals(0, heartManager.heartsLost)
+        assertEquals(5, heartManager.sessionHeartsLost)
+    }
+
+    @Test
+    fun reset_clearsSessionHeartsLost() {
+        heartManager.deductHeart()
+        heartManager.deductHeart()
+        heartManager.reset()
+        assertEquals(0, heartManager.sessionHeartsLost)
+    }
 }

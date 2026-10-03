@@ -31,6 +31,10 @@ class BlendItCompleteViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val groupIdArg: String? = savedStateHandle["groupId"]
+    private val heartsLostArg: String? = savedStateHandle["heartsLost"]
+    private val wordsCorrectArg: String? = savedStateHandle["wordsCorrect"]
+    private val totalWordsArg: String? = savedStateHandle["totalWords"]
+
     val groupId: Int = groupIdArg?.toIntOrNull() ?: 1
 
     private val _starsEarned = MutableStateFlow(3)
@@ -65,9 +69,18 @@ class BlendItCompleteViewModel @Inject constructor(
     }
 
     private fun completeSession() {
+        val heartsLost = heartsLostArg?.toIntOrNull()?.coerceAtLeast(0) ?: 0
+        val wordsCorrect = wordsCorrectArg?.toIntOrNull()?.coerceAtLeast(0) ?: 5
+        val totalWords = totalWordsArg?.toIntOrNull()?.coerceAtLeast(1) ?: 5
         val profileId = sessionManager.activeProfileId.value ?: 1L
+
         viewModelScope.launch {
-            val stars = BlendItStarThresholds.calculateStars(groupId, totalHeartsLost = 0)
+            val stars = BlendItStarThresholds.calculateStars(
+                groupId = groupId,
+                totalHeartsLost = heartsLost,
+                wordsCorrect = wordsCorrect,
+                totalWords = totalWords
+            )
             _starsEarned.value = stars
 
             blendItProgressRepository.saveProgress(
@@ -75,7 +88,7 @@ class BlendItCompleteViewModel @Inject constructor(
                     profileId = profileId,
                     groupId = groupId,
                     starsEarned = stars,
-                    heartsLost = 0,
+                    heartsLost = heartsLost,
                     isCompleted = true,
                     completedAt = System.currentTimeMillis()
                 )

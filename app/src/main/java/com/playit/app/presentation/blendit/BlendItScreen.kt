@@ -38,6 +38,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.presentation.components.BlendItCard
+import com.playit.app.presentation.components.CelebrationOverlay
+import com.playit.app.presentation.components.CelebrationType
 import com.playit.app.presentation.components.GummyContainer
 import com.playit.app.presentation.components.LessonStep
 import com.playit.app.presentation.components.LessonTopBar
@@ -50,7 +52,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun BlendItScreen(
     viewModel: BlendItViewModel,
-    onSessionComplete: (Int) -> Unit,
+    onSessionComplete: (BlendItResult) -> Unit,
     onBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -68,7 +70,7 @@ fun BlendItScreen(
     LaunchedEffect(uiState) {
         if (uiState is BlendItUiState.SessionComplete) {
             delay(800L) // allow completion chime and celebration animation to play
-            onSessionComplete(viewModel.groupId)
+            onSessionComplete(viewModel.result())
         }
     }
 
@@ -317,5 +319,11 @@ fun BlendItScreen(
                 }
             }
         }
+
+        CelebrationOverlay(
+            type = CelebrationType.STAR_BURST,
+            isPlaying = uiState is BlendItUiState.HeartDepleted,
+            onFinished = { viewModel.restartSession() }
+        )
     }
 }

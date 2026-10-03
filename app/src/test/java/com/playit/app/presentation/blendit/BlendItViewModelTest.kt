@@ -177,7 +177,7 @@ class BlendItViewModelTest {
     }
 
     @Test
-    fun restartSession_resetsHeartsAndCurrentWordIndex() = runTest {
+    fun heartDepleted_restartsWithThreeHearts() = runTest {
         viewModel = BlendItViewModel(
             blendItWordRepository, blendItAttemptRepository, blendItWordSelector,
             sessionManager, audioPlayer, audioResolver, savedStateHandle
@@ -196,9 +196,46 @@ class BlendItViewModelTest {
         viewModel.restartSession()
         advanceUntilIdle()
 
-        assertEquals(5, viewModel.hearts.value)
+        assertEquals(3, viewModel.hearts.value)
+        assertEquals(5, viewModel.result().heartsLost)
         assertEquals(0, viewModel.currentWordIndex.value)
         assertEquals(BlendItUiState.Idle, viewModel.uiState.value)
+    }
+
+    @Test
+    fun result_countsFirstTryWords() = runTest {
+        viewModel = BlendItViewModel(
+            blendItWordRepository, blendItAttemptRepository, blendItWordSelector,
+            sessionManager, audioPlayer, audioResolver, savedStateHandle
+        )
+        advanceUntilIdle()
+
+        // Word 1: SAM - correct first try
+        viewModel.placeTile('S')
+        viewModel.placeTile('A')
+        viewModel.placeTile('M')
+        advanceUntilIdle()
+        viewModel.submitWord()
+        runCurrent()
+
+        // Advance past delay to advance to Word 2: SIS
+        advanceTimeBy(1300)
+        advanceUntilIdle()
+
+        // Word 2: SIS - one wrong submit
+        viewModel.submitWord()
+        advanceUntilIdle()
+
+        // Now place SIS correctly
+        viewModel.placeTile('S')
+        viewModel.placeTile('I')
+        viewModel.placeTile('S')
+        advanceUntilIdle()
+        viewModel.submitWord()
+        runCurrent()
+
+        assertEquals(1, viewModel.result().wordsCorrect)
+        assertEquals(1, viewModel.result().heartsLost)
     }
 
     @Test

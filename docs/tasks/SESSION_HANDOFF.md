@@ -3,16 +3,91 @@
 > This document is the asynchronous communication bridge between **Claude** (architect, card author, reviewer) and **agy** (implementer) on branch `refactor/hear-say-it`.
 > Update this document at the conclusion of each session so the other agent has complete, structured context upon pulling.
 
-## Latest Session Status (2026-10-03) — Card 08 (Image Batch 01)
+## Notice for Claude (Monday Sync): Capstone 2 Week 3 Refactored Specifications (SRS v3.0, SDD v2.0, SPMP v2.0)
+
+> **Context:** The team refactored the formal Capstone 2 engineering package for Week 3 submission based on the empirical Weeks 1–2 MVP Field Validation ($N=25$: 16 early learners, 5 parents, 4 certified DepEd teachers; mean SUS $75.50$ / Grade B+).
+> **Directive:** Development continues in parallel without blocking on document sign-off to preserve sprint momentum. The user and Claude will sync on these documents on Monday morning.
+
+### Refactored Specification Documents
+1. **Refactored SRS v3.0 (`docs/SRS_v3.0_Refactored.md`)**:
+   - **Scope (§1.2):** Standardized curriculum to 26 letters (7 chapters); Ñ excluded; NG deferred to Chapter 8 digraphs.
+   - **FR-02 (P0):** Enforced pure phoneme acoustic models (eliminated schwa trailing "ma" → /m/ [m:]); continuous sounds held $\approx 800\,\text{ms}$, stops clipped at $\le 250\,\text{ms}$; runtime sequence assembly ($\le 15\,\text{s}$) with persistent ear replay button.
+   - **FR-03 (P1):** Dynamic 4-state mic visualizer (Idle, Listening with live RMS ripple, Processing, Result), tap-to-listen $\le 100\,\text{ms}$, 3-tier prompt ladder with specific verbal corrections. **Say It never depletes player hearts**.
+   - **FR-NEW-REC (P1):** Spaced retrieval warm-up checks (prioritizing `NEEDS_PRACTICE` letters) and end-of-session recall checks to establish true memory retention.
+   - **NFR-ASR-01 (P1):** Vosk engine calibrated for $\ge 80\%$ agreement with teachers on child speech, false reject ceiling $\le 15\%$, and discrete error tagging (`LETTER_NAME`, `ADDED_VOWEL`, `SUBSTITUTION`, `UNKNOWN`).
+   - **NFR-PERF-01 (P1):** Latency from speech end (`speech_end`) to feedback P90 $\le 0.5\,\text{s}$; Find It tap feedback P90 $\le 0.3\,\text{s}$.
+   - **FR-13 (P1):** Purged 5 non-decodable CVC words (AIM, BEE, TOY, BOY, ZOO); replaced with AM, SUM, TUB, YAM, ZIP; flagged QUIZ as documented exception.
+   - **FR-14 (P1):** Multi-profile support (up to 6 child profiles) for shared classroom tablet stations (`PED-12`).
+   - **FR-NEW-TEL (P1):** Local Room telemetry event logging with monotonic clocks; PIN-gated CSV/PDF export via Android Share Sheet (0 network calls).
+   - **NFR-ACC-01 / ACC-02 (P2):** Visual mouth articulation guides and sound captions (`ACC-06`); global $\ge 64\,\text{dp}$ touch target floor (`ACC-07`).
+   - **Removed Requirement:** Eliminated musical pitch deviation ($\pm 10\,\text{cents}$) as inapplicable to speech phonetics.
+   - **RTM v3.0 (§4):** Full 16-row bidirectional traceability matrix mapping findings `F-01` through `F-16` to objectives, requirements, design components, and STD test cases.
+
+2. **Refactored SDD v2.0 (`docs/SDD_v2.0_Refactored.md`)**:
+   - **Tutoring & Pedagogy Layer (§2.1–§2.2):** Introduced `LessonEngine`, `TutorPolicy` finite state machine (FSM), `SayItJudge` with per-letter grammars, and `LearnerModel` review scheduler.
+   - **Audio Subsystem (§3.1):** `AudioPlaybackManager` with pre-cached `SoundPool` for instant phoneme bursts; separated `ph_m.wav`, `kw_m_mouse.wav`, and carrier assets; runtime `AudioComposer`.
+   - **Speech Recognition Pipeline (§3.2):** Switched from `SpeechService` to an asynchronous `AudioRecord` 16 kHz mono loop streaming raw PCM to compute real-time normalized RMS amplitude for `MicStateVisualizer` while feeding Vosk `acceptWaveForm()`.
+   - **Room Database Schema v3 (§3.5):** Added `ProfileEntity`, `LetterProgressEntity`, and `TelemetryEventEntity`; local RFC 4180 CSV exporter.
+   - **Pediatric UI Tokens (§3.6):** `Modifier.pediatricTouchTarget(64.dp)` and `ArticulationCue` composable.
+
+3. **Refactored SPMP v2.0 (`docs/SPMP_v2.0_Refactored.md`)**:
+   - **Scope & Strategy (§1):** Chapter 1 (*m, s, a, i*) established as the complete vertical slice for Round 2; Kokoro-82M and Chatterbox-Turbo 3-stage audio release gates (Gates 1–3).
+   - **WBS (§2):** 9 structured work packages (Pedagogy, Audio, ASR Spike, Tutoring Layer, Autonomy, Telemetry, Testing, Round 2, Documentation).
+   - **Schedule (§3):** Re-baselined Weeks 3–9 master schedule.
+   - **Risk Register (§6):** Expanded 8-point risk matrix (R1–R8) with concrete proactive mitigations and contingencies.
+
+### Action Plan
+- **Claude:** Review the three refactored specification documents (`docs/SRS_v3.0_Refactored.md`, `docs/SDD_v2.0_Refactored.md`, `docs/SPMP_v2.0_Refactored.md`) and Card 11 implementation when syncing on Monday morning.
+- **agy:** Completed Card 11 (`card-11-stars-and-hearts.md`). Unit tests passing cleanly in CI/local. Ready for Claude review.
+
+---
+
+## Latest Session Status (2026-10-03) — Card 11: Stars and Hearts Bug Fixes
 
 | Field | Value |
 |---|---|
 | **Author** | agy |
 | **Branch** | `refactor/hear-say-it` |
 | **Head Commit** | `pending` |
-| **Subject** | `docs(assets): add batch 1 user picks and 29 candidate images for cutout (Card 08)` |
-| **Active Card** | Card 08 (`Status: done`) |
-| **Review Status** | All 29 items picked in Round 1 (`picks.json` generated); ready for Claude background cutout and audit |
+| **Subject** | `fix(progress): stars and hearts use the child's real results (FR-04, FR-06, FR-13)` |
+| **Active Card** | Card 11 (`Status: done`) |
+| **Review Status** | Code implemented, tested, and passing all unit tests locally. Ready for Claude code review. |
+
+---
+
+## What Was Completed in This Session (Card 11)
+
+1. **HeartManager (`HeartManager.kt`)**:
+   - Added `sessionHeartsLost: Int` (cleared only on `reset()`, preserved across `resetForRestart()`).
+   - Incremented `sessionHeartsLost` on every `deductHeart()`.
+   - Added unit tests: `sessionHeartsLost_survivesRestart` and `reset_clearsSessionHeartsLost`.
+
+2. **Navigation Routes (`Routes.kt`, `NavGraph.kt`, `RoutesTest.kt`)**:
+   - Updated `LETTER_COMPLETE` and `BLEND_IT_COMPLETE` to accept optional query arguments with defaults (`heartsLost`, `wordsCorrect`, `totalWords`).
+   - Updated `NavGraph` composable route arguments and callback handlers for Find It and Blend It.
+   - Added unit test suite `RoutesTest.kt` verifying route query parameters.
+
+3. **Top Bar & Pediatric Compliance (`LessonTopBar.kt`)**:
+   - Fixed `LessonTopBar` default `maxHearts` from 3 to `GameplayConstants.STARTING_HEARTS` (5).
+
+4. **Find It Gameplay & Recovery (`FindItViewModel.kt`, `FindItScreen.kt`)**:
+   - Exposed `sessionHeartsLost` in `FindItViewModel`.
+   - Tracked `consecutiveCorrect` and wired `heartManager.checkRecovery(consecutiveCorrect)` (+1 heart per 3 correct in a row, capped at initial starting pool).
+   - Updated `FindItScreen` `onNext` signature to `(phonemeId: String, heartsLost: Int) -> Unit` passing `sessionHeartsLost`.
+   - Added unit tests in `FindItViewModelTest`: `wrongTaps_countIntoSessionHeartsLost`, `sessionHeartsLost_survivesRestart`, and `threeCorrectInARow_recoversAHeart`.
+
+5. **Blend It Gameplay & Depletion Handling (`BlendItViewModel.kt`, `BlendItScreen.kt`)**:
+   - Added `BlendItResult(groupId, heartsLost, wordsCorrect, totalWords)` and `result()` method.
+   - Tracked `wordsSolvedFirstTry` (only counting words with 0 wrong attempts) and consecutive correct words recovery.
+   - Fixed `restartSession()` to invoke `heartManager.resetForRestart()` (3-heart restart per spec).
+   - Updated `BlendItScreen` `onSessionComplete` callback to take `BlendItResult`.
+   - Added `CelebrationOverlay(type = CelebrationType.STAR_BURST)` for `BlendItUiState.HeartDepleted`.
+   - Added unit tests in `BlendItViewModelTest`: `heartDepleted_restartsWithThreeHearts` and `result_countsFirstTryWords`.
+
+6. **Completion Scoring (`LetterCompleteViewModel.kt`, `BlendItCompleteViewModel.kt`)**:
+   - Removed `coerceIn(0, 2)` clamping in `LetterCompleteViewModel`, using `coerceAtLeast(0)` so 3+ hearts lost yields 1 star.
+   - Updated `BlendItCompleteViewModel` to read `heartsLost`, `wordsCorrect`, and `totalWords` from `SavedStateHandle`, pass to `BlendItStarThresholds.calculateStars(...)`, and persist `heartsLost`.
+   - Added unit tests: `LetterCompleteViewModelTest.heartsLostArg_threeOrMore_givesOneStar`, `LetterCompleteViewModelTest.heartsLostArg_missing_givesThreeStars`, and `BlendItCompleteViewModelTest.starsUseNavResults`.
 
 ---
 

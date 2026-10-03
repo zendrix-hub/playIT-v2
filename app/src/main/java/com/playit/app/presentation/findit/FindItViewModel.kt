@@ -61,6 +61,11 @@ class FindItViewModel @Inject constructor(
 
     val heartManager = HeartManager()
 
+    val sessionHeartsLost: Int
+        get() = heartManager.sessionHeartsLost
+
+    private var consecutiveCorrect: Int = 0
+
     private val _hearts = MutableStateFlow(heartManager.currentHearts)
     val hearts: StateFlow<Int> = _hearts.asStateFlow()
 
@@ -177,6 +182,10 @@ class FindItViewModel @Inject constructor(
         }
 
         if (item.isCorrect) {
+            consecutiveCorrect++
+            heartManager.checkRecovery(consecutiveCorrect)
+            _hearts.value = heartManager.currentHearts
+
             val newFound = _foundItemIds.value + item.id
             _foundItemIds.value = newFound
             _foundCount.value = newFound.size
@@ -194,6 +203,7 @@ class FindItViewModel @Inject constructor(
                 audioPlayer.playAssetAudio(sfx)
             }
         } else {
+            consecutiveCorrect = 0
             val isGameOver = heartManager.deductHeart()
             _hearts.value = heartManager.currentHearts
 
@@ -212,6 +222,7 @@ class FindItViewModel @Inject constructor(
     }
 
     fun restartSession() {
+        consecutiveCorrect = 0
         heartManager.resetForRestart()
         _hearts.value = heartManager.currentHearts
         _nextHighlighted.value = false

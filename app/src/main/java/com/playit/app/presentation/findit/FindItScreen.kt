@@ -50,7 +50,7 @@ import com.playit.app.presentation.theme.*
 @Composable
 fun FindItScreen(
     viewModel: FindItViewModel,
-    onNext: (String) -> Unit,
+    onNext: (phonemeId: String, heartsLost: Int) -> Unit,
     onBack: () -> Unit
 ) {
     val targetPhoneme by viewModel.targetPhoneme.collectAsStateWithLifecycle()
@@ -321,7 +321,7 @@ fun FindItScreen(
                 ) {
                     GummyButton(
                         text = "Complete Lesson",
-                        onClick = { onNext(targetPhoneme?.id?.toString() ?: "1") },
+                        onClick = { onNext(targetPhoneme?.id?.toString() ?: "1", viewModel.sessionHeartsLost) },
                         backgroundColor = EmeraldLeaf,
                         shadowColor = EmeraldLeafShadow,
                         contentColor = Color.White,

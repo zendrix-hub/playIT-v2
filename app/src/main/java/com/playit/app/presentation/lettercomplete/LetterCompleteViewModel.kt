@@ -80,7 +80,7 @@ class LetterCompleteViewModel @Inject constructor(
 
     private fun completeLesson() {
         val phonemeId = phonemeIdArg?.toIntOrNull() ?: 1
-        val heartsLost = heartsLostArg?.toIntOrNull()?.coerceIn(0, 2) ?: 0
+        val heartsLost = heartsLostArg?.toIntOrNull()?.coerceAtLeast(0) ?: 0
         val profileId = sessionManager.activeProfileId.value ?: 1L
 
         viewModelScope.launch {

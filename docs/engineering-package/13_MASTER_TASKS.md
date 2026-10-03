@@ -265,7 +265,7 @@ Each card ticks its own item in its commit (see `docs/tasks/AGY_RUNBOOK.md`). A 
 - [x] Card 08: Image batch 1, Find It and key-word pictures picked by the user (asset card; Claude ticks it from picks.json) (FR-05)
 - [ ] Card 09: Approved held /m/ replaces the Edge-TTS clip (NFR-AUD-01, FR-02)
 - [ ] Card 10: Screenshot tests for changed screens (Roborazzi), uploaded by CI
-- [ ] Card 11: Stars and hearts use real results (FR-04, FR-06, FR-13)
+- [x] Card 11: Stars and hearts use real results (FR-04, FR-06, FR-13)
 - [ ] Card 12: Find It distractors, gentle correction colour, no emoji in the PDF (FR-05, FR-12)
 - [ ] Card 13: Approved batch-1 pictures in the app (FR-05)
 - [ ] Card 03b: Say It corrections from fragments around the sound (FR-03)

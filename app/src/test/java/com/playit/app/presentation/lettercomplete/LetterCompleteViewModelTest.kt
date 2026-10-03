@@ -191,4 +191,42 @@ class LetterCompleteViewModelTest {
             audioPlayer.playAssetAudio("ui/ui_complete_next.wav", any())
         }
     }
+
+    @Test
+    fun heartsLostArg_threeOrMore_givesOneStar() = runTest {
+        every { savedStateHandle.get<String>("phonemeId") } returns "1"
+        every { savedStateHandle.get<String>("heartsLost") } returns "3"
+
+        viewModel = LetterCompleteViewModel(
+            phonemeRepository, lessonProgressRepository, streakTracker,
+            sessionManager, audioPlayer, audioResolver, savedStateHandle
+        )
+        advanceUntilIdle()
+
+        assertEquals(1, viewModel.starsEarned.value)
+        coVerify {
+            lessonProgressRepository.saveProgress(
+                match { it.starsEarned == 1 && it.heartsLost == 3 }
+            )
+        }
+    }
+
+    @Test
+    fun heartsLostArg_missing_givesThreeStars() = runTest {
+        every { savedStateHandle.get<String>("phonemeId") } returns "1"
+        every { savedStateHandle.get<String>("heartsLost") } returns null
+
+        viewModel = LetterCompleteViewModel(
+            phonemeRepository, lessonProgressRepository, streakTracker,
+            sessionManager, audioPlayer, audioResolver, savedStateHandle
+        )
+        advanceUntilIdle()
+
+        assertEquals(3, viewModel.starsEarned.value)
+        coVerify {
+            lessonProgressRepository.saveProgress(
+                match { it.starsEarned == 3 && it.heartsLost == 0 }
+            )
+        }
+    }
 }

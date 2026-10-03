@@ -34,6 +34,13 @@ sealed class BlendItUiState {
     object SessionComplete : BlendItUiState()
 }
 
+data class BlendItResult(
+    val groupId: Int,
+    val heartsLost: Int,
+    val wordsCorrect: Int,
+    val totalWords: Int
+)
+
 @HiltViewModel
 class BlendItViewModel @Inject constructor(
     private val blendItWordRepository: BlendItWordRepository,
@@ -59,6 +66,16 @@ class BlendItViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     val heartManager = HeartManager()
+
+    private var wordsSolvedFirstTry: Int = 0
+    private var consecutiveCorrectWords: Int = 0
+
+    fun result(): BlendItResult = BlendItResult(
+        groupId = groupId,
+        heartsLost = heartManager.sessionHeartsLost,
+        wordsCorrect = wordsSolvedFirstTry,
+        totalWords = _words.value.size
+    )
 
     private val _hearts = MutableStateFlow(heartManager.currentHearts)
     val hearts: StateFlow<Int> = _hearts.asStateFlow()
@@ -231,6 +248,13 @@ class BlendItViewModel @Inject constructor(
         }
 
         if (isCorrect) {
+            if (_wrongAttemptsForCurrentWord.value == 0) {
+                wordsSolvedFirstTry++
+            }
+            consecutiveCorrectWords++
+            heartManager.checkRecovery(consecutiveCorrectWords)
+            _hearts.value = heartManager.currentHearts
+
             _uiState.value = BlendItUiState.WordCorrect
             soundOutJob?.cancel()
             soundOutJob = viewModelScope.launch {
@@ -264,9 +288,10 @@ class BlendItViewModel @Inject constructor(
                 }
             }
         } else {
+            consecutiveCorrectWords = 0
             val isGameOver = heartManager.deductHeart()
             _hearts.value = heartManager.currentHearts
-            _totalHeartsLost.value = heartManager.heartsLost
+            _totalHeartsLost.value = heartManager.sessionHeartsLost
             _wrongAttemptsForCurrentWord.value += 1
 
             val sfxBuzz = audioResolver.getSfxPath(SfxEvent.BLENDIT_BUZZ)
@@ -326,9 +351,11 @@ class BlendItViewModel @Inject constructor(
     }
 
     fun restartSession() {
-        heartManager.reset()
+        wordsSolvedFirstTry = 0
+        consecutiveCorrectWords = 0
+        heartManager.resetForRestart()
         _hearts.value = heartManager.currentHearts
-        _totalHeartsLost.value = 0
+        _totalHeartsLost.value = heartManager.sessionHeartsLost
         setupWordAtIndex(0)
     }
 

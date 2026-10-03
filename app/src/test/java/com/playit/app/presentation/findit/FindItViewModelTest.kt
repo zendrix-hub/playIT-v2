@@ -223,4 +223,62 @@ class FindItViewModelTest {
 
         verify(exactly = 1) { audioPlayer.playAssetAudio("vo_path.mp3", any()) }
     }
+
+    @Test
+    fun wrongTaps_countIntoSessionHeartsLost() = runTest {
+        viewModel = FindItViewModel(
+            phonemeRepository, findItAttemptRepository, gridGenerator,
+            sessionManager, audioPlayer, audioResolver, savedStateHandle
+        )
+        advanceUntilIdle()
+
+        viewModel.selectPictureItem(mockPictureGrid[3])
+        viewModel.selectPictureItem(mockPictureGrid[4])
+        advanceUntilIdle()
+
+        assertEquals(2, viewModel.sessionHeartsLost)
+    }
+
+    @Test
+    fun sessionHeartsLost_survivesRestart() = runTest {
+        viewModel = FindItViewModel(
+            phonemeRepository, findItAttemptRepository, gridGenerator,
+            sessionManager, audioPlayer, audioResolver, savedStateHandle
+        )
+        advanceUntilIdle()
+
+        repeat(5) {
+            viewModel.selectPictureItem(mockPictureGrid[3])
+        }
+        advanceUntilIdle()
+
+        viewModel.restartSession()
+        advanceUntilIdle()
+
+        viewModel.selectPictureItem(mockPictureGrid[3])
+        advanceUntilIdle()
+
+        assertEquals(6, viewModel.sessionHeartsLost)
+        assertEquals(2, viewModel.hearts.value)
+    }
+
+    @Test
+    fun threeCorrectInARow_recoversAHeart() = runTest {
+        viewModel = FindItViewModel(
+            phonemeRepository, findItAttemptRepository, gridGenerator,
+            sessionManager, audioPlayer, audioResolver, savedStateHandle
+        )
+        advanceUntilIdle()
+
+        viewModel.selectPictureItem(mockPictureGrid[3])
+        advanceUntilIdle()
+        assertEquals(4, viewModel.hearts.value)
+
+        viewModel.selectPictureItem(mockPictureGrid[0])
+        viewModel.selectPictureItem(mockPictureGrid[1])
+        viewModel.selectPictureItem(mockPictureGrid[2])
+        advanceUntilIdle()
+
+        assertEquals(5, viewModel.hearts.value)
+    }
 }

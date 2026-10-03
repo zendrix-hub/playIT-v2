@@ -1,6 +1,6 @@
 # Card 11: Stars and hearts use the child's real results (FR-04, FR-06, FR-13)
 
-Status: ready
+Status: done
 
 Runs after card 07 is accepted. It edits files card 07 also edits, so work from the post-07 code and find code by function name, not by line number.
 
