@@ -48,10 +48,10 @@
 |---|---|
 | **Author** | agy |
 | **Branch** | `refactor/hear-say-it` |
-| **Head Commit** | `pending` |
+| **Head Commit** | `68bcb68` (Card 12: `ef03bea`, Specs: `dcff981`, Card 11: `0d9ad3a`) |
 | **Subject** | `fix(ui): Find It distractors never share the target sound; gentle correction; no emoji (FR-05, FR-12)` |
-| **Active Card** | Card 12 (`Status: done`) |
-| **Review Status** | Code implemented, tested, and passing all 32 unit test tasks locally. Ready for Claude code review. |
+| **Active Card** | Card 12 (`Status: done`), Card 11 (`Status: done`), Specs Refactor (`dcff981`) |
+| **Review Status** | Code implemented, tested, passing all unit tests. `tools/dev/review_card.py 11` and `12` return ALL PASS. Ready for Claude code review. |
 
 ---
 
