@@ -205,7 +205,7 @@ fun BlendItScreen(
                             strokeColor = when {
                                 isHighlighted -> SunnyGold
                                 uiState is BlendItUiState.WordCorrect -> EmeraldLeaf
-                                uiState is BlendItUiState.WordIncorrect -> CoralBerry
+                                uiState is BlendItUiState.WordIncorrect -> GentleCorrectionOrange
                                 else -> ModernBorderSoft
                             },
                             depthHeight = if (isHighlighted) 6.dp else 4.dp,

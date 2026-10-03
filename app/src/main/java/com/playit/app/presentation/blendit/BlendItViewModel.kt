@@ -294,10 +294,10 @@ class BlendItViewModel @Inject constructor(
             _totalHeartsLost.value = heartManager.sessionHeartsLost
             _wrongAttemptsForCurrentWord.value += 1
 
-            val sfxBuzz = audioResolver.getSfxPath(SfxEvent.BLENDIT_BUZZ)
+            val sfxPop = audioResolver.getSfxPath(SfxEvent.INCORRECT_POP)
             val sfxWhoosh = audioResolver.getSfxPath(SfxEvent.HEART_LOSS_WHOOSH)
             val voEncourage = audioResolver.getRotatingEncourageVo()
-            audioPlayer.playSequence(listOf(sfxBuzz, sfxWhoosh, voEncourage))
+            audioPlayer.playSequence(listOf(sfxPop, sfxWhoosh, voEncourage))
 
             if (isGameOver) {
                 _uiState.value = BlendItUiState.HeartDepleted

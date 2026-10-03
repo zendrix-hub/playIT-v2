@@ -3,6 +3,7 @@ package com.playit.app.presentation.blendit
 import androidx.lifecycle.SavedStateHandle
 import com.playit.app.data.audio.AudioPlayer
 import com.playit.app.data.audio.AudioResolver
+import com.playit.app.data.audio.SfxEvent
 import com.playit.app.domain.manager.BlendItWordSelector
 import com.playit.app.domain.model.BlendItAttempt
 import com.playit.app.domain.model.BlendItWord
@@ -256,5 +257,31 @@ class BlendItViewModelTest {
         advanceTimeBy(10_001)
 
         verify(exactly = 1) { audioPlayer.playAssetAudio("vo_path.mp3", any()) }
+    }
+
+    @Test
+    fun wrongSubmit_playsSoftPop_notBuzz() = runTest {
+        val capturedSequences = mutableListOf<List<String>>()
+        every { audioPlayer.playSequence(capture(capturedSequences), any()) } just Runs
+        every { audioResolver.getSfxPath(SfxEvent.INCORRECT_POP) } returns "sfx_pop.mp3"
+        every { audioResolver.getSfxPath(SfxEvent.BLENDIT_BUZZ) } returns "sfx_buzz.mp3"
+
+        viewModel = BlendItViewModel(
+            blendItWordRepository, blendItAttemptRepository, blendItWordSelector,
+            sessionManager, audioPlayer, audioResolver, savedStateHandle
+        )
+        advanceUntilIdle()
+
+        // Place incorrect order: M, A, S
+        viewModel.placeTile('M')
+        viewModel.placeTile('A')
+        viewModel.placeTile('S')
+        advanceUntilIdle()
+
+        viewModel.submitWord()
+        advanceUntilIdle()
+
+        assertTrue(capturedSequences.any { it.contains("sfx_pop.mp3") })
+        assertFalse(capturedSequences.any { it.contains("sfx_buzz.mp3") })
     }
 }

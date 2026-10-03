@@ -46,6 +46,16 @@ class GridGenerator @Inject constructor() {
         "z" to listOf("Zebra" to "images/pictures/picture_zebra.png", "Zoo" to "images/pictures/blendword_zoo.png", "Zip" to "images/pictures/picture_zip.png")
     )
 
+    /** Banks that never give distractors: x lists words that END in x; ng and ñ are not curriculum letters (pending SME). */
+    private val noDistractorBanks = setOf("x", "ng", "ñ")
+    /** Letters that share a first sound; a distractor never comes from the target's group. */
+    private val sameSoundGroups = listOf(setOf("c", "k", "q"))
+
+    internal fun distractorLettersFor(target: String): List<String> {
+        val group = sameSoundGroups.firstOrNull { target in it } ?: setOf(target)
+        return pictureBank.keys.filter { it !in group && it !in noDistractorBanks }
+    }
+
     /**
      * Generates a 5-item grid with EXACTLY 3 correct target pictures and 2 distractors.
      */
@@ -68,7 +78,7 @@ class GridGenerator @Inject constructor() {
         }
 
         // Pick 2 distractors from other phonemes
-        val distractorLetters = pictureBank.keys.filter { it != cleanTarget }.shuffled()
+        val distractorLetters = distractorLettersFor(cleanTarget).shuffled()
         val distractorItems = mutableListOf<FindItPictureItem>()
         for (distLetter in distractorLetters) {
             val distList = pictureBank[distLetter] ?: continue

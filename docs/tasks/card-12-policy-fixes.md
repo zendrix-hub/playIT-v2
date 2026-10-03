@@ -1,6 +1,6 @@
 # Card 12: Find It distractors, gentle correction, no emoji (FR-05, FR-12)
 
-Status: ready
+Status: done
 
 Runs after card 11 is accepted. It edits `FindItScreen.kt`, `BlendItScreen.kt` and `BlendItViewModel.kt` after cards 07 and 11, so find code by name, not by line number.
 

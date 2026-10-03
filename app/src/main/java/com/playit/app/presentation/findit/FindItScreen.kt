@@ -199,12 +199,12 @@ fun FindItScreen(
                                         (state as FindItState.Incorrect).selectedItem.id == item.id
                                 val borderColor = when {
                                     isFound -> EmeraldLeaf
-                                    isIncorrectSelection -> CoralBerry
+                                    isIncorrectSelection -> GentleCorrectionOrange
                                     else -> ModernBorderSoft
                                 }
                                 val faceColor = when {
                                     isFound -> EmeraldLeaf.copy(alpha = 0.15f)
-                                    isIncorrectSelection -> CoralBerry.copy(alpha = 0.12f)
+                                    isIncorrectSelection -> GentleCorrectionOrange.copy(alpha = 0.12f)
                                     else -> SurfaceCard
                                 }
                                 Box(modifier = Modifier.weight(1f)) {
@@ -239,12 +239,12 @@ fun FindItScreen(
                                         (state as FindItState.Incorrect).selectedItem.id == item.id
                                 val borderColor = when {
                                     isFound -> EmeraldLeaf
-                                    isIncorrectSelection -> CoralBerry
+                                    isIncorrectSelection -> GentleCorrectionOrange
                                     else -> ModernBorderSoft
                                 }
                                 val faceColor = when {
                                     isFound -> EmeraldLeaf.copy(alpha = 0.15f)
-                                    isIncorrectSelection -> CoralBerry.copy(alpha = 0.12f)
+                                    isIncorrectSelection -> GentleCorrectionOrange.copy(alpha = 0.12f)
                                     else -> SurfaceCard
                                 }
                                 Box(modifier = Modifier.weight(1f)) {
@@ -279,12 +279,12 @@ fun FindItScreen(
                                      (state as FindItState.Incorrect).selectedItem.id == item.id
                             val borderColor = when {
                                 isFound -> EmeraldLeaf
-                                isIncorrectSelection -> CoralBerry
+                                isIncorrectSelection -> GentleCorrectionOrange
                                 else -> ModernBorderSoft
                             }
                             val faceColor = when {
                                 isFound -> EmeraldLeaf.copy(alpha = 0.15f)
-                                isIncorrectSelection -> CoralBerry.copy(alpha = 0.12f)
+                                isIncorrectSelection -> GentleCorrectionOrange.copy(alpha = 0.12f)
                                 else -> SurfaceCard
                             }
                             Box(

@@ -37,25 +37,42 @@
    - **Risk Register (§6):** Expanded 8-point risk matrix (R1–R8) with concrete proactive mitigations and contingencies.
 
 ### Action Plan
-- **Claude:** Review the three refactored specification documents (`docs/SRS_v3.0_Refactored.md`, `docs/SDD_v2.0_Refactored.md`, `docs/SPMP_v2.0_Refactored.md`) and Card 11 implementation when syncing on Monday morning.
-- **agy:** Completed Card 11 (`card-11-stars-and-hearts.md`). Unit tests passing cleanly in CI/local. Ready for Claude review.
+- **Claude:** Review the three refactored specification documents (`docs/SRS_v3.0_Refactored.md`, `docs/SDD_v2.0_Refactored.md`, `docs/SPMP_v2.0_Refactored.md`), Card 11, and Card 12 implementations when syncing on Monday morning.
+- **agy:** Completed Card 11 (`card-11-stars-and-hearts.md`) and Card 12 (`card-12-policy-fixes.md`). Unit tests passing cleanly in CI/local. Ready for Claude review.
 
 ---
 
-## Latest Session Status (2026-10-03) — Card 11: Stars and Hearts Bug Fixes
+## Latest Session Status (2026-10-03) — Card 12: Find It Distractors, Gentle Correction, Zero Emoji
 
 | Field | Value |
 |---|---|
 | **Author** | agy |
 | **Branch** | `refactor/hear-say-it` |
 | **Head Commit** | `pending` |
-| **Subject** | `fix(progress): stars and hearts use the child's real results (FR-04, FR-06, FR-13)` |
-| **Active Card** | Card 11 (`Status: done`) |
-| **Review Status** | Code implemented, tested, and passing all unit tests locally. Ready for Claude code review. |
+| **Subject** | `fix(ui): Find It distractors never share the target sound; gentle correction; no emoji (FR-05, FR-12)` |
+| **Active Card** | Card 12 (`Status: done`) |
+| **Review Status** | Code implemented, tested, and passing all 32 unit test tasks locally. Ready for Claude code review. |
 
 ---
 
-## What Was Completed in This Session (Card 11)
+## What Was Completed in This Session (Card 12)
+
+1. **`GridGenerator` distractor sound isolation (`GridGenerator.kt`, `GridGeneratorTest.kt`)**:
+   - Filtered out `noDistractorBanks` (`x`, `ng`, `ñ`) from providing distractors.
+   - Isolated `sameSoundGroups` (`c`, `k`, `q`) so distractors never share the target's initial phoneme sound.
+   - Added unit tests: `distractors_neverShareTheTargetSound`, `distractors_neverFromSpecialBanks`, `distractorLettersFor_k_excludesSameSoundGroup`.
+2. **Gentle correction colors (`FindItScreen.kt`, `BlendItScreen.kt`)**:
+   - Replaced all harsh `CoralBerry` red error indications with `GentleCorrectionOrange` per Design System 03 §2/§6.
+3. **Blend It audio feedback (`BlendItViewModel.kt`, `BlendItViewModelTest.kt`)**:
+   - Replaced harsh `SfxEvent.BLENDIT_BUZZ` with soft `SfxEvent.INCORRECT_POP` on wrong word submissions.
+   - Added unit test: `wrongSubmit_playsSoftPop_notBuzz`.
+4. **Zero-Emoji Policy compliance (`PdfExporter.kt`, `ZeroEmojiPolicyTest.kt`)**:
+   - Cleaned emoji/symbols from parent PDF exporter.
+   - Created automated regression test `ZeroEmojiPolicyTest.kt` verifying zero emojis across all `.kt` and `.xml` source files.
+
+---
+
+## What Was Completed in Card 11 (Earlier in Session)
 
 1. **HeartManager (`HeartManager.kt`)**:
    - Added `sessionHeartsLost: Int` (cleared only on `reset()`, preserved across `resetForRestart()`).
