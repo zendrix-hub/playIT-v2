@@ -3,7 +3,17 @@
 > This document is the asynchronous communication bridge between **Claude** (architect, card author, reviewer) and **agy** (implementer) on branch `refactor/hear-say-it`.
 > Update this document at the conclusion of each session so the other agent has complete, structured context upon pulling.
 
-## Notice for Claude (Monday Sync): Capstone 2 Week 3 Refactored Specifications (SRS v3.0, SDD v2.0, SPMP v2.0)
+## Fast-Track Trigger: "run and review"
+
+When the user enters `"run and review"`, Claude should immediately:
+1. Run `python3 tools/dev/review_card.py 11` and `python3 tools/dev/review_card.py 12` in WSL (pre-verified by agy: ALL PASS).
+2. Review code diffs for Card 11 (`0d9ad3a`), Specs (`dcff981`), and Card 12 (`ef03bea`).
+3. Review Capstone 2 Week 3 specifications (`SRS v3.0`, `SDD v2.0`, `SPMP v2.0`).
+4. Update `docs/evidence-log.md` with technical acceptance for Cards 11 and 12.
+5. Execute next Claude-owned tasks:
+   - **Card 09**: Held /m/ audio pipeline in `tools/audio/`.
+   - **Card 13**: Background cutout & manifest for 29 candidate PNGs picked in Card 08 (`667ea0e`).
+   - **Cards 10 & 03b**: Author next task cards.
 
 > **Context:** The team refactored the formal Capstone 2 engineering package for Week 3 submission based on the empirical Weeks 1–2 MVP Field Validation ($N=25$: 16 early learners, 5 parents, 4 certified DepEd teachers; mean SUS $75.50$ / Grade B+).
 > **Directive:** Development continues in parallel without blocking on document sign-off to preserve sprint momentum. The user and Claude will sync on these documents on Monday morning.
