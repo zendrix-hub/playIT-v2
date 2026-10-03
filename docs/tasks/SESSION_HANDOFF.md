@@ -7,10 +7,15 @@
 
 When the user enters `"run and review"`, Claude should immediately:
 1. Run `python3 tools/dev/review_card.py 11` and `python3 tools/dev/review_card.py 12` in WSL (pre-verified by agy: ALL PASS).
-2. Review code diffs for Card 11 (`0d9ad3a`), Specs (`dcff981`), and Card 12 (`ef03bea`).
-3. Review Capstone 2 Week 3 specifications (`SRS v3.0`, `SDD v2.0`, `SPMP v2.0`).
-4. Update `docs/evidence-log.md` with technical acceptance for Cards 11 and 12.
-5. Execute next Claude-owned tasks:
+   - Note: Card 06 and Card 07 were already reviewed and accepted in commit `ad23db9`.
+2. Review code diffs:
+   - `a17969d` — Card 07b (Avatar-only onboarding, parent rename, voiced map pop-up).
+   - `667ea0e` — Card 08 (29 user-picked candidate PNGs for batch 1 staged for cutout).
+   - `0d9ad3a` — Card 11 (Stars math, 3-heart restart, 5-heart display, session hearts persistence).
+   - `dcff981` — Capstone 2 Week 3 Specifications (`SRS v3.0`, `SDD v2.0`, `SPMP v2.0`).
+   - `ef03bea` — Card 12 (Find It distractor isolation, gentle correction orange, soft pop audio, `ZeroEmojiPolicyTest`).
+3. Update `docs/evidence-log.md` with technical acceptance for Cards 07b, 11, and 12.
+4. Execute next Claude-owned tasks:
    - **Card 09**: Held /m/ audio pipeline in `tools/audio/`.
    - **Card 13**: Background cutout & manifest for 29 candidate PNGs picked in Card 08 (`667ea0e`).
    - **Cards 10 & 03b**: Author next task cards.

@@ -14,6 +14,7 @@ When the user enters `"run and review"` (or `"review"`), execute the following w
      python3 tools/dev/review_card.py 12
      ```
    - Confirm all checks (`files`, `tests`, `status`, `evidence-log`, `body`, `emoji`) output `PASS`.
+   - Note: Card 07 was already reviewed and accepted in commit `ad23db9`.
 
 3. **Verify Tests & CI**:
    - Run unit tests: `tools/dev/gradlew_wsl.sh testDebugUnitTest` (or `./gradlew testDebugUnitTest`).
@@ -21,10 +22,12 @@ When the user enters `"run and review"` (or `"review"`), execute the following w
 
 4. **Review Commits & Technical Acceptance**:
    - Review code diffs:
+     - `a17969d` — Card 07b (Avatar-only onboarding, parent rename, voiced map pop-up).
+     - `667ea0e` — Card 08 (User picked all 29 candidate PNGs in Round 1; staged for background cutout).
      - `0d9ad3a` — Card 11 (Stars math, 3-heart restart, 5-heart display, session hearts persistence).
      - `dcff981` — Capstone 2 Week 3 Specifications (`docs/SRS_v3.0_Refactored.md`, `docs/SDD_v2.0_Refactored.md`, `docs/SPMP_v2.0_Refactored.md`).
      - `ef03bea` — Card 12 (Find It distractor isolation, gentle correction orange, soft pop audio, `ZeroEmojiPolicyTest`).
-   - Record technical acceptance in `docs/evidence-log.md` (change status from `pass (local)` / `pending` to `accepted`).
+   - Record technical acceptance in `docs/evidence-log.md` (for Cards 07b, 11, and 12).
 
 5. **Proceed with Claude-Owned Next Steps**:
    - **Card 09 (Held /m/)**: Run Kokoro / Chatterbox pipeline in `tools/audio/` to prepare the held sound release manifest.
