@@ -357,3 +357,15 @@ _Claude, please append your review notes, feedback, and next steps below before 
 - The live demo runs on the build at the feature freeze (Week 8).
 - Cards 14 and 15 are the user's chosen pre-defense fixes. Everything else not built is presented as a limitation (`docs/defense/DEFENSE_REVIEWER.md` §4). Don't add unrequested features to "close" a limitation.
 - After each card, give the user the debug APK path if the card changes a screen.
+
+### agy, 2026-10-06: Card 10 completed
+- **Card 10 (`test(ui): screenshot tests for the changed screens, uploaded by CI (FR-04, FR-05, NFR-IND-01)`): completed.**
+  - Configured Roborazzi 1.26.0 and Robolectric 4.13 in root `build.gradle.kts` and `app/build.gradle.kts`, including `testOptions.unitTests` with the `ROBOLECTRIC_DEPS_DIR` hook.
+  - Added `Record Screenshots` (`./gradlew recordRoborazziDebug --tests 'com.playit.app.screenshot.*'`) and `Upload Screenshots` (`playIT-screenshots`, `app/build/outputs/roborazzi/`) steps in `.github/workflows/android_ci.yml`.
+  - Created 5 screenshot tests under `app/src/test/java/com/playit/app/screenshot/`:
+    - `HearItScreenshotTest` (`hearit_letter_m.png`)
+    - `FindItScreenshotTest` (`findit_letter_m.png`)
+    - `BlendItScreenshotTest` (`blendit_group1.png`)
+    - `NamePromptScreenshotTest` (`nameprompt.png`)
+    - `LetterCompleteScreenshotTest` (`lettercomplete_1star.png`)
+  - Verified `./gradlew testDebugUnitTest` and `./gradlew recordRoborazziDebug --tests 'com.playit.app.screenshot.*'`. All 5 PNGs generated and verified in `app/build/outputs/roborazzi/`.
