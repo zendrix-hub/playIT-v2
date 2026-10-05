@@ -334,3 +334,26 @@ _Claude, please append your review notes, feedback, and next steps below before 
   - `2026-09-30-fixup-slowfish-2` has never been reviewed.
 - **Environment:** the Kokoro model download had silently stopped at 193 MB. `~/.playit-env/rebuild_kokoro.sh` now resumes the download and fails on errors. The Roborazzi spike failed on a proxy timeout and is being re-run.
 - **Card 10 is `ready` (later, 2026-10-05).** The Roborazzi spike passed. Robolectric fetches `android-all` at test time, and this WSL proxy breaks Java TLS, so the spike used a curl-fetched jar in `~/.playit-env/robolectric-deps` through the `ROBOLECTRIC_DEPS_DIR` hook. The card keeps that hook; it does nothing when the variable is unset. Next agy session: card 10.
+
+### Claude, 2026-10-05 (evening): directions for agy
+**Next agy sessions, in order:**
+1. **Card 10** (`docs/tasks/card-10-screenshot-tests.md`, ready): Roborazzi screenshot tests and the CI upload step. Use exactly Roborazzi 1.26.0 and Robolectric 4.13. Keep the `ROBOLECTRIC_DEPS_DIR` block as written; it does nothing on your PC or in CI. The first run downloads about 150 MB.
+2. **Card 14** (`docs/tasks/card-14-privacy-pack.md`, ready after 10 is accepted):
+   - `allowBackup="false"`, plus backup-exclusion XML;
+   - "Delete this child's data" in the Parent Zone;
+   - a parent privacy notice, using the card's text word for word.
+3. **Then card 13** (pictures), **09** (/m/), **03b** and **15** (decodable words), as each becomes `ready`. Claude sets them ready when the user's reviews are in.
+
+**Rules that changed today:**
+- **Files agy must not touch:**
+  - `docs/defense/`: the defense reviewer, numbers sheet and drill log. Claude and the user own these.
+  - The validation reports: `docs/validation-package/04_MVP_VALIDATION_HIGHLIGHTS.md` and its .docx/.pdf, plus `consultation_prep_dashboard.html`.
+  - The specs (SRS 3.1, SDD 2.1, SPMP 2.1).
+- **Privacy:** never write a participant's name or email in the repo; use codes (C-, T-, P-, F-). The GitHub repo is **public**, so this matters.
+- **Rendering .docx/.pdf:** render them from the .md with `tools/docs/render_doc.sh`. `scripts/generate_validation_highlights_*.py` are retired; they only exit with a pointer.
+- **Specs:** they now mark unbuilt components "planned" (SDD §2.0 table). If a card builds one of them, mention that in the commit body, so Claude can update the table.
+
+**Defense (Week 9, Nov 2-7) and the code:**
+- The live demo runs on the build at the feature freeze (Week 8).
+- Cards 14 and 15 are the user's chosen pre-defense fixes. Everything else not built is presented as a limitation (`docs/defense/DEFENSE_REVIEWER.md` §4). Don't add unrequested features to "close" a limitation.
+- After each card, give the user the debug APK path if the card changes a screen.
