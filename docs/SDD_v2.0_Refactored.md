@@ -5,7 +5,7 @@
 **Department:** College of Computer Studies, Cebu Institute of Technology – University  
 **Document Version:** 2.0 (Renewed & Fully Refactored Post-MVP Validation)  
 **Publication Date:** September 26, 2026  
-**Document Status:** Approved System Architecture Blueprint  
+**Document Status:** Draft for adviser review (revised 2026-10-05; items marked **[proposed]** await adviser approval). Components are marked by implementation status in §2.0  
 
 ---
 
@@ -16,7 +16,8 @@
 | **0.1** | May 11, 2026 | System Architect | Initial SDD draft based on SRS v2.0 (MVVM, Clean Architecture, Room SQLite, Vosk ASR). |
 | **0.2** | May 15, 2026 | System Architect | Added Word Challenge (Blend It) CVC synthesis checkpoint per adviser directive. |
 | **1.0** | May 20, 2026 | System Architect & Dev Team | Final Capstone 1 SDD: decoupled game modules, established baseline Room DB schema v1. |
-| **2.0** | September 26, 2026 | Lead Architect & Capstone Team | **Comprehensive Renewal & Architectural Refactoring Based on MVP Validation:**<br>• **Tutoring & Pedagogy Layer (§2.2):** Introduced `LessonEngine`, `TutorPolicy` finite state machine (FSM), and `SayItJudge` with per-letter dynamic grammars and error tagging; **eliminated heart deductions in Say It**.<br>• **Audio Subsystem Architecture (§3.1):** Refactored `AudioPlaybackManager` with `AudioComposer` and pre-cached `SoundPool` for instant phoneme playback; isolated pure phoneme (`ph_m.wav`) and key-word (`kw_m_mouse.wav`) assets (FR-02, NFR-AUD-01).<br>• **Speech Recognition Subsystem (§3.2):** Replaced `SpeechService` with an asynchronous `AudioRecord` 16kHz mono loop streaming raw PCM buffers to calculate normalized RMS amplitude for `MicStateVisualizer` while feeding Vosk `Recognizer.acceptWaveForm()`; guaranteed tap-to-listening transition in ≤100ms (FR-03, NFR-PERF-01).<br>• **Decodable Word Bank Refactoring (§3.4):** Purged 5 invalid CVC words (AIM, BEE, TOY, BOY, ZOO) containing untaught vowel teams/diphthongs; replaced with AM, SUM, TUB, YAM, ZIP; flagged QUIZ exception (FR-13).<br>• **Persistence & Telemetry (Room Schema v3, §4):** Added `ProfileEntity` (multi-profile up to 6), `LetterProgressEntity` (spaced retrieval mastery), and `TelemetryEventEntity` (microsecond-accurate monotonic timestamps); added local PIN-gated CSV/PDF exporters (FR-14, FR-NEW-TEL).<br>• **Pediatric Tokens & Accessibility (§3.6):** Formalized `Modifier.pediatricTouchTarget(64.dp)` and created `ArticulationCue` composable (NFR-ACC-01, NFR-ACC-02). |
+| **2.0** | September 26, 2026 | Lead Architect & Capstone Team | **Comprehensive Renewal & Architectural Refactoring Based on MVP Validation (design; see §2.0 for what is implemented):**<br>• **Tutoring & Pedagogy Layer (§2.2):** Designs `LessonEngine`, `TutorPolicy` finite state machine (FSM), and `SayItJudge` with per-letter dynamic grammars and error tagging; **eliminated heart deductions in Say It**.<br>• **Audio Subsystem Architecture (§3.1):** Refactored `AudioPlaybackManager` with `AudioComposer` and pre-cached `SoundPool` for instant phoneme playback; isolated pure phoneme (`ph_m.wav`) and key-word (`kw_m_mouse.wav`) assets (FR-02, NFR-AUD-01).<br>• **Speech Recognition Subsystem (§3.2):** Plans to replace `SpeechService` (still used today) with an asynchronous `AudioRecord` 16kHz mono loop streaming raw PCM buffers to calculate normalized RMS amplitude for `MicStateVisualizer` while feeding Vosk `Recognizer.acceptWaveForm()`; guaranteed tap-to-listening transition in ≤100ms (FR-03, NFR-PERF-01).<br>• **Decodable Word Bank Refactoring (§3.4):** Purged 5 invalid CVC words (AIM, BEE, TOY, BOY, ZOO) containing untaught vowel teams/diphthongs; replaced with AM, SUM, TUB, YAM, ZIP; flagged QUIZ exception (FR-13).<br>• **Persistence & Telemetry (Room Schema v4, planned, §4):** Extends the existing `ProfileEntity` (multi-profile up to 6) and plans `LetterProgressEntity` (spaced retrieval mastery), and `TelemetryEventEntity` (microsecond-accurate monotonic timestamps); added local PIN-gated CSV/PDF exporters (FR-14, FR-NEW-TEL).<br>• **Pediatric Tokens & Accessibility (§3.6):** Plans `Modifier.pediatricTouchTarget(64.dp)` and an `ArticulationCue` composable (NFR-ACC-01, NFR-ACC-02). |
+| **2.1** | October 5, 2026 | Capstone Team (Claude review) | Corrections for adviser review: new §2.0 implementation-status table (implemented vs planned); §3.3.1 judge uses word mode as in the code, with no fixed confidence threshold; Room schema v4 (v3 is current) with explicit migrations; revision 2.0 entries reworded as design, not completed work. |
 
 ---
 
@@ -31,7 +32,7 @@ This design document governs the entire PlayIT Android mobile application:
 - Autonomous, teacher-independent **Tutoring & Pedagogy Engine** (`LessonEngine`, `TutorPolicy` FSM, `SayItJudge`).
 - Low-latency Audio Subsystem utilizing pre-cached `SoundPool` and runtime `AudioComposer`.
 - Privacy-preserving, completely offline speech recognition via Vosk 0.3.47.
-- Room SQLite Database (Schema v3) supporting multi-profile isolation and structured interaction telemetry.
+- Room SQLite Database (Schema v4, planned; the app is at v3 today) supporting multi-profile isolation and structured interaction telemetry.
 - Pediatric-first design system strictly enforcing a zero-emoji policy and $\ge 64\,\text{dp}$ touch targets.
 - Local, unauthenticated Parent/Facilitator Dashboard with arithmetic safety gates and PDF/CSV report generation.
 
@@ -54,6 +55,26 @@ This design document governs the entire PlayIT Android mobile application:
 ---
 
 ## 2. Architectural Design
+
+### 2.0 Implementation Status (checked against the code on 2026-10-05)
+This document describes the target design for Weeks 4–9. The table separates what the app does today from what is planned, so the design is not read as a description of the current build.
+
+| Component | Status | Where / note |
+|---|---|---|
+| `TutorPolicy` (prompt ladder, no hearts in Say It) | Implemented, as a stateless policy | `domain/manager/TutorPolicy.kt`; the FSM in §3.3.2 is the planned form |
+| `SpeechValidator` (word-mode judge, per-letter foil grammars, error types) | Implemented | `domain/manager/SpeechValidator.kt`; plays the role of the planned `SayItJudge` |
+| `VoskRecognizer` with Vosk `SpeechService` | Implemented | `data/speech/VoskRecognizer.kt`; the `AudioRecord` loop of §3.2 is planned (`AudioCapture.kt` exists but is not wired in) |
+| `HearItSequenceBuilder` (modeling sequence) | Implemented | `domain/manager/HearItSequenceBuilder.kt`; a general `AudioComposer` is planned |
+| Idle re-prompt (10 s) and next-step cues | Implemented | `presentation/components/IdleRePrompt.kt` |
+| `HeartManager`, `StarCalculator`, `GridGenerator`, `ArithmeticGateManager` | Implemented | `domain/manager/` |
+| `ProfileEntity`, `SessionManager` (up to 6 profiles) | Implemented | Room schema version 3 (`PlayItDatabase.kt`) |
+| Parent PDF report | Implemented | `data/pdf/PdfExporter.kt` |
+| `LessonEngine`, `LearnerModel` (review scheduler) | Planned | — |
+| `AudioComposer`, `AudioPlaybackManager` | Planned | Playback today goes through `data/audio/AudioPlayer.kt`, which already uses a `SoundPool` for short clips |
+| `MicStateVisualizer` (4 mic states, RMS ripple) | Planned | — |
+| `LetterProgressEntity`, `TelemetryEventEntity`, `TelemetryLogger`, `CsvExportManager` | Planned | Needs Room schema v4 and a migration |
+| `Modifier.pediatricTouchTarget()`, `ArticulationCue` | Planned | — |
+
 
 ### 2.1 System Architecture Paradigm
 PlayIT is structured around **Clean Architecture** principles combined with **MVVM** and unidirectional data flow (UDF) using Kotlin Coroutines and Jetpack Compose `StateFlow`. To guarantee autonomous child operation without requiring adult supervision, this refactored design situates a specialized **Tutoring Layer** between the Domain and Presentation layers.
@@ -88,7 +109,7 @@ PlayIT is structured around **Clean Architecture** principles combined with **MV
 +-----------------------------------------v-----------------------------------------+
 |                             DATA & INFRASTRUCTURE LAYER                           |
 |  +--------------------+  +----------------------+  +---------------------------+  |
-|  | Vosk Engine        |  | Audio Subsystem      |  | Room Database (Schema v3) |  |
+|  | Vosk Engine        |  | Audio Subsystem      |  | Room Database (Schema v4) |  |
 |  | - AudioRecord Loop |  | - SoundPool Cache    |  | - ProfileEntity           |  |
 |  | - 16kHz PCM Buffer |  | - MediaPlayer Fallback| | - LetterProgressEntity    |  |
 |  | - RMS Calculator   |  | - Asset Manifest     |  | - TelemetryEventEntity    |  |
@@ -228,20 +249,24 @@ Vosk is instantiated with a constrained per-letter runtime grammar rather than o
 ```json
 {
   "letter": "m",
-  "grammar": ["<target_m>", "em", "ma", "[unk]"],
-  "targetToken": "<target_m>",
+  "mode": "WORD",
+  "grammar": ["mouse", "m", "em", "ma", "muh", "[unk]"],
+  "targetToken": "mouse",
   "foils": {
+    "m": "LETTER_NAME",
     "em": "LETTER_NAME",
-    "ma": "ADDED_VOWEL"
-  },
-  "confidenceThreshold": 0.65
+    "ma": "ADDED_VOWEL",
+    "muh": "ADDED_VOWEL"
+  }
 }
 ```
 - **Error Classification:**
-  - Utterance matches `targetToken` and confidence $\ge 0.65$ $\rightarrow$ `JudgeResult.CORRECT`.
+  - **Scoring mode (hybrid):** the scored check is word mode (the key word, e.g. "mouse"), as in `SpeechValidator.grammarFor()` today. Pure-sound grammars (`<target_m>`) are used for the recall check only if the on-device Vosk test with children passes; the Week 4 spike found that Vosk cannot confirm a held /m/, so `SpeechValidator.SOUND_MODE_ENABLED = false` (`docs/spikes/vosk-foil-spike.md`).
+  - **Confidence:** no fixed threshold is set in this design. If a confidence threshold is introduced, it is tuned on Round 2 data, validated on a held-out set, and kept in configuration (refactor spec §6.2, §6.4).
+  - Utterance matches `targetToken` $\rightarrow$ `JudgeResult.CORRECT`.
   - Utterance matches `"em"` $\rightarrow$ `JudgeResult.ERROR(ErrorType.LETTER_NAME)`.
   - Utterance matches `"ma"` $\rightarrow$ `JudgeResult.ERROR(ErrorType.ADDED_VOWEL)`.
-  - Utterance matches `"[unk]"` or confidence $<0.65$ $\rightarrow$ `JudgeResult.ERROR(ErrorType.UNKNOWN)`.
+  - Utterance matches `"[unk]"` or nothing $\rightarrow$ `JudgeResult.ERROR(ErrorType.UNKNOWN)`.
 
 #### 3.3.2 TutorPolicy Finite State Machine (FSM)
 ```
@@ -280,7 +305,7 @@ Vosk is instantiated with a constrained per-letter runtime grammar rather than o
 ---
 
 ### 3.4 Decodable Blend It Word Bank Refactoring (FR-13)
-The seeded database entity `BlendItWord` is updated via Room Schema v3 migration. The 5 invalid words identified during MVP validation are formally replaced:
+The seeded database entity `BlendItWord` is updated by the content reseed (planned; card 15), with the word list confirmed by a teacher. The 5 invalid words identified during MVP validation are formally replaced:
 
 | Chapter | Unlocked Letters | Purged Word | Violation Reason | Replacement Word | Valid Letters Used |
 |:---:|---|:---:|---|:---:|:---:|
@@ -293,18 +318,25 @@ The seeded database entity `BlendItWord` is updated via Room Schema v3 migration
 
 ---
 
-### 3.5 Database Architecture (Room Schema v3) & Telemetry Logger (FR-14, FR-NEW-TEL)
+### 3.5 Database Architecture (Room Schema v4, planned) & Telemetry Logger (FR-14, FR-NEW-TEL)
 
 #### 3.5.1 Room Database Entities
 ```kotlin
-// Profile Entity: Multi-Profile Management (FR-14)
+// Profile Entity: Multi-Profile Management (FR-14). EXISTS in schema v3 (data/local/entity/ProfileEntity.kt);
+// unchanged in v4. The name is optional for the child: onboarding is avatar-only and the default name is the
+// avatar's name; a parent can rename the profile in the Parent Zone.
 @Entity(tableName = "profiles")
 data class ProfileEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val displayName: String,
-    val avatarResName: String,
-    val createdAtEpoch: Long = System.currentTimeMillis()
+    @PrimaryKey(autoGenerate = true) val profileId: Long = 0,
+    val name: String,
+    val avatarResId: Int,
+    val totalStars: Int = 0,
+    val currentStreak: Int = 0,
+    val lastPlayedAt: Long = System.currentTimeMillis(),
+    val createdAt: Long = System.currentTimeMillis()
 )
+
+// PLANNED for schema v4: LetterProgressEntity and TelemetryEventEntity below.
 
 // Letter Progress Entity: Spaced Retrieval Mastery (FR-NEW-REC)
 @Entity(
@@ -312,7 +344,7 @@ data class ProfileEntity(
     foreignKeys = [
         ForeignKey(
             entity = ProfileEntity::class,
-            parentColumns = ["id"],
+            parentColumns = ["profileId"],
             childColumns = ["profileId"],
             onDelete = ForeignKey.CASCADE
         )
@@ -336,7 +368,7 @@ data class LetterProgressEntity(
     foreignKeys = [
         ForeignKey(
             entity = ProfileEntity::class,
-            parentColumns = ["id"],
+            parentColumns = ["profileId"],
             childColumns = ["profileId"],
             onDelete = ForeignKey.CASCADE
         )
@@ -467,4 +499,4 @@ Screen Enters -> Mascot leads 2 Choral Turns ("Say it with me!")
 1. **Audio Latency & Purity Test Suite (`TC-AUD-01`, `TC-AUD-02`):** Automated instrumentation tests verifying SoundPool stream start latency $\le 50\,\text{ms}$ and gate verification integrity.
 2. **Microphone Reactive Visualizer Suite (`TC-MIC-01`, `TC-MIC-02`):** Robolectric/Espresso tests measuring state transition timestamp deltas ($\le 100\,\text{ms}$) and ripple scaling proportional to mock PCM input.
 3. **ASR Discrimination Suite (`TC-ASR-01` to `06`):** Audio replay harness feeding benchmark child recordings (normal, foil, noise) into Vosk to verify $\ge 80\%$ agreement and $\le 15\%$ false reject limits.
-4. **Room Schema Migration Suite (`TC-DB-01`, `TC-DB-02`):** `MigrationTestHelper` verifying flawless upgrade from Schema v1/v2 to Schema v3 without data loss.
+4. **Room Schema Migration Suite (`TC-DB-01`, `TC-DB-02`):** `MigrationTestHelper` verifying upgrade from Schema v3 (current) to Schema v4 without data loss. Prerequisites: set `exportSchema = true` and replace `fallbackToDestructiveMigration()` with explicit migrations (both planned).

@@ -789,8 +789,8 @@
 
             <div class="stat-card success">
                 <div class="stat-label">Mean Usability (SUS)</div>
-                <div class="stat-value">75.50 <span style="font-size: 1rem; color: var(--success); font-weight: 700;">Grade B+</span></div>
-                <div class="stat-sub">Industry Avg: 68.0 | Adjusted: 81.88</div>
+                <div class="stat-value">75.5 <span style="font-size: 1rem; color: var(--success); font-weight: 700;">Grade B</span></div>
+                <div class="stat-sub">n = 5 | 95% CI 57.3&ndash;93.7 | Avg 68</div>
             </div>
 
             <div class="stat-card success">
@@ -897,8 +897,8 @@
                             <td>
                                 4-page diagnostic report focusing on <strong>actionable insights</strong> rather than raw counts:
                                 <ul style="margin-left: 1.25rem; margin-top: 0.35rem; font-size: 0.85rem;">
-                                    <li>Empirical usability benchmark (Mean SUS = 75.50 / Grade B+)</li>
-                                    <li>Direct verbatim teacher feedback (Teacher Leony & Teacher Joy)</li>
+                                    <li>Caregiver-perceived usability (Mean SUS = 75.5, n = 5, Grade B; 95% CI 57.3&ndash;93.7)</li>
+                                    <li>Direct verbatim teacher feedback (teachers T-1 & T-2)</li>
                                     <li>4 Problems/Issues encountered (Phoneme intrusion, mic latency, etc.)</li>
                                     <li>4 Positive aspects to permanently retain (100% offline, tap ergonomics)</li>
                                     <li>5 Feature improvements with priority (P0 to P2)</li>
@@ -998,12 +998,11 @@
                     </div>
                     <div class="qa-answer">
                         <strong>Strong Answer:</strong><br>
-                        "No, Respondent 2 actually loved the app verbally! The 50.0 score is a textbook example of <span class="qa-highlight">survey acquiescence bias</span>:
+                        "Respondent P-2 scored 50. They agreed (4 or 5) with all ten items, including the five negatively worded ones, which suggests acquiescent or careless responding: the SUS alternates positive and negative statements, and agreeing with a negative item lowers the score.
                         <ul style="margin-left: 1.5rem; margin-top: 0.35rem;">
-                            <li>The System Usability Scale (Brooke, 1996) alternates positive (odd) and negative reverse-scored (even) statements.</li>
-                            <li>Respondent 2 uniformly selected '5.0' (Strongly Agree) down the entire form without reading the reverse polarity, meaning they marked 5.0 on 'I found the system unnecessarily complex' and 'I found the system very cumbersome.'</li>
-                            <li>When scored according to standard Brooke formulas, negative items scored 5 contribute 0 points (5 - 5 = 0), penalizing their score down to 50.0.</li>
-                            <li>Our peer respondents scored <strong>77.5, 80.0, 85.0, and 85.0</strong>. Excluding this acquiescent outlier yields an adjusted peer Mean SUS of <span class="qa-highlight">81.88 / 100 (Grade A-)</span>. Even including this outlier, our Mean SUS of <strong>75.50</strong> comfortably exceeds both the industry average (68.0) and our target (75.0)."</li>
+                            <li>We set no exclusion rule before collecting data, so P-2 stays in the reported mean of <strong>75.5</strong> (SD 14.62).</li>
+                            <li>Without P-2 the mean would be 81.9, but we report that only as a sensitivity check, not as a result.</li>
+                            <li>With five respondents the 95% CI is 57.3&ndash;93.7, so we cannot claim a significant difference from the average of 68 (t(4) = 1.15, p = .32). We treat SUS as a diagnostic signal, and Round 2 briefs respondents on the mixed wording and sets exclusion rules in advance."</li>
                         </ul>
                     </div>
                 </div>
@@ -1021,9 +1020,9 @@
                     </div>
                     <div class="qa-answer">
                         <strong>Strong Answer:</strong><br>
-                        "The single most valuable finding came from Item <strong>PED-08</strong> where certified DepEd educators (specifically Teacher Leony Layaguin and Teacher Joy Flores) flagged that certain phoneme models uttered the letter name or a trailing schwa /ə/ instead of the pure phoneme.
+                        "The single most valuable finding came from Item <strong>PED-08</strong> where certified DepEd educators (two of the four teachers, T-1 and T-2) flagged that certain phoneme models uttered the letter name or a trailing schwa /ə/ instead of the pure phoneme.
                         <br><br>
-                        For example, the letter <strong>M</strong> was uttered as <em>'ma, ma, ma'</em> rather than pure continuous humming <em>/m/ ('mmm')</em>. In early reading, if a child learns /m/ as 'ma', when they attempt to blend <strong>SAM</strong> in Chapter 1, they sound out <em>'ma - a - t'</em> instead of <em>'s - a - m'</em>.
+                        For example, the letter <strong>M</strong> was uttered as <em>'ma, ma, ma'</em> rather than pure continuous humming <em>/m/ ('mmm')</em>. In early reading, if a child learns /m/ as 'ma', when they attempt to blend <strong>SAM</strong> in Chapter 1, they sound out <em>'sa - a - ma'</em> instead of <em>'s - a - m'</em>.
                         <br><br>
                         <strong>Our Week 3 Engineering Action:</strong>
                         <ul style="margin-left: 1.5rem; margin-top: 0.35rem;">
@@ -1134,49 +1133,49 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td><strong>Respondent 1</strong></td>
+                            <td><strong>P-1</strong></td>
                             <td>Parent Evaluator</td>
                             <td><code>[4, 1, 5, 2, 3, 3, 4, 1, 4, 2]</code></td>
                             <td><strong>77.50</strong></td>
-                            <td><span class="badge badge-ready">Grade B+ (Good)</span></td>
+                            <td><span class="badge badge-ready">B+</span></td>
                         </tr>
                         <tr>
-                            <td><strong>Respondent 2</strong></td>
+                            <td><strong>P-2</strong></td>
                             <td>Parent Evaluator</td>
                             <td><code>[5, 5, 4, 4, 4, 5, 5, 5, 5, 4]</code></td>
                             <td><strong>50.00</strong></td>
-                            <td><span class="badge badge-flagged">Acquiescence Bias Outlier</span></td>
+                            <td><span class="badge badge-flagged">F; agreed with all items (retained)</span></td>
                         </tr>
                         <tr>
-                            <td><strong>Respondent 3</strong></td>
+                            <td><strong>P-3</strong></td>
                             <td>Supervising Teacher</td>
                             <td><code>[4, 1, 3, 1, 4, 2, 5, 2, 4, 2]</code></td>
                             <td><strong>80.00</strong></td>
-                            <td><span class="badge badge-ready">Grade A- (Excellent)</span></td>
+                            <td><span class="badge badge-ready">A-</span></td>
                         </tr>
                         <tr>
-                            <td><strong>Respondent 4</strong></td>
+                            <td><strong>P-4</strong></td>
                             <td>Supervising Teacher</td>
                             <td><code>[4, 1, 5, 1, 4, 2, 5, 2, 4, 2]</code></td>
                             <td><strong>85.00</strong></td>
-                            <td><span class="badge badge-ready">Grade A (Excellent)</span></td>
+                            <td><span class="badge badge-ready">A+</span></td>
                         </tr>
                         <tr>
-                            <td><strong>Respondent 5</strong></td>
+                            <td><strong>P-5</strong></td>
                             <td>Parent Evaluator</td>
                             <td><code>[5, 3, 5, 1, 5, 1, 5, 3, 4, 2]</code></td>
                             <td><strong>85.00</strong></td>
-                            <td><span class="badge badge-ready">Grade A (Excellent)</span></td>
+                            <td><span class="badge badge-ready">A+</span></td>
                         </tr>
                         <tr style="background-color: #EFF6FF; font-weight: bold;">
                             <td colspan="3">Composite Mean SUS Score (N = 5)</td>
                             <td>75.50</td>
-                            <td><span class="badge badge-ready">Grade B+ (Target ≥ 75.0 Achieved)</span></td>
+                            <td><span class="badge badge-ready">B (target 75 met; 95% CI 57.3&ndash;93.7)</span></td>
                         </tr>
-                        <tr style="background-color: #F0FDF4; font-weight: bold;">
-                            <td colspan="3">Adjusted Peer Mean SUS (Excluding Acquiescent Outlier)</td>
-                            <td>81.88</td>
-                            <td><span class="badge badge-ready">Grade A- (Excellent Usability)</span></td>
+                        <tr style="background-color: #F0FDF4;">
+                            <td colspan="3">Sensitivity check only: mean without P-2 (exclusion not pre-registered)</td>
+                            <td>81.9</td>
+                            <td>not a reported result</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1243,28 +1242,28 @@
                 </p>
 
                 <div class="quote-box">
-                    <div class="quote-author">Teacher Leony Layaguin — Grade 1 DepEd Educator (leony.layaguin01@deped.gov.ph)</div>
+                    <div class="quote-author">T-1 — DepEd Grade 1 reading teacher</div>
                     <div class="quote-text">
                         "The app is very useful and engaging for Grade 1 learners. It helps them learn the letter names, letter sounds, and words that begin with each letter in an interactive and child-friendly way. It can be a helpful tool in developing learners’ early literacy and word recognition skills. <span class="qa-highlight">One area that needs improvement is the pronunciation of the letter sounds. The app sometimes sounds like it is saying the letter name rather than producing the correct sound. For example, the sound of M should be pronounced as /m/ (mmm, mmm, mmm) rather than 'ma, ma, ma.'</span> Using accurate phonetic sounds would make the app more effective for beginning readers."
                     </div>
                 </div>
 
                 <div class="quote-box">
-                    <div class="quote-author">Teacher Joy Flores — Primary Reading Facilitator (flores.joy1824@gmail.com)</div>
+                    <div class="quote-author">T-2 — reading facilitator</div>
                     <div class="quote-text">
                         "Good job on doing the app. It’s a helpful tool for those beginning readers. Children enjoys it as it is digitized and interactive. <span class="qa-highlight">My only concern is the sounding of letters better to have it sounds correctly so that children will not get confused with it.</span> Overall, great job! Hope you also develop reading app for advanced readers."
                     </div>
                 </div>
 
                 <div class="quote-box">
-                    <div class="quote-author">Teacher Elena L. Bien — DepEd Public School Educator (elena.bien@deped.gov.ph)</div>
+                    <div class="quote-author">T-3 — DepEd educator</div>
                     <div class="quote-text">
                         "Application is appropriate for Grade 1 learners."
                     </div>
                 </div>
 
                 <div class="quote-box">
-                    <div class="quote-author">Teacher Luz Bajar Rapsing — Educator (luzbajarrapsing@gmail.com)</div>
+                    <div class="quote-author">T-4 — basic education educator</div>
                     <div class="quote-text">
                         "The app is appropriate for grade 1 learners and is easy to navigate."
                     </div>
@@ -1377,7 +1376,7 @@
                     <input type="checkbox" id="chk5">
                     <div class="checklist-content">
                         <div class="checklist-title">Folder 5: 05_Meeting_and_Consultation_Notes/</div>
-                        <div class="checklist-desc">Field observer log sheets (OBS-01 to OBS-05 task timings recorded in seconds) and interview notes with Teacher Leony Layaguin and Teacher Joy Flores.</div>
+                        <div class="checklist-desc">Field observer log sheets (OBS-01 to OBS-05 task timings recorded in seconds) and interview notes with teachers T-1 and T-2.</div>
                     </div>
                 </div>
             </div>

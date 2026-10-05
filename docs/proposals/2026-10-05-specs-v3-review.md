@@ -5,9 +5,11 @@ Claude's review of commit `dcff981` (`docs/SRS_v3.0_Refactored.md`, `docs/SDD_v2
 - `docs/specs/hear-say-refactor.md`, `docs/spikes/vosk-foil-spike.md`, and 01 §7 / 03 §5;
 - the code at `e864efd`.
 
-No document was changed. Each item says what the document says, what the source says, and the evidence.
+The review itself changed no document; the fixes came after, as noted below. Each item says what the document says, what the source says, and the evidence.
 
 ## Blocking (the document contradicts a decision or the code)
+**Status 2026-10-05 (later):** items 1-4 fixed in SRS 3.1, SDD 2.1 and SPMP 2.1, which add a revision row, a §2.0 implementation-status table in the SDD, and [proposed] labels. Teacher names in SRS F-01/F-11 and the SPMP findings table were replaced by codes, and the emojis (item 19) were removed. Items 5-18 and 20-21 are still open.
+
 1. **Say It scoring.** SDD §3.3.1 and §4.2 Branch A, and SRS FR-03, score a pure-sound grammar (`<target_m>`).
    - Decision (AGENTS.md): Say It is hybrid. The echo step uses word mode ("mouse"), and the recall check uses the pure sound only if the Vosk spike passes.
    - The spike found that Vosk cannot confirm a pure sound. `SpeechValidator.SOUND_MODE_ENABLED = false` (vosk-foil-spike.md:25-33).
@@ -59,7 +61,7 @@ No document was changed. Each item says what the document says, what the source 
     - FR-04 says a 3×2 grid, which has 6 cells, but the grid shows 5 items.
     - FR-06 doesn't say what happens below 50% accuracy. The code gives 1 star.
 18. **NG in Chapter 8.** "NG deferred to Chapter 8" has no decision behind it. 13_MASTER_TASKS only excludes NG and Ñ.
-19. **Emoji (Zero-Emoji Policy).** SPMP line 36 and SRS line 319 use 🙂/😐. Write "smiling/neutral faces" instead.
+19. **Emoji (Zero-Emoji Policy).** SPMP line 36 and SRS line 319 used two face emojis. Write "smiling/neutral faces" instead.
 20. **Dates and counts.**
     - The implementation weeks differ: "Weeks 4-7", "Weeks 1-6", and a Weeks 3-9 schedule.
     - The dry run is N=5 in one place and 3-5 in another.

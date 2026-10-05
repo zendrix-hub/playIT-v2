@@ -5,7 +5,7 @@
 **Department:** College of Computer Studies, Cebu Institute of Technology – University  
 **Document Version:** 3.0 (Renewed & Fully Refactored Post-MVP Validation)  
 **Publication Date:** September 26, 2026  
-**Document Status:** Approved Software Requirements Baseline  
+**Document Status:** Draft for adviser review (revised 2026-10-05; items marked **[proposed]** await adviser approval)  
 
 ---
 
@@ -16,6 +16,7 @@
 | **1.0** | May 4, 2026 | Requirements Lead | Initial draft compiled from IT332 Project Proposal (Revised 4). |
 | **2.0** | May 4, 2026 | Requirements Lead | Comprehensive revision strictly aligned with approved proposal details, including Vosk offline engine, 28-letter sequence, Room DB, and preliminary gamification rules. |
 | **3.0** | September 26, 2026 | Requirements Lead & Capstone Team | **Comprehensive Renewal and Refactoring Based on Weeks 1–2 MVP Field Validation (N=25):**<br>• **Curricular Re-alignment (§1.2):** Standardized curriculum to 26 letters (7 chapters); removed Ñ (purely Spanish/Filipino orthography) and deferred NG to Chapter 8 (advanced digraphs).<br>• **Pure Phoneme Modeling (FR-02, P0):** Eliminated schwa / letter-name vocal intrusion (e.g., "ma" → /m/ [m:]); mandated runtime carrier-phoneme-keyword sequence (≤15s) with persistent audio replay.<br>• **Microphone Visualizer & Tutoring Loop (FR-03, P1):** Replaced static button with dynamic 4-state visualizer (Idle, Listening with live RMS ripple, Processing, Result); added We Do/You Do prompt ladder; **eliminated heart deductions in Say It**.<br>• **Spaced Retrieval Mastery (FR-NEW-REC, P1):** Introduced un-modeled warm-up retrieval checks and end-of-session recall checks to establish true memory retention beyond immediate imitation.<br>• **Vosk Accuracy & Fairness (NFR-ASR-01, P1):** Established ≥80% agreement with teacher ratings, false rejects ≤15%, Philippine English acoustic calibration, and discrete error classification (`LETTER_NAME`, `ADDED_VOWEL`, `SUBSTITUTION`, `UNKNOWN`).<br>• **Latency Standards (NFR-PERF-01, P1):** Redefined latency from speech termination (`speech_end`) to feedback (P90 ≤0.5s); Find It tap latency (P90 ≤0.3s).<br>• **Decodable Word Bank (FR-13, P1):** Purged 5 non-decodable CVC words (AIM, BEE, TOY, BOY, ZOO) containing untaught vowel teams/diphthongs; replaced with AM, SUM, TUB, YAM, ZIP; flagged QUIZ as documented exception.<br>• **Classroom Multi-Profile (FR-14, P1):** Added independent profile management (up to 6 child profiles per device) for shared reading stations.<br>• **Offline Telemetry Logging & CSV Export (FR-NEW-TEL, P1):** Local event logging in Room DB; PIN-gated CSV/PDF export via Android Share Sheet with zero network transmission.<br>• **Pediatric Inclusivity & Ergonomics (NFR-ACC-01 / ACC-02, P2):** Integrated visual mouth articulation guides and sound captions; enforced minimum 64dp touch targets with ≥8dp margins.<br>• **Removed Requirement:** Eliminated acoustic pitch deviation (±10 cents) as inapplicable to speech phonetics. |
+| **3.1** | October 5, 2026 | Capstone Team (Claude review) | Corrections for adviser review: status changed from "Approved" to draft; FR-03 states the hybrid scoring mode (word mode scored; pure sound only if the Vosk test passes); open items marked **[proposed]** (≤15 s sequence, automatic mic, ≥70% recall, 12-minute session, Chatterbox held sounds); teacher names replaced by codes T-1 to T-4 (RA 10173); Room schema v4 (v3 is the current version). |
 
 ---
 
@@ -134,7 +135,7 @@ PlayIT is an independent, self-contained mobile application executing natively o
      - Key Word Audio (e.g., *"mouse"*)
      - Pure Phoneme (1 iteration)
      - Carrier (*"Say it with me!"*)
-  5. The entire modeling sequence shall execute within $\le 15\,\text{s}$.
+  5. **[proposed]** The entire modeling sequence shall execute within $\le 15\,\text{s}$.
   6. A persistent Audio Replay ("Ear") button shall be present on screen to allow immediate replay of steps 3–6 at any time.
 - **Acceptance Criteria:** 26 of 26 phoneme clips rated "Pure" by at least 3 of 4 DepEd reading teachers (HI-1); modeling sequence completed within $\le 15\,\text{s}$ (HI-2).
 
@@ -147,7 +148,7 @@ PlayIT is an independent, self-contained mobile application executing natively o
 - **Requirement:**
   1. The Say It module shall transition through a structured tutoring sequence:
      - **We Do Step:** Two un-scored choral practice turns (*"Say it with me!"*) with animated mascot lip movements.
-     - **You Do Step:** Independent vocal turn. The microphone shall activate automatically following the carrier cue *"Your turn!"* (or upon explicit tap of the microphone button).
+     - **You Do Step:** Independent vocal turn. **[proposed]** The microphone shall activate automatically following the carrier cue *"Your turn!"* (or upon explicit tap of the microphone button).
   2. The microphone component shall explicitly display one of four mutually exclusive operational states:
      - **IDLE:** Teal microphone icon, stationary.
      - **LISTENING:** Amber active icon surrounded by a real-time, audio-reactive animated ripple whose expansion radius scales with live input RMS amplitude ($0.0\text{--}1.0$).
@@ -159,6 +160,7 @@ PlayIT is an independent, self-contained mobile application executing natively o
      - *Attempt 2 Miss:* Slower re-model with enlarged visual mouth articulation cue + *"Your turn."*
      - *Attempt 3 Miss:* System initiates together-practice (*"Let's say it together: /m/."*), marks the letter as `NEEDS_PRACTICE` in Room DB, advances the lesson without failure screens, and schedules a spaced recall recheck.
   5. **Heart Protection:** The Say It module shall **never deplete player hearts** upon incorrect pronunciation or recognition rejection.
+  6. **Scoring Mode (hybrid; user decision 2026-10-01):** The scored Say It check uses **word mode**: the child says the key word (e.g., "mouse"), and the judge matches it against a per-letter grammar of the key word plus that letter's foils (letter name, added vowel). Pure-sound scoring is used for the recall check only if the on-device Vosk test with children shows that held letter names are rejected; the Week 4 spike found that Vosk cannot confirm a correct pure sound (`docs/spikes/vosk-foil-spike.md`), so pure-sound scoring is currently disabled. Letter names and added vowels are never accepted.
 - **Acceptance Criteria:** Tap-to-Listening latency $\le 100\,\text{ms}$ (TC-MIC-01); all 3 prompt ladder branches successfully execute (TC-SAY-01..04); 0 hearts deducted across all Say It errors.
 
 ##### [FR-NEW-REC] Spaced Retrieval Warm-Up and Recall Mastery Checks (New · P1)
@@ -168,7 +170,7 @@ PlayIT is an independent, self-contained mobile application executing natively o
   3. Priority queue logic: Letters flagged as `NEEDS_PRACTICE` shall appear first, followed by oldest `SECURE` letters.
   4. Each completed node shall culminate in an **End-of-Session Recall Check**.
   5. A letter shall achieve permanent `SECURE` mastery status only after producing a correct vocalization during an unassisted recall check.
-- **Acceptance Criteria:** TC-REV-01 to TC-REV-03 pass; $\ge 70\%$ of previously un-mastered letters correctly produced during end-of-session recall checks (SI-4).
+- **Acceptance Criteria:** TC-REV-01 to TC-REV-03 pass; **[proposed]** $\ge 70\%$ of previously un-mastered letters correctly produced during end-of-session recall checks (SI-4).
 
 ---
 
@@ -256,7 +258,7 @@ PlayIT is an independent, self-contained mobile application executing natively o
 
 ##### [NFR-AUD-01] Phoneme Audio Production & Three-Stage Release Gate (New · P0)
 - **Requirement:**
-  1. Audio assets shall be generated using the validated Kokoro-82M neural model (Apache-2.0) and Chatterbox-Turbo (MIT) voice-cloned to reference tones.
+  1. Audio assets shall be generated using the Kokoro-82M neural model (Apache-2.0). Held (continuous) sounds may instead use Chatterbox-Turbo (MIT), voice-cloned from a Kokoro reference clip, chosen per clip by ear (user decision 2026-10-01; **[proposed]**, adviser confirmation pending).
   2. No phoneme model shall be synthesized by feeding single letters into raw text-to-speech. Continuous sounds shall utilize phoneme IPA tokens or phonetic interjections (e.g., *"Mmm!"*); short sounds shall utilize human phoneme recordings.
   3. Every shipped audio clip shall pass three strict verification gates:
      - **Gate 1 (Internal Acoustic Audit):** Zero audible trailing schwa, clipped at $\le 800\,\text{ms}$ (continuous) or $\le 250\,\text{ms}$ (stops), SNR $\ge 25\,\text{dB}$.
@@ -297,7 +299,7 @@ PlayIT is an independent, self-contained mobile application executing natively o
 - **Requirement:** Every clickable or interactive element across child-facing and adult-facing screens—including corner back arrows, settings icons, and ear buttons—shall enforce a minimum touch target bounding box of $64\times 64\,\text{dp}$ with at least $8\,\text{dp}$ separation from adjacent targets.
 
 ##### [NFR-SES-01] Developmental Session Pacing (New · P2)
-- **Requirement:** To prevent cognitive exhaustion in 6-year-old learners, the application shall gracefully terminate a learning session at the first completed node after approximately 12 minutes of continuous gameplay, celebrating earned stars and returning to the profile screen.
+- **Requirement:** To prevent cognitive exhaustion in 6-year-old learners, **[proposed]** the application shall gracefully terminate a learning session at the first completed node after approximately 12 minutes of continuous gameplay, celebrating earned stars and returning to the profile screen.
 
 #### 3.3.3 Reliability, Offline Security & Architecture
 
@@ -315,17 +317,17 @@ The following Requirements Traceability Matrix (RTM v3.0) demonstrates the bidir
 
 | Finding ID | Empirical Validation Evidence & Stakeholder Voice | Capstone Objective / SMART Goal | Refactored Req. ID | SDD v2.0 Design Component | Proposed STD Test Case(s) | Round 2 Field Verification Target | Priority |
 |:---:|---|:---:|:---:|---|---|---|:---:|
-| **F-01** | **PED-08 (50% flagged):** Pronunciation of letter sounds; Teacher Leony: *"M should be /m/ (mmm) rather than 'ma'."* | **Gen Obj 1 / HI-1** (Pure Phoneme Model) | **FR-02** | `AudioPlaybackManager`, `SoundPool` cache, `raw/ph_*.wav` | **TC-AUD-01:** Phoneme playback $\le 15\,\text{s}$<br>**TC-AUD-02:** Zero schwa audio audit | **Instrument A (Part 1):** $\ge 3/4$ teachers rate pure across 26 letters | **P0** |
-| **F-02** | **Facilitator Notes:** Children hesitated at mic; perceived ease was lowest dimension (🙂/😐 = 43.7%). | **Gen Obj 2 / SI-3** (Child Independence) | **FR-03** | `MicStateVisualizer`, `AudioRecord` RMS loop | **TC-MIC-01:** Tap-to-Listen $\le 100\,\text{ms}$<br>**TC-MIC-02:** Ripple scales with RMS input | **Instrument B / D-10:** Child hesitation drops to $<15\%$ | **P1** |
+| **F-01** | **PED-08 (50% flagged):** Pronunciation of letter sounds; Teacher T-1: *"M should be /m/ (mmm) rather than 'ma'."* | **Gen Obj 1 / HI-1** (Pure Phoneme Model) | **FR-02** | `AudioPlaybackManager`, `SoundPool` cache, `raw/ph_*.wav` | **TC-AUD-01:** Phoneme playback $\le 15\,\text{s}$<br>**TC-AUD-02:** Zero schwa audio audit | **Instrument A (Part 1):** $\ge 3/4$ teachers rate pure across 26 letters | **P0** |
+| **F-02** | **Facilitator Notes:** Children hesitated at mic; perceived ease was lowest dimension (7 of 16 children did not choose the top face = 43.8%). | **Gen Obj 2 / SI-3** (Child Independence) | **FR-03** | `MicStateVisualizer`, `AudioRecord` RMS loop | **TC-MIC-01:** Tap-to-Listen $\le 100\,\text{ms}$<br>**TC-MIC-02:** Ripple scales with RMS input | **Instrument B / D-10:** Child hesitation drops to $<15\%$ | **P1** |
 | **F-03** | **Validation Gap:** MVP testing lacked empirical ASR agreement scoring against teacher judgments. | **Gen Obj 2 / SI-1** (ASR Agreement) | **NFR-ASR-01** | `SayItJudge`, Vosk Grammar Compiler | **TC-ASR-01 to 05:** Recognition across child pitch/noise $\le 40\,\text{dB}$<br>**TC-ASR-06:** False reject $\le 15\%$ | **Instruments B & C:** $\ge 80\%$ agreement with teacher ratings | **P1** |
 | **F-04** | **Validation Gap:** Speech latency unmeasured in field due to missing diagnostic logging. | **Gen Obj 2 / SI-2** (Immediate Feedback) | **NFR-PERF-01** | `TelemetryLogger`, Monotonic Clock (`elapsedRealtime`) | **TC-PERF-01:** Say It P90 $\le 0.5\,\text{s}$<br>**TC-PERF-02:** Find It P90 $\le 0.3\,\text{s}$ | **Instrument D (D-01, D-02):** Timed latency verification | **P1** |
 | **F-05** | **Design Audit:** 5 CVC words (AIM, BEE, TOY, BOY, ZOO) contained unintroduced vowel teams/diphthongs. | **Gen Obj 4 / O4** (Decodable CVC Synthesis) | **FR-13** | `BlendItWordBank`, Room Seed Migration v3 | **TC-BLD-01:** 100% words match unlocked chapter letters | **Instrument A (Part 2):** Teacher decodability audit | **P1** |
 | **F-06** | **Teacher Feedback:** Teachers requested batch data export for classroom tracking; missing telemetry. | **Gen Obj 5 / O5** (Progress Tracking) | **FR-NEW-TEL** | `TelemetryLogger`, `CsvExportManager` | **TC-TEL-01:** Telemetry schema validation<br>**TC-EXP-01:** PIN gate enforcement<br>**TC-EXP-02:** Zero network calls | **Instrument C:** Successful CSV export on test tablet | **P1** |
 | **F-07** | **PED-12 (100%):** Teachers desire app for remedial reading stations with shared devices. | **Gen Obj 5 / O5** (Classroom Stations) | **FR-14** | `ProfileEntity`, `ProfileRepository`, Avatar Switcher | **TC-DB-03:** Multi-profile data isolation test | **Instrument D:** 6 profiles operate concurrently without data bleed | **P1** |
-| **F-08** | **Field Observation:** Need formal proof that app survives unexpected OS kill without progress loss. | **Gen Obj 5 / O6** (Data Reliability) | **NFR-REL-01** | Room Transaction DAOs, Schema v3 Migration | **TC-DB-01:** 20 force-close crash tests<br>**TC-DB-02:** Migration preservation test | **Instrument D (D-05, D-06):** 100% progress retained after process kill | **P1** |
+| **F-08** | **Field Observation:** Need formal proof that app survives unexpected OS kill without progress loss. | **Gen Obj 5 / O6** (Data Reliability) | **NFR-REL-01** | Room Transaction DAOs, Schema v4 Migration (planned) | **TC-DB-01:** 20 force-close crash tests<br>**TC-DB-02:** Migration preservation test | **Instrument D (D-05, D-06):** 100% progress retained after process kill | **P1** |
 | **F-09** | **ACC-06 (60% Yes):** Accessibility gap for hearing-impaired learners; missing visual cues. | **Gen Obj 1 / O6** (Pediatric Inclusion) | **NFR-ACC-01** | `ArticulationCue` Composable, Sound Captions | **TC-ACC-01:** Visual cue and caption present for 26/26 letters | **Instrument D (D-09):** Inspection of articulation cues | **P2** |
 | **F-10** | **ACC-07 (80% Yes):** Evaluators recommended larger edge margins and corner touch areas. | **Gen Obj 5 / O6** (Ergonomics) | **NFR-ACC-02** | `Modifier.minimumTouchTarget(64.dp)` | **TC-ACC-02:** Automated layout audit confirming all targets $\ge 64\,\text{dp}$ | **Instrument D (D-07):** Physical layout verification | **P2** |
-| **F-11** | **Teacher Feedback:** Teacher Joy Flores requested advanced reading expansion track. | **Long-term Roadmap** | **Future Scope (P3)** | Data-driven Chapter Model (`Chapter 8+`) | N/A (Deferred to Post-Capstone) | N/A | **P3** |
+| **F-11** | **Teacher Feedback:** Teacher T-2 requested advanced reading expansion track. | **Long-term Roadmap** | **Future Scope (P3)** | Data-driven Chapter Model (`Chapter 8+`) | N/A (Deferred to Post-Capstone) | N/A | **P3** |
 | **F-12** | **Adviser Review:** Modeling sequence lacked formal composition spec and replay mechanism. | **HI-2** (Sequence Spec) | **FR-02** | `AudioComposer`, `LessonScript` | **TC-SCR-01:** Runtime sequence execution $\le 15\,\text{s}$ | **Instrument D (D-11):** Sequence timing verification | **P0** |
 | **F-13** | **Adviser Review:** Synthetic TTS creates schwa when prompt is a lone letter. | **HI-1** (Audio Pipeline) | **NFR-AUD-01** | Kokoro-82M / Chatterbox Pipeline, Asset Manifest | **TC-AUD-03:** Manifest gate verification check | **Gate 3 Audit:** Expert phoneme verification | **P0** |
 | **F-14** | **Adviser Review:** Learning model must guarantee child can succeed without an adult co-present. | **HI-3, SI-3** (Autonomy) | **NFR-IND-01, FR-03** | `TutorPolicy`, Spoken Carriers, 10s Idle Re-prompt | **TC-IND-01 to 03:** Spoken instruction & idle prompts | **Silent Observer Protocol:** $\ge 85\%$ unprompted completion | **P1** |
