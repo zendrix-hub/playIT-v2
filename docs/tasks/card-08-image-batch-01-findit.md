@@ -1,7 +1,7 @@
 # Card 08: Image batch 1: Find It and key-word pictures, in rounds until the user is happy (asset card)
 
 Type: asset
-Status: done
+Status: accepted
 
 Run this in its own agy session, alongside the code relay. It never touches the repo: no edits, no commit, no push. It writes only into the batch folder below.
 

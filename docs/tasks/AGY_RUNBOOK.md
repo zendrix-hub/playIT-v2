@@ -98,27 +98,18 @@ Write the question to `docs/tasks/QUESTIONS.md` (card, question, what you found,
 - Add or replace audio in `app/src/main/assets/` unless a card says so.
 - Use emojis in UI text.
 
-## Current queue (2026-10-01, relay night)
-The `Status:` line in each card is the source of truth; this table is a snapshot. Cards 00-05 are accepted (CI green on draft PR #2; see `docs/evidence-log.md`).
+## Current queue (2026-10-05)
+The `Status:` line in each card is the source of truth; this table is a snapshot. Cards 00-07, 07b, 08, 11 and 12 are accepted (CI green; see `docs/evidence-log.md`).
 
 Code relay (agy session A), in this order:
 
 | Order | Card | Status | Note |
 |---|---|---|---|
-| 1 | 06 | accepted | 4deb625, CI green |
-| 2 | 07 | accepted | 18f7fb8, CI green |
-| 3 | 07b | ready, next | Avatar-only onboarding, parent rename, voiced map pop-up; copies the other 3 UI clips |
-| 4 | 11 | ready (after 07b is accepted) | Stars and hearts use real results |
-| 5 | 12 | ready (after 11 is accepted) | Find It distractors, gentle correction colour, no emoji test |
-| 6 | 09 | being written | Approved /m/ into the app; waits for the user's A/B pick |
-| 7 | 10 | being written | Screenshot tests; waits for Claude's local spike |
-| 8 | 03b | being written | Say It corrections from fragments; waits for the user's OK on the compositions |
-| 9 | 13 | being written | Approved batch-1 pictures into the app; waits for card 08's picks |
+| 1 | 13 | waiting | Batch-1 pictures into the app, and "Up" gets its own picture. Waits for the user's OK on the final picture page and the image release |
+| 2 | 09 | being written | Approved /m/ into the app; waits for the user's pick in `2026-10-01-compositions-m` |
+| 3 | 10 | being written | Screenshot tests; waits for Claude's local Roborazzi spike |
+| 4 | 03b | being written | Say It corrections from fragments; waits for the user's OK on the compositions |
 
-Take the first card in this order whose status is `ready` and whose "after" card is `accepted`. Claude moves 09, 10 and 03b up as soon as they are ready.
+Take the first card in this order whose status is `ready`. Claude sets a card to `ready` when its input exists.
 
-Images (agy session B, in parallel):
-
-| Card | Status | Note |
-|---|---|---|
-| 08 | ready | Asset card: 29 Find It and key-word pictures, in rounds until the user picks one per item. Writes only to `Documents\playIT-image-batches\2026-10-01-findit-batch-01\` |
+Images (agy session B): card 08 is accepted. The next image card (the 7 words with two drawings, and any batch-1 picture the user marks FIX) is not written yet. Asset cards that hand picks to Claude say where to put them; batch 1's picks were committed under `docs/assets/briefs/2026-10-01-findit-batch-01/picks/`.

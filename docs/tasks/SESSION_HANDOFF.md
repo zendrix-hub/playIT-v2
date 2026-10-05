@@ -313,3 +313,23 @@ _Claude, please append your review notes, feedback, and next steps below before 
 - **Next code card: 07b** (avatar onboarding, parent rename, voiced map pop-up). Then 11, then 12.
 - **Card 08 (images)** has not started; run it in a separate agy session ("This is the image session").
 
+
+### Claude review, 2026-10-05 ("run and review")
+- **Accepted:** 07b (a17969d), 08 (667ea0e), 11 (0d9ad3a), 12 (ef03bea). CI is green on every commit (runs are in the evidence log), and the local `testDebugUnitTest` passed. Every card now passes `review_card.py`. The earlier 07b `files` FAIL was a gap in the tool, which did not read bare file names like `` `ui_node_start.wav` `` after a full path; the tool is fixed.
+- **Card 08 deviation (kept):** the card said "never write into the repo", but the 29 picks were committed, 15 MB under `docs/assets/briefs/.../picks/`. That is what let Claude cut them out here, since the batch folder is on agy's PC. From now on, asset cards say where picks go.
+- **Specs v3 (dcff981):** the review is in `docs/proposals/2026-10-05-specs-v3-review.md`. It found 4 blocking items, to fix before the adviser sees the documents:
+  1. Pure-sound Say It scoring, which goes against the hybrid decision and the Vosk spike.
+  2. Room "v3", which the code already uses.
+  3. Unbuilt classes listed as done.
+  4. [proposed] items stated as approved.
+- **Images:**
+  - `tools/images/cutout.py`, `audit.py` and `make_release.py` are added.
+  - All 29 cutouts pass the audit. The only WARN is the apple, 53% red, because it is a red apple.
+  - The final page is `C:\Users\riva.zn\Documents\playIT-image-batches\2026-10-01-findit-batch-01\final\index.html`. The user marks OK/FIX and exports the CSV into the batch folder.
+  - Then Claude runs `make_release.py` into `docs/image-release/<date>/` and sets card 13 to `ready`.
+- **Card 13** is written and `waiting`.
+- **Blocked on the user:**
+  - Card 09 needs the /m/ pick in `2026-10-01-compositions-m`. There is no review CSV yet.
+  - Card 03b needs the OK on the compositions.
+  - `2026-09-30-fixup-slowfish-2` has never been reviewed.
+- **Environment:** the Kokoro model download had silently stopped at 193 MB. `~/.playit-env/rebuild_kokoro.sh` now resumes the download and fails on errors. The Roborazzi spike failed on a proxy timeout and is being re-run.

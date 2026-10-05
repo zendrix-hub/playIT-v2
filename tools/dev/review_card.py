@@ -49,14 +49,19 @@ def card_paths(text):
     """Repo-relative paths (or glob patterns, where the card writes <id>) from the Files section."""
     paths = set()
     body = section(text, "Files")
-    for tok in re.findall(r"`([^`]+)`", body):
-        tok = re.sub(r"<[^>]+>", "*", tok.strip())
-        if " " in tok:
-            continue
-        if tok.startswith(("app/", "docs/", "tools/", ".github/", "gradle/")) or tok in ("build.gradle.kts", "settings.gradle.kts"):
-            paths.add(tok)
-        elif tok.endswith(".kt"):
-            paths.add((TEST if tok.endswith("Test.kt") else MAIN) + tok)
+    for line in body.splitlines():
+        folder = None  # "Add: `app/.../a.wav`, `b.wav`": a bare file name shares the folder of the path before it
+        for tok in re.findall(r"`([^`]+)`", line):
+            tok = re.sub(r"<[^>]+>", "*", tok.strip())
+            if " " in tok:
+                continue
+            if tok.startswith(("app/", "docs/", "tools/", ".github/", "gradle/")) or tok in ("build.gradle.kts", "settings.gradle.kts"):
+                paths.add(tok)
+                folder = tok.rsplit("/", 1)[0] if "/" in tok else None
+            elif tok.endswith(".kt"):
+                paths.add((TEST if tok.endswith("Test.kt") else MAIN) + tok)
+            elif folder and "/" not in tok and "." in tok:
+                paths.add(f"{folder}/{tok}")
     return paths
 
 
