@@ -333,3 +333,4 @@ _Claude, please append your review notes, feedback, and next steps below before 
   - Card 03b needs the OK on the compositions.
   - `2026-09-30-fixup-slowfish-2` has never been reviewed.
 - **Environment:** the Kokoro model download had silently stopped at 193 MB. `~/.playit-env/rebuild_kokoro.sh` now resumes the download and fails on errors. The Roborazzi spike failed on a proxy timeout and is being re-run.
+- **Card 10 is `ready` (later, 2026-10-05).** The Roborazzi spike passed. Robolectric fetches `android-all` at test time, and this WSL proxy breaks Java TLS, so the spike used a curl-fetched jar in `~/.playit-env/robolectric-deps` through the `ROBOLECTRIC_DEPS_DIR` hook. The card keeps that hook; it does nothing when the variable is unset. Next agy session: card 10.

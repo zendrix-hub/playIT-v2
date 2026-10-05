@@ -105,9 +105,9 @@ Code relay (agy session A), in this order:
 
 | Order | Card | Status | Note |
 |---|---|---|---|
-| 1 | 13 | waiting | Batch-1 pictures into the app, and "Up" gets its own picture. Waits for the user's OK on the final picture page and the image release |
-| 2 | 09 | being written | Approved /m/ into the app; waits for the user's pick in `2026-10-01-compositions-m` |
-| 3 | 10 | being written | Screenshot tests; waits for Claude's local Roborazzi spike |
+| 1 | 10 | ready | Screenshot tests (Roborazzi 1.26.0, Robolectric 4.13, proven by Claude's spike); CI uploads the PNGs |
+| 2 | 13 | waiting | Batch-1 pictures into the app, and "Up" gets its own picture. Waits for the user's OK on the final picture page and the image release |
+| 3 | 09 | being written | Approved /m/ into the app; waits for the user's pick in `2026-10-01-compositions-m` |
 | 4 | 03b | being written | Say It corrections from fragments; waits for the user's OK on the compositions |
 
 Take the first card in this order whose status is `ready`. Claude sets a card to `ready` when its input exists.
