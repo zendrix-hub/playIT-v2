@@ -273,7 +273,7 @@ Each card ticks its own item in its commit (see `docs/tasks/AGY_RUNBOOK.md`). A 
 - [ ] Card 15: Decodable Blend It word list, 5 words per chapter, teacher-confirmed (FR-13)
 - [ ] Card 16: Blend It word card fits its text (screenshot finding) (FR-13). Superseded by card 20
 - [x] Card 17: Performance and calm motion: no haptics, downscaled images, no endless idle animation, portrait (NFR-PERF-01)
-- [ ] Card 17b: ViewModel init blocks run after every property (crash fix from Claude's dry run)
+- [x] Card 17b: ViewModel init blocks run after every property (crash fix from Claude's dry run)
 - [ ] Card 18: Adaptive layout foundation, LessonScaffold, 4-size layout tests (NFR-ACC-02)
 - [ ] Card 19: Hear It and Say It fit; Say It mic states (FR-03, NFR-ACC-02)
 - [ ] Card 20: Find It and Blend It fit (FR-05, FR-13)

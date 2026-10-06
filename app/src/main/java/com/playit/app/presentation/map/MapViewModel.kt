@@ -55,17 +55,6 @@ class MapViewModel @Inject constructor(
 
     val activeProfileId: StateFlow<Long?> = sessionManager.activeProfileId
 
-    init {
-        viewModelScope.launch {
-            activeProfileId.collect { profileId ->
-                if (profileId != null) {
-                    streakTracker.resetIfInactive(profileId)
-                    streakTracker.recordActivity(profileId)
-                }
-            }
-        }
-    }
-
     fun playHeartRecoverySound() {
         val sfx = audioResolver.getSfxPath(SfxEvent.HEART_RECOVERY_SPARKLE)
         audioPlayer.playAssetAudio(sfx)
@@ -166,6 +155,17 @@ class MapViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
+
+    init {
+        viewModelScope.launch {
+            activeProfileId.collect { profileId ->
+                if (profileId != null) {
+                    streakTracker.resetIfInactive(profileId)
+                    streakTracker.recordActivity(profileId)
+                }
+            }
+        }
+    }
 
     override fun onCleared() {
         super.onCleared()

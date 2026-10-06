@@ -473,4 +473,16 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - Created `PerformancePolicyTest.kt` verifying zero haptic feedback calls, portrait manifest lock, zero idle floating caller arguments, and zero endless animations on LetterCard and MascotSpeechHeader.
   - Verified full test suite passes (`./gradlew testDebugUnitTest`: 206 tests, 0 failures).
 
+#### 4. Card 17b: ViewModel Init Order (Crash Fix)
+- **Problem**: Kotlin initializes class members strictly top-to-bottom. Having `init { ... }` blocks declared before subsequent class properties caused `NullPointerException` (e.g. `this._isPlayingPrompt is null` in `BlendItViewModel`) if coroutines or flow collections resumed synchronously (e.g. `Dispatchers.Main.immediate` or pre-loaded data).
+- **Changes**:
+  - Moved `init { ... }` block to follow the last class-level property declaration in:
+    - `BlendItViewModel.kt`
+    - `FindItViewModel.kt`
+    - `HearItViewModel.kt`
+    - `SayItViewModel.kt`
+    - `MapViewModel.kt`
+  - Created test `ViewModelInitOrderTest.kt` verifying that no `*ViewModel.kt` has a class-level property below its `init {` block.
+- **Verification**: `ViewModelInitOrderTest` passes cleanly; `python3 tools/dev/review_card.py 17b` reports ALL PASS.
+
 

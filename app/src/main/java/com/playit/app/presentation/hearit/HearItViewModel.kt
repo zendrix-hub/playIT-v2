@@ -66,10 +66,6 @@ class HearItViewModel @Inject constructor(
         idleTimer.touch()
     }
 
-    init {
-        loadPhoneme()
-    }
-
     private fun loadPhoneme() {
         val id = phonemeIdArg?.toIntOrNull() ?: 1
         viewModelScope.launch {
@@ -91,6 +87,10 @@ class HearItViewModel @Inject constructor(
 
     private val _isPlayingPrompt = MutableStateFlow(false)
     val isPlayingPrompt: StateFlow<Boolean> = _isPlayingPrompt.asStateFlow()
+
+    init {
+        loadPhoneme()
+    }
 
     /** Full "I do" sequence (spec §2.1 Table 3): on load and on mascot tap. */
     fun playModelingSequence() {

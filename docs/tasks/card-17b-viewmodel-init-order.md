@@ -1,6 +1,6 @@
 # Card 17b: ViewModel init blocks run after every property (crash fix found by Claude's dry run)
 
-Status: ready (after card 17; its files don't overlap cards 14 and 17, so it may run the same night)
+Status: done
 
 ## Why
 Claude dry-ran plan Task 2 on 2026-10-06. `BlendItScreenshotTest` crashed with:

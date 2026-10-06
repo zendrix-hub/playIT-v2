@@ -101,10 +101,6 @@ class FindItViewModel @Inject constructor(
         idleTimer.touch()
     }
 
-    init {
-        loadGrid()
-    }
-
     private fun loadGrid() {
         val id = phonemeIdArg?.toIntOrNull() ?: 1
         viewModelScope.launch {
@@ -131,6 +127,10 @@ class FindItViewModel @Inject constructor(
 
     private val _isPlayingPrompt = MutableStateFlow(false)
     val isPlayingPrompt: StateFlow<Boolean> = _isPlayingPrompt.asStateFlow()
+
+    init {
+        loadGrid()
+    }
 
     fun playIntroThenTargetSound() {
         audioPlayer.stop()

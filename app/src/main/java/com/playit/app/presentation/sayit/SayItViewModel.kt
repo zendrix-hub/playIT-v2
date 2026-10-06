@@ -109,10 +109,6 @@ class SayItViewModel @Inject constructor(
 
     private var autoStopJob: Job? = null
 
-    init {
-        loadPhoneme()
-    }
-
     private fun loadPhoneme() {
         val id = phonemeIdArg?.toIntOrNull() ?: 1
         viewModelScope.launch {
@@ -191,6 +187,10 @@ class SayItViewModel @Inject constructor(
 
     private var lastAudioPlayTime: Long = 0L
     private val AUDIO_DEBOUNCE_MS = 500L
+
+    init {
+        loadPhoneme()
+    }
 
     /**
      * Plays the target example-word audio (e.g. audio/words/word_mouse.mp3) as the model

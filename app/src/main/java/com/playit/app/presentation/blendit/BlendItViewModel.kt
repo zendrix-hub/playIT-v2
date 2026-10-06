@@ -106,10 +106,6 @@ class BlendItViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<BlendItUiState>(BlendItUiState.Idle)
     val uiState: StateFlow<BlendItUiState> = _uiState.asStateFlow()
 
-    init {
-        loadSessionWords()
-    }
-
     private fun loadSessionWords() {
         viewModelScope.launch {
             val availableWords = blendItWordRepository.getWordsForGroup(groupId).first()
@@ -136,6 +132,10 @@ class BlendItViewModel @Inject constructor(
         isBusy = { _isPlayingPrompt.value },
         onIdle = { playBlendItIntroAudio() }
     )
+
+    init {
+        loadSessionWords()
+    }
 
     fun onScreenVisible() {
         idleTimer.start()
