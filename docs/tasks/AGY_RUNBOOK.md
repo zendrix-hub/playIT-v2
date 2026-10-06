@@ -109,7 +109,8 @@ Code relay (agy session A), in this order:
 | 2 | 13 | waiting | Batch-1 pictures into the app, and "Up" gets its own picture. Waits for the user's OK on the final picture page and the image release |
 | 3 | 09 | being written | Approved /m/ into the app; waits for the user's pick in `2026-10-01-compositions-m` |
 | 4 | 03b | being written | Say It corrections from fragments; waits for the user's OK on the compositions |
-| 5 | 15 | being written | Decodable Blend It words; waits for the user's and a teacher's OK on the word list, then new word audio and pictures |
+| 5 | 16 | waiting (user's go) | Blend It card fits its text (found by screenshot tests); small, recommended before the demo |
+| 6 | 15 | being written | Decodable Blend It words; waits for the user's and a teacher's OK on the word list, then new word audio and pictures |
 
 Take the first card in this order whose status is `ready`. Claude sets a card to `ready` when its input exists.
 

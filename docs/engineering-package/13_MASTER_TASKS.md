@@ -271,3 +271,4 @@ Each card ticks its own item in its commit (see `docs/tasks/AGY_RUNBOOK.md`). A 
 - [ ] Card 03b: Say It corrections from fragments around the sound (FR-03)
 - [ ] Card 14: Privacy pack: no cloud backup, delete a child's data, privacy notice (FR-14)
 - [ ] Card 15: Decodable Blend It word list, 5 words per chapter, teacher-confirmed (FR-13)
+- [ ] Card 16: Blend It word card fits its text (screenshot finding) (FR-13)
