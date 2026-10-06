@@ -101,17 +101,26 @@ Write the question to `docs/tasks/QUESTIONS.md` (card, question, what you found,
 ## Current queue (2026-10-06)
 The `Status:` line in each card is the source of truth; this table is a snapshot. Cards 00-08, 07b, 10, 11 and 12 are accepted (CI green; see `docs/evidence-log.md`).
 
+**UI overhaul plan (user-approved 2026-10-06):** `docs/superpowers/plans/2026-10-06-ui-fit-effects-overhaul.md`. Cards 17-24 are its Tasks 1-8. Each card points to its plan task for the steps and the code. Read the plan's "Global Constraints" before every card.
+
 Code relay (agy session A), in this order:
 
 | Order | Card | Status | Note |
 |---|---|---|---|
-| 1 | 14 | ready, next | Privacy pack: backup off, delete a child's data, privacy notice |
-| 2 | 13 | waiting | Batch-1 pictures into the app, and "Up" gets its own picture. Waits for the user's OK on the final picture page and the image release |
-| 3 | 09 | being written | Approved /m/ into the app; waits for the user's pick in `2026-10-01-compositions-m` |
-| 4 | 03b | being written | Say It corrections from fragments; waits for the user's OK on the compositions |
-| 5 | 16 | waiting (user's go) | Blend It card fits its text (found by screenshot tests); small, recommended before the demo |
-| 6 | 15 | being written | Decodable Blend It words; waits for the user's and a teacher's OK on the word list, then new word audio and pictures |
+| 1 | 14 | ready, next | Privacy pack |
+| 2 | 17 | ready (after 14; files don't overlap, so both may run tonight) | Plan Task 1: performance and calm motion (no haptics, downscaled images, portrait) |
+| 3 | 18 | after 17 is accepted | Plan Task 2: adaptive layout foundation + 4-size layout tests |
+| 4 | 19 | after 18 | Plan Task 3: Hear It + Say It fit, mic states |
+| 5 | 20 | after 19 | Plan Task 4: Find It + Blend It fit (supersedes card 16) |
+| 6 | 21 | after 20 | Plan Task 5: complete, splash, profile screens (may move past the cut line) |
+| 7 | 22 | after 21 (or 20) | Plan Task 6: map overhaul |
+| 8 | 23 | after 22 | Plan Task 7: purposeful effects (may move past the cut line) |
+| 9 | 24 | after 23 | Plan Task 8: captions + mouth cues (may move past the cut line) |
+| any | 13, 09, 03b, 15 | waiting | Slot in when their assets are released (pictures, /m/, compositions, word list) |
+| — | 16 | superseded by 20 | Do not run |
+
+**Cut line:** 17, 18, 19, 20 and 22 must land before Round 2 (Oct 19). Code cards are done by Fri Oct 16.
+
+Images (agy session B, in parallel): **card 25** (mouth-shape pictures), **ready now**. It uses the daily Nano Banana quota, so start it with card 17.
 
 Take the first card in this order whose status is `ready`. Claude sets a card to `ready` when its input exists.
-
-Images (agy session B): card 08 is accepted. The next image card (the 7 words with two drawings, and any batch-1 picture the user marks FIX) is not written yet. Asset cards that hand picks to Claude say where to put them; batch 1's picks were committed under `docs/assets/briefs/2026-10-01-findit-batch-01/picks/`.

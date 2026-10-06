@@ -383,3 +383,35 @@ _Claude, please append your review notes, feedback, and next steps below before 
 - **Claude, 2026-10-06:**
   - The word clips for card 15 are ready to review: `playIT-audio-batches/2026-10-06-blendwords-card15`.
   - Spike addendum: Vosk mishears close short vowels (tub/tab, miss/mess, vet/vat) even on clean synthetic audio.
+
+### Claude, 2026-10-06 (afternoon): UI overhaul plan approved; directions for agy
+The user approved `docs/superpowers/plans/2026-10-06-ui-fit-effects-overhaul.md`. **agy is the main executor; Claude reviews every weekday** when the user says "run and review".
+
+**What to run:**
+1. **Code session A:** card 14 (privacy), then **card 17**. Their files don't overlap, so both may run tonight. After that, cards 18 → 19 → 20 → 21 → 22 → 23 → 24, one at a time, each after the previous one is accepted.
+2. **Image session B, start now:** **card 25** (mouth-shape pictures). Nano Banana has a daily quota, so it runs alongside card 17. If the quota runs out, write `STATUS.md` and continue the next day. At the end, commit only the picks folder, as the card says.
+
+**How to run a plan card:**
+- Each card 17-24 points to its plan task. The plan has the steps, the code and the test code. Do them in order: failing test, implementation, passing test.
+- The card has the Files list and the Tests table that `review_card.py` checks.
+- Read the plan's "Global Constraints" every time:
+  - 64 dp child targets;
+  - text at least 16 sp, and at least 24 sp for letters and words;
+  - no red for wrong answers;
+  - motion durations;
+  - reduced motion;
+  - no haptics;
+  - portrait;
+  - zero emoji.
+- Before committing, run `./gradlew testDebugUnitTest` and `./gradlew recordRoborazziDebug --tests 'com.playit.app.screenshot.*'`. Look at the PNGs for all 4 sizes: compact 360x640, a21s 360x740, phone 411x891, tablet 800x1280.
+- After each code card, give the user the debug APK path. They test on a Samsung Galaxy A21s.
+
+**Cut line:**
+- 17, 18, 19, 20 and 22 must land before Round 2 (Oct 19). The target is all code cards by Fri Oct 16.
+- 21, 23 and 24 may move to Oct 26-30 if days slip. Say so in the handoff rather than rushing.
+- Card 16 is superseded by card 20; don't run it.
+
+**Defense reviewer updated:**
+- The "marks the letter for review" claim is removed, because it isn't built.
+- The mic wording matches card 19's time-based ripple.
+- Screenshot tests are now marked as done.

@@ -150,8 +150,8 @@ New files, each with one responsibility:
 - Modify: `presentation/components/MascotSpeechHeader.kt` (remove breathing only)
 - Modify: `presentation/components/AssetUtils.kt` (delegate to `AssetImage.kt`)
 - Create: `presentation/components/AssetImage.kt`
-- Create: `presentation/theme/PlayItMotion.kt`; Delete: `presentation/theme/Motion.kt` (update its 3 users to `PlayItMotion`)
-- Delete: `app/src/main/assets/audio/vo/*.mp3` (26 byte-identical duplicates of `audio/ui/vo_*`; no code reference) and `app/src/main/assets/audio/tts_[exci_20260816_104503.mp3`
+- Create: `presentation/theme/PlayItMotion.kt`; Delete: `presentation/theme/Motion.kt` (no code uses it; checked 2026-10-06)
+- Delete: `app/src/main/assets/audio/vo/vo_*.mp3` (26 byte-identical duplicates of `audio/ui/vo_*`; no code reference) and `app/src/main/assets/audio/tts_*.mp3` (one stray file, `tts_[exci_20260816_104503.mp3`)
 - Test: `app/src/test/java/com/playit/app/presentation/components/AssetImageTest.kt`
 - Test: `app/src/test/java/com/playit/app/PerformancePolicyTest.kt`
 
@@ -284,7 +284,7 @@ In `AssetUtils.kt`:
 - Existing callers compile unchanged, because `maxSize` has a default.
 - Pass `maxSize` where the image is larger than 160 dp: the letter card picture (`200.dp`) and the splash (`320.dp`).
 
-`PlayItMotion.kt` (move the old `Motion` constants here; update the callers to `PlayItMotion.*`):
+`PlayItMotion.kt` (it replaces the unused `Motion.kt`):
 ```kotlin
 package com.playit.app.presentation.theme
 
@@ -375,7 +375,7 @@ git commit -m "perf(ui): downscaled async images, no haptics, no endless idle an
 - Modify: `presentation/theme/Theme.kt` (provide `LocalPlayItDimens`)
 - Create: `presentation/components/LessonScaffold.kt`
 - Modify: `presentation/components/MascotSpeechHeader.kt` (sizes from dimens, `maxLines`, ellipsis)
-- Modify: every caller that sets a fixed `.height(N.dp)` on a `GummyButton` or `GummyContainer`. Change it to `.heightIn(min = N.dp)`. List them with `git grep -n "GummyButton\|GummyContainer" -- app/src/main | grep "height("` and name each in the commit body.
+- Modify (only `.height(N.dp)` -> `.heightIn(min = N.dp)` on a `GummyButton` or `GummyContainer`): `presentation/hearit/HearItScreen.kt`, `presentation/blendit/BlendItScreen.kt`, `presentation/blendit/BlendItCompleteScreen.kt`, `presentation/lettercomplete/LetterCompleteScreen.kt`, `presentation/findit/FindItScreen.kt`, `presentation/sayit/SayItScreen.kt`, `presentation/splash/SplashScreen.kt`, `presentation/components/FindItGrid.kt`, `presentation/components/LetterCard.kt`, `presentation/profile/ProfileSelectScreen.kt`, `presentation/profile/components/AddProfileButton.kt`, `presentation/profile/components/ProfileCard.kt`, `presentation/map/components/NodeActionPopupDialog.kt`, `presentation/map/components/UnitGuidebookDialog.kt`, `presentation/dashboard/ParentDashboardScreen.kt`, `presentation/dashboard/components/ArithmeticGuardDialog.kt`, `presentation/dashboard/components/ProfileSwitcherDropdown.kt`. Leave a fixed height that is not on a gummy component alone. If another file needs the change, name it in the commit body.
 - Create: `app/src/test/java/com/playit/app/screenshot/Devices.kt` (qualifier constants + `WithFontScale`)
 - Test: `app/src/test/java/com/playit/app/presentation/theme/DimensTest.kt`
 - Test: `app/src/test/java/com/playit/app/presentation/components/GummyContainerLayoutTest.kt`

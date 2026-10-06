@@ -1,6 +1,6 @@
 # Card 16: Blend It word card fits its text (UI fix found by screenshot tests)
 
-Status: waiting (for the user's go; Claude recommends it before the demo)
+Status: superseded by card 20 (plan Task 4 includes this exact fix and test; do not run this card)
 
 Runs after card 14 is accepted. It touches only `BlendItCard.kt` and one new test.
 

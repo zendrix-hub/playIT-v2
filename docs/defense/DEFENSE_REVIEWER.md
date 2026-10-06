@@ -50,7 +50,7 @@ Each question has the answer to give, the evidence, the follow-up to expect, and
 **A2. How accurate is Say It on children?** (H)
 - **Answer:** We haven't measured it yet, and we say so. Round 1 did not record speech data. Round 2 compares the app's decision with a teacher's judgement on each attempt. Our target is at least 80% agreement and at most 15% false rejects of correct attempts.
 - **Evidence:** spec `docs/specs/hear-say-refactor.md` (judge targets); `docs/specs/validation-report.md` (Round 2 plan).
-- **Follow-up:** "What if you miss the target?" Answer: Say It already never removes hearts. After 3 misses it moves on and marks the letter for review. So a false reject costs the child a retry, not a penalty. If agreement is low we lower the stakes further (Say It as practice only) and report it.
+- **Follow-up:** "What if you miss the target?" Answer: Say It already never removes hearts. After 3 misses it leads the child through the sound together and moves on (marking the letter for a later review is planned, FR-NEW-REC; don't say it already does). So a false reject costs the child a retry, not a penalty. If agreement is low we lower the stakes further (Say It as practice only) and report it.
 - **Don't say:** "about 75%", "75% confidence threshold". There is no data and no threshold.
 - **Extra evidence we found ourselves (2026-10-06):** even on clean synthetic speech, Vosk confused close short vowels (tub/tab, miss/mess, vet/vat) at low confidence (`docs/spikes/vosk-foil-spike.md`, addendum). So our grammars never pit words that differ only by a short vowel against each other, and we expect children's vowels to be harder still. Volunteering this shows we test our own assumptions.
 
@@ -73,7 +73,7 @@ Each question has the answer to give, the evidence, the follow-up to expect, and
 - **Don't say:** "under 400 ms", "≤500 ms".
 
 **A7. What about classroom noise?** (H)
-- **Answer:** There's no noise handling yet. A small grammar helps, because Vosk must pick one of a few words, but noise can still cause false rejects. Round 1 protocol required ≤40 dB checked with an approximate indicator, and Round 2 logs the measured level. A live mic indicator and noise warning are planned.
+- **Answer:** There's no noise handling yet. A small grammar helps, because Vosk must pick one of a few words, but noise can still cause false rejects. Round 1 protocol required ≤40 dB checked with an approximate indicator, and Round 2 logs the measured level. Say It shows the mic's state: listening, "I hear you" once the recognizer picks up words, then the result (card 19). A meter that follows the child's voice level and a noise warning are planned; the recognizer we use doesn't report loudness, so that needs a new audio loop.
 - **Don't say:** "NoiseMonitor", "AGC", "works in noisy classrooms".
 
 **A8. Where does the audio come from? Isn't it AI?** (M)
@@ -117,7 +117,7 @@ Each question has the answer to give, the evidence, the follow-up to expect, and
   - 226 JVM unit tests, all passing. They cover the domain rules (hearts, stars, speech judging, grid, tutor policy) and the ViewModels, using MockK and coroutine test tools.
   - CI runs them on every push.
   - A test scans the source for emoji (our zero-emoji policy).
-  - Screenshot tests (Roborazzi) are being added.
+  - Screenshot tests (Roborazzi) render the screens in CI; the layout tests check 4 phone sizes (cards 10 and 18).
 - **Follow-up:** "UI tests? Recognizer tests?" Answer: 4 instrumented UI test classes exist but don't run in CI. The recognizer is checked by the spike and phone tests, not by automated audio tests. That's a gap.
 - **Don't say:** "Truth, Turbine, DAO tests".
 
@@ -243,7 +243,7 @@ Each question has the answer to give, the evidence, the follow-up to expect, and
 
 **F6. How does the app handle a struggling child?** (M)
 - **Answer:**
-  - Say It: a 3-step prompt ladder with specific corrections, then it moves on and marks the letter for review.
+  - Say It: a 3-step prompt ladder with specific corrections, a mouth-shape cue from the second try (card 24), then it says the sound together with the child and moves on.
   - Find It: hearts with recovery (+1 per 3 correct in a row), and a gentle 3-heart restart instead of a game-over screen.
   - Everywhere: gentle orange instead of red, a soft pop instead of a buzzer, and a 10 s idle re-prompt that repeats the instruction.
 

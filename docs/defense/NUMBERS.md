@@ -37,7 +37,7 @@ Checked against the code and data on 2026-10-05, at commit `c5e6957` on `refacto
 | JVM unit tests | **226**, all passing (local, 2026-10-05) (re-check), in 30 test classes |
 | Instrumented UI tests | 4 classes; **not run in CI** |
 | CI | GitHub Actions: unit tests + debug APK on every push to the PR |
-| Screenshot tests | card 10 (Roborazzi), pending |
+| Screenshot tests | Roborazzi, 5 screens rendered in CI (card 10, accepted 2026-10-06); 4-size layout tests from card 18 |
 
 ## Audio and images
 | Item | Value |
