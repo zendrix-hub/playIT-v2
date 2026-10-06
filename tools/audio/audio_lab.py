@@ -326,6 +326,44 @@ def keywords(k, a, vm, voice):
                       "Mark OK or FIX, add a note for FIX. Export CSV when done.", rows, mode="okfix")
     print(f"wrote {len(rows)} clips to {out}")
 
+# Card 15 candidate Blend It words (pending the user's and a teacher's OK on the list). IPA for the
+# phoneme take, and foils Vosk should NOT hear: a wrong vowel, or "am" read as the time "a.m.".
+BLEND_WORDS = {
+    "am":   ("ˈæm",  ["a m", "um", "em", "aim"]),
+    "tub":  ("tˈʌb", ["tab", "tube", "tub"]),
+    "yam":  ("jˈæm", ["yum", "jam", "yam"]),
+    "miss": ("mˈɪs", ["mess", "moss", "miss"]),
+    "zap":  ("zˈæp", ["zip", "sap", "zap"]),
+    "vet":  ("vˈɛt", ["vat", "bet", "vet"]),
+}
+
+def blendwords(k, a, vm, voice):
+    """Card 15 word clips: three takes per word (text 0.95, text 0.85, IPA 0.95), Vosk-checked, OK/FIX."""
+    out = pathlib.Path(a.out); out.mkdir(parents=True, exist_ok=True)
+    words = [w for w in (a.items.split(",") if a.items else BLEND_WORDS)]
+    rows = []
+    for word in words:
+        ipa, foils = BLEND_WORDS[word]
+        takes = [("text, speed 0.95", word, KW_SPEED, False),
+                 ("text, speed 0.85", word, 0.85, False),
+                 (f"phonemes {ipa}, speed 0.95", ipa, KW_SPEED, True)]
+        for i, (how, text, sp, ph) in enumerate(takes, 1):
+            au = clean(*synth(k, text, voice, sp, phonemes=ph))
+            name = f"word_{word}_t{i}.wav"
+            sf.write(out / name, au, SR_OUT)
+            heard = vosk_check(au, SR_OUT, sorted(set([word] + [f for f in foils if " " not in f])), vm)
+            note = how + (f"; Vosk heard {heard}" if heard is not None else "")
+            rows.append({"file": name, "group": f"{word.upper()} (Blend It, card 15)", "says": word,
+                         "listen_for": "Clear CVC word a 6-year-old can blend? Right vowel (not a.m. / tube / yum)?",
+                         "auto_check": note})
+    write_review_page(out, out.name, "playIT Blend It words (card 15 candidates)",
+                      "New decodable Blend It words, three takes each. Mark the best take OK and the others FIX "
+                      "(or FIX all with a note). Export CSV when done. The word list itself still needs a teacher's OK. "
+                      "Judge by ear: Vosk mishears close short vowels even on clean audio (tub/tab, miss/mess, vet/vat; "
+                      "formants show Kokoro said the right vowel), so a Vosk mismatch here is not a reason to reject.",
+                      rows, mode="okfix")
+    print(f"wrote {len(rows)} clips to {out}")
+
 def ui(k, a, vm, voice):
     """Spoken UI lines (tutor_script.UI_LINES) for the no-reading pass, OK/FIX review."""
     from tutor_script import UI_LINES
@@ -343,8 +381,8 @@ def ui(k, a, vm, voice):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("batch", choices=["heldsound", "heldsound2", "script", "redo", "keywords", "ui"])
-    p.add_argument("--items", default="", help="redo: comma list of fragment ids, words, or slow:<word>")
+    p.add_argument("batch", choices=["heldsound", "heldsound2", "script", "redo", "keywords", "ui", "blendwords"])
+    p.add_argument("--items", default="", help="redo: comma list of fragment ids, words, or slow:<word>; blendwords: comma list of words")
     p.add_argument("--out", required=True)
     p.add_argument("--voice", default=VOICE)
     p.add_argument("--letter", default="m", help="heldsound: which continuous letter")
@@ -360,7 +398,7 @@ def main():
     if a.vosk:
         from vosk import Model, SetLogLevel; SetLogLevel(-1); vm = Model(a.vosk)
     _, voice = parse_candidate(a.voice, k)
-    {"heldsound": heldsound, "heldsound2": heldsound2, "script": script, "redo": redo, "keywords": keywords, "ui": ui}[a.batch](k, a, vm, voice)
+    {"heldsound": heldsound, "heldsound2": heldsound2, "script": script, "redo": redo, "keywords": keywords, "ui": ui, "blendwords": blendwords}[a.batch](k, a, vm, voice)
 
 if __name__ == "__main__":
     main()

@@ -34,3 +34,21 @@ Every candidate token exists in the model vocabulary except "sss" and "ssss". Th
 
 ## To repeat on-device
 Record 5 children × 4 Chapter 1 sounds × 3 productions (correct, added vowel, letter name). Run them through the grammar and fill in the same table. Report false-accept and false-reject rates against teacher judgment (SI-1).
+
+## Addendum 2026-10-06: close short vowels (found while making card 15 word clips)
+Kokoro clips (voice af_heart 0.7 + af_bella 0.3, speed 0.95), checked against a 3-word grammar of the word and its close-vowel neighbors. The column "vowel F1/F2" is a rough median over the voiced part, measured with Praat via parselmouth.
+
+| Kokoro said | Vosk heard (conf.) | vowel F1/F2 (Hz) | Same pair, other word: Kokoro said, Vosk heard |
+|---|---|---|---|
+| tub | tab (0.73) | 397/1550 | tab: tab (1.00), 966/1816 |
+| miss | mess (0.63) | 789/2213 | mess: mess (1.00), 996/2086 |
+| vet | vat (0.56) | 680/2032 | vat: vat (1.00), 958/1983 |
+| sum | sum (0.50) | 304/1511 | sam: sam (1.00), 883/1830 |
+| met | met (0.64) | 943/2094 | mat: mat (1.00), 1044/2010 |
+
+The formants show that Kokoro produced different vowels in each pair. So the errors are Vosk's. On clean adult-like synthetic speech, the small English model often picks the wrong word when the grammar holds close short vowels. Even when it is right on these pairs, its confidence is low.
+
+**Consequences:**
+- A Say It grammar must not hold minimal-pair foils that differ only in a short vowel. Today's grammars hold only the key word, the letter names and the added vowels, so they are not affected. Keep it that way.
+- Children's vowels vary more than synthetic ones, so vowel discrimination by Vosk should be assumed unreliable. This is a defense point (DEFENSE_REVIEWER A2/A4) and a Round 2 measurement item.
+- Word clips are judged by ear, not by Vosk (2026-10-06-blendwords-card15 page note).

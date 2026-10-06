@@ -52,6 +52,7 @@ Each question has the answer to give, the evidence, the follow-up to expect, and
 - **Evidence:** spec `docs/specs/hear-say-refactor.md` (judge targets); `docs/specs/validation-report.md` (Round 2 plan).
 - **Follow-up:** "What if you miss the target?" Answer: Say It already never removes hearts. After 3 misses it moves on and marks the letter for review. So a false reject costs the child a retry, not a penalty. If agreement is low we lower the stakes further (Say It as practice only) and report it.
 - **Don't say:** "about 75%", "75% confidence threshold". There is no data and no threshold.
+- **Extra evidence we found ourselves (2026-10-06):** even on clean synthetic speech, Vosk confused close short vowels (tub/tab, miss/mess, vet/vat) at low confidence (`docs/spikes/vosk-foil-spike.md`, addendum). So our grammars never pit words that differ only by a short vowel against each other, and we expect children's vowels to be harder still. Volunteering this shows we test our own assumptions.
 
 **A3. Does Say It check the letter sound, like /m/?** (H)
 - **Answer:** No. It checks the key word, like "mouse". Our spike found Vosk can't confirm a held /m/, because its dictionary has no entry that matches a held nasal. So pure-sound scoring is switched off. The child says the sound with Lily (unscored), then says the key word, which is scored. Pure-sound scoring comes back for the recall check only if the on-device test with children passes.
