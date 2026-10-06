@@ -29,6 +29,7 @@ All code paths are under `app/src/main/java/com/playit/app/` or `app/src/test/ja
 - Delete: `app/src/main/assets/audio/vo/vo_*.mp3` (26 byte-identical duplicates of `audio/ui/vo_*`; no code reference) and `app/src/main/assets/audio/tts_*.mp3` (one stray file, `tts_[exci_20260816_104503.mp3`)
 - Test: `app/src/test/java/com/playit/app/presentation/components/AssetImageTest.kt`
 - Test: `app/src/test/java/com/playit/app/PerformancePolicyTest.kt`
+- Modify (screenshot tests only): `app/src/test/java/com/playit/app/screenshot/HearItScreenshotTest.kt`, `FindItScreenshotTest.kt`, `BlendItScreenshotTest.kt`, `NamePromptScreenshotTest.kt`, `LetterCompleteScreenshotTest.kt`. Wait for `AssetDecodeTracker.isIdle()` before each capture (plan Task 1, Files).
 
 ## Tests
 | Test file | Test | Assertion |

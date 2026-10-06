@@ -155,6 +155,7 @@ New files, each with one responsibility:
 - Delete: `app/src/main/assets/audio/vo/vo_*.mp3` (26 byte-identical duplicates of `audio/ui/vo_*`; no code reference) and `app/src/main/assets/audio/tts_*.mp3` (one stray file, `tts_[exci_20260816_104503.mp3`)
 - Test: `app/src/test/java/com/playit/app/presentation/components/AssetImageTest.kt`
 - Test: `app/src/test/java/com/playit/app/PerformancePolicyTest.kt`
+- Modify (screenshot tests only): `app/src/test/java/com/playit/app/screenshot/HearItScreenshotTest.kt`, `FindItScreenshotTest.kt`, `BlendItScreenshotTest.kt`, `NamePromptScreenshotTest.kt`, `LetterCompleteScreenshotTest.kt`. After `compose.waitForIdle()`, add `compose.waitUntil(5_000) { AssetDecodeTracker.isIdle() }` and then `compose.waitForIdle()` again, before the capture. Claude's dry run of 2026-10-06 showed that without this, the Blend It picture is still loading when the screenshot is taken.
 
 **Interfaces:**
 - Produces:
@@ -212,7 +213,7 @@ class PerformancePolicyTest {
         val card = File(main, "java/com/playit/app/presentation/components/LetterCard.kt").readText()
         val header = File(main, "java/com/playit/app/presentation/components/MascotSpeechHeader.kt").readText()
         assertFalse(card.contains("breathingPulse("))
-        assertFalse(header.contains("rememberInfiniteTransition"))
+        assertFalse(header.contains("rememberInfiniteTransition("))   // the call, not a leftover import
     }
 }
 ```
@@ -254,6 +255,14 @@ fun calculateInSampleSize(srcWidth: Int, srcHeight: Int, reqWidth: Int, reqHeigh
 
 private val transparent = ColorPainter(Color.Transparent)
 
+/** Counts decodes in flight, so screenshot tests can wait until every picture on screen has loaded. */
+object AssetDecodeTracker {
+    private val pending = java.util.concurrent.atomic.AtomicInteger(0)
+    fun isIdle(): Boolean = pending.get() == 0
+    internal fun start() { pending.incrementAndGet() }
+    internal fun done() { pending.decrementAndGet() }
+}
+
 /**
  * Loads an asset PNG at about [maxSize] (in dp) on a background thread. Shows nothing until
  * it is ready, and nothing if the file is missing (a missing asset never crashes a screen).
@@ -268,6 +277,8 @@ fun rememberAssetPainter(assetPath: String, maxSize: Dp = 160.dp): Painter {
         key1 = key
     ) {
         if (value !== transparent) return@produceState
+        AssetDecodeTracker.start()
+        try {
         value = withContext(Dispatchers.IO) {
             runCatching {
                 val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
@@ -280,6 +291,9 @@ fun rememberAssetPainter(assetPath: String, maxSize: Dp = 160.dp): Painter {
                 AssetBitmapCache.put(key, bmp)
                 BitmapPainter(bmp.asImageBitmap())
             } ?: transparent
+        }
+        } finally {
+            AssetDecodeTracker.done()   // after the value is set, so a waiting test sees the picture
         }
     }
     return painter
@@ -343,6 +357,7 @@ Other edits:
 - `MascotSpeechHeader.kt`:
   - Delete `infiniteTransition`, `breatheScaleY` and `breatheScaleX`.
   - The `graphicsLayer` keeps only `tapBounceScale` and the amplitude squash (and only the tap bounce under reduced motion).
+  - Delete the imports that become unused (`rememberInfiniteTransition`, `infiniteRepeatable`, `RepeatMode`, `animateFloat`, `tween`, `FastOutSlowInEasing` if nothing else uses them).
 - `GummyButton.kt`:
   - Delete `val haptic = LocalHapticFeedback.current` and the `haptic.performHapticFeedback(...)` line.
   - Delete the two unused imports.
@@ -511,8 +526,11 @@ abstract class LayoutMatrixTest(private val deviceName: String) {
         assertTrue("$tag bottom ${node.bottom} > window ${root.bottom} on $deviceName", node.bottom <= root.bottom)
     }
 
-    protected fun capture(name: String) =
+    protected fun capture(name: String) {
+        compose.waitUntil(5_000) { AssetDecodeTracker.isIdle() }   // pictures load off the main thread (Task 1)
+        compose.waitForIdle()
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/${name}_$deviceName.png")
+    }
 
     /** Font-scale checks run on every size except compact (360x640 at 1.3 is below our support floor). */
     protected fun assumeFontScaleChecks() = assumeTrue(deviceName != "compact")
