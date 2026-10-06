@@ -146,7 +146,8 @@ New files, each with one responsibility:
 - Modify: `presentation/components/GummyButton.kt` (remove haptic only)
 - Modify: `presentation/components/PulseModifier.kt`
 - Modify: `presentation/components/GummyMotionAsset.kt`
-- Modify: `presentation/components/LetterCard.kt` (remove `.breathingPulse()` only)
+- Modify: `presentation/components/LetterCard.kt` (remove `.breathingPulse()` and its `isIdleFloating = true` argument only)
+- Modify (remove the explicit `isIdleFloating = true` / `isIdleFloating = !isCorrect` argument only): `presentation/components/BlendItCard.kt`, `presentation/components/FindItGrid.kt`, `presentation/components/MascotBubble.kt` (and `LetterCard.kt`, above)
 - Modify: `presentation/components/MascotSpeechHeader.kt` (remove breathing only)
 - Modify: `presentation/components/AssetUtils.kt` (delegate to `AssetImage.kt`)
 - Create: `presentation/components/AssetImage.kt`
@@ -199,6 +200,12 @@ class PerformancePolicyTest {
     @Test fun activityIsPortraitOnly() {
         val manifest = File(main, "AndroidManifest.xml").readText()
         assertTrue(manifest.contains("android:screenOrientation=\"portrait\""))
+    }
+
+    @Test fun noIdleFloatingRequestedByCallers() {
+        // Dry run 2026-10-06: four callers passed isIdleFloating = true explicitly, so changing the default alone kept them floating.
+        val hits = kotlinSources().filter { Regex("isIdleFloating\\s*=\\s*(true|!)").containsMatchIn(it.readText()) }.map { it.name }.toList()
+        assertTrue("Idle floating is removed (effects on meaningful moments only): $hits", hits.isEmpty())
     }
 
     @Test fun noEndlessIdleAnimationOnLetterCardOrMascotHeader() {
@@ -327,7 +334,7 @@ fun Modifier.idleBounce(enabled: Boolean = true): Modifier = composed {
 ```
 
 `GummyMotionAsset.kt`:
-- Change the `isIdleFloating` default to `false`.
+- Change the `isIdleFloating` default to `false`, and delete the explicit `isIdleFloating = true` / `isIdleFloating = !isCorrect` argument in `LetterCard`, `BlendItCard`, `FindItGrid` and `MascotBubble`.
 - In `idleFloating()`, return `this` when `!enabled || LocalReducedMotion.current`, *before* `rememberInfiniteTransition`.
 - `celebrationWiggle` and `interactiveSquish` stay. Make `celebrationWiggle` skip when reduced motion is on.
 

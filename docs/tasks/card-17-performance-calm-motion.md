@@ -20,7 +20,8 @@ All code paths are under `app/src/main/java/com/playit/app/` or `app/src/test/ja
 - Modify: `presentation/components/GummyButton.kt` (remove haptic only)
 - Modify: `presentation/components/PulseModifier.kt`
 - Modify: `presentation/components/GummyMotionAsset.kt`
-- Modify: `presentation/components/LetterCard.kt` (remove `.breathingPulse()` only)
+- Modify: `presentation/components/LetterCard.kt` (remove `.breathingPulse()` and its `isIdleFloating = true` argument only)
+- Modify (remove the explicit `isIdleFloating = true` / `isIdleFloating = !isCorrect` argument only): `presentation/components/BlendItCard.kt`, `presentation/components/FindItGrid.kt`, `presentation/components/MascotBubble.kt` (and `LetterCard.kt`, above)
 - Modify: `presentation/components/MascotSpeechHeader.kt` (remove breathing only)
 - Modify: `presentation/components/AssetUtils.kt` (delegate to `AssetImage.kt`)
 - Create: `presentation/components/AssetImage.kt`
@@ -38,6 +39,7 @@ All code paths are under `app/src/main/java/com/playit/app/` or `app/src/test/ja
 | AssetImageTest | `inSampleSize_neverZero` | returns 1 for a 0 request |
 | PerformancePolicyTest | `noHapticFeedbackCalls` | no `performHapticFeedback` in app sources |
 | PerformancePolicyTest | `activityIsPortraitOnly` | manifest has `screenOrientation="portrait"` |
+| PerformancePolicyTest | `noIdleFloatingRequestedByCallers` | no caller passes `isIdleFloating = true` or `= !...` |
 | PerformancePolicyTest | `noEndlessIdleAnimationOnLetterCardOrMascotHeader` | no `breathingPulse(` in LetterCard, no `rememberInfiniteTransition` in MascotSpeechHeader |
 
 All other tests must still pass, including `ZeroEmojiPolicyTest` and the card 10 screenshot tests. Run `./gradlew testDebugUnitTest`, then `./gradlew recordRoborazziDebug --tests 'com.playit.app.screenshot.*'`, and look at the new PNGs for all 4 sizes before committing.

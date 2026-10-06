@@ -364,6 +364,22 @@ def blendwords(k, a, vm, voice):
                       rows, mode="okfix")
     print(f"wrote {len(rows)} clips to {out}")
 
+def vo(k, a, vm, voice):
+    """Lesson voice lines (tutor_script.LESSON_VO), Kokoro remakes of the Edge clips, OK/FIX review."""
+    from tutor_script import LESSON_VO
+    out = pathlib.Path(a.out); out.mkdir(parents=True, exist_ok=True)
+    rows = []
+    for cid, (text, speed, source) in LESSON_VO.items():
+        au = clean(*synth(k, text, voice, speed))
+        sf.write(out / f"{cid}.wav", au, SR_OUT)
+        rows.append({"file": f"{cid}.wav", "group": "Lesson voice lines (replace Edge TTS)", "says": text,
+                     "listen_for": f"Clear, warm, natural for a 6-year-old? ({source})", "auto_check": ""})
+    write_review_page(out, out.name, "playIT lesson voice lines (Kokoro)",
+                      "The lines Lily says during lessons, remade in the app's Kokoro voice to replace the old Edge TTS clips. "
+                      "Two texts changed to match the app today (see the note in each row). Mark OK or FIX, add a note "
+                      "for FIX. Export CSV when done.", rows, mode="okfix")
+    print(f"wrote {len(rows)} clips to {out}")
+
 def ui(k, a, vm, voice):
     """Spoken UI lines (tutor_script.UI_LINES) for the no-reading pass, OK/FIX review."""
     from tutor_script import UI_LINES
@@ -381,7 +397,7 @@ def ui(k, a, vm, voice):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("batch", choices=["heldsound", "heldsound2", "script", "redo", "keywords", "ui", "blendwords"])
+    p.add_argument("batch", choices=["heldsound", "heldsound2", "script", "redo", "keywords", "ui", "blendwords", "vo"])
     p.add_argument("--items", default="", help="redo: comma list of fragment ids, words, or slow:<word>; blendwords: comma list of words")
     p.add_argument("--out", required=True)
     p.add_argument("--voice", default=VOICE)
@@ -398,7 +414,7 @@ def main():
     if a.vosk:
         from vosk import Model, SetLogLevel; SetLogLevel(-1); vm = Model(a.vosk)
     _, voice = parse_candidate(a.voice, k)
-    {"heldsound": heldsound, "heldsound2": heldsound2, "script": script, "redo": redo, "keywords": keywords, "ui": ui, "blendwords": blendwords}[a.batch](k, a, vm, voice)
+    {"heldsound": heldsound, "heldsound2": heldsound2, "script": script, "redo": redo, "keywords": keywords, "ui": ui, "blendwords": blendwords, "vo": vo}[a.batch](k, a, vm, voice)
 
 if __name__ == "__main__":
     main()

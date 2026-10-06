@@ -54,6 +54,31 @@ UI_LINES = {
     "ui_pick_avatar":   ("Pick your animal friend!", 0.95, "card 07b: avatar-only onboarding"),
 }
 
+# Lesson voice lines still on Edge TTS in the app (audio/ui/vo_*.mp3). Only the 19 the code plays
+# (VoContext users and the rotating correct/encourage/hint lines). Kokoro remakes, 2026-10-06.
+# Two texts changed to match the app today; the source column says so.
+LESSON_VO = {
+    "vo_welcome_01":         ("Hi there! I'm so happy you're here. Let's play and learn together!", 0.95, "welcome (unchanged text)"),
+    "vo_encourage_01":       ("Good try! Let's listen again.", 0.95, "wrong answer, rotating 1 of 3"),
+    "vo_encourage_02":       ("Almost! One more try, you can do it!", 0.95, "wrong answer, rotating 2 of 3"),
+    "vo_encourage_03":       ("Let's practice one more time.", 0.95, "wrong answer, rotating 3 of 3"),
+    "vo_correct_01":         ("Yes! That's it!", 0.95, "correct, rotating 1 of 2"),
+    "vo_correct_02":         ("Perfect! Great job!", 0.95, "correct, rotating 2 of 2"),
+    "vo_hint_01":            ("Hmm, let's think about this together.", 0.95, "hint, rotating 1 of 2"),
+    "vo_hint_02":            ("Here's a little help!", 0.95, "hint, rotating 2 of 2"),
+    "vo_streak_01":          ("You've been practicing every day, amazing!", 0.95, "Blend It complete streak (adviser memo asks about child-facing streaks)"),
+    "vo_complete_01":        ("You did it! I'm so proud of you!", 0.95, "letter / blend complete"),
+    "vo_unlock_01":          ("A new letter is ready for you!", 0.95, "letter complete, next node unlocked"),
+    "vo_blendit_intro_01":   ("Let's build some words together!", 0.95, "Blend It intro"),
+    "vo_findit_intro_01":    ("Can you find all the pictures that start with this sound?", 0.95, "Find It intro. CHANGED: was 'the picture that matches the sound'; Find It has 3 targets"),
+    "vo_sayit_intro_01":     ("Your turn! Say it into the microphone.", 0.95, "Say It intro (sound mode). CHANGED: was 'Say the sound'; Say It scores the word (AGENTS.md hybrid decision)"),
+    "vo_sayit_word_intro_01": ("Now it's your turn! Say the whole word clearly into the microphone!", 0.95, "Say It intro (word mode)"),
+    "vo_quiet_check_01":     ("Let's be as quiet as a mouse before we start listening!", 0.95, "before listening"),
+    "vo_noise_alert_01":     ("It's a little noisy right now. Let's find a quiet spot!", 0.95, "noise alert"),
+    "vo_map_tarana":         ("Let's go! Tap a letter to begin our adventure!", 0.95, "map greeting"),
+    "vo_parent_gate":        ("Grown-ups only. Solve the math problem to continue.", 0.95, "parent gate (adult-facing)"),
+}
+
 # Per-letter cues. Only m (praise) and f (substitution) are written in the spec; the rest are
 # [proposed] drafts listed in the proposal for teachers, and fall back as shown.
 ARTICULATION_CUES = {"m": "cue_lips_together"}
