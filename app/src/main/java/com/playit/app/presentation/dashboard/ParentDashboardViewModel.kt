@@ -8,6 +8,7 @@ import com.playit.app.domain.model.Profile
 import com.playit.app.domain.model.ProfileDashboardData
 import com.playit.app.domain.model.ReportData
 import com.playit.app.domain.repository.ProfileRepository
+import com.playit.app.navigation.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -38,11 +39,16 @@ data class ParentDashboardUiState(
 class ParentDashboardViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val reportGenerator: ReportGenerator,
-    private val pdfExporter: PdfExporter
+    private val pdfExporter: PdfExporter,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ParentDashboardUiState())
     val uiState: StateFlow<ParentDashboardUiState> = _uiState.asStateFlow()
+
+    private var hasDeleted = false
+    private val _noProfilesLeft = MutableStateFlow(false)
+    val noProfilesLeft: StateFlow<Boolean> = _noProfilesLeft.asStateFlow()
 
     init {
         loadProfiles()
@@ -52,6 +58,9 @@ class ParentDashboardViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 profileRepository.getAllProfiles().collectLatest { profiles ->
+                    if (hasDeleted && profiles.isEmpty()) {
+                        _noProfilesLeft.value = true
+                    }
                     val currentSelected = _uiState.value.selectedProfile
                         ?.let { sel -> profiles.firstOrNull { it.id == sel.id } }
                         ?: profiles.firstOrNull()
@@ -60,7 +69,7 @@ class ParentDashboardViewModel @Inject constructor(
                         selectedProfile = currentSelected
                     )
                     currentSelected?.let { selectProfile(it) } ?: run {
-                        _uiState.value = _uiState.value.copy(isLoading = false)
+                        _uiState.value = _uiState.value.copy(isLoading = false, dashboardData = null)
                     }
                 }
             } catch (e: Exception) {
@@ -122,6 +131,19 @@ class ParentDashboardViewModel @Inject constructor(
         }
         viewModelScope.launch {
             profileRepository.updateProfile(profile.copy(name = trimmed))
+        }
+    }
+
+    fun deleteProfile(profile: Profile) {
+        hasDeleted = true
+        viewModelScope.launch {
+            profileRepository.deleteProfile(profile)
+            if (sessionManager.activeProfileId.value == profile.id) {
+                sessionManager.clearActiveProfile()
+            }
+            if (_uiState.value.selectedProfile?.id == profile.id) {
+                _uiState.value = _uiState.value.copy(selectedProfile = null)
+            }
         }
     }
 }

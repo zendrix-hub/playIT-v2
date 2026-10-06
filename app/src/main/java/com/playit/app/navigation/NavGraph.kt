@@ -220,6 +220,9 @@ fun NavGraph(
                 },
                 onReportPreview = { file ->
                     navController.navigate(Routes.reportPreview(file.absolutePath))
+                },
+                onAllProfilesDeleted = {
+                    navController.navigate(Routes.PROFILE_SELECT) { popUpTo(0) }
                 }
             )
         }

@@ -424,3 +424,31 @@ Claude applied plan Tasks 1 and 2 to a throwaway worktree (`~/.playit-env/spike-
 4. **A real, pre-existing crash:** `init {}` before later properties in 5 ViewModels, with an NPE in `BlendItViewModel`. This is the new **card 17b**.
 
 Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design), and the screens render correctly. Tonight's order for agy: **14 → 17 → 17b**, and card 25 in the image session.
+
+### agy, 2026-10-06 (night): Card 14 executed; Card 25 image session paused on quota
+
+#### 1. Card 14: Privacy Pack (FR-14)
+- **Manifest & Backup Rules**:
+  - `AndroidManifest.xml`: set `android:allowBackup="false"`, `android:dataExtractionRules="@xml/data_extraction_rules"`, `android:fullBackupContent="@xml/backup_rules"`.
+  - Added `app/src/main/res/xml/backup_rules.xml` and `data_extraction_rules.xml` excluding `root`, `file`, `database`, `sharedpref`, `external` domains across cloud backup and device transfer.
+- **ParentDashboardViewModel (`ParentDashboardViewModel.kt`)**:
+  - Injected `sessionManager: SessionManager`.
+  - Added `deleteProfile(profile: Profile)` which calls `profileRepository.deleteProfile(profile)`, clears session if active, and resets `selectedProfile` to trigger next selection.
+  - Added `val noProfilesLeft: StateFlow<Boolean>` emitting true when profile list becomes empty after a deletion.
+- **LearnerHeroCard (`LearnerHeroCard.kt`)**:
+  - Added `onDelete: () -> Unit = {}`.
+  - Added "Delete this child's data" text button (48dp height) opening confirmation dialog with `GentleCorrectionOrange` delete button.
+- **ParentDashboardScreen & Navigation**:
+  - Wired `onDelete = { viewModel.deleteProfile(dashboardData.profile) }`.
+  - Added `onAllProfilesDeleted = { navController.navigate(Routes.PROFILE_SELECT) { popUpTo(0) } }` in `NavGraph.kt`.
+  - Added "Privacy" button opening `PrivacyNoticeDialog.kt` with the 5 required bullets verbatim.
+- **Tests Added/Updated**:
+  - `ManifestPrivacyTest.kt`: `backupIsDisabled`.
+  - `ParentDashboardViewModelTest.kt`: `deleteProfile_callsRepository`, `deleteActiveProfile_clearsSession`, `deleteOtherProfile_keepsSession`, `deleteLastProfile_setsNoProfilesLeft`.
+  - Zero-emoji policy check passed (0 violations).
+
+#### 2. Card 25: Image Session (Mouth Shapes)
+- Generated `round-01/mouth_lips_together__v1.png` (1024x1024, corner check passed > 235).
+- Hit daily quota on `gemini-3.1-flash-image` (429 RESOURCE_EXHAUSTED; resets 2026-10-08T11:11:18Z).
+- Followed Card 25 quota rule: generated review page at `Documents/playIT-image-batches/2026-10-07-mouth-shapes/round-01/index.html` and recorded `STATUS.md`.
+

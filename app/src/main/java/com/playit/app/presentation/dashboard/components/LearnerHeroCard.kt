@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.text.style.TextAlign
 import com.playit.app.domain.model.ProfileDashboardData
 import com.playit.app.presentation.components.GummyButton
 import com.playit.app.presentation.components.GummyTextField
@@ -38,9 +39,11 @@ import com.playit.app.presentation.theme.*
 fun LearnerHeroCard(
     data: ProfileDashboardData,
     onRename: (String) -> Unit = {},
+    onDelete: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showRenameDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
     var newName by remember { mutableStateOf("") }
 
     val masteryFraction = if (data.totalLettersCount > 0) {
@@ -132,6 +135,81 @@ fun LearnerHeroCard(
         }
     }
 
+    if (showDeleteDialog) {
+        Dialog(onDismissRequest = { showDeleteDialog = false }) {
+            Surface(
+                shape = DialogShape,
+                color = SurfaceCard,
+                border = BorderStroke(2.5.dp, ModernBorder),
+                shadowElevation = 12.dp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Delete ${data.profile.name}'s data?",
+                        fontFamily = LexendFontFamily,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = TextMidnight,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = "This removes this child's profile, stars and progress from this device. It cannot be undone.",
+                        fontFamily = LexendFontFamily,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = TextMuted,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        TextButton(
+                            onClick = { showDeleteDialog = false },
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp)
+                        ) {
+                            Text(
+                                text = "Cancel",
+                                fontFamily = LexendFontFamily,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = TextMuted
+                            )
+                        }
+
+                        GummyButton(
+                            text = "Delete",
+                            backgroundColor = GentleCorrectionOrange,
+                            shadowColor = GentleCorrectionOrangeShadow,
+                            contentColor = Color.White,
+                            onClick = {
+                                showDeleteDialog = false
+                                onDelete()
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = CardShape,
@@ -188,6 +266,19 @@ fun LearnerHeroCard(
                         fontWeight = FontWeight.Medium,
                         color = TextMuted
                     )
+                    TextButton(
+                        onClick = { showDeleteDialog = true },
+                        modifier = Modifier.height(48.dp),
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Text(
+                            text = "Delete this child's data",
+                            fontFamily = LexendFontFamily,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = TextMuted
+                        )
+                    }
                 }
 
                 // Streak Pill
