@@ -448,9 +448,15 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - Zero-emoji policy check passed (0 violations).
 
 #### 2. Card 25: Image Session (Mouth Shapes)
-- Generated `round-01/mouth_lips_together__v1.png` (1024x1024, corner check passed > 235).
-- Hit daily quota on `gemini-3.1-flash-image` (429 RESOURCE_EXHAUSTED; resets 2026-10-08T11:11:18Z).
-- Followed Card 25 quota rule: generated review page at `Documents/playIT-image-batches/2026-10-07-mouth-shapes/round-01/index.html` and recorded `STATUS.md`.
+- **Batch Directory**: `C:\Users\Zendrix\Documents\playIT-image-batches\2026-10-07-mouth-shapes\`
+- **Completed Assets (Item 1 - lips together)**:
+  - `mouth_lips_together__v1.png` (1024x1024, Pillow corner check > 235 passed).
+  - `mouth_lips_together__v2.png` (1024x1024, Pillow corner check > 235 passed).
+  - Both variants logged in `round-01/generation_log.jsonl` and rendered on review page `round-01/index.html`.
+- **Quota Status & Next Steps**:
+  - Model `gemini-3.1-flash-image` (Nano Banana Pro) hit `429 RESOURCE_EXHAUSTED` (Google quota countdown targeting `2026-10-08T11:11:18Z`, ~36 hours remaining).
+  - Automated background hourly monitor (`task-225`) is active and will autonomously resume generation for the remaining 8 items (`mouth_teeth_on_lip` through `mouth_open_breath`) once quota refills.
+  - Per Card 25 quota rule, `STATUS.md` is updated and the review page is ready.
 
 #### 3. Card 17: Performance and Calm Motion Foundation (NFR-PERF-01)
 - **Manifest**: Added `android:screenOrientation="portrait"` to `MainActivity`.
