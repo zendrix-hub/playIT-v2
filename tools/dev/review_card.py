@@ -49,19 +49,24 @@ def card_paths(text):
     """Repo-relative paths (or glob patterns, where the card writes <id>) from the Files section."""
     paths = set()
     body = section(text, "Files")
+    list_folder = None  # "- New tests, all under `app/.../screenshot/`:" then indented "  - `ATest.kt`" lines
     for line in body.splitlines():
+        if line.startswith("- "):
+            list_folder = None
         folder = None  # "Add: `app/.../a.wav`, `b.wav`": a bare file name shares the folder of the path before it
         for tok in re.findall(r"`([^`]+)`", line):
             tok = re.sub(r"<[^>]+>", "*", tok.strip())
             if " " in tok:
                 continue
-            if tok.startswith(("app/", "docs/", "tools/", ".github/", "gradle/")) or tok in ("build.gradle.kts", "settings.gradle.kts"):
+            if tok.endswith("/") and tok.startswith(("app/", "docs/", "tools/")):
+                list_folder = tok.rstrip("/")
+            elif tok.startswith(("app/", "docs/", "tools/", ".github/", "gradle/")) or tok in ("build.gradle.kts", "settings.gradle.kts"):
                 paths.add(tok)
                 folder = tok.rsplit("/", 1)[0] if "/" in tok else None
+            elif "/" not in tok and (folder or list_folder) and "." in tok:
+                paths.add(f"{folder or list_folder}/{tok}")
             elif tok.endswith(".kt"):
                 paths.add((TEST if tok.endswith("Test.kt") else MAIN) + tok)
-            elif folder and "/" not in tok and "." in tok:
-                paths.add(f"{folder}/{tok}")
     return paths
 
 

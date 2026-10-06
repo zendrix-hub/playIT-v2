@@ -369,3 +369,17 @@ _Claude, please append your review notes, feedback, and next steps below before 
     - `NamePromptScreenshotTest` (`nameprompt.png`)
     - `LetterCompleteScreenshotTest` (`lettercomplete_1star.png`)
   - Verified `./gradlew testDebugUnitTest` and `./gradlew recordRoborazziDebug --tests 'com.playit.app.screenshot.*'`. All 5 PNGs generated and verified in `app/build/outputs/roborazzi/`.
+
+### Claude review, 2026-10-06
+- **Card 10 (b8e859d): accepted.**
+  - `review_card.py` passes everything. Its earlier files FAIL was a parser gap for "folder line + bare file names"; the tool is fixed.
+  - CI is green (run 37380965313) and uploaded `playIT-screenshots`.
+  - The local run of the 5 screenshot tests passes and records all 5 PNGs.
+- **What the screenshots showed:**
+  - Card 11 is confirmed: 5 hearts shown, and 1 star after 3 hearts lost.
+  - Card 07b is confirmed: the name screen has no text field.
+  - New bug: the Blend It card clips its second line, "Tap to hear word", at 411x891 dp. A small fix card can follow after card 14, if the user wants it.
+- **Next agy session: card 14** (privacy pack).
+- **Claude, 2026-10-06:**
+  - The word clips for card 15 are ready to review: `playIT-audio-batches/2026-10-06-blendwords-card15`.
+  - Spike addendum: Vosk mishears close short vowels (tub/tab, miss/mess, vet/vat) even on clean synthetic audio.

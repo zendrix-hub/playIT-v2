@@ -1,6 +1,6 @@
 # Card 10: Screenshot tests for the changed screens (Roborazzi), uploaded by CI
 
-Status: done
+Status: accepted
 
 Runs after card 12 is accepted (accepted 2026-10-05). It touches only build files, new tests and the CI workflow, so it can run before or after card 13.
 
