@@ -48,6 +48,8 @@ class HearItScreenshotTest {
         val vm = HearItViewModel(repo, player, resolver, handle)
         compose.setContent { PlayItTheme { HearItScreen(vm, onNext = {}, onBack = {}) } }
         compose.waitForIdle()
+        compose.waitUntil(5_000) { com.playit.app.presentation.components.AssetDecodeTracker.isIdle() }
+        compose.waitForIdle()
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/hearit_letter_m.png")
     }
 }

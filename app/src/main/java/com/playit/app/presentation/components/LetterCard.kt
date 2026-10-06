@@ -85,7 +85,6 @@ fun LetterCard(
             .height(290.dp)
             .padding(horizontal = 8.dp)
             .graphicsLayer { rotationZ = cardRotation }
-            .breathingPulse()
     ) {
         Box(
             modifier = Modifier
@@ -161,7 +160,6 @@ fun LetterCard(
                 GummyMotionAsset(
                     assetPath = pictureAsset,
                     contentDescription = if (promptMode) "Say the word $displayWord" else displayWord,
-                    isIdleFloating = true,
                     floatDistance = 5.dp,
                     modifier = Modifier.size(92.dp),
                     onClick = onTapReplay

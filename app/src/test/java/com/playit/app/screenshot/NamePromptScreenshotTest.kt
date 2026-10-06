@@ -38,6 +38,8 @@ class NamePromptScreenshotTest {
 
         compose.setContent { PlayItTheme { NamePromptScreen(vm, onProfileCreated = {}, onBack = {}) } }
         compose.waitForIdle()
+        compose.waitUntil(5_000) { com.playit.app.presentation.components.AssetDecodeTracker.isIdle() }
+        compose.waitForIdle()
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/nameprompt.png")
     }
 }

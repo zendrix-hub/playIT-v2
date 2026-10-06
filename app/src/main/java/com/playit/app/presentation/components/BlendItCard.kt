@@ -69,7 +69,6 @@ fun BlendItCard(
                     GummyMotionAsset(
                         assetPath = assetPath,
                         contentDescription = "Blend word illustration: $cleanWord",
-                        isIdleFloating = true,
                         floatDistance = 4.dp,
                         celebrateTrigger = isCorrect,
                         modifier = Modifier.size(92.dp)

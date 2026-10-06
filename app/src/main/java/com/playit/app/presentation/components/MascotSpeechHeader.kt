@@ -1,14 +1,8 @@
 package com.playit.app.presentation.components
 
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -73,25 +67,6 @@ fun MascotSpeechHeader(
     )
 
     val isReducedMotion = LocalReducedMotion.current
-    val infiniteTransition = rememberInfiniteTransition(label = "mascotBreathe")
-    val breatheScaleY by infiniteTransition.animateFloat(
-        initialValue = 1.0f,
-        targetValue = 1.035f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 3600, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "mascotBreatheY"
-    )
-    val breatheScaleX by infiniteTransition.animateFloat(
-        initialValue = 1.0f,
-        targetValue = 1.018f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 3600, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "mascotBreatheX"
-    )
 
     Row(
         modifier = modifier
@@ -107,8 +82,8 @@ fun MascotSpeechHeader(
                 .graphicsLayer {
                     val ampSquashY = 1.0f + (amplitude.coerceIn(0f, 1f) * 0.25f)
                     val ampSquashX = 1.0f - (amplitude.coerceIn(0f, 1f) * 0.12f)
-                    val scaleXCombined: Float = if (isReducedMotion) tapBounceScale else (tapBounceScale * breatheScaleX * ampSquashX)
-                    val scaleYCombined: Float = if (isReducedMotion) tapBounceScale else (tapBounceScale * breatheScaleY * ampSquashY)
+                    val scaleXCombined: Float = if (isReducedMotion) tapBounceScale else (tapBounceScale * ampSquashX)
+                    val scaleYCombined: Float = if (isReducedMotion) tapBounceScale else (tapBounceScale * ampSquashY)
                     scaleX = scaleXCombined
                     scaleY = scaleYCombined
                     transformOrigin = TransformOrigin(0.5f, 1f)

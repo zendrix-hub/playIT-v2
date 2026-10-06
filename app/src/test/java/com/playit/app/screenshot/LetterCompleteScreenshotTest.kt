@@ -58,6 +58,8 @@ class LetterCompleteScreenshotTest {
 
         compose.setContent { PlayItTheme { LetterCompleteScreen(vm, onReturnToMap = {}) } }
         compose.waitForIdle()
+        compose.waitUntil(5_000) { com.playit.app.presentation.components.AssetDecodeTracker.isIdle() }
+        compose.waitForIdle()
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/lettercomplete_1star.png")
     }
 }

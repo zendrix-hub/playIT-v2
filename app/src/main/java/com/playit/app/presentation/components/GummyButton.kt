@@ -37,8 +37,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -67,7 +65,6 @@ fun GummyContainer(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val isReducedMotion = LocalReducedMotion.current
-    val haptic = LocalHapticFeedback.current
 
     val effectiveFace = if (enabled) faceColor else DisabledColor
     val effectiveShadow = if (enabled) shadowColor else DisabledColorShadow
@@ -108,7 +105,6 @@ fun GummyContainer(
             indication = null,
             enabled = enabled,
             onClick = {
-                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                 onClick()
             }
         )

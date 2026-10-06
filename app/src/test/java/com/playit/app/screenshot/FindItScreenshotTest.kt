@@ -56,6 +56,8 @@ class FindItScreenshotTest {
 
         compose.setContent { PlayItTheme { FindItScreen(vm, onNext = { _, _ -> }, onBack = {}) } }
         compose.waitForIdle()
+        compose.waitUntil(5_000) { com.playit.app.presentation.components.AssetDecodeTracker.isIdle() }
+        compose.waitForIdle()
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/findit_letter_m.png")
     }
 }

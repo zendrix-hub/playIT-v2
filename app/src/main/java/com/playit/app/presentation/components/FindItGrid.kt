@@ -81,7 +81,6 @@ fun FindItCard(
                     GummyMotionAsset(
                         assetPath = item.imagePath,
                         contentDescription = item.word,
-                        isIdleFloating = !isCorrect,
                         floatDistance = 3.dp,
                         celebrateTrigger = isCorrect,
                         modifier = Modifier.size(52.dp)

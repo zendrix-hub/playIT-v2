@@ -452,3 +452,25 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
 - Hit daily quota on `gemini-3.1-flash-image` (429 RESOURCE_EXHAUSTED; resets 2026-10-08T11:11:18Z).
 - Followed Card 25 quota rule: generated review page at `Documents/playIT-image-batches/2026-10-07-mouth-shapes/round-01/index.html` and recorded `STATUS.md`.
 
+#### 3. Card 17: Performance and Calm Motion Foundation (NFR-PERF-01)
+- **Manifest**: Added `android:screenOrientation="portrait"` to `MainActivity`.
+- **Haptic Feedback**: Removed `LocalHapticFeedback` import and `performHapticFeedback` invocation from `GummyButton.kt`.
+- **Calm Motion**:
+  - `PulseModifier.kt`: updated `breathingPulse` and `idleBounce` to check `!enabled || LocalReducedMotion.current` before creating `rememberInfiniteTransition`.
+  - `GummyMotionAsset.kt`: updated `isIdleFloating` default to `false`; `idleFloating` skips before transition creation when disabled or under reduced motion; `celebrationWiggle` skips when reduced motion is true.
+  - Removed `isIdleFloating = true` and `isIdleFloating = !isCorrect` explicit arguments across callers (`LetterCard.kt`, `BlendItCard.kt`, `FindItGrid.kt`, `MascotBubble.kt`).
+  - Removed `.breathingPulse()` from `LetterCard.kt`.
+  - Removed continuous idle breathing transition (`infiniteTransition`, `breatheScaleY`, `breatheScaleX`) from `MascotSpeechHeader.kt`.
+- **Async Downscaled Image Loading**:
+  - Created `AssetImage.kt` with `calculateInSampleSize()`, `AssetDecodeTracker`, and async `rememberAssetPainter(assetPath, maxSize = 160.dp)`.
+  - Re-factored `AssetUtils.kt` to delegate image painting to `AssetImage.kt` while preserving `AssetBitmapCache` and `MascotState`.
+  - Created `PlayItMotion.kt` (replacing unused `Motion.kt`) defining motion constants and spring/snap specs for normal and reduced motion.
+- **Audio Asset Cleanup**:
+  - Deleted 26 duplicate MP3 files under `app/src/main/assets/audio/vo/vo_*.mp3` and stray `app/src/main/assets/audio/tts_[exci_20260816_104503.mp3`.
+- **Screenshot Tests & Policy Verification**:
+  - Modified 5 screenshot tests (`HearItScreenshotTest`, `FindItScreenshotTest`, `BlendItScreenshotTest`, `NamePromptScreenshotTest`, `LetterCompleteScreenshotTest`) to synchronize on `AssetDecodeTracker.isIdle()`.
+  - Created `AssetImageTest.kt` verifying power-of-two downsampling ratios and edge cases.
+  - Created `PerformancePolicyTest.kt` verifying zero haptic feedback calls, portrait manifest lock, zero idle floating caller arguments, and zero endless animations on LetterCard and MascotSpeechHeader.
+  - Verified full test suite passes (`./gradlew testDebugUnitTest`: 206 tests, 0 failures).
+
+
