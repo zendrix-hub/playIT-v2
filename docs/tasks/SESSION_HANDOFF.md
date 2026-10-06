@@ -415,3 +415,12 @@ The user approved `docs/superpowers/plans/2026-10-06-ui-fit-effects-overhaul.md`
 - The "marks the letter for review" claim is removed, because it isn't built.
 - The mic wording matches card 19's time-based ripple.
 - Screenshot tests are now marked as done.
+
+### Claude, 2026-10-06 (evening): dry runs of cards 17 and 18 (before agy runs them)
+Claude applied plan Tasks 1 and 2 to a throwaway worktree (`~/.playit-env/spike-shots`) and ran the full suite and the screenshots. It found and fixed four problems:
+1. **Idle floating:** 4 callers passed `isIdleFloating = true`, so the card 17 Files list now names them, plus a policy test.
+2. **Async picture loading:** screenshots could capture before the pictures decoded. Fix: `AssetDecodeTracker`, and the screenshot tests wait for it.
+3. **`GummyContainer`:** the plan's `propagateMinConstraints` version made fill buttons ("Let's Play") fill the whole screen. It is replaced by a custom `Layout` in plan Task 2, which is tested.
+4. **A real, pre-existing crash:** `init {}` before later properties in 5 ViewModels, with an NPE in `BlendItViewModel`. This is the new **card 17b**.
+
+Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design), and the screens render correctly. Tonight's order for agy: **14 → 17 → 17b**, and card 25 in the image session.

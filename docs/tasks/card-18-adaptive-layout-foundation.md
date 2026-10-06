@@ -1,10 +1,12 @@
 # Card 18: Adaptive layout foundation and the device matrix
 
-Status: ready after 17 is accepted
+Status: ready after 17b is accepted
 
 **This card's steps, code and test code are in the plan:** `docs/superpowers/plans/2026-10-06-ui-fit-effects-overhaul.md`, section "Task 2". Follow Steps 1-5 there exactly, in order (failing test first). Read the plan's "Global Constraints" before you start; they apply to every card. This card holds what the review checks: the Files list, the Tests table and the commit.
 
 ## Why
+**Dry-run note (Claude, 2026-10-06):** the plan's `GummyContainer` code was replaced after a dry run. Use the custom `Layout` version now in plan Task 2. The test files in the plan are complete and compiled. With cards 17, 17b and this card applied, the full suite was 260 tests, 0 failed, and the 4 scaffold sizes and 5 screens rendered correctly.
+
 - `GummyContainer` draws its face with `matchParentSize()`, so content can never size it. Every button and card is stuck at its minimum, and content spills out. Examples: the Blend It card (176 dp); the Find It "Hear" pill, whose `wrapContentWidth()` collapses to 0 width.
 - There are no dimension tokens: 164 hard-coded `fontSize` values and fixed card sizes such as `LetterCard` 280x290.
 - `MascotSpeechHeader` takes about 260 dp on a 360-wide screen: an 86x98 dp mascot plus 24 sp text in a 132 dp column.

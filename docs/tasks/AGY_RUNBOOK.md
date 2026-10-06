@@ -109,7 +109,8 @@ Code relay (agy session A), in this order:
 |---|---|---|---|
 | 1 | 14 | ready, next | Privacy pack |
 | 2 | 17 | ready (after 14; files don't overlap, so both may run tonight) | Plan Task 1: performance and calm motion (no haptics, downscaled images, portrait) |
-| 3 | 18 | after 17 is accepted | Plan Task 2: adaptive layout foundation + 4-size layout tests |
+| 2b | 17b | ready (after 17; files don't overlap 14 or 17) | ViewModel init order: a start-up crash found by Claude's dry run |
+| 3 | 18 | after 17b is accepted | Plan Task 2: adaptive layout foundation + 4-size layout tests |
 | 4 | 19 | after 18 | Plan Task 3: Hear It + Say It fit, mic states |
 | 5 | 20 | after 19 | Plan Task 4: Find It + Blend It fit (supersedes card 16) |
 | 6 | 21 | after 20 | Plan Task 5: complete, splash, profile screens (may move past the cut line) |

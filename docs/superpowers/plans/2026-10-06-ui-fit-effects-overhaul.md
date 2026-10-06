@@ -106,7 +106,7 @@ New files, each with one responsibility:
 | Day | agy (main executor) | Claude (second hand) |
 |---|---|---|
 | Tue Oct 6 | Card 14 (privacy, already ready) | Write cards 17-25 from this plan; mouth-shape brief; reviewer corrections |
-| Wed Oct 7 | **Card 17** (Task 1: performance and calm motion) | Review card 14. Audio: Kokoro remakes of the lesson VO lines (review page) |
+| Wed Oct 7 | **Card 17** (Task 1: performance and calm motion), then **card 17b** (ViewModel init order; found by the dry run) | Review card 14. Audio: Kokoro remakes of the lesson VO lines (review page) |
 | Thu Oct 8 | **Card 18** (Task 2: adaptive foundation) | Review card 17 on the A21s checklist |
 | Fri Oct 9 | **Card 19** (Task 3: Hear It + Say It + mic states) | Review card 18; image session brief for mouth shapes (card 25 ready) |
 | Mon Oct 12 | **Card 20** (Task 4: Find It + Blend It) | Review card 19; image release for batch 1, if the user OK'd it |
@@ -440,7 +440,31 @@ class DimensTest {
 ```
 
 ```kotlin
-// GummyContainerLayoutTest.kt: Robolectric, same runner annotations as card 10's screenshot tests
+// GummyContainerLayoutTest.kt: Robolectric, same runner annotations as card 10's screenshot tests (complete file, compiled in the dry run)
+package com.playit.app.presentation.components
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material3.Text
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.getBoundsInRoot
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.unit.dp
+import com.playit.app.presentation.theme.PlayItTheme
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import org.robolectric.annotation.GraphicsMode
+
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [34], qualifiers = "w360dp-h740dp-xhdpi")
@@ -513,7 +537,35 @@ fun WithFontScale(fontScale: Float, content: @Composable () -> Unit) {
 ```
 
 ```kotlin
-// LayoutMatrixTest.kt: shared checks; each subclass fixes the screen size with @Config
+// LayoutMatrixTest.kt: shared checks; each subclass fixes the screen size with @Config (complete file, compiled in the dry run)
+package com.playit.app.screenshot
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.getBoundsInRoot
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.unit.dp
+import com.github.takahirom.roborazzi.captureRoboImage
+import com.playit.app.presentation.components.AssetDecodeTracker
+import com.playit.app.presentation.components.LessonScaffold
+import com.playit.app.presentation.components.MascotSpeechHeader
+import com.playit.app.presentation.theme.PlayItTheme
+import org.junit.Assume.assumeTrue
+import org.junit.Assert.assertTrue
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import org.robolectric.annotation.GraphicsMode
+
 // (the size must be set before the test activity starts, so it can't be a runtime parameter).
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 abstract class LayoutMatrixTest(private val deviceName: String) {
@@ -619,7 +671,7 @@ data class PlayItDimens(
 
 fun dimensFor(profile: WindowProfile): PlayItDimens = when (profile) {
     WindowProfile.COMPACT -> PlayItDimens(profile, 16.dp, 560.dp, 64.dp, 18, 3, 210.dp, 76.dp, 96.dp, 96.dp, 1.5f, 64.dp, 68.dp, 112.dp)
-    WindowProfile.REGULAR -> PlayItDimens(profile, 20.dp, 560.dp, 80.dp, 20, 3, 250.dp, 88.dp, 112.dp, 112.dp, 1.2f, 68.dp, 76.dp, 140.dp)
+    WindowProfile.REGULAR -> PlayItDimens(profile, 20.dp, 560.dp, 80.dp, 20, 4, 250.dp, 88.dp, 112.dp, 112.dp, 1.2f, 68.dp, 76.dp, 140.dp)
     WindowProfile.WIDE -> PlayItDimens(profile, 32.dp, 560.dp, 96.dp, 22, 4, 300.dp, 96.dp, 128.dp, 132.dp, 1.2f, 76.dp, 88.dp, 160.dp)
 }
 
@@ -630,45 +682,79 @@ val LocalPlayItDimens = staticCompositionLocalOf { dimensFor(WindowProfile.REGUL
 - Read `val cfg = LocalConfiguration.current`.
 - Provide `LocalPlayItDimens provides dimensFor(windowProfileFor(cfg.screenWidthDp, cfg.screenHeightDp))` next to `LocalReducedMotion`.
 
-`GummyContainer` keeps the same signature and visuals but changes how it measures:
-- The outer Box gets `propagateMinConstraints = true`.
-- The face Box is **not** `matchParentSize`. It gets `propagateMinConstraints = true`, so it is at least the requested minimum and grows with its content.
-- Content sits in an inner centred Box, so small content keeps its natural size.
+`GummyContainer` keeps the same signature and visuals but changes how it measures. Use a custom `Layout`:
+1. Ask the face for its content's natural (intrinsic) size.
+2. Clamp it to the caller's limits.
+3. Measure the depth band and the face at exactly that size.
 
-Replace the face block (`GummyButton.kt:136-159`) with:
+Big content then grows the container instead of spilling out, and content that uses `fillMaxSize` still fills only the container.
+
+**Don't use `propagateMinConstraints` for this.** Claude's dry run (2026-10-06) found that it made fill-content buttons, such as "Let's Play", grow to the whole free height. `Modifier.height(IntrinsicSize.Min)` doesn't work either: a Box whose children all use `matchParentSize` reports a natural size of 0.
+
+Replace the outer `Box(modifier = modifier.graphicsLayer { ... }.then(clickableModifier)) { ... }` of `GummyContainer` with this. Add `import androidx.compose.ui.layout.Layout` and `import androidx.compose.ui.unit.Constraints`:
 ```kotlin
-Box(
-    modifier = modifier
-        .graphicsLayer { scaleX = squashScaleX; scaleY = squashScaleY }
-        .then(clickableModifier),
-    contentAlignment = Alignment.Center,
-    propagateMinConstraints = true
-) {
-    Box(
-        modifier = Modifier
-            .matchParentSize()
-            .offset(y = depthHeight)
-            .background(effectiveShadow, shape)
-            .border(strokeWidth, strokeColor, shape)
-    )
-    Box(
-        modifier = Modifier
-            .offset { IntOffset(0, pressOffsetY.dp.roundToPx()) }
-            .background(effectiveFace, shape)
-            .border(strokeWidth, strokeColor, shape),
-        propagateMinConstraints = true
-    ) {
-        Box(contentAlignment = Alignment.Center) {
+    // Custom layout: the container is as big as its content's natural size, clamped to the caller's
+    // limits (size/heightIn/fillMaxWidth). Big content grows it instead of spilling out, and content
+    // that uses fillMaxSize still fills only the container (Claude dry run 2026-10-06).
+    Layout(
+        modifier = modifier
+            .graphicsLayer {
+                scaleX = squashScaleX
+                scaleY = squashScaleY
+            }
+            .then(clickableModifier),
+        content = {
+            // Bottom depth band layer (shadow color)
             Box(
-                Modifier.matchParentSize().clip(shape).background(
-                    Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.22f), Color.White.copy(alpha = 0.04f), Color.Transparent))
-                )
+                modifier = Modifier
+                    .offset(y = depthHeight)
+                    .background(effectiveShadow, shape)
+                    .border(strokeWidth, strokeColor, shape)
             )
-            content()
+            // Top face layer (face color + content) translated down on press
+            Box(
+                modifier = Modifier
+                    .offset { IntOffset(0, pressOffsetY.dp.roundToPx()) }
+                    .background(effectiveFace, shape)
+                    .border(strokeWidth, strokeColor, shape),
+                contentAlignment = Alignment.Center
+            ) {
+                // Modern subtle top gloss highlight sheen
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clip(shape)
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.White.copy(alpha = 0.22f),
+                                    Color.White.copy(alpha = 0.04f),
+                                    Color.Transparent
+                                )
+                            )
+                        )
+                )
+                content()
+            }
+        }
+    ) { measurables, constraints ->
+        val band = measurables[0]
+        val face = measurables[1]
+        val width = if (constraints.hasFixedWidth) constraints.maxWidth
+            else face.maxIntrinsicWidth(constraints.maxHeight).coerceIn(constraints.minWidth, constraints.maxWidth)
+        val height = if (constraints.hasFixedHeight) constraints.maxHeight
+            else face.minIntrinsicHeight(width).coerceIn(constraints.minHeight, constraints.maxHeight)
+        val exact = Constraints.fixed(width, height)
+        val bandPlaceable = band.measure(exact)
+        val facePlaceable = face.measure(exact)
+        layout(width, height) {
+            bandPlaceable.place(0, 0)
+            facePlaceable.place(0, 0)
         }
     }
-}
 ```
+This code passed all 260 tests and the 5 screenshot screens in the dry run.
+
 Change every caller's fixed `.height(N.dp)` on a gummy component to `.heightIn(min = N.dp)` (the Files list says how to find them).
 
 `LessonScaffold.kt` fills the screen when the content fits, scrolls when it doesn't, caps the width and pins the bottom bar:
