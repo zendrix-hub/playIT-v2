@@ -6,4 +6,4 @@ Goal: every area drilled at least twice before Week 9, plus a full mock defense 
 
 | Date | Area | Questions | Correct | Incomplete | Risky | Weak spots to redo |
 |---|---|---|---|---|---|---|
-| | | | | | | |
+| 2026-10-07 | A: speech recognition and audio (worked example: Claude gave model answers at the user's request) | 6 (Q1 recognizer choice; Q2 accuracy on children; Q3 pure sound vs key word; Q4 letter-name foil; Q5 own testing incl. short-vowel finding; Q6 synthetic voice and teacher audit) | — | — | — | Next session: the same 6 questions without the answers shown; focus Q2 (accuracy, kappa) and Q3 (word vs sound) |
