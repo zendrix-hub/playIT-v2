@@ -1,6 +1,6 @@
 # Card 14: Privacy pack: no cloud backup, delete a child's data, privacy notice (FR-14)
 
-Status: done
+Status: accepted
 
 Runs after card 10 is accepted. It touches the Parent Zone, which no open card edits.
 

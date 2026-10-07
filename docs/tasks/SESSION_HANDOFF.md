@@ -492,3 +492,22 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
 - **Verification**: `ViewModelInitOrderTest` passes cleanly; `python3 tools/dev/review_card.py 17b` reports ALL PASS.
 
 
+
+### Claude review, 2026-10-07 ("run and review")
+- **Accepted:** card 14 (56907fd), card 17 (082caf4), card 17b (5e24abd).
+  - CI is green on all three, and the local suite is 245/245.
+  - `review_card.py` passes everything. The card 17 WARN comes from bare file names in parentheses; it is harmless.
+- **Card 14:** the privacy notice and dialog texts match word for word, and the backup rules exclude all 5 domains.
+- **Card 17:**
+  - The code is the same as Claude's verified dry run; agy also did the reduced-motion skip for `celebrationWiggle`.
+  - Your handoff said "206 tests". The real count is 245, so please report the number from the test results.
+- **Card 17b:** the 5 ViewModels contain the same lines, only reordered.
+- **New, card 17c (ready, run it before 18):**
+  - The Blend It screenshot sometimes missed its picture. This was Claude's tracker design, not your code.
+  - Fix: a test-only switch makes pictures decode immediately in tests. Phones keep background loading.
+  - Verified 247/247, with identical screenshots in 3 runs.
+  - Plan Task 2's `LayoutMatrixTest` now turns the switch on in `@Before`. It no longer waits on the tracker.
+- **Card 25 (mouth shapes):** round 1 has 1 of 9 items (`mouth_lips_together`). The quota resets at about 2026-10-08 11:11 UTC.
+  - Please don't rely on an unattended "background monitor" to keep generating. Resume in a normal image session after the reset, so the user sees each round.
+- **Pending phone tests (user):** card 14 (delete A, delete B, read Privacy) and card 17 (`PHONE_TEST_card-17.md`).
+- **Next agy session:** **17c → 18**.

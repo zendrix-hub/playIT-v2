@@ -553,11 +553,12 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.dp
 import com.github.takahirom.roborazzi.captureRoboImage
-import com.playit.app.presentation.components.AssetDecodeTracker
+import com.playit.app.presentation.components.AssetImageConfig
 import com.playit.app.presentation.components.LessonScaffold
 import com.playit.app.presentation.components.MascotSpeechHeader
 import com.playit.app.presentation.theme.PlayItTheme
 import org.junit.Assume.assumeTrue
+import org.junit.Before
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -571,6 +572,9 @@ import org.robolectric.annotation.GraphicsMode
 abstract class LayoutMatrixTest(private val deviceName: String) {
     @get:Rule val compose = createComposeRule()
 
+    /** Pictures decode on the first frame in tests, so captures always include them (card 17c). */
+    @Before fun syncImages() { AssetImageConfig.decodeSynchronously = true }
+
     /** Fails if the node's bottom is below the window (the child would have to scroll to reach it). */
     protected fun assertOnScreen(tag: String) {
         val node = compose.onNodeWithTag(tag, useUnmergedTree = true).getBoundsInRoot()
@@ -579,7 +583,6 @@ abstract class LayoutMatrixTest(private val deviceName: String) {
     }
 
     protected fun capture(name: String) {
-        compose.waitUntil(5_000) { AssetDecodeTracker.isIdle() }   // pictures load off the main thread (Task 1)
         compose.waitForIdle()
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/${name}_$deviceName.png")
     }
