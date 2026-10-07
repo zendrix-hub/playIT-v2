@@ -3,8 +3,10 @@ package com.playit.app.data.audio
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import java.io.File
 
 class AudioResolverTest {
 
@@ -60,11 +62,11 @@ class AudioResolverTest {
 
     @Test
     fun getVoPath_returnsCorrectPaths() {
-        assertEquals("audio/ui/vo_welcome_01.mp3", audioResolver.getVoPath(VoContext.WELCOME_01))
+        assertEquals("audio/vo/lesson/vo_welcome_01.wav", audioResolver.getVoPath(VoContext.WELCOME_01))
         assertEquals("audio/ui/vo_return_welcome_01.mp3", audioResolver.getVoPath(VoContext.RETURN_WELCOME_01))
-        assertEquals("audio/ui/vo_findit_intro_01.mp3", audioResolver.getVoPath(VoContext.FINDIT_INTRO_01))
-        assertEquals("audio/ui/vo_sayit_intro_01.mp3", audioResolver.getVoPath(VoContext.SAYIT_INTRO_01))
-        assertEquals("audio/ui/vo_blendit_intro_01.mp3", audioResolver.getVoPath(VoContext.BLENDIT_INTRO_01))
+        assertEquals("audio/vo/lesson/vo_findit_intro_01.wav", audioResolver.getVoPath(VoContext.FINDIT_INTRO_01))
+        assertEquals("audio/vo/lesson/vo_sayit_intro_01.wav", audioResolver.getVoPath(VoContext.SAYIT_INTRO_01))
+        assertEquals("audio/vo/lesson/vo_blendit_intro_01.wav", audioResolver.getVoPath(VoContext.BLENDIT_INTRO_01))
     }
 
     @Test
@@ -73,19 +75,51 @@ class AudioResolverTest {
         val secondCorrect = audioResolver.getRotatingCorrectVo()
         val thirdCorrect = audioResolver.getRotatingCorrectVo()
 
-        assertEquals("audio/ui/vo_correct_01.mp3", firstCorrect)
-        assertEquals("audio/ui/vo_correct_02.mp3", secondCorrect)
-        assertEquals("audio/ui/vo_correct_01.mp3", thirdCorrect)
+        assertEquals("audio/vo/lesson/vo_correct_01.wav", firstCorrect)
+        assertEquals("audio/vo/lesson/vo_correct_02.wav", secondCorrect)
+        assertEquals("audio/vo/lesson/vo_correct_01.wav", thirdCorrect)
 
         val firstEncourage = audioResolver.getRotatingEncourageVo()
         val secondEncourage = audioResolver.getRotatingEncourageVo()
         val thirdEncourage = audioResolver.getRotatingEncourageVo()
         val fourthEncourage = audioResolver.getRotatingEncourageVo()
 
-        assertEquals("audio/ui/vo_encourage_01.mp3", firstEncourage)
-        assertEquals("audio/ui/vo_encourage_02.mp3", secondEncourage)
-        assertEquals("audio/ui/vo_encourage_03.mp3", thirdEncourage)
-        assertEquals("audio/ui/vo_encourage_01.mp3", fourthEncourage)
+        assertEquals("audio/vo/lesson/vo_encourage_01.wav", firstEncourage)
+        assertEquals("audio/vo/lesson/vo_encourage_02.wav", secondEncourage)
+        assertEquals("audio/vo/lesson/vo_encourage_03.wav", thirdEncourage)
+        assertEquals("audio/vo/lesson/vo_encourage_01.wav", fourthEncourage)
+
+        val firstHint = audioResolver.getRotatingHintVo()
+        val secondHint = audioResolver.getRotatingHintVo()
+        val thirdHint = audioResolver.getRotatingHintVo()
+
+        assertEquals("audio/vo/lesson/vo_hint_01.wav", firstHint)
+        assertEquals("audio/vo/lesson/vo_hint_02.wav", secondHint)
+        assertEquals("audio/vo/lesson/vo_hint_01.wav", thirdHint)
+    }
+
+    @Test
+    fun lessonVo_allReleasedLinesUseWav() {
+        val manifestFile = listOf(
+            File("docs/audio-release/2026-10-07/manifest.json"),
+            File("../docs/audio-release/2026-10-07/manifest.json")
+        ).firstOrNull { it.exists() } ?: error("manifest.json not found")
+
+        val assetsDir = listOf(
+            File("src/main/assets"),
+            File("app/src/main/assets")
+        ).firstOrNull { it.exists() } ?: error("assets not found")
+
+        val text = manifestFile.readText()
+        val clipIdPattern = Regex("\"clipId\":\\s*\"([^\"]+)\"")
+        val clipIds = clipIdPattern.findAll(text).map { it.groupValues[1] }.toList()
+        assertTrue("Manifest should have at least 19 clips", clipIds.size >= 19)
+
+        for (clipId in clipIds) {
+            val wavFile = File(assetsDir, "audio/vo/lesson/$clipId.wav")
+            assertTrue("Expected released line to exist on disk: ${wavFile.path}", wavFile.exists())
+            assertTrue("Expected non-empty audio file: ${wavFile.path}", wavFile.length() > 0L)
+        }
     }
 
     @Test
@@ -100,7 +134,8 @@ class AudioResolverTest {
     fun getDevPlaceholderForAsset_mapsProductionPathsToDevPlaceholders() {
         assertEquals("audio/_dev_placeholder/phoneme_beep.wav", audioResolver.getDevPlaceholderForAsset("audio/phonemes/phoneme_a.mp3"))
         assertEquals("audio/_dev_placeholder/word_beep.wav", audioResolver.getDevPlaceholderForAsset("audio/words/word_apple.mp3"))
-        assertEquals("audio/_dev_placeholder/vo_tone.wav", audioResolver.getDevPlaceholderForAsset("audio/ui/vo_welcome_01.mp3"))
+        assertEquals("audio/_dev_placeholder/vo_tone.wav", audioResolver.getDevPlaceholderForAsset("audio/ui/vo_return_welcome_01.mp3"))
+        assertEquals("audio/_dev_placeholder/vo_tone.wav", audioResolver.getDevPlaceholderForAsset("audio/vo/lesson/vo_welcome_01.wav"))
         assertEquals("audio/_dev_placeholder/sfx_chime.wav", audioResolver.getDevPlaceholderForAsset("audio/ui/sfx_correct_chime.mp3"))
     }
 

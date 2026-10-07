@@ -526,3 +526,14 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - card 26 (audio release 2026-10-07, the 19 lesson lines).
 - **Groupmates' test sheet:** `docs/tasks/GROUP_TEST_2026-10-07.md`.
 - **Card 25:** resume after the quota reset (about 19:11 Philippine time) in a normal image session.
+
+### agy, 2026-10-07 (night): Card 26 executed
+- **Card 26: Lesson voice lines in Kokoro voice (NFR-AUD-01)**:
+  - Verified SHA-256 for all 19 clips in `docs/audio-release/2026-10-07/manifest.json`.
+  - Copied 19 clips to `app/src/main/assets/audio/vo/lesson/<clipId>.wav`.
+  - Deleted 19 replaced `.mp3` files from `app/src/main/assets/audio/ui/`.
+  - Updated `AudioResolver.kt`: added `kokoroLessonVo` set, `lessonVoPath()` resolver, updated `getVoPath()` and rotational helpers (`getRotatingCorrectVo`, `getRotatingEncourageVo`, `getRotatingHintVo`), and updated `getDevPlaceholderForAsset()` for `audio/vo/lesson/`.
+  - Updated `AudioResolverTest.kt`: updated expected paths to `.wav` lesson paths and added `lessonVo_allReleasedLinesUseWav` test.
+  - Updated `AudioCompletenessCheckTest.kt`: verified 19 lesson wavs and 2 legacy mp3s.
+  - Verified test suite passes: all 36 actionable tasks green via `./gradlew testDebugUnitTest`.
+

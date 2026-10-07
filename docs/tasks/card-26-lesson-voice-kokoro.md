@@ -1,6 +1,6 @@
 # Card 26: Lesson voice lines in the Kokoro voice (replaces the old Edge TTS)
 
-Status: ready (after 17c; its files don't overlap 17c or 18, so it may run the same night)
+Status: done
 
 ## Why
 Lily's 19 lesson lines are still the old Edge-TTS voice: welcome, correct, try again, hints, intros, unlock, complete. They are `audio/ui/vo_*.mp3`, from `AudioResolver.getVoPath` and the 3 rotating functions. Since 2026-09-30 every other spoken line in the app uses the Kokoro voice, so a child hears two different voices.

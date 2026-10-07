@@ -29,25 +29,30 @@ class AudioCompletenessCheckTest {
     )
 
     private val requiredVoLines = listOf(
-        "vo_welcome_01.mp3",
-        "vo_encourage_01.mp3",
-        "vo_encourage_02.mp3",
-        "vo_encourage_03.mp3",
-        "vo_correct_01.mp3",
-        "vo_correct_02.mp3",
-        "vo_hint_01.mp3",
-        "vo_hint_02.mp3",
+        "vo_welcome_01.wav",
+        "vo_encourage_01.wav",
+        "vo_encourage_02.wav",
+        "vo_encourage_03.wav",
+        "vo_correct_01.wav",
+        "vo_correct_02.wav",
+        "vo_hint_01.wav",
+        "vo_hint_02.wav",
+        "vo_streak_01.wav",
+        "vo_complete_01.wav",
+        "vo_unlock_01.wav",
+        "vo_blendit_intro_01.wav",
+        "vo_findit_intro_01.wav",
+        "vo_sayit_intro_01.wav",
+        "vo_sayit_word_intro_01.wav",
+        "vo_quiet_check_01.wav",
+        "vo_noise_alert_01.wav",
+        "vo_map_tarana.wav",
+        "vo_parent_gate.wav"
+    )
+
+    private val legacyVoLines = listOf(
         "vo_milestone_01.mp3",
-        "vo_streak_01.mp3",
-        "vo_complete_01.mp3",
-        "vo_unlock_01.mp3",
-        "vo_blendit_intro_01.mp3",
-        "vo_findit_intro_01.mp3",
-        "vo_sayit_intro_01.mp3",
-        "vo_sayit_word_intro_01.mp3",
-        "vo_quiet_check_01.mp3",
-        "vo_return_welcome_01.mp3",
-        "vo_noise_alert_01.mp3"
+        "vo_return_welcome_01.mp3"
     )
 
     private val requiredSfxFiles = listOf(
@@ -66,6 +71,7 @@ class AudioCompletenessCheckTest {
         assertEquals(26, requiredPhonemeLetters.size)
         assertEquals(32, requiredWords.size)
         assertEquals(19, requiredVoLines.size)
+        assertEquals(2, legacyVoLines.size)
         assertEquals(8, requiredSfxFiles.size)
     }
 
@@ -74,6 +80,7 @@ class AudioCompletenessCheckTest {
         val phonemesDir = File(assetsAudioDir, "phonemes")
         val wordsDir = File(assetsAudioDir, "words")
         val uiDir = File(assetsAudioDir, "ui")
+        val lessonDir = File(assetsAudioDir, "vo/lesson")
 
         val missing = mutableListOf<String>()
 
@@ -88,6 +95,11 @@ class AudioCompletenessCheckTest {
         }
 
         requiredVoLines.forEach { vo ->
+            val f = File(lessonDir, vo)
+            if (!f.exists()) missing.add(f.path)
+        }
+
+        legacyVoLines.forEach { vo ->
             val f = File(uiDir, vo)
             if (!f.exists()) missing.add(f.path)
         }
