@@ -1,6 +1,6 @@
 # Card 17c: Pictures decode immediately in tests, so screenshots are reliable
 
-Status: ready (after 17b; runs before 18, whose layout tests depend on it)
+Status: done
 
 ## Why
 Claude's review of card 17 (2026-10-07) found that the Blend It screenshot sometimes shows an empty circle where the picture should be.

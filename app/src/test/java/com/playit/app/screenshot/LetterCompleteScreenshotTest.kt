@@ -31,6 +31,8 @@ import org.robolectric.annotation.GraphicsMode
 class LetterCompleteScreenshotTest {
     @get:Rule val compose = createComposeRule()
 
+    @org.junit.Before fun syncImages() { com.playit.app.presentation.components.AssetImageConfig.decodeSynchronously = true }
+
     @Test
     fun letterComplete_threeHeartsLost_oneStar() {
         val phonemeRepo: PhonemeRepository = mockk(relaxed = true)
@@ -58,7 +60,6 @@ class LetterCompleteScreenshotTest {
 
         compose.setContent { PlayItTheme { LetterCompleteScreen(vm, onReturnToMap = {}) } }
         compose.waitForIdle()
-        compose.waitUntil(5_000) { com.playit.app.presentation.components.AssetDecodeTracker.isIdle() }
         compose.waitForIdle()
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/lettercomplete_1star.png")
     }

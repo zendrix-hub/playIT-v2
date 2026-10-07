@@ -544,4 +544,12 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - Updated `AudioResolverTest.kt`: updated standard letters check, added `phonemeM_usesReleasedHeldSound`, `otherPhonemes_keepOldPath`, and `releasedPhoneme_fileExists`.
   - Verified test suite passes locally.
 
+### agy, 2026-10-07 (night): Card 17c executed
+- **Card 17c: Pictures decode immediately in tests so screenshots are reliable (NFR-PERF-01)**:
+  - Added `AssetImageConfig.decodeSynchronously` and synchronous fallback `decodeAsset()` in `AssetImage.kt`.
+  - Created `AssetImageLoadTest.kt` with `pictureIsDecodedOnFirstComposition` and `missingAsset_isTransparentNotCrash`.
+  - Updated 5 screenshot tests (`HearItScreenshotTest`, `FindItScreenshotTest`, `BlendItScreenshotTest`, `NamePromptScreenshotTest`, `LetterCompleteScreenshotTest`) with `@Before fun syncImages() { AssetImageConfig.decodeSynchronously = true }` and removed tracker wait.
+  - Verified `./gradlew testDebugUnitTest` and two runs of `recordRoborazziDebug --tests 'com.playit.app.screenshot.*'` passed cleanly (247 tests, 0 failures; Blend It picture rendered reliably in screenshots).
+
+
 

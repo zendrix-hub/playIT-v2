@@ -26,6 +26,8 @@ import org.robolectric.annotation.GraphicsMode
 class NamePromptScreenshotTest {
     @get:Rule val compose = createComposeRule()
 
+    @org.junit.Before fun syncImages() { com.playit.app.presentation.components.AssetImageConfig.decodeSynchronously = true }
+
     @Test
     fun namePrompt_avatarOnly() {
         val profileRepo: ProfileRepository = mockk(relaxed = true)
@@ -38,7 +40,6 @@ class NamePromptScreenshotTest {
 
         compose.setContent { PlayItTheme { NamePromptScreen(vm, onProfileCreated = {}, onBack = {}) } }
         compose.waitForIdle()
-        compose.waitUntil(5_000) { com.playit.app.presentation.components.AssetDecodeTracker.isIdle() }
         compose.waitForIdle()
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/nameprompt.png")
     }

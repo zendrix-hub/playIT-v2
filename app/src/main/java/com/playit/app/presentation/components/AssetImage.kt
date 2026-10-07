@@ -4,6 +4,7 @@ import android.graphics.BitmapFactory
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
@@ -26,6 +27,15 @@ fun calculateInSampleSize(srcWidth: Int, srcHeight: Int, reqWidth: Int, reqHeigh
 
 private val transparent = ColorPainter(Color.Transparent)
 
+/**
+ * Test switch: when true, pictures decode during composition instead of on a background thread, so
+ * screenshot and layout tests always capture them. Production code never sets it (card 17c; Claude's
+ * review of 2026-10-07 found the background load raced the capture in about 1 run in 5).
+ */
+object AssetImageConfig {
+    @Volatile var decodeSynchronously: Boolean = false
+}
+
 /** Counts decodes in flight, so screenshot tests can wait until every picture on screen has loaded. */
 object AssetDecodeTracker {
     private val pending = java.util.concurrent.atomic.AtomicInteger(0)
@@ -38,11 +48,30 @@ object AssetDecodeTracker {
  * Loads an asset PNG at about [maxSize] (in dp) on a background thread. Shows nothing until
  * it is ready, and nothing if the file is missing (a missing asset never crashes a screen).
  */
+private fun decodeAsset(context: android.content.Context, assetPath: String, reqPx: Int): Painter? =
+    runCatching {
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        context.assets.open(assetPath).use { BitmapFactory.decodeStream(it, null, bounds) }
+        val opts = BitmapFactory.Options().apply {
+            inSampleSize = calculateInSampleSize(bounds.outWidth, bounds.outHeight, reqPx, reqPx)
+        }
+        context.assets.open(assetPath).use { BitmapFactory.decodeStream(it, null, opts) }
+    }.getOrNull()?.let { bmp ->
+        AssetBitmapCache.put("$assetPath@$reqPx", bmp)
+        BitmapPainter(bmp.asImageBitmap())
+    }
+
 @Composable
 fun rememberAssetPainter(assetPath: String, maxSize: Dp = 160.dp): Painter {
     val context = LocalContext.current
     val reqPx = with(LocalDensity.current) { maxSize.roundToPx() }
     val key = "$assetPath@$reqPx"
+    if (AssetImageConfig.decodeSynchronously) {
+        return remember(key) {
+            AssetBitmapCache.get(key)?.let { BitmapPainter(it.asImageBitmap()) }
+                ?: decodeAsset(context, assetPath, reqPx) ?: transparent
+        }
+    }
     val painter by produceState<Painter>(
         initialValue = AssetBitmapCache.get(key)?.let { BitmapPainter(it.asImageBitmap()) } ?: transparent,
         key1 = key

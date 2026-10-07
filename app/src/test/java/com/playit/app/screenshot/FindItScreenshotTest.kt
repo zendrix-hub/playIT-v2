@@ -30,6 +30,8 @@ import org.robolectric.annotation.GraphicsMode
 class FindItScreenshotTest {
     @get:Rule val compose = createComposeRule()
 
+    @org.junit.Before fun syncImages() { com.playit.app.presentation.components.AssetImageConfig.decodeSynchronously = true }
+
     @Test
     fun findIt_letterM_fiveHearts() {
         val fakePhoneme = Phoneme(id = 1, letter = "m", audioPath = "path", imagePath = "images/pictures/picture_mouse.png", exampleWord = "mouse")
@@ -56,7 +58,6 @@ class FindItScreenshotTest {
 
         compose.setContent { PlayItTheme { FindItScreen(vm, onNext = { _, _ -> }, onBack = {}) } }
         compose.waitForIdle()
-        compose.waitUntil(5_000) { com.playit.app.presentation.components.AssetDecodeTracker.isIdle() }
         compose.waitForIdle()
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/findit_letter_m.png")
     }

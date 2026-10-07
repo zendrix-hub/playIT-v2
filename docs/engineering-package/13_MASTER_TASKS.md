@@ -274,7 +274,7 @@ Each card ticks its own item in its commit (see `docs/tasks/AGY_RUNBOOK.md`). A 
 - [ ] Card 16: Blend It word card fits its text (screenshot finding) (FR-13). Superseded by card 20
 - [x] Card 17: Performance and calm motion: no haptics, downscaled images, no endless idle animation, portrait (NFR-PERF-01)
 - [x] Card 17b: ViewModel init blocks run after every property (crash fix from Claude's dry run)
-- [ ] Card 17c: Pictures decode immediately in tests so screenshots are reliable
+- [x] Card 17c: Pictures decode immediately in tests so screenshots are reliable
 - [x] Card 26: Lesson voice lines in the Kokoro voice (NFR-AUD-01)
 - [ ] Card 18: Adaptive layout foundation, LessonScaffold, 4-size layout tests (NFR-ACC-02)
 - [ ] Card 19: Hear It and Say It fit; Say It mic states (FR-03, NFR-ACC-02)

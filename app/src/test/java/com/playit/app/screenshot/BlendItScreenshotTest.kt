@@ -30,6 +30,8 @@ import org.robolectric.annotation.GraphicsMode
 class BlendItScreenshotTest {
     @get:Rule val compose = createComposeRule()
 
+    @org.junit.Before fun syncImages() { com.playit.app.presentation.components.AssetImageConfig.decodeSynchronously = true }
+
     @Test
     fun blendIt_group1_firstWord() {
         val wordRepo: BlendItWordRepository = mockk()
@@ -59,7 +61,6 @@ class BlendItScreenshotTest {
 
         compose.setContent { PlayItTheme { BlendItScreen(vm, onSessionComplete = {}, onBack = {}) } }
         compose.waitForIdle()
-        compose.waitUntil(5_000) { com.playit.app.presentation.components.AssetDecodeTracker.isIdle() }
         compose.waitForIdle()
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/blendit_group1.png")
     }

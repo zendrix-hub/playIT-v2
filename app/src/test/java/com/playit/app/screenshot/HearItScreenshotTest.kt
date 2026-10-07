@@ -30,6 +30,8 @@ import org.robolectric.annotation.GraphicsMode
 class HearItScreenshotTest {
     @get:Rule val compose = createComposeRule()
 
+    @org.junit.Before fun syncImages() { com.playit.app.presentation.components.AssetImageConfig.decodeSynchronously = true }
+
     @Test
     fun hearIt_letterM() {
         val fakePhoneme = Phoneme(1, "m", "p", "images/pictures/picture_mouse.png", "mouse")
@@ -48,7 +50,6 @@ class HearItScreenshotTest {
         val vm = HearItViewModel(repo, player, resolver, handle)
         compose.setContent { PlayItTheme { HearItScreen(vm, onNext = {}, onBack = {}) } }
         compose.waitForIdle()
-        compose.waitUntil(5_000) { com.playit.app.presentation.components.AssetDecodeTracker.isIdle() }
         compose.waitForIdle()
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/hearit_letter_m.png")
     }
