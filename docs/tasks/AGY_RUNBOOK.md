@@ -119,7 +119,9 @@ Code relay (agy session A), in this order:
 | 7 | 22 | after 21 (or 20) | Plan Task 6: map overhaul |
 | 8 | 23 | after 22 | Plan Task 7: purposeful effects (may move past the cut line) |
 | 9 | 24 | after 23 | Plan Task 8: captions + mouth cues (may move past the cut line) |
-| any | 13, 09, 03b, 15 | waiting | Slot in when their assets are released (pictures, /m/, compositions, word list) |
+| any | 13 | ready (image release 2026-10-07) | 29 new pictures; "Up" gets its own picture |
+| any | 09 | ready (audio release 2026-10-07-m) | Held /m/ (run after 26: both edit AudioResolver) |
+| any | 03b, 15 | waiting | 03b: remake of the added-vowel correction; 15: the teacher's word list |
 | — | 16 | superseded by 20 | Do not run |
 
 **Cut line:** 17, 18, 19, 20 and 22 must land before Round 2 (Oct 19). Code cards are done by Fri Oct 16.
