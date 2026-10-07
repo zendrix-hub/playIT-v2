@@ -515,3 +515,14 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - **Audio release 2026-10-07:** the 19 lesson voice lines, user-approved, are ready.
   - **Card 26 is ready.** Run it after 17c; its files don't overlap 17c or 18.
   - **Tonight:** 17c → 26 → 18 if time allows, then the phone tests for 14 and 17 (and 26).
+
+### Claude, 2026-10-07 (afternoon): TONIGHT, read this first
+- **The user has a group meeting tonight.** Follow **`docs/tasks/TONIGHT_2026-10-07.md`**: 26 → 09 → 13 → 17c → **APK A** → say **"TEST WITH groupmates"** to the user → 18 → **APK B**.
+- **No Claude review between cards tonight** (user-approved). Claude reviews all of them tomorrow morning.
+- If time is short, skip 13. Card 18 must never block APK A.
+- **Newly ready:**
+  - card 13 (image release 2026-10-07, 29 pictures);
+  - card 09 (audio release 2026-10-07-m, the held /m/ the user picked);
+  - card 26 (audio release 2026-10-07, the 19 lesson lines).
+- **Groupmates' test sheet:** `docs/tasks/GROUP_TEST_2026-10-07.md`.
+- **Card 25:** resume after the quota reset (about 19:11 Philippine time) in a normal image session.

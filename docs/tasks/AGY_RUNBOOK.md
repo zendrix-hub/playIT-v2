@@ -98,6 +98,8 @@ Write the question to `docs/tasks/QUESTIONS.md` (card, question, what you found,
 - Add or replace audio in `app/src/main/assets/` unless a card says so.
 - Use emojis in UI text.
 
+> **TONIGHT (2026-10-07) ONLY:** follow `docs/tasks/TONIGHT_2026-10-07.md`. The order is 26 → 09 → 13 → 17c → APK A → tell the user "TEST WITH groupmates" → 18 → APK B. There is no Claude review between cards tonight (user-approved).
+
 ## Current queue (2026-10-06)
 The `Status:` line in each card is the source of truth; this table is a snapshot. Cards 00-08, 07b, 10, 11 and 12 are accepted (CI green; see `docs/evidence-log.md`).
 
