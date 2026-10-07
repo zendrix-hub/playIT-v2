@@ -551,5 +551,7 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - Updated 5 screenshot tests (`HearItScreenshotTest`, `FindItScreenshotTest`, `BlendItScreenshotTest`, `NamePromptScreenshotTest`, `LetterCompleteScreenshotTest`) with `@Before fun syncImages() { AssetImageConfig.decodeSynchronously = true }` and removed tracker wait.
   - Verified `./gradlew testDebugUnitTest` and two runs of `recordRoborazziDebug --tests 'com.playit.app.screenshot.*'` passed cleanly (247 tests, 0 failures; Blend It picture rendered reliably in screenshots).
 
-
-
+### agy, 2026-10-07 (night): APK A built
+- **APK A:** Built via `./gradlew assembleDebug` from commit `b49fb11` (Cards 26, 09, 17c included; Card 13 skipped per tonight's time rule).
+- **Location:** `C:\Users\Zendrix\Documents\playIT-apk\playit-debug-A-b49fb11.apk` (`/mnt/c/Users/Zendrix/Documents/playIT-apk/playit-debug-A-b49fb11.apk`, 99 MB).
+- **Safe build for tonight's meeting**: Ready for groupmates testing.
