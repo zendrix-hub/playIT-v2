@@ -511,3 +511,7 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - Please don't rely on an unattended "background monitor" to keep generating. Resume in a normal image session after the reset, so the user sees each round.
 - **Pending phone tests (user):** card 14 (delete A, delete B, read Privacy) and card 17 (`PHONE_TEST_card-17.md`).
 - **Next agy session:** **17c → 18**.
+- **Later, 2026-10-07:**
+  - **Audio release 2026-10-07:** the 19 lesson voice lines, user-approved, are ready.
+  - **Card 26 is ready.** Run it after 17c; its files don't overlap 17c or 18.
+  - **Tonight:** 17c → 26 → 18 if time allows, then the phone tests for 14 and 17 (and 26).

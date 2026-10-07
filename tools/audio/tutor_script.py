@@ -58,14 +58,14 @@ UI_LINES = {
 # (VoContext users and the rotating correct/encourage/hint lines). Kokoro remakes, 2026-10-06.
 # Two texts changed to match the app today; the source column says so.
 LESSON_VO = {
-    "vo_welcome_01":         ("Hi there! I'm so happy you're here. Let's play and learn together!", 0.95, "welcome (unchanged text)"),
+    "vo_welcome_01":         ("Hi there! I'm so happy you're here. Let's play and learn together!", 0.85, "welcome (unchanged text)"),
     "vo_encourage_01":       ("Good try! Let's listen again.", 0.95, "wrong answer, rotating 1 of 3"),
-    "vo_encourage_02":       ("Almost! One more try, you can do it!", 0.95, "wrong answer, rotating 2 of 3"),
+    "vo_encourage_02":       ("Almost! One more try, you can do it!", 0.78, "wrong answer, rotating 2 of 3"),
     "vo_encourage_03":       ("Let's practice one more time.", 0.95, "wrong answer, rotating 3 of 3"),
     "vo_correct_01":         ("Yes! That's it!", 0.95, "correct, rotating 1 of 2"),
     "vo_correct_02":         ("Perfect! Great job!", 0.95, "correct, rotating 2 of 2"),
-    "vo_hint_01":            ("Hmm, let's think about this together.", 0.95, "hint, rotating 1 of 2"),
-    "vo_hint_02":            ("Here's a little help!", 0.95, "hint, rotating 2 of 2"),
+    "vo_hint_01":            ("Let's think about this together.", 0.78, "hint, rotating 1 of 2. CHANGED: 'Hmm' removed (sounded like 'hum'; user 2026-10-07)"),
+    "vo_hint_02":            ("Here's a little help!", 0.82, "hint, rotating 2 of 2"),
     "vo_streak_01":          ("You've been practicing every day, amazing!", 0.95, "Blend It complete streak (adviser memo asks about child-facing streaks)"),
     "vo_complete_01":        ("You did it! I'm so proud of you!", 0.95, "letter / blend complete"),
     "vo_unlock_01":          ("A new letter is ready for you!", 0.95, "letter complete, next node unlocked"),

@@ -111,6 +111,7 @@ Code relay (agy session A), in this order:
 | 2 | 17 | ready (after 14; files don't overlap, so both may run tonight) | Plan Task 1: performance and calm motion (no haptics, downscaled images, portrait) |
 | 2b | 17b | ready (after 17; files don't overlap 14 or 17) | ViewModel init order: a start-up crash found by Claude's dry run |
 | 2c | 17c | ready (after 17b) | Pictures decode immediately in tests (screenshot flake found in the card 17 review) |
+| 2d | 26 | ready (after 17c; files don't overlap 17c or 18) | Lesson voice lines in the Kokoro voice (audio release 2026-10-07) |
 | 3 | 18 | after 17c is accepted | Plan Task 2: adaptive layout foundation + 4-size layout tests |
 | 4 | 19 | after 18 | Plan Task 3: Hear It + Say It fit, mic states |
 | 5 | 20 | after 19 | Plan Task 4: Find It + Blend It fit (supersedes card 16) |
