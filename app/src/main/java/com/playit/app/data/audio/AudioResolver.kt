@@ -80,6 +80,9 @@ class AudioResolver @Inject constructor() {
     private fun lessonVoPath(suffix: String): String =
         if (suffix in kokoroLessonVo) "audio/vo/lesson/vo_$suffix.wav" else "audio/ui/vo_$suffix.mp3"
 
+    /** Letter sounds released as user-approved held sounds (docs/audio-release); the rest are still the old MP3s. */
+    private val releasedPhonemes = setOf("m")
+
     /**
      * Resolves the asset path for a phoneme letter.
      */
@@ -89,6 +92,7 @@ class AudioResolver @Inject constructor() {
             "ñ", "enye" -> "enye"
             else -> clean
         }
+        if (key in releasedPhonemes) return "audio/phonemes/ph_$key.wav"
         return "audio/phonemes/phoneme_$key.mp3"
     }
 

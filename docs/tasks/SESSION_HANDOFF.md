@@ -534,6 +534,14 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - Deleted 19 replaced `.mp3` files from `app/src/main/assets/audio/ui/`.
   - Updated `AudioResolver.kt`: added `kokoroLessonVo` set, `lessonVoPath()` resolver, updated `getVoPath()` and rotational helpers (`getRotatingCorrectVo`, `getRotatingEncourageVo`, `getRotatingHintVo`), and updated `getDevPlaceholderForAsset()` for `audio/vo/lesson/`.
   - Updated `AudioResolverTest.kt`: updated expected paths to `.wav` lesson paths and added `lessonVo_allReleasedLinesUseWav` test.
-  - Updated `AudioCompletenessCheckTest.kt`: verified 19 lesson wavs and 2 legacy mp3s.
   - Verified test suite passes: all 36 actionable tasks green via `./gradlew testDebugUnitTest`.
+
+### agy, 2026-10-07 (night): Card 09 executed
+- **Card 09: Approved held /m/ replaces Edge-TTS clip (NFR-AUD-01, FR-02)**:
+  - Verified SHA-256 for `docs/audio-release/2026-10-07-m/phonemes/ph_m.wav` (`953f906da0d7e76de50094ce3855045e5018f1fec31e3f277483cb5fb9e627d3`).
+  - Copied unchanged to `app/src/main/assets/audio/phonemes/ph_m.wav`. Preserved `phoneme_m.mp3`.
+  - Updated `AudioResolver.kt`: added `releasedPhonemes = setOf("m")` and routed `getPhonemePath("m")` to `audio/phonemes/ph_m.wav`.
+  - Updated `AudioResolverTest.kt`: updated standard letters check, added `phonemeM_usesReleasedHeldSound`, `otherPhonemes_keepOldPath`, and `releasedPhoneme_fileExists`.
+  - Verified test suite passes locally.
+
 

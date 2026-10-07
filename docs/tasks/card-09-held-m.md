@@ -1,6 +1,6 @@
 # Card 09: The approved held /m/ replaces the old Edge-TTS clip (NFR-AUD-01, FR-02)
 
-Status: ready
+Status: done
 
 Runs any time: it touches only `AudioResolver`, its tests and one asset. It doesn't overlap cards 13, 17c, 18 or 26 in code. Card 26 also edits `AudioResolver.kt` and `AudioResolverTest.kt`, so if both run the same night, run 26 first and then make this card's change on top of it.
 
