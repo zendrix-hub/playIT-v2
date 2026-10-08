@@ -100,8 +100,8 @@ Write the question to `docs/tasks/QUESTIONS.md` (card, question, what you found,
 
 > **TONIGHT (2026-10-07) ONLY:** follow `docs/tasks/TONIGHT_2026-10-07.md`. The order is 26 → 09 → 13 → 17c → APK A → tell the user "TEST WITH groupmates" → 18 → APK B. There is no Claude review between cards tonight (user-approved).
 
-## Current queue (2026-10-06)
-The `Status:` line in each card is the source of truth; this table is a snapshot. Cards 00-08, 07b, 10, 11 and 12 are accepted (CI green; see `docs/evidence-log.md`).
+## Current queue (2026-10-08)
+The `Status:` line in each card is the source of truth; this table is a snapshot. Cards 00-12, 07b, 14, 17, 17b, 17c and 26 are accepted (CI green; see `docs/evidence-log.md`). **Tonight's order is in `docs/tasks/TONIGHT_2026-10-08.md`.**
 
 **UI overhaul plan (user-approved 2026-10-06):** `docs/superpowers/plans/2026-10-06-ui-fit-effects-overhaul.md`. Cards 17-24 are its Tasks 1-8. Each card points to its plan task for the steps and the code. Read the plan's "Global Constraints" before every card.
 
@@ -109,25 +109,23 @@ Code relay (agy session A), in this order:
 
 | Order | Card | Status | Note |
 |---|---|---|---|
-| 1 | 14 | ready, next | Privacy pack |
-| 2 | 17 | ready (after 14; files don't overlap, so both may run tonight) | Plan Task 1: performance and calm motion (no haptics, downscaled images, portrait) |
-| 2b | 17b | ready (after 17; files don't overlap 14 or 17) | ViewModel init order: a start-up crash found by Claude's dry run |
-| 2c | 17c | ready (after 17b) | Pictures decode immediately in tests (screenshot flake found in the card 17 review) |
-| 2d | 26 | ready (after 17c; files don't overlap 17c or 18) | Lesson voice lines in the Kokoro voice (audio release 2026-10-07) |
-| 3 | 18 | after 17c is accepted | Plan Task 2: adaptive layout foundation + 4-size layout tests |
+| 1 | 13 | ready, next | 29 new pictures (image release 2026-10-07); "Up" gets its own picture |
+| 2 | 26b | ready (after 13) | Fix card from the card 26 review: delete the unused AudioCompletenessCheck class |
+| — | APK A2 | after 26b is accepted | Meeting build tonight (see TONIGHT_2026-10-08.md) |
+| 3 | 18 | ready | Plan Task 2: adaptive layout foundation + 4-size layout tests |
 | 4 | 19 | after 18 | Plan Task 3: Hear It + Say It fit, mic states |
-| 5 | 20 | after 19 | Plan Task 4: Find It + Blend It fit (supersedes card 16) |
-| 6 | 21 | after 20 | Plan Task 5: complete, splash, profile screens (may move past the cut line) |
-| 7 | 22 | after 21 (or 20) | Plan Task 6: map overhaul |
-| 8 | 23 | after 22 | Plan Task 7: purposeful effects (may move past the cut line) |
-| 9 | 24 | after 23 | Plan Task 8: captions + mouth cues (may move past the cut line) |
-| any | 13 | ready (image release 2026-10-07) | 29 new pictures; "Up" gets its own picture |
-| any | 09 | ready (audio release 2026-10-07-m) | Held /m/ (run after 26: both edit AudioResolver) |
-| any | 03b, 15 | waiting | 03b: remake of the added-vowel correction; 15: the teacher's word list |
+| 5 | 03b | waiting (the user's review of `2026-10-08-no-ah-redo`) | Spoken Say It corrections. After 19, because both edit `SayItViewModel.kt` |
+| 6 | 20 | after 19 | Plan Task 4: Find It + Blend It fit (supersedes card 16) |
+| 7 | 21 | after 20 | Plan Task 5: complete, splash, profile screens (may move past the cut line) |
+| 8 | 22 | after 21 (or 20) | Plan Task 6: map overhaul |
+| 9 | 23 | after 22 | Plan Task 7: purposeful effects (may move past the cut line) |
+| 10 | 24 | after 23 | Plan Task 8: captions + mouth cues (may move past the cut line) |
+| any | 09b | waiting (the user's review of `2026-10-01-heldsound-s-a-i`) | Held S, A, I (Chapter 1). Only `AudioResolver` and one test, so it runs as soon as it is ready |
+| any | 15 | waiting | The teacher's word list |
 | — | 16 | superseded by 20 | Do not run |
 
 **Cut line:** 17, 18, 19, 20 and 22 must land before Round 2 (Oct 19). Code cards are done by Fri Oct 16.
 
-Images (agy session B, in parallel): **card 25** (mouth-shape pictures), **ready now**. It uses the daily Nano Banana quota, so start it with card 17.
+Images (agy session B, in parallel): **card 25** (mouth-shape pictures), **ready**. Round 1 has 1 of 9 items; resume tonight after the quota reset (about 19:11 Philippine time).
 
 Take the first card in this order whose status is `ready`. Claude sets a card to `ready` when its input exists.

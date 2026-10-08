@@ -5,20 +5,9 @@
 
 ## Fast-Track Trigger: "run and review"
 
-When the user enters `"run and review"`, Claude should immediately:
-1. Run `python3 tools/dev/review_card.py 11` and `python3 tools/dev/review_card.py 12` in WSL (pre-verified by agy: ALL PASS).
-   - Note: Card 06 and Card 07 were already reviewed and accepted in commit `ad23db9`.
-2. Review code diffs:
-   - `a17969d` — Card 07b (Avatar-only onboarding, parent rename, voiced map pop-up).
-   - `667ea0e` — Card 08 (29 user-picked candidate PNGs for batch 1 staged for cutout).
-   - `0d9ad3a` — Card 11 (Stars math, 3-heart restart, 5-heart display, session hearts persistence).
-   - `dcff981` — Capstone 2 Week 3 Specifications (`SRS v3.0`, `SDD v2.0`, `SPMP v2.0`).
-   - `ef03bea` — Card 12 (Find It distractor isolation, gentle correction orange, soft pop audio, `ZeroEmojiPolicyTest`).
-3. Update `docs/evidence-log.md` with technical acceptance for Cards 07b, 11, and 12.
-4. Execute next Claude-owned tasks:
-   - **Card 09**: Held /m/ audio pipeline in `tools/audio/`.
-   - **Card 13**: Background cutout & manifest for 29 candidate PNGs picked in Card 08 (`667ea0e`).
-   - **Cards 10 & 03b**: Author next task cards.
+The steps are in `CLAUDE.md` ("Shortcut Command"), so they live in one place. The newest state is always at the **end** of this file.
+
+## Archive: Week 3 specs context (2026-10-03)
 
 > **Context:** The team refactored the formal Capstone 2 engineering package for Week 3 submission based on the empirical Weeks 1–2 MVP Field Validation ($N=25$: 16 early learners, 5 parents, 4 certified DepEd teachers; mean SUS $75.50$ / Grade B+).
 > **Directive:** Development continues in parallel without blocking on document sign-off to preserve sprint momentum. The user and Claude will sync on these documents on Monday morning.
@@ -555,3 +544,23 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
 - **APK A:** Built via `./gradlew assembleDebug` from commit `b49fb11` (Cards 26, 09, 17c included; Card 13 skipped per tonight's time rule).
 - **Location:** `C:\Users\Zendrix\Documents\playIT-apk\playit-debug-A-b49fb11.apk` (`/mnt/c/Users/Zendrix/Documents/playIT-apk/playit-debug-A-b49fb11.apk`, 99 MB).
 - **Safe build for tonight's meeting**: Ready for groupmates testing.
+
+### Claude review, 2026-10-08 ("run and review")
+- **Accepted:** card 26 (82d3d5a), card 09 (64bf5fd), card 17c (b49fb11). CI is green on all three, and the local suite is 251/251 at 91fdd74.
+- **Card 26:** the code is exactly the card's.
+  - **Finding (Claude's card, not your code):** the unused `AudioCompletenessCheck` class still lists the deleted mp3s. Nothing calls it.
+  - **Fix card 26b (ready):** delete the class.
+- **Card 09:** exact. Every screen asks `AudioResolver` first, so the seeded `phoneme_m.mp3` path is never played.
+- **Card 17c:** `AssetImage.kt` is byte-identical to Claude's verified diff.
+- **Card 18 is now `ready`.**
+- **New checks in `review_card.py`:**
+  - `refs` fails when a deleted asset is still named in app code.
+  - `hash` warns until the reviewer writes the hash into the evidence-log row. agy can't know its own hash, so keep writing the commit subject there.
+- **"run and review" steps** now live only in `CLAUDE.md`, and they're generic.
+- **The groupmates did not test last night.** They test tonight with **APK A2** (APK A plus cards 13 and 26b). Sheet: `docs/tasks/GROUP_TEST_2026-10-08.md`; it says only M's sound is new.
+- **TONIGHT, read `docs/tasks/TONIGHT_2026-10-08.md`:**
+  - **Code (relay mode):** 13 → review → 26b → review → **APK A2** → `TEST WITH groupmates` → 18.
+  - **Images:** card 25 resumes after the quota reset (about 19:11 PH time).
+- **Waiting on the user (2 listening pages):**
+  - `Documents/playIT-audio-batches/2026-10-08-no-ah-redo/index.html`: the "no ah" correction, 14 rows. It unblocks card 03b, which runs after 19.
+  - `Documents/playIT-audio-batches/2026-10-01-heldsound-s-a-i/index.html`: held S, A, I, 33 takes. It unblocks card 09b, Chapter 1's other three letters.

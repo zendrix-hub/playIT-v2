@@ -2,34 +2,13 @@
 
 ## Shortcut Command: "run and review"
 
-When the user enters `"run and review"` (or `"review"`), execute the following workflow:
+When the user enters `"run and review"` (or `"review"`), Claude:
 
-1. **Read Latest Handoff Context**:
-   - Inspect `docs/tasks/SESSION_HANDOFF.md` for current sprint state, commit hashes, and notes.
-
-2. **Run Mechanical Card Checks**:
-   - Run the mechanical verification script in WSL for recent agy commits:
-     ```bash
-     python3 tools/dev/review_card.py 11
-     python3 tools/dev/review_card.py 12
-     ```
-   - Confirm all checks (`files`, `tests`, `status`, `evidence-log`, `body`, `emoji`) output `PASS`.
-   - Note: Card 07 was already reviewed and accepted in commit `ad23db9`.
-
-3. **Verify Tests & CI**:
-   - Run unit tests: `tools/dev/gradlew_wsl.sh testDebugUnitTest` (or `./gradlew testDebugUnitTest`).
-   - Check CI status: `tools/dev/ci_status.sh`.
-
-4. **Review Commits & Technical Acceptance**:
-   - Review code diffs:
-     - `a17969d` — Card 07b (Avatar-only onboarding, parent rename, voiced map pop-up).
-     - `667ea0e` — Card 08 (User picked all 29 candidate PNGs in Round 1; staged for background cutout).
-     - `0d9ad3a` — Card 11 (Stars math, 3-heart restart, 5-heart display, session hearts persistence).
-     - `dcff981` — Capstone 2 Week 3 Specifications (`docs/SRS_v3.0_Refactored.md`, `docs/SDD_v2.0_Refactored.md`, `docs/SPMP_v2.0_Refactored.md`).
-     - `ef03bea` — Card 12 (Find It distractor isolation, gentle correction orange, soft pop audio, `ZeroEmojiPolicyTest`).
-   - Record technical acceptance in `docs/evidence-log.md` (for Cards 07b, 11, and 12).
-
-5. **Proceed with Claude-Owned Next Steps**:
-   - **Card 09 (Held /m/)**: Run Kokoro / Chatterbox pipeline in `tools/audio/` to prepare the held sound release manifest.
-   - **Card 13 (Batch-1 Images)**: Cut out backgrounds for the 29 candidate PNGs picked in Card 08 (`667ea0e`), verify transparency and dimensions, generate `docs/image-release/<date>/manifest.json`, and author Card 13.
-   - **Task Cards**: Author Card 10 (Screenshot tests / Roborazzi) and Card 03b (Say It corrections).
+1. **Pulls and reads the newest state.** `git pull`. Read the newest entries at the end of `docs/tasks/SESSION_HANDOFF.md`: the last "Claude review" entry and every agy entry after it.
+2. **Finds the agy commits to review:** every commit since Claude's last review whose body has `Card: NN`. List them with `git log --grep='^Card: ' --format='%h %s'`.
+3. **Runs the mechanical checks** for each card: `python3 tools/dev/review_card.py NN`. Every line should be `PASS`. A `refs` FAIL means a deleted asset is still named in app code, and needs a fix card if the card didn't list that file. A `hash` WARN means the evidence-log row still needs its hash, which is filled in at acceptance.
+4. **Runs the tests and checks CI.** Run `ROBOLECTRIC_DEPS_DIR=~/.playit-env/robolectric-deps tools/dev/gradlew_wsl.sh --offline testDebugUnitTest`; drop `--offline` only if a dependency is missing from the cache. Then run `tools/dev/ci_status.sh`. For UI cards, also check the 4 sizes in the `playIT-screenshots` CI artifact.
+5. **Reads each diff against its card.** Check the Files list, the exact code given in the card, and stale references outside the card.
+6. **Accepts or writes a fix card.** Accepting means the evidence-log row gets `(accepted)`, the hash and the CI run. A fix card is `card-NNb`. Then a "Claude review" entry goes in the handoff and the queue in `AGY_RUNBOOK.md` is updated.
+7. **Checks the user's review pages.** Look for new `*_review.csv` files in `Documents/playIT-audio-batches/` and `Documents/playIT-image-batches/`. Turn approved picks into releases and set the cards that wait on them to `ready`.
+8. **Does the next Claude-owned step** from the newest "Claude" handoff entry.

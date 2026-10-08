@@ -6,6 +6,10 @@ Checks one commit against its card and prints PASS / WARN / FAIL lines:
   status     the card says `Status: done` at that commit; 13_MASTER_TASKS.md ticks it; evidence-log has a row
   body       the commit body has Card / Requirement / Tests run / Decisions used
   assets     every added or changed file under app/src/main/assets/ matches a release manifest SHA-256
+  refs       no deleted asset's file name is still written in app/src/main code at that commit
+             (catches lists the card forgot, like the stale AudioCompletenessCheck after card 26)
+  hash       the evidence-log row (in the working tree) has the commit hash; agy can't write its own
+             hash, so this is a reminder for the reviewer to fill it in at acceptance
   emoji      no emoji in added lines (Zero-Emoji Policy)
 The judgement part (does the code do what the card says, is it correct) stays with the reviewer.
 
@@ -176,6 +180,32 @@ def main(argv=None):
             data = subprocess.run(["git", "show", f"{commit}:{p}"], cwd=REPO, capture_output=True, check=True).stdout
             src = hashes.get(sha256_bytes(data))
             say("PASS" if src else "FAIL", "assets", f"{p} = {src}" if src else f"{p} matches no release manifest")
+
+    # refs: deleted assets still named in app code. Match the path under assets/; match the bare file
+    # name only when no asset of that name is left (code often lists bare names and adds the folder).
+    gone = sorted({ps[0] for st, *ps in changed if st[0] in "DR" and ps[0].startswith("app/src/main/assets/")})
+    if gone:
+        left = {p.rsplit("/", 1)[-1] for p in git("ls-tree", "-r", "--name-only", commit, "app/src/main/assets").splitlines()}
+        stale = set()
+        for path in gone:
+            rel, name = path[len("app/src/main/assets/"):], path.rsplit("/", 1)[-1]
+            for needle in [rel] + ([name] if name not in left else []):
+                hits = subprocess.run(["git", "grep", "-n", "-F", needle, commit, "--", "app/src/main/java", "app/src/main/res"],
+                                      cwd=REPO, capture_output=True, text=True).stdout
+                stale.update(h.split(":", 1)[1] for h in hits.splitlines())
+        if stale:
+            files = sorted({h.split(":", 1)[0] for h in stale})
+            say("FAIL", "refs", f"{len(stale)} lines still name a deleted asset, in: " + ", ".join(files)
+                + " (if the card didn't list the file, write a fix card)")
+        else:
+            say("PASS", "refs", f"none of the {len(gone)} deleted assets is named in app code")
+
+    # hash: the reviewer fills the commit hash into the evidence-log row at acceptance
+    short = git("rev-parse", "--short=7", commit).strip()
+    row = next((l for l in (REPO / "docs/evidence-log.md").read_text(encoding="utf-8").splitlines()
+                if re.match(rf"\| {re.escape(nn)}\b", l)), None)
+    if row and short not in row:
+        say("WARN", "hash", f"evidence-log row has no hash yet: at acceptance write {short} and the CI run")
 
     # emoji in added lines
     diff = git("show", "--format=", "-U0", commit, "--", "app/")
