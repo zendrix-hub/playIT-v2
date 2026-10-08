@@ -588,3 +588,59 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
     - Checker for the team member's laptop: `tools/audio/check_recordings.py` (stdlib only).
     - AGENTS.md records the decision.
   - Due Oct 11. Claude then builds the user's review, the release and a card.
+
+### agy, 2026-10-08 (night): Cards 13, 26b, APK A2, 18, and 09b executed
+
+- **Execution Summary:**
+  1. **Card 13: Image batch 1 into app (`card-13-image-batch-01-into-app.md`)**:
+     - Verified all 29 image hashes against `docs/image-release/2026-10-07/manifest.json`.
+     - Copied all 29 PNG files to `app/src/main/assets/images/pictures/`.
+     - Updated `GridGenerator.kt` so "Up" uses its own picture (`images/pictures/picture_up.png`).
+     - Added `up_usesItsOwnPicture` test in `GridGeneratorTest.kt`.
+     - Added `PictureAssetsTest.kt` with `everyGridPictureExists` and `releasedPicturesMatchManifest`.
+     - Unit tests: 254 passed, 0 failed.
+     - Committed: `b909329` (`feat(assets): batch-1 pictures from image release 2026-10-07; "Up" gets its own picture (FR-05)`).
+     - Verified with `review_card.py 13`: ALL PASS. Pushed to `origin refactor/hear-say-it`.
+
+  2. **Card 26b: Remove dead audio check (`card-26b-remove-dead-audio-check.md`)**:
+     - Deleted unused `app/src/main/java/com/playit/app/data/audio/AudioCompletenessCheck.kt`.
+     - Ran verification grep confirming zero remaining references across `app/src/main`.
+     - Unit tests: 254 passed, 0 failed.
+     - Committed: `0886ec4` (`refactor(audio): remove the unused AudioCompletenessCheck class (NFR-AUD-01)`).
+     - Verified with `review_card.py 26b`: ALL PASS. Pushed to `origin refactor/hear-say-it`.
+
+  3. **APK A2 Built (Meeting Build)**:
+     - Built from commit `0886ec4` using `./gradlew assembleDebug --no-daemon`.
+     - Output preserved: `playit-debug-A-b49fb11.apk` intact and not overwritten.
+     - APK A2 staged at:
+       - Windows path: `C:\Users\Zendrix\Documents\playIT-apk\playit-debug-A2-0886ec4.apk`
+       - WSL path: `/mnt/c/Users/Zendrix/Documents/playIT-apk\playit-debug-A2-0886ec4.apk`
+       - Size: 106,203,823 bytes (~101 MB).
+
+  4. **Card 18: Adaptive layout foundation (`card-18-adaptive-layout-foundation.md`)**:
+     - Created `Dimens.kt` (WindowProfile COMPACT, REGULAR, WIDE tokens; 64dp touch and 16sp text floors).
+     - Created `LessonScaffold.kt` (fixed topBar/header/bottomBar, scrollable weight body with `contentMaxWidth` cap).
+     - Created `Devices.kt` qualifiers and `WithFontScale`.
+     - Created test suites: `DimensTest.kt`, `GummyContainerLayoutTest.kt`, `LayoutMatrixTest.kt`.
+     - Updated `Theme.kt` with `LocalPlayItDimens`.
+     - Updated `MascotSpeechHeader.kt` with adaptive dimens tokens, maxLines and ellipsis.
+     - Updated `GummyButton.kt` (`GummyContainer` measuring via custom `Layout` composable).
+     - Updated `.height()` -> `.heightIn(min = ...)` across all 17 specified presentation files.
+     - Unit tests: 274 tests (273 passed, 1 ignored on compact fontScale).
+     - Committed: `5489293` (`feat(ui): adaptive dimensions, LessonScaffold, GummyContainer grows with content (NFR-ACC-02)`).
+     - Verified with `review_card.py 18`: ALL PASS. Pushed to `origin refactor/hear-say-it`.
+
+  5. **Card 09b: Approved held /s/ sound (`card-09b-held-s.md`)**:
+     - Verified SHA-256 for `docs/audio-release/2026-10-08-s/phonemes/ph_s.wav` (`a3c53911618eb4e8bbfd70ef51e4c0ae080c69b48ec5ed5698f4bca8fa7d8009`).
+     - Copied `ph_s.wav` to `app/src/main/assets/audio/phonemes/ph_s.wav`. Preserved `phoneme_s.mp3`.
+     - Updated `AudioResolver.kt`: added `"s"` to `releasedPhonemes = setOf("m", "s")`.
+     - Updated `AudioResolverTest.kt`: updated standard letters check, added `phonemeS_usesReleasedHeldSound`, updated `otherPhonemes_keepOldPath`, updated `releasedPhoneme_fileExists` for `ph_m.wav` and `ph_s.wav`.
+     - Unit tests: 275 tests (274 passed, 1 ignored).
+     - Committed: `1df3f56` (`feat(audio): approved held /s/ replaces the Edge clip (NFR-AUD-01, FR-02)`).
+     - Verified with `review_card.py 09b`: ALL PASS. Pushed to `origin refactor/hear-say-it`.
+
+- **Current Branch Status:**
+  - Branch: `refactor/hear-say-it`
+  - Head commit: `1df3f56` (pushed to origin)
+  - Working tree clean. Ready for Claude's morning review!
+
