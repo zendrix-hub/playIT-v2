@@ -23,7 +23,7 @@ class GridGenerator @Inject constructor() {
         "o" to listOf("Orange" to "images/pictures/picture_orange.png", "Owl" to "images/pictures/picture_owl.png", "Ox" to "images/pictures/picture_ox.png"),
         "b" to listOf("Ball" to "images/pictures/picture_ball.png", "Bat" to "images/pictures/blendword_bat.png", "Bus" to "images/pictures/blendword_bus.png"),
         "e" to listOf("Elephant" to "images/pictures/picture_elephant.png", "Egg" to "images/pictures/picture_egg.png", "Envelope" to "images/pictures/picture_envelope.png"),
-        "u" to listOf("Umbrella" to "images/pictures/picture_umbrella.png", "Up" to "images/pictures/blendword_sub.png", "Uncle" to "images/pictures/picture_uncle.png"),
+        "u" to listOf("Umbrella" to "images/pictures/picture_umbrella.png", "Up" to "images/pictures/picture_up.png", "Uncle" to "images/pictures/picture_uncle.png"),
         "t" to listOf("Tiger" to "images/pictures/picture_tiger.png", "Tree" to "images/pictures/picture_tree.png", "Top" to "images/pictures/picture_top.png"),
         "k" to listOf("Kite" to "images/pictures/picture_kite.png", "Kit" to "images/pictures/blendword_kit.png", "Key" to "images/pictures/picture_key.png"),
         "l" to listOf("Lion" to "images/pictures/picture_lion.png", "Lit" to "images/pictures/blendword_lit.png", "Leaf" to "images/pictures/picture_leaf.png"),

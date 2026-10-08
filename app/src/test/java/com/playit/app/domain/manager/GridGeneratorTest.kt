@@ -102,4 +102,15 @@ class GridGeneratorTest {
         }
         assertTrue("Expected 'm' to be in distractorLettersFor('k')", result.contains("m"))
     }
+
+    @Test
+    fun up_usesItsOwnPicture() {
+        repeat(200) {
+            val grid = gridGenerator.generate5ItemGrid("u")
+            val upItems = grid.filter { it.word == "Up" }
+            for (item in upItems) {
+                assertEquals("images/pictures/picture_up.png", item.imagePath)
+            }
+        }
+    }
 }

@@ -1,6 +1,6 @@
 # Card 13: Batch-1 pictures into the app; "Up" gets its own picture (FR-05)
 
-Status: ready (image release 2026-10-07 exists: 29 pictures, all marked OK by the user)
+Status: done
 
 Runs after card 12 is accepted. It edits `GridGenerator.kt`, which card 12 also edited, so find code by name, not by line number.
 
