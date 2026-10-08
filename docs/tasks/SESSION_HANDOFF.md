@@ -581,3 +581,10 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - **/a/ and /i/:** the user chose the **onset style, "a, a, apple"**: the vowel at its natural length (about 0.1-0.15 s), not stretched, with a soft decay.
     - Tool: `tools/audio/vowel_onset.py`. Page: `2026-10-08-vowel-onsets` (12 rows).
     - It changes the Hear It rhythm for vowels, so it needs a card (Claude writes it after the user scores the page). The teacher audit must confirm it, and the adviser must confirm it as a spec change (Table 4's ~800 ms is for held consonants).
+- **Later still, 2026-10-08:**
+  - The onset page didn't satisfy the user either (only /a/ O3 scored 4 alone, 3 in Hear It; /i/ unscored).
+  - **User decision:** a team member makes the short vowels with **ElevenLabs**.
+    - Guide: `docs/tasks/AUDIO_TASK_short-vowels.md`. It uses Voice Changer from their own spoken takes into a Lily clone (`docs/audio-reference/lily_reference.wav`), plus Text to Speech for the "a, a, apple" phrases.
+    - Checker for the team member's laptop: `tools/audio/check_recordings.py` (stdlib only).
+    - AGENTS.md records the decision.
+  - Due Oct 11. Claude then builds the user's review, the release and a card.
