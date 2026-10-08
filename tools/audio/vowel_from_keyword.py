@@ -95,59 +95,64 @@ def check(y, ref):
             + ("" if near[0] == ref else f"  (target {ref})"))
 
 
-ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-ap.add_argument("--out", required=True)
-OUT = pathlib.Path(ap.parse_args().out)
-OUT.mkdir(parents=True, exist_ok=True)
-clips = released_clips()
-rows, ctx = [], []
-for letter, (word, ref) in TARGET.items():
-    (OUT / letter).mkdir(exist_ok=True)
-    w = load(clips[f"kw_{word}"])
-    a, b, run = vowel_span(w, ref)
-    core = w[a:b]
-    print(f"{letter}: vowel {a / SR * 1000:.0f}-{b / SR * 1000:.0f} ms in kw_{word} "
-          f"(voiced run {run[0] * 1000:.0f}-{run[1] * 1000:.0f} ms), {len(core) / SR * 1000:.0f} ms")
-    sf.write(OUT / letter / f"00_cut_from_{word}.wav", finish(fade(core)), SR)
-    rows.append({"file": f"{letter}/00_cut_from_{word}.wav", "group": f"/{letter}/ cut from the approved '{word}'",
-                 "says": f"/{letter}/ as it is inside '{word}', unchanged", "listen_for": "Reference: the vowel at its own length",
-                 "auto_check": check(finish(fade(core)), ref)})
-    f0 = median_f0(core, SR)
-    variants = []
-    for ms in (300, 450, 600):
-        variants.append((f"stretch_{ms}ms", f"stretched to {ms} ms, its own pitch kept",
-                         finish(fade(stretch(core, ms)))))
-    for ms in (450, 600):
-        y = held(core, ms, f0)
-        variants.append((f"held_{ms}ms", f"held {ms} ms, gentle falling pitch and loudness swell",
-                         finish(fade(swell(y, SR, attack_ms=40, peak_at=0.3, end_db=-5)))))
-    for vid, how, y in variants:
-        f = f"{letter}/{vid}.wav"
-        sf.write(OUT / f, y, SR)
-        rows.append({"file": f, "group": f"/{letter}/ cut from the approved '{word}'", "says": f"/{letter}/ {how}",
-                     "listen_for": f"Is it clearly the /{letter}/ of '{word}'? Not the letter name, no 'uh' after it",
-                     "auto_check": check(y, ref)})
-    for vid, how, y in variants:
-        if vid not in ("stretch_450ms", "held_450ms"):
-            continue
-        ids = expand("hearit_sequence", letter, word)
-        missing = [c for c in ids if not (c.startswith(("ph_", "PAUSE_")) or c in clips)]
-        if missing:
-            print("skip context:", missing)
-            continue
-        seq = render(ids, clips, y)
-        f = f"{letter}/hearit_sequence_{vid}.wav"
-        sf.write(OUT / f, seq, SR)
-        ctx.append({"file": f, "group": "Hear It, in context (450 ms versions)",
-                    "says": " + ".join(says_of(c, letter, word) for c in ids if not c.startswith("PAUSE_")),
-                    "listen_for": f"With /{letter}/ {vid.replace('_', ' ')}: does the whole sequence feel right?",
-                    "auto_check": f"{len(seq) / SR:.1f} s total"})
+def main():
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--out", required=True)
+    OUT = pathlib.Path(ap.parse_args().out)
+    OUT.mkdir(parents=True, exist_ok=True)
+    clips = released_clips()
+    rows, ctx = [], []
+    for letter, (word, ref) in TARGET.items():
+        (OUT / letter).mkdir(exist_ok=True)
+        w = load(clips[f"kw_{word}"])
+        a, b, run = vowel_span(w, ref)
+        core = w[a:b]
+        print(f"{letter}: vowel {a / SR * 1000:.0f}-{b / SR * 1000:.0f} ms in kw_{word} "
+              f"(voiced run {run[0] * 1000:.0f}-{run[1] * 1000:.0f} ms), {len(core) / SR * 1000:.0f} ms")
+        sf.write(OUT / letter / f"00_cut_from_{word}.wav", finish(fade(core)), SR)
+        rows.append({"file": f"{letter}/00_cut_from_{word}.wav", "group": f"/{letter}/ cut from the approved '{word}'",
+                     "says": f"/{letter}/ as it is inside '{word}', unchanged", "listen_for": "Reference: the vowel at its own length",
+                     "auto_check": check(finish(fade(core)), ref)})
+        f0 = median_f0(core, SR)
+        variants = []
+        for ms in (300, 450, 600):
+            variants.append((f"stretch_{ms}ms", f"stretched to {ms} ms, its own pitch kept",
+                             finish(fade(stretch(core, ms)))))
+        for ms in (450, 600):
+            y = held(core, ms, f0)
+            variants.append((f"held_{ms}ms", f"held {ms} ms, gentle falling pitch and loudness swell",
+                             finish(fade(swell(y, SR, attack_ms=40, peak_at=0.3, end_db=-5)))))
+        for vid, how, y in variants:
+            f = f"{letter}/{vid}.wav"
+            sf.write(OUT / f, y, SR)
+            rows.append({"file": f, "group": f"/{letter}/ cut from the approved '{word}'", "says": f"/{letter}/ {how}",
+                         "listen_for": f"Is it clearly the /{letter}/ of '{word}'? Not the letter name, no 'uh' after it",
+                         "auto_check": check(y, ref)})
+        for vid, how, y in variants:
+            if vid not in ("stretch_450ms", "held_450ms"):
+                continue
+            ids = expand("hearit_sequence", letter, word)
+            missing = [c for c in ids if not (c.startswith(("ph_", "PAUSE_")) or c in clips)]
+            if missing:
+                print("skip context:", missing)
+                continue
+            seq = render(ids, clips, y)
+            f = f"{letter}/hearit_sequence_{vid}.wav"
+            sf.write(OUT / f, seq, SR)
+            ctx.append({"file": f, "group": "Hear It, in context (450 ms versions)",
+                        "says": " + ".join(says_of(c, letter, word) for c in ids if not c.startswith("PAUSE_")),
+                        "listen_for": f"With /{letter}/ {vid.replace('_', ' ')}: does the whole sequence feel right?",
+                        "auto_check": f"{len(seq) / SR:.1f} s total"})
 
-write_review_page(
-    OUT, OUT.name, "playIT: /a/ and /i/ cut from 'apple' and 'insect'",
-    "New method (your decision 2026-10-08): the vowel is cut out of the key word you already approved, so it matches "
-    "the word exactly, then lengthened. Short vowels are short in speech, so the lengths are 300-600 ms, not 800. "
-    "Score each 1-5 (5 = ship it). Honest note: cut out of 'apple', Kokoro's vowel measures closer to 'ah' (ɑ) than "
-    "to the textbook æ, the same as the takes you rejected; inside the word it sounds right. So judge by ear: does it "
-    "sound like the start of 'apple' / 'insect'? Never 'ay' or 'ee' (the letter names of A and E). Export CSV when done.", rows + ctx, mode="score")
-print(f"wrote {len(rows) + len(ctx)} rows to {OUT}")
+    write_review_page(
+        OUT, OUT.name, "playIT: /a/ and /i/ cut from 'apple' and 'insect'",
+        "New method (your decision 2026-10-08): the vowel is cut out of the key word you already approved, so it matches "
+        "the word exactly, then lengthened. Short vowels are short in speech, so the lengths are 300-600 ms, not 800. "
+        "Score each 1-5 (5 = ship it). Honest note: cut out of 'apple', Kokoro's vowel measures closer to 'ah' (ɑ) than "
+        "to the textbook æ, the same as the takes you rejected; inside the word it sounds right. So judge by ear: does it "
+        "sound like the start of 'apple' / 'insect'? Never 'ay' or 'ee' (the letter names of A and E). Export CSV when done.", rows + ctx, mode="score")
+    print(f"wrote {len(rows) + len(ctx)} rows to {OUT}")
+
+
+if __name__ == "__main__":
+    main()

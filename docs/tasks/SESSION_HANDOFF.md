@@ -575,3 +575,9 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
 - **"no ah" (card 03b):** the user keeps the current `fb_no_ah` for now and wants a better take later. A swap needs no code change (same clip id).
   - The split remakes clicked at the cuts (Claude's splice bug, now fixed). Optional page: `2026-10-08-no-ah-redo-2`.
   - Claude writes card 03b after card 19 is accepted, so 03b's code matches 19's.
+- **Later, 2026-10-08:**
+  - The user rejected both new pages, `2026-10-08-vowels-from-keywords` ("robotic or buzzy", "cut off or choppy") and `2026-10-08-no-ah-redo-2`.
+  - **"no ah":** card 03b uses the current `fb_no_ah`. No more remakes unless the user asks.
+  - **/a/ and /i/:** the user chose the **onset style, "a, a, apple"**: the vowel at its natural length (about 0.1-0.15 s), not stretched, with a soft decay.
+    - Tool: `tools/audio/vowel_onset.py`. Page: `2026-10-08-vowel-onsets` (12 rows).
+    - It changes the Hear It rhythm for vowels, so it needs a card (Claude writes it after the user scores the page). The teacher audit must confirm it, and the adviser must confirm it as a spec change (Table 4's ~800 ms is for held consonants).
