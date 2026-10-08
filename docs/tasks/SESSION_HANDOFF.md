@@ -559,7 +559,7 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
 - **"run and review" steps** now live only in `CLAUDE.md`, and they're generic.
 - **The groupmates did not test last night.** They test tonight with **APK A2** (APK A plus cards 13 and 26b). Sheet: `docs/tasks/GROUP_TEST_2026-10-08.md`; it says only M's sound is new.
 - **TONIGHT, read `docs/tasks/TONIGHT_2026-10-08.md`:**
-  - **Code (relay mode):** 13 → review → 26b → review → **APK A2** → `TEST WITH groupmates` → 18.
+  - **Code (no Claude review between cards; Claude reviews tomorrow):** 13 → 26b → **APK A2** → `TEST WITH groupmates` → 18.
   - **Images:** card 25 resumes after the quota reset (about 19:11 PH time).
 - **Waiting on the user (2 listening pages):**
   - `Documents/playIT-audio-batches/2026-10-08-no-ah-redo/index.html`: the "no ah" correction, 14 rows. It unblocks card 03b, which runs after 19.

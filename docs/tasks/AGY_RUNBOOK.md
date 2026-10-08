@@ -111,7 +111,7 @@ Code relay (agy session A), in this order:
 |---|---|---|---|
 | 1 | 13 | ready, next | 29 new pictures (image release 2026-10-07); "Up" gets its own picture |
 | 2 | 26b | ready (after 13) | Fix card from the card 26 review: delete the unused AudioCompletenessCheck class |
-| — | APK A2 | after 26b is accepted | Meeting build tonight (see TONIGHT_2026-10-08.md) |
+| — | APK A2 | after 26b is pushed | Meeting build tonight (see TONIGHT_2026-10-08.md) |
 | 3 | 18 | ready | Plan Task 2: adaptive layout foundation + 4-size layout tests |
 | 4 | 19 | after 18 | Plan Task 3: Hear It + Say It fit, mic states |
 | 5 | 03b | waiting (the user's review of `2026-10-08-no-ah-redo`) | Spoken Say It corrections. After 19, because both edit `SayItViewModel.kt` |
