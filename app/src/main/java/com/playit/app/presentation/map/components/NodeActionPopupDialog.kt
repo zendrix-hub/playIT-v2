@@ -302,7 +302,7 @@ fun NodeActionPopupDialog(
                         contentColor = Color.White,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(52.dp)
+                            .heightIn(min = 52.dp)
                     )
                 }
             }

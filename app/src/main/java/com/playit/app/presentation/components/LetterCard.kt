@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -82,7 +83,7 @@ fun LetterCard(
         depthHeight = 6.dp,
         modifier = modifier
             .width(280.dp)
-            .height(290.dp)
+            .heightIn(min = 290.dp)
             .padding(horizontal = 8.dp)
             .graphicsLayer { rotationZ = cardRotation }
     ) {

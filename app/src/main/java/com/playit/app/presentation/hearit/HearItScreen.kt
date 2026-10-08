@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -297,7 +298,7 @@ fun HearItScreen(
                     contentColor = com.playit.app.presentation.theme.TextMidnight,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(64.dp)
+                        .heightIn(min = 64.dp)
                         .breathingPulse(enabled = nextHighlighted)
                         .graphicsLayer {
                             scaleX = unlockScale.value

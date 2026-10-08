@@ -135,7 +135,7 @@ fun ProfileSelectScreen(
                     shadowColor = UbeShadow,
                     contentColor = Cloud,
                     fontSize = 14,
-                    modifier = Modifier.height(52.dp)
+                    modifier = Modifier.heightIn(min = 52.dp)
                 )
             }
 

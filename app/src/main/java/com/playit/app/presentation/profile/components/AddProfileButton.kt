@@ -46,7 +46,7 @@ fun AddProfileButton(
         depthHeight = 6.dp,
         modifier = modifier
             .fillMaxWidth()
-            .height(76.dp)
+            .heightIn(min = 76.dp)
             .breathingPulse(enabled = enabled && isPrimaryAction)
     ) {
         Row(

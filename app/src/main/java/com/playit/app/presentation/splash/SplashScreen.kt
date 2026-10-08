@@ -155,7 +155,7 @@ fun SplashScreen(
                         onClick = onStartClick,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(64.dp)
+                            .heightIn(min = 64.dp)
                     )
                 }
             }

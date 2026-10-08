@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.presentation.theme.*
@@ -67,6 +68,7 @@ fun MascotSpeechHeader(
     )
 
     val isReducedMotion = LocalReducedMotion.current
+    val d = LocalPlayItDimens.current
 
     Row(
         modifier = modifier
@@ -78,7 +80,7 @@ fun MascotSpeechHeader(
         // Full-Body Mascot Character with Real-Time Mic Amplitude & Breathing
         Box(
             modifier = Modifier
-                .size(width = 86.dp, height = 98.dp)
+                .size(d.mascotHeader)
                 .graphicsLayer {
                     val ampSquashY = 1.0f + (amplitude.coerceIn(0f, 1f) * 0.25f)
                     val ampSquashX = 1.0f - (amplitude.coerceIn(0f, 1f) * 0.12f)
@@ -95,7 +97,7 @@ fun MascotSpeechHeader(
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = rememberAssetPainter(mascotState.assetPath),
+                painter = rememberAssetPainter(mascotState.assetPath, maxSize = d.mascotHeader),
                 contentDescription = "Lily the Tarsier",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier.fillMaxSize()
@@ -154,10 +156,12 @@ fun MascotSpeechHeader(
                 Text(
                     text = message,
                     fontFamily = LexendFontFamily,
-                    fontSize = 24.sp,
+                    fontSize = d.bubbleTextSp.sp,
                     fontWeight = FontWeight.Bold,
                     color = TextMidnight,
-                    lineHeight = 32.sp,
+                    lineHeight = (d.bubbleTextSp + 6).sp,
+                    maxLines = d.bubbleMaxLines,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
                 )
 

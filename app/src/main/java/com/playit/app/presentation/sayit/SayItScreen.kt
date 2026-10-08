@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -267,7 +268,7 @@ fun SayItScreen(
                         depthHeight = 6.dp,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(116.dp)
+                            .heightIn(min = 116.dp)
                             .padding(horizontal = 16.dp)
                             .shake(trigger = state is SayItState.Incorrect)
                     ) {
@@ -474,7 +475,7 @@ fun SayItScreen(
                     backgroundColor = EmeraldLeaf,
                     shadowColor = EmeraldLeafShadow,
                     contentColor = Color.White,
-                    modifier = Modifier.fillMaxWidth().height(64.dp)
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp)
                 )
             }
         }

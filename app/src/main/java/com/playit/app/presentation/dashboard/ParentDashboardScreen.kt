@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -161,7 +162,7 @@ fun ParentDashboardScreen(
                     contentColor = Color.White,
                     enabled = uiState.exportStatus !is ExportStatus.Exporting && uiState.selectedProfile != null,
                     fontSize = 13,
-                    modifier = Modifier.height(52.dp)
+                    modifier = Modifier.heightIn(min = 52.dp)
                 )
             }
 

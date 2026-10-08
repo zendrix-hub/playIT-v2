@@ -374,7 +374,7 @@ fun UnitGuidebookDialog(
                         contentColor = Color.White,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(54.dp)
+                            .heightIn(min = 54.dp)
                     )
                 }
             }
