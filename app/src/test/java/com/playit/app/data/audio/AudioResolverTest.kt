@@ -21,7 +21,7 @@ class AudioResolverTest {
     fun getPhonemePath_returnsCorrectPathForStandardLetters() {
         assertEquals("audio/phonemes/phoneme_b.mp3", audioResolver.getPhonemePath("b"))
         assertEquals("audio/phonemes/phoneme_a.mp3", audioResolver.getPhonemePath("a"))
-        assertEquals("audio/phonemes/phoneme_s.mp3", audioResolver.getPhonemePath("s"))
+        assertEquals("audio/phonemes/phoneme_t.mp3", audioResolver.getPhonemePath("t"))
     }
 
     @Test
@@ -31,8 +31,15 @@ class AudioResolverTest {
     }
 
     @Test
+    fun phonemeS_usesReleasedHeldSound() {
+        assertEquals("audio/phonemes/ph_s.wav", audioResolver.getPhonemePath("s"))
+        assertEquals("audio/phonemes/ph_s.wav", audioResolver.getPhonemePath("S "))
+    }
+
+    @Test
     fun otherPhonemes_keepOldPath() {
-        assertEquals("audio/phonemes/phoneme_s.mp3", audioResolver.getPhonemePath("s"))
+        assertEquals("audio/phonemes/phoneme_a.mp3", audioResolver.getPhonemePath("a"))
+        assertEquals("audio/phonemes/phoneme_t.mp3", audioResolver.getPhonemePath("t"))
     }
 
     @Test
@@ -41,9 +48,12 @@ class AudioResolverTest {
             File("src/main/assets"),
             File("app/src/main/assets")
         ).firstOrNull { it.exists() } ?: error("assets not found")
-        val wav = File(assetsDir, "audio/phonemes/ph_m.wav")
-        assertTrue("ph_m.wav should exist", wav.exists())
-        assertTrue("ph_m.wav should not be empty", wav.length() > 0L)
+        val wavM = File(assetsDir, "audio/phonemes/ph_m.wav")
+        assertTrue("ph_m.wav should exist", wavM.exists())
+        assertTrue("ph_m.wav should not be empty", wavM.length() > 0L)
+        val wavS = File(assetsDir, "audio/phonemes/ph_s.wav")
+        assertTrue("ph_s.wav should exist", wavS.exists())
+        assertTrue("ph_s.wav should not be empty", wavS.length() > 0L)
     }
 
     @Test

@@ -1,6 +1,6 @@
 # Card 09b: The approved held /s/ replaces the old Edge-TTS clip (NFR-AUD-01, FR-02)
 
-Status: ready
+Status: done
 
 **Not before APK A2 tonight** (the user's decision, 2026-10-08): the meeting build has only the new M. Run it after card 18, or tomorrow.
 

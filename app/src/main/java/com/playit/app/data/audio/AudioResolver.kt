@@ -81,7 +81,7 @@ class AudioResolver @Inject constructor() {
         if (suffix in kokoroLessonVo) "audio/vo/lesson/vo_$suffix.wav" else "audio/ui/vo_$suffix.mp3"
 
     /** Letter sounds released as user-approved held sounds (docs/audio-release); the rest are still the old MP3s. */
-    private val releasedPhonemes = setOf("m")
+    private val releasedPhonemes = setOf("m", "s")
 
     /**
      * Resolves the asset path for a phoneme letter.
