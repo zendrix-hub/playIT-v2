@@ -564,3 +564,14 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
 - **Waiting on the user (2 listening pages):**
   - `Documents/playIT-audio-batches/2026-10-08-no-ah-redo/index.html`: the "no ah" correction, 14 rows. It unblocks card 03b, which runs after 19.
   - `Documents/playIT-audio-batches/2026-10-01-heldsound-s-a-i/index.html`: held S, A, I, 33 takes. It unblocks card 09b, Chapter 1's other three letters.
+
+### Claude, 2026-10-08 (afternoon): the user's listening reviews
+- **Held /s/:** the user scored the Chatterbox "Sssss." take 5 of 5. It ships at its own length, 1.19 s.
+  - Release `docs/audio-release/2026-10-08-s`; **card 09b is ready**.
+  - Run it after card 18, and **never before APK A2**: the meeting build has only the new M.
+- **/a/ and /i/** (tool: `tools/audio/vowel_from_keyword.py`): the user rejected all of them (best /i/ was 3 of 5).
+  - Claude's measurements agree: the Chatterbox vowels drift to "ah/aw", and the Kokoro ones to "eh" or "ee".
+  - New method (user decision): cut the vowel out of the approved key words "apple" and "insect" and stretch it (300-600 ms). Page: `2026-10-08-vowels-from-keywords`.
+- **"no ah" (card 03b):** the user keeps the current `fb_no_ah` for now and wants a better take later. A swap needs no code change (same clip id).
+  - The split remakes clicked at the cuts (Claude's splice bug, now fixed). Optional page: `2026-10-08-no-ah-redo-2`.
+  - Claude writes card 03b after card 19 is accepted, so 03b's code matches 19's.

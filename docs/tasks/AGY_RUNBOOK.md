@@ -114,13 +114,13 @@ Code relay (agy session A), in this order:
 | — | APK A2 | after 26b is pushed | Meeting build tonight (see TONIGHT_2026-10-08.md) |
 | 3 | 18 | ready | Plan Task 2: adaptive layout foundation + 4-size layout tests |
 | 4 | 19 | after 18 | Plan Task 3: Hear It + Say It fit, mic states |
-| 5 | 03b | waiting (the user's review of `2026-10-08-no-ah-redo`) | Spoken Say It corrections. After 19, because both edit `SayItViewModel.kt` |
+| 5 | 03b | waiting (Claude writes it after card 19 is accepted; its audio input is ready: the user keeps the current `fb_no_ah`) | Spoken Say It corrections. After 19, because both edit `SayItViewModel.kt` |
 | 6 | 20 | after 19 | Plan Task 4: Find It + Blend It fit (supersedes card 16) |
 | 7 | 21 | after 20 | Plan Task 5: complete, splash, profile screens (may move past the cut line) |
 | 8 | 22 | after 21 (or 20) | Plan Task 6: map overhaul |
 | 9 | 23 | after 22 | Plan Task 7: purposeful effects (may move past the cut line) |
 | 10 | 24 | after 23 | Plan Task 8: captions + mouth cues (may move past the cut line) |
-| any | 09b | waiting (the user's review of `2026-10-01-heldsound-s-a-i`) | Held S, A, I (Chapter 1). Only `AudioResolver` and one test, so it runs as soon as it is ready |
+| any | 09b | ready (audio release 2026-10-08-s), **not before APK A2** | Held /s/. Only `AudioResolver`, one test and one asset. A and I follow in a later card (new method under review) |
 | any | 15 | waiting | The teacher's word list |
 | — | 16 | superseded by 20 | Do not run |
 
