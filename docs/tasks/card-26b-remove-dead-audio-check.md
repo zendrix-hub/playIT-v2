@@ -1,6 +1,6 @@
 # Card 26b: Remove the unused AudioCompletenessCheck class (fix card from the card 26 review)
 
-Status: ready
+Status: done
 
 Runs after card 13. It touches one file that no other open card lists.
 

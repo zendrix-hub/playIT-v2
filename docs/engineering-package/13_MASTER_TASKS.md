@@ -277,7 +277,7 @@ Each card ticks its own item in its commit (see `docs/tasks/AGY_RUNBOOK.md`). A 
 - [x] Card 17b: ViewModel init blocks run after every property (crash fix from Claude's dry run)
 - [x] Card 17c: Pictures decode immediately in tests so screenshots are reliable
 - [x] Card 26: Lesson voice lines in the Kokoro voice (NFR-AUD-01)
-- [ ] Card 26b: Remove the unused AudioCompletenessCheck class (fix card from the card 26 review)
+- [x] Card 26b: Remove the unused AudioCompletenessCheck class (fix card from the card 26 review)
 - [ ] Card 18: Adaptive layout foundation, LessonScaffold, 4-size layout tests (NFR-ACC-02)
 - [ ] Card 19: Hear It and Say It fit; Say It mic states (FR-03, NFR-ACC-02)
 - [ ] Card 20: Find It and Blend It fit (FR-05, FR-13)
