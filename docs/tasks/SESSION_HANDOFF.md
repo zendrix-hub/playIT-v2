@@ -641,6 +641,28 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
 
 - **Current Branch Status:**
   - Branch: `refactor/hear-say-it`
-  - Head commit: `1df3f56` (pushed to origin)
-  - Working tree clean. Ready for Claude's morning review!
+  - Head commit: `5c3ff64`
+  - Working tree clean.
+
+### agy, 2026-10-09: Card 25 Round 1 Review & Picks (Mouth Shapes)
+- **Batch**: `2026-10-07-mouth-shapes`
+- **User Review Completed**:
+  - The user reviewed Round 1 on `round-01/index.html` and exported `2026-10-07-mouth-shapes_round-01_review.csv`.
+  - 6 of 9 items picked:
+    - `mouth_lips_together`: `round-01/mouth_lips_together__v2.png`
+    - `mouth_teeth_on_lip`: `round-01/mouth_teeth_on_lip__v2.png`
+    - `mouth_tongue_up`: `round-01/mouth_tongue_up__v2.png`
+    - `mouth_teeth_close`: `round-01/mouth_teeth_close__v1.png`
+    - `mouth_back`: `round-01/mouth_back__v1.png`
+    - `mouth_round`: `round-01/mouth_round__v1.png`
+- **Staged Assets in Git for Claude**:
+  - `docs/assets/briefs/2026-10-07-mouth-shapes/2026-10-07-mouth-shapes_round-01_review.csv`
+  - `docs/assets/briefs/2026-10-07-mouth-shapes/picks.json`
+  - `docs/assets/briefs/2026-10-07-mouth-shapes/picks/<id>.png` (6 picked PNGs)
+- **Open Items for Round 2**:
+  - `mouth_wide_open` (variants 1 & 2)
+  - `mouth_smile` (variants 1 & 2)
+  - `mouth_open_breath` (variants 1 & 2)
+  - Note: Quota on `gemini-3.1-flash-image` has reset. Ready for Round 2 generation when directed.
+
 
