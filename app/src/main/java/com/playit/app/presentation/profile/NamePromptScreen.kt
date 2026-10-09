@@ -1,5 +1,8 @@
 package com.playit.app.presentation.profile
 
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.testTag
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -71,7 +74,7 @@ fun NamePromptScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(90.dp)
+                .heightIn(min = 72.dp)
                 .align(Alignment.BottomCenter),
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.Center
@@ -110,17 +113,17 @@ fun NamePromptScreen(
                 Column {
                     Text(
                         text = "New Player Profile",
-                        fontFamily = LexendFontFamily,
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = TextMidnight
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = TextMidnight,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = "Create your player profile",
-                        fontFamily = LexendFontFamily,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = TextMuted
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = TextMuted,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
@@ -188,6 +191,7 @@ fun NamePromptScreen(
                     .fillMaxWidth()
                     .heightIn(min = 64.dp)
                     .padding(bottom = 8.dp)
+                    .testTag("nameprompt_play")
             )
         }
     }

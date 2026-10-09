@@ -1,5 +1,8 @@
 package com.playit.app.presentation.splash
 
+import androidx.compose.ui.platform.testTag
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
@@ -92,9 +95,8 @@ fun SplashScreen(
             // PlayIT Wordmark
             Text(
                 text = "PlayIT",
-                fontFamily = LexendFontFamily,
-                fontSize = 44.sp,
-                fontWeight = FontWeight.ExtraBold,
+                style = MaterialTheme.typography.displayLarge,
+                maxLines = 1,
                 color = Ink,
                 letterSpacing = 0.5.sp,
                 textAlign = TextAlign.Center
@@ -105,21 +107,23 @@ fun SplashScreen(
             // Pediatric Value-Proposition Tagline
             Text(
                 text = "Mabuhay! Ready to learn to read?",
-                fontFamily = LexendFontFamily,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.SemiBold,
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+                maxLines = 2,
                 color = InkSoft,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 24.dp)
             )
 
-            Spacer(modifier = Modifier.weight(1f))
-
-            // Interactive Tarsier Mascot Dome with Breathing and Blinking
+            // Interactive Tarsier Mascot Dome with Breathing and Blinking. It takes the space under
+            // the title, at most 420 dp tall, and keeps its 0.9 shape by narrowing on short screens.
+            Box(
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                contentAlignment = Alignment.BottomCenter
+            ) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(420.dp)
+                    .heightIn(max = 420.dp)
+                    .aspectRatio(0.9f)
                     .graphicsLayer {
                         scaleY = breatheScaleY
                         scaleX = breatheScaleX
@@ -156,8 +160,10 @@ fun SplashScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 64.dp)
+                            .testTag("splash_start")
                     )
                 }
+            }
             }
         }
     }

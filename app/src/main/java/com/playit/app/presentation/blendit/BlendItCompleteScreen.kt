@@ -1,5 +1,7 @@
 package com.playit.app.presentation.blendit
 
+import com.playit.app.presentation.components.LessonScaffold
+import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -74,7 +77,6 @@ fun BlendItCompleteScreen(
                     )
                 )
             )
-            .padding(24.dp)
     ) {
         // Native celebration confetti particle burst in Filipino theme colors
         CelebrationOverlay(
@@ -85,43 +87,64 @@ fun BlendItCompleteScreen(
             modifier = Modifier.fillMaxSize()
         )
 
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+        LessonScaffold(
+            topBar = {},
+            header = {
+                DockedMascotWithBubble(
+                    message = "Group ${viewModel.groupId} Mastered!",
+                    mascotState = MascotState.CELEBRATING,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            },
+            bottomBar = {
+                GummyContainer(
+                    onClick = onReturnToMap,
+                    faceColor = com.playit.app.presentation.theme.SunnyGold,
+                    shadowColor = com.playit.app.presentation.theme.SunnyGoldShadow,
+                    shape = com.playit.app.presentation.theme.ButtonShape,
+                    strokeWidth = 2.5.dp,
+                    strokeColor = com.playit.app.presentation.theme.ModernBorder,
+                    depthHeight = 6.dp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 64.dp)
+                        .testTag("complete_continue")
+                        .breathingPulse(enabled = nextHighlighted)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Continue to Map",
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Black),
+                            maxLines = 1,
+                            color = com.playit.app.presentation.theme.TextMidnight
+                        )
+                    }
+                }
+            }
         ) {
-            // Docked Mascot Prompt
-            DockedMascotWithBubble(
-                message = "Group ${viewModel.groupId} Mastered!",
-                mascotState = MascotState.CELEBRATING
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Text(
-                text = "GROUP ${viewModel.groupId}",
-                fontFamily = LexendFontFamily,
-                color = Cloud.copy(alpha = 0.85f),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.ExtraBold,
-                letterSpacing = 1.sp
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = "Challenge Mastered!",
-                fontFamily = LexendFontFamily,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Cloud
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
+            // Title pair stays together; the scaffold spaces the groups evenly.
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "GROUP ${viewModel.groupId}",
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp),
+                    color = Cloud.copy(alpha = 0.85f),
+                    maxLines = 1
+                )
+                Text(
+                    text = "Challenge Mastered!",
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = Cloud,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2
+                )
+            }
 
             // Bouncy staggered star pop-in
             StarDisplay(earnedStars = starsEarned, maxStars = 3, starSize = 56.dp)
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             // Streak bonus pill
             Box(
@@ -149,50 +172,11 @@ fun BlendItCompleteScreen(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "$starsEarned ${if (starsEarned == 1) "Star" else "Stars"} • Bonus Unlocked!",
-                        fontFamily = LexendFontFamily,
-                        fontSize = 15.sp,
+                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
                         color = Cloud,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        maxLines = 2
                     )
-                }
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            // Vibrant SunnyGold continue button
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .navigationBarsPadding()
-                    .padding(bottom = 12.dp)
-            ) {
-                GummyContainer(
-                    onClick = onReturnToMap,
-                    faceColor = com.playit.app.presentation.theme.SunnyGold,
-                    shadowColor = com.playit.app.presentation.theme.SunnyGoldShadow,
-                    shape = com.playit.app.presentation.theme.ButtonShape,
-                    strokeWidth = 2.5.dp,
-                    strokeColor = com.playit.app.presentation.theme.ModernBorder,
-                    depthHeight = 6.dp,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 64.dp)
-                        .breathingPulse(enabled = nextHighlighted)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "Continue to Map",
-                            fontFamily = LexendFontFamily,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Black,
-                            color = com.playit.app.presentation.theme.TextMidnight
-                        )
-                    }
                 }
             }
         }

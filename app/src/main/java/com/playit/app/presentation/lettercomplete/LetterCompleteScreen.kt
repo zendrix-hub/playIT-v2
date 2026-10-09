@@ -1,5 +1,7 @@
 package com.playit.app.presentation.lettercomplete
 
+import com.playit.app.presentation.components.LessonScaffold
+import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -72,7 +75,6 @@ fun LetterCompleteScreen(
             .fillMaxSize()
             .resetsIdle { viewModel.onUserInteraction() }
             .background(brush = Brush.verticalGradient(colors = listOf(Ube, UbeDark)))
-            .padding(24.dp)
     ) {
         CelebrationOverlay(
             type = CelebrationType.CONFETTI,
@@ -82,58 +84,16 @@ fun LetterCompleteScreen(
             modifier = Modifier.fillMaxSize()
         )
 
-        Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-            DockedMascotWithBubble(
-                message = "You mastered Letter $letter! Amazing sound practice!",
-                mascotState = MascotState.CELEBRATING
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Text(
-                text = "LETTER $letter",
-                fontFamily = LexendFontFamily,
-                color = Cloud.copy(alpha = 0.85f),
-                fontSize = 24.sp,
-                fontWeight = FontWeight.ExtraBold,
-                letterSpacing = 1.sp
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = "Complete!",
-                fontFamily = LexendFontFamily,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Cloud
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            StarDisplay(earnedStars = starsEarned, maxStars = 3, starSize = 56.dp)
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Box(
-                modifier = Modifier
-                    .background(color = SunnyGold.copy(alpha = 0.22f), shape = PillShape)
-                    .border(1.5.dp, SunnyGold.copy(alpha = 0.5f), PillShape)
-                    .padding(horizontal = 20.dp, vertical = 10.dp)
-            ) {
-                Text(
-                    text = "$starsEarned ${if (starsEarned == 1) "Star" else "Stars"} Earned!",
-                    fontFamily = LexendFontFamily,
-                    fontSize = 24.sp,
-                    color = Cloud,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
+        LessonScaffold(
+            topBar = {},
+            header = {
+                DockedMascotWithBubble(
+                    message = "You mastered Letter $letter! Amazing sound practice!",
+                    mascotState = MascotState.CELEBRATING,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Box(modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = 12.dp)) {
+            },
+            bottomBar = {
                 GummyContainer(
                     onClick = onReturnToMap,
                     faceColor = com.playit.app.presentation.theme.SunnyGold,
@@ -145,6 +105,7 @@ fun LetterCompleteScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = 64.dp)
+                        .testTag("complete_continue")
                         .breathingPulse(enabled = nextHighlighted)
                 ) {
                     Row(
@@ -154,13 +115,46 @@ fun LetterCompleteScreen(
                     ) {
                         Text(
                             text = "Continue to Map",
-                            fontFamily = LexendFontFamily,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Black,
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Black),
+                            maxLines = 1,
                             color = com.playit.app.presentation.theme.TextMidnight
                         )
                     }
                 }
+            }
+        ) {
+            // Title pair stays together; the scaffold spaces the groups evenly.
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "LETTER $letter",
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp),
+                    color = Cloud.copy(alpha = 0.85f),
+                    maxLines = 1
+                )
+                Text(
+                    text = "Complete!",
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = Cloud,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2
+                )
+            }
+
+            StarDisplay(earnedStars = starsEarned, maxStars = 3, starSize = 56.dp)
+
+            Box(
+                modifier = Modifier
+                    .background(color = SunnyGold.copy(alpha = 0.22f), shape = PillShape)
+                    .border(1.5.dp, SunnyGold.copy(alpha = 0.5f), PillShape)
+                    .padding(horizontal = 20.dp, vertical = 10.dp)
+            ) {
+                Text(
+                    text = "$starsEarned ${if (starsEarned == 1) "Star" else "Stars"} Earned!",
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                    color = Cloud,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2
+                )
             }
         }
     }

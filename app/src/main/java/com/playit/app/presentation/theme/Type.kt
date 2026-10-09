@@ -50,11 +50,12 @@ val AndikaFontFamily = FontFamily(
 
 val Typography = Typography(
     // Letter cards, celebrations — biggest display text
+    // Child text sizes per 10_UI_IMPLEMENTATION_GUIDE :20-24 (card 21)
     displayLarge = TextStyle(
         fontFamily = LexendFontFamily,
         fontWeight = FontWeight.ExtraBold,
-        fontSize = 44.sp,
-        lineHeight = 52.sp,
+        fontSize = 40.sp,
+        lineHeight = 48.sp,
         letterSpacing = (-0.5).sp
     ),
     displayMedium = TextStyle(
@@ -67,8 +68,8 @@ val Typography = Typography(
     headlineLarge = TextStyle(
         fontFamily = LexendFontFamily,
         fontWeight = FontWeight.ExtraBold,
-        fontSize = 30.sp,
-        lineHeight = 38.sp
+        fontSize = 28.sp,
+        lineHeight = 36.sp
     ),
     headlineMedium = TextStyle(
         fontFamily = LexendFontFamily,
@@ -92,8 +93,8 @@ val Typography = Typography(
     titleMedium = TextStyle(
         fontFamily = LexendFontFamily,
         fontWeight = FontWeight.SemiBold,
-        fontSize = 20.sp,
-        lineHeight = 26.sp
+        fontSize = 22.sp,
+        lineHeight = 28.sp
     ),
     titleSmall = TextStyle(
         fontFamily = LexendFontFamily,

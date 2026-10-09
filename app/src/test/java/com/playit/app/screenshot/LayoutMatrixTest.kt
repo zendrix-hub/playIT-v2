@@ -55,6 +55,12 @@ import com.playit.app.domain.repository.ProfileRepository
 import com.playit.app.presentation.map.MapScreen
 import com.playit.app.presentation.map.MapViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import com.playit.app.presentation.lettercomplete.LetterCompleteScreen
+import com.playit.app.presentation.lettercomplete.LetterCompleteViewModel
+import com.playit.app.presentation.profile.NamePromptScreen
+import com.playit.app.presentation.profile.ProfileViewModel
+import com.playit.app.presentation.splash.SplashScreen
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.Flow
@@ -258,6 +264,75 @@ abstract class LayoutMatrixTest(private val deviceName: String) {
         compose.setContent { PlayItTheme { map() } }
         compose.waitForIdle()
         assertOnScreen("map_current_node"); capture("map")
+    }
+    /** Built as LetterCompleteScreenshotTest builds it (1 star after 3 hearts lost). */
+    @Composable private fun complete() {
+        val vm = remember {
+            val repo: PhonemeRepository = mockk(relaxed = true)
+            coEvery { repo.getPhonemeById(any()) } returns mouse
+            val h: SavedStateHandle = mockk {
+                every { get<String>("phonemeId") } returns "1"
+                every { get<String>("heartsLost") } returns "3"
+            }
+            LetterCompleteViewModel(
+                phonemeRepository = repo,
+                lessonProgressRepository = mockk<LessonProgressRepository>(relaxed = true),
+                streakTracker = mockk<StreakTracker>(relaxed = true),
+                sessionManager = mockk<SessionManager>(relaxed = true) { every { activeProfileId } returns MutableStateFlow(1L) },
+                audioPlayer = mockk<AudioPlayer>(relaxed = true),
+                audioResolver = mockk<AudioResolver>(relaxed = true),
+                savedStateHandle = h
+            )
+        }
+        LetterCompleteScreen(vm, onReturnToMap = {})
+    }
+
+    /** Built as NamePromptScreenshotTest builds it. */
+    @Composable private fun namePrompt() {
+        val vm = remember {
+            val repo: ProfileRepository = mockk(relaxed = true) { every { getAllProfiles() } returns MutableStateFlow(emptyList()) }
+            ProfileViewModel(repo, mockk<SessionManager>(relaxed = true), mockk<AudioPlayer>(relaxed = true), mockk<AudioResolver>(relaxed = true))
+        }
+        NamePromptScreen(vm, onProfileCreated = {}, onBack = {})
+    }
+
+    @Test fun complete_continueVisible() {
+        compose.setContent { PlayItTheme { complete() } }
+        compose.waitForIdle()
+        assertOnScreen("complete_continue"); capture("complete")
+    }
+
+    @Test fun complete_continueVisible_fontScale13() {
+        assumeFontScaleChecks()
+        compose.setContent { PlayItTheme { WithFontScale(1.3f) { complete() } } }
+        compose.waitForIdle()
+        assertOnScreen("complete_continue")
+    }
+
+    @Test fun splash_startVisible() {
+        compose.setContent { PlayItTheme { SplashScreen(onStartClick = {}) } }
+        compose.waitForIdle()
+        assertOnScreen("splash_start"); capture("splash")
+    }
+
+    @Test fun splash_startVisible_fontScale13() {
+        assumeFontScaleChecks()
+        compose.setContent { PlayItTheme { WithFontScale(1.3f) { SplashScreen(onStartClick = {}) } } }
+        compose.waitForIdle()
+        assertOnScreen("splash_start")
+    }
+
+    @Test fun nameprompt_letsPlayVisible() {
+        compose.setContent { PlayItTheme { namePrompt() } }
+        compose.waitForIdle()
+        assertOnScreen("nameprompt_play"); capture("nameprompt")
+    }
+
+    @Test fun nameprompt_letsPlayVisible_fontScale13() {
+        assumeFontScaleChecks()
+        compose.setContent { PlayItTheme { WithFontScale(1.3f) { namePrompt() } } }
+        compose.waitForIdle()
+        assertOnScreen("nameprompt_play")
     }
 }
 
