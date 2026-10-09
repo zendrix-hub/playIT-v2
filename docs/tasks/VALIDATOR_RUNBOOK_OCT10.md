@@ -44,11 +44,15 @@ Whenever Claude announces a new commit for validation:
 | Card 18 | `5489293` | 274 passed | 4 sizes green | Included in APK A2+ | ✅ VALIDATED |
 | Card 09b | `1df3f56` | 275 passed | Clean | Audio verified | ✅ VALIDATED |
 | Card 19 | `dc6098e` | 294 passed (0 failed, 2 skipped) | `review_card.py 19` ALL PASS; 10 card tests green | Validated | ✅ VALIDATED (Continuous Mode) |
-| Card 03b | *In Progress (Claude)* | *TBD* | *N/A* | *TBD* | *Continuous Execution* |
-| Card 20 | *Pending Claude* | *TBD* | *Find It grid & Blend It card visible on all 4 sizes* | *TBD* | *Continuous Execution* |
+| Card 03b | `339f309` | 298 passed (0 failed, 2 skipped) | `review_card.py 03b` ALL PASS; 5 card tests green | Validated | ✅ VALIDATED (Continuous Mode) |
+| Card 20 | *In Progress (Claude)* | *TBD* | *Find It grid & Blend It card visible on all 4 sizes* | *TBD* | *Continuous Execution* |
 | Card 22 | *Pending Claude* | *TBD* | *TopStatsBar pills visible with 16-char name* | *TBD* | *Continuous Execution* |
+| Card 21 | *Pending Claude* | *TBD* | *Complete, Splash, Profile screens fit* | *TBD* | *Continuous Execution* |
+| Card 23 | *Pending Claude* | *TBD* | *Purposeful effects & zero haptics* | *TBD* | *Continuous Execution* |
+| Card 15 | *Pending Claude* | *TBD* | *5 decodable Blend It replacement words* | *TBD* | *Continuous Execution* |
+| Card 24 | *Pending Claude* | *TBD* | *Sound captions & mouth-shape cues* | *TBD* | *Continuous Execution* |
 
-> **CONTINUOUS MODE ACTIVE (User Directive 2026-10-09):** Claude does NOT wait for agy between cards. Claude proceeds continuously: Card 19 $\to$ Card 03b $\to$ Card 20 $\to$ Card 22. agy will conduct the full multi-card review, test run, and APK validation once Claude finishes the sprint run.
+> **CONTINUOUS MODE ACTIVE (User Directive 2026-10-09):** Claude does NOT wait for agy between cards. Claude proceeds continuously: Card 19 $\to$ Card 03b $\to$ Card 20 $\to$ Card 22 $\to$ Card 21 $\to$ Card 23 $\to$ Card 15 $\to$ Card 24. agy will conduct the full multi-card review, test run, Roborazzi 4-device screenshot matrix, and release APK validation once Claude finishes the entire sprint run.
 
 
 ---
