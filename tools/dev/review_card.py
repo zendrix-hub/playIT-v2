@@ -34,7 +34,8 @@ EMOJI = re.compile("[\U0001F000-\U0001FAFF\u2600-\u27BF\u2300-\u23FF\u2B00-\u2BF
 
 
 def git(*args):
-    return subprocess.run(["git", *args], cwd=REPO, capture_output=True, text=True, check=True).stdout
+    return subprocess.run(["git", *args], cwd=REPO, capture_output=True, text=True, encoding="utf-8",
+                          errors="replace", check=True).stdout
 
 
 def card_file(nn):
