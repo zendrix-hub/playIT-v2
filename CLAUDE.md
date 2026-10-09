@@ -48,3 +48,31 @@ When the user enters `"run and review"` (or `"review"`), Claude operates as **Th
    After pushing Card 27:
    - Update `docs/tasks/SESSION_HANDOFF.md` summarizing all completed cards, commits, and passing tests.
    - Update `docs/tasks/VALIDATOR_RUNBOOK_OCT10.md` notifying agy that the entire sprint batch (Cards 20, 22, 21, 23, 15, 24, 27) is ready for final batch validation (full 280+ unit test run, 4-size Roborazzi screenshot audit, and release debug APK assembly).
+
+---
+
+## Final Submission Packaging & Evidence-Log Acceptance
+
+When the sprint batch is validated by agy (verified at `c07206e`), Claude operates at full capacity to complete final acceptance and academic deliverables:
+
+1. **Pull Latest Changes:**
+   `git pull origin refactor/hear-say-it`
+
+2. **Evidence-Log Acceptance (`docs/evidence-log.md`):**
+   - Fill commit hashes for cards 03b (`339f309`), 20 (`9bb8cb7`), 22 (`3be745b`), 21 (`9bac8ca`), 23 (`dd42582`), 15 (`299cea2`), 24 (`20efb22`), and 27 (`eaf8634`).
+   - Append `(accepted)` review entries referencing agy's automated validation verdict (364 unit tests passed with 100% pass rate, 41 Roborazzi layout screenshot matrix passed across 4 display sizes, and `playit-debug-B-eaf8634.apk` assembled).
+
+3. **Render Official Submission Package (`docs/submission/`):**
+   - Run the dedicated rendering tool:
+     `python3 tools/docs/render_submission_package.py`
+   - Confirms generation of all four official academic documents into `docs/submission/` in both PDF and DOCX formats:
+     * `playIT_MVP_Validation_Findings_and_Refactoring_Priorities.pdf` + `.docx`
+     * `playIT_SDD_v2.0.pdf` + `.docx`
+     * `playIT_SRS_v3.0.pdf` + `.docx`
+     * `playIT_SPMP_v2.0.pdf` + `.docx`
+     * `SUBMISSION_OVERVIEW_AND_REVIEW_CHECKLIST.md`
+
+4. **Commit & Push:**
+   - Commit: `docs(submission): formalize batch acceptance and build official IT411 submission package (PDF and DOCX)`
+   - Push to `origin refactor/hear-say-it`.
+
