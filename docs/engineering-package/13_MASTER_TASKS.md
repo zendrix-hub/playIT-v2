@@ -271,7 +271,7 @@ Each card ticks its own item in its commit (see `docs/tasks/AGY_RUNBOOK.md`). A 
 - [x] Card 13: Approved batch-1 pictures in the app (FR-05)
 - [x] Card 03b: Say It corrections from fragments around the sound (FR-03)
 - [x] Card 14: Privacy pack: no cloud backup, delete a child's data, privacy notice (FR-14)
-- [ ] Card 15: Decodable Blend It word list, 5 words per chapter, teacher-confirmed (FR-13)
+- [x] Card 15: Decodable Blend It word list, 5 words per chapter, teacher-confirmed (FR-13). Word list by user decision 2026-10-09; teacher confirmation and AM/TUB/YAM/ZIP assets pending
 - [ ] Card 16: Blend It word card fits its text (screenshot finding) (FR-13). Superseded by card 20
 - [x] Card 17: Performance and calm motion: no haptics, downscaled images, no endless idle animation, portrait (NFR-PERF-01)
 - [x] Card 17b: ViewModel init blocks run after every property (crash fix from Claude's dry run)
