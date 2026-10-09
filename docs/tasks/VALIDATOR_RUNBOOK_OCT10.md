@@ -43,7 +43,7 @@ Whenever Claude announces a new commit for validation:
 | Card 26b | `0886ec4` | 254 passed | Clean | Included in APK A2 | ✅ VALIDATED |
 | Card 18 | `5489293` | 274 passed | 4 sizes green | Included in APK A2+ | ✅ VALIDATED |
 | Card 09b | `1df3f56` | 275 passed | Clean | Audio verified | ✅ VALIDATED |
-| Card 19 | *Pending Claude* | *TBD* | *Hear It play & Say It mic visible on all 4 sizes* | *TBD* | *Awaiting implementation* |
+| Card 19 | `dc6098e` | 294 (0 failed, 2 skipped) on Claude's run | Claude checked hearit_* and sayit_* by eye; agy to confirm (section 4) | TBD | READY FOR agy (section 4) |
 | Card 03b | *Pending Claude* | *TBD* | *N/A* | *TBD* | *Awaiting implementation* |
 | Card 20 | *Pending Claude* | *TBD* | *Find It grid & Blend It card visible on all 4 sizes* | *TBD* | *Awaiting implementation* |
 | Card 22 | *Pending Claude* | *TBD* | *TopStatsBar pills visible with 16-char name* | *TBD* | *Awaiting implementation* |
@@ -59,3 +59,53 @@ At the end of the sprint (Saturday night, Oct 10):
    ```
 2. Verify output size (~100 MB) and copy to `Documents/playIT-apk/playit-debug-refactor-final.apk`.
 3. Confirm 100% zero network calls under airplane mode.
+
+---
+
+## 4. Ready for agy: Card 19 (`dc6098e`)
+
+Commit: `dc6098e` feat(sayit): Hear It and Say It fit every phone; mic shows listening, heard and result (FR-03).
+Acceptance commit before it: `6608552` (cards 13, 26b, 18, 09b accepted; `review_card.py` path fix for Windows).
+
+### 4.1 Automated
+```bash
+git pull origin refactor/hear-say-it
+./gradlew testDebugUnitTest
+./gradlew testDebugUnitTest --tests '*MicStatusTest' --tests '*SayItViewModelTest' --tests '*LayoutMatrix*'
+python3 tools/dev/review_card.py 19
+```
+Expected:
+- Full suite: 294 tests, 0 failed, 2 skipped (`LayoutMatrixCompactTest` font-scale checks are skipped by design).
+- `MicStatusTest`: 5 of 5 pass. `SayItViewModelTest`: 30 of 30 pass, including `partialSpeech_setsHeard` and `recognizerStoppedExternally_returnsToIdle`.
+- `LayoutMatrix{Compact,A21s,Phone,Tablet}Test`: 6 tests each; `hearIt_playVisible`, `sayIt_micVisible` and `sayIt_micVisible_fontScale13` pass (font scale is skipped on compact).
+- `review_card.py 19`: all PASS. One WARN is expected: there is no evidence-log hash until Claude accepts the card.
+- `ZeroEmojiPolicyTest` passes.
+
+### 4.2 Screenshot matrix (Roborazzi)
+```bash
+./gradlew recordRoborazziDebug --tests 'com.playit.app.screenshot.*'
+```
+Open `app/build/outputs/roborazzi/` and check these 8 images:
+
+| Image | Must be true |
+|---|---|
+| `hearit_compact.png`, `hearit_a21s.png`, `hearit_phone.png`, `hearit_tablet.png` | "M is for Mouse" is on one line and not ellipsized. The play button and the 5 dots are above the "Next: Say It" bar. The card is at most 320 dp wide (centred on tablet). |
+| `sayit_compact.png`, `sayit_a21s.png`, `sayit_phone.png`, `sayit_tablet.png` | "Say the word Mouse" is not cut. The green mic, its label "Tap and say it" and the 3 attempt dots are above the "Next: Find It" bar. No red anywhere. On compact only, the "Tap to listen" pill is hidden; the corner speaker badge stays. |
+
+Known, not a failure: the key-word picture in the Hear It card is small (about 40 dp on compact, 60 dp on phone), because the big "Mm" letter takes most of the card height. Report it in the verdict; Claude decides on a dimens follow-up.
+
+The Hear It play button shows grey in the screenshots, because the mocked player never finishes the intro. That is expected.
+
+### 4.3 Device check (APK on the A21s)
+Build: `./gradlew assembleDebug`, then install. Run lesson M:
+1. Hear It: the play button is visible without scrolling and Next unlocks as before.
+2. Say It, before tapping: the mic is green with "Tap and say it".
+3. Tap the mic and stay silent: the mic is amber, one ring grows from it, and the label reads "I'm listening...".
+4. Start saying "mouse": the mic turns lavender with bouncing dots, "I hear you!".
+5. Correct: a green check with a small pop, "Yes!", and the green banner above Next.
+6. Say "em": an orange ear with a gentle shake, "Let's try again", and the orange banner above Next. Tapping the mic starts a new attempt.
+7. Review Focus 2: tap the mic, press Home within 3 s, then reopen the app. The mic must be green "Tap and say it", not stuck listening, and no attempt dot is added.
+8. Turn on Settings > Accessibility > Remove animations: the listening ring is a still outline, the dots don't move, and there is no pop or shake.
+9. Samsung font size Large: the mic is still visible without scrolling.
+
+Record the verdict in section 2 and in `SESSION_HANDOFF.md`. Then Claude accepts the card (hash and CI run in `docs/evidence-log.md`) and starts card 03b.

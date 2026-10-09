@@ -690,3 +690,26 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
 
 
 
+
+### Claude, 2026-10-09 (night): "run and review": cards 13, 26b, 18, 09b accepted; card 19 implemented
+
+- **Environment:** this session ran on Windows (Git Bash + PowerShell), not WSL: Python 3.13 at `%LOCALAPPDATA%\Programs\Python\Python313`, JDK 17 (Adoptium), Android SDK at `%LOCALAPPDATA%\Android\Sdk`, `gradlew.bat`. `review_card.py` passed a Windows path to `git show` and crashed. It now uses POSIX paths (commit `6608552`).
+- **Accepted (`6608552`):**
+  - Cards 13 `b909329`, 26b `0886ec4`, 18 `5489293` and 09b `1df3f56`.
+  - `review_card.py`: all PASS. Card 26b has one WARN, which is expected: the card keeps `AudioCompletenessCheckTest`.
+  - CI green on each: runs 37785988722, 37790588953, 37800443965, 37805757544.
+  - Evidence-log rows now carry hashes and CI runs, plus "(accepted)" rows.
+- **Card 19 (`dc6098e`), pushed:**
+  - `MicStatus` and `micStatusFor`.
+  - `SayItViewModel.micStatus` and `onScreenHidden`. `SayItScreen` calls it on ON_STOP and on dispose.
+  - New `MicButton` with 4 states plus a reduced-motion variant. No red.
+  - Hear It and Say It now use `LessonScaffold`. The Say It feedback banner sits in the bottom bar above Next.
+  - Tests: 294 run, 0 failed, 2 skipped (forced rerun). The 10 card tests exist and pass. Claude checked the Roborazzi `hearit_*` and `sayit_*` images on all 4 sizes.
+  - Plan deviations (in the commit body):
+    - LetterCard is the column width up to 320 dp, not a 0.97 aspect ratio. At 0.97 the compact card cut "M is for Mouse".
+    - Say It cards use 80% of `letterCardHeight`.
+    - On compact, the "Tap to listen" pill is hidden.
+    - The red waveform bar and the 11.5 sp noise pill are gone.
+  - Open point for Claude: the Hear It key-word picture is small (about 40-60 dp), because the "Mm" letter takes most of the card. Possible follow-up: raise REGULAR/WIDE `letterCardHeight`, or shrink the letter on short cards. Decide after agy's screenshots and the phone check.
+- **For agy:** validate card 19 per `docs/tasks/VALIDATOR_RUNBOOK_OCT10.md` section 4 (automated checks, the 8 screenshots, and A21s steps 1-9, including Home while listening).
+- **Next active task:** after agy's verdict, Claude accepts card 19 and implements **card 03b** (spoken Say It corrections). After that come cards 20 and 22 (Tier 1).
