@@ -1,6 +1,6 @@
 # Card 23: Purposeful effects
 
-Status: ready after 22 is accepted
+Status: done
 
 **This card's steps, code and test code are in the plan:** `docs/superpowers/plans/2026-10-06-ui-fit-effects-overhaul.md`, section "Task 7". Follow Steps 1-5 there exactly, in order (failing test first). Read the plan's "Global Constraints" before you start; they apply to every card. This card holds what the review checks: the Files list, the Tests table and the commit.
 

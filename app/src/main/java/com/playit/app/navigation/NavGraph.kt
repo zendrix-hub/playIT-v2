@@ -1,5 +1,13 @@
 package com.playit.app.navigation
 
+import com.playit.app.presentation.theme.PlayItMotion
+import com.playit.app.presentation.theme.LocalReducedMotion
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.EnterTransition
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -36,9 +44,19 @@ import java.nio.charset.StandardCharsets
 fun NavGraph(
     navController: NavHostController = rememberNavController()
 ) {
+    // Screen change: a fade plus a slight upward move (21_ANIMATION_GUIDE); none under reduced motion.
+    val reduced = LocalReducedMotion.current
+    val enter: EnterTransition = if (reduced) EnterTransition.None else
+        fadeIn(tween(PlayItMotion.SCREEN_MS)) + slideInVertically(tween(PlayItMotion.SCREEN_MS)) { it / 40 }
+    val exit: ExitTransition = if (reduced) ExitTransition.None else fadeOut(tween(PlayItMotion.SCREEN_MS))
+
     NavHost(
         navController = navController,
-        startDestination = Routes.SPLASH
+        startDestination = Routes.SPLASH,
+        enterTransition = { enter },
+        exitTransition = { exit },
+        popEnterTransition = { enter },
+        popExitTransition = { exit }
     ) {
         composable(Routes.SPLASH) {
             SplashScreen(

@@ -187,6 +187,11 @@ fun MapScreen(
 
     LaunchedEffect(shakenNodeId) {
         if (shakenNodeId == null) return@LaunchedEffect
+        if (isReducedMotion) {
+            // Reduced motion: no shake; the locked cue and the node dialog still respond.
+            shakenNodeId = null
+            return@LaunchedEffect
+        }
         shakeOffset.snapTo(0f)
         shakeOffset.animateTo(
             targetValue = 0f,
