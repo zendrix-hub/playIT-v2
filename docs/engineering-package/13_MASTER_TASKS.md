@@ -269,7 +269,7 @@ Each card ticks its own item in its commit (see `docs/tasks/AGY_RUNBOOK.md`). A 
 - [x] Card 11: Stars and hearts use real results (FR-04, FR-06, FR-13)
 - [x] Card 12: Find It distractors, gentle correction colour, no emoji in the PDF (FR-05, FR-12)
 - [x] Card 13: Approved batch-1 pictures in the app (FR-05)
-- [ ] Card 03b: Say It corrections from fragments around the sound (FR-03)
+- [x] Card 03b: Say It corrections from fragments around the sound (FR-03)
 - [x] Card 14: Privacy pack: no cloud backup, delete a child's data, privacy notice (FR-14)
 - [ ] Card 15: Decodable Blend It word list, 5 words per chapter, teacher-confirmed (FR-13)
 - [ ] Card 16: Blend It word card fits its text (screenshot finding) (FR-13). Superseded by card 20

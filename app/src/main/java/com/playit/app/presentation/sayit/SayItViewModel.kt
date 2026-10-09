@@ -384,23 +384,14 @@ class SayItViewModel @Inject constructor(
                 _canContinue.value = true
             }
             is TutorAction.Correct -> {
-                val opener = if (action.supportLevel == 1) {
-                    when (action.errorType) {
-                        SpeechErrorType.LETTER_NAME -> "fb_letter_name"
-                        SpeechErrorType.ADDED_VOWEL -> "fb_added_vowel"
-                        else -> "fb_listen_again"
-                    }
+                val pop = audioResolver.getSfxPath(SfxEvent.INCORRECT_POP)
+                val yourTurn = audioResolver.getTutorPath("car_your_turn")
+                val sequence = if (action.supportLevel == 1) {
+                    listOf(pop) + levelOneCorrection(action.errorType, letter, targetWord) + yourTurn
                 } else {
-                    "car_watch_my_lips"
+                    listOf(pop, audioResolver.getTutorPath("car_watch_my_lips"), model, yourTurn)
                 }
-                audioPlayer.playSequence(
-                    listOf(
-                        audioResolver.getSfxPath(SfxEvent.INCORRECT_POP),
-                        audioResolver.getTutorPath(opener),
-                        model,
-                        audioResolver.getTutorPath("car_your_turn")
-                    )
-                )
+                audioPlayer.playSequence(sequence)
             }
             is TutorAction.LeadAndMoveOn -> {
                 // TODO(FR-NEW-REC): mark the letter NEEDS_PRACTICE and queue a recall check
@@ -413,6 +404,29 @@ class SayItViewModel @Inject constructor(
                 )
                 _canContinue.value = true
             }
+        }
+    }
+
+    /**
+     * First-miss correction between the pop and "Your turn!" (spec §3.2; tools/audio/tutor_script.py
+     * COMPOSE corr_letter_name, corr_added_vowel, remodel). The key word is left out in
+     * letter-sound mode (ng, ñ).
+     */
+    private fun levelOneCorrection(errorType: SpeechErrorType, letter: String, word: String?): List<String> {
+        val sound = audioResolver.getPhonemePath(letter)
+        val keyWord = listOfNotNull(word?.let { audioResolver.getKeyWordPath(it) })
+        return when (errorType) {
+            SpeechErrorType.LETTER_NAME -> listOf(
+                audioResolver.getTutorPath("fb_letter_name"),
+                audioResolver.getTutorPath("fb_its_sound_is"),
+                sound
+            ) + keyWord
+            SpeechErrorType.ADDED_VOWEL -> listOf(
+                audioResolver.getTutorPath("fb_almost_just"),
+                sound,
+                audioResolver.getTutorPath("fb_no_ah")
+            ) + keyWord
+            else -> listOf(audioResolver.getTutorPath("fb_listen"), sound) + keyWord
         }
     }
 

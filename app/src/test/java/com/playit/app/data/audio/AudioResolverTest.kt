@@ -57,6 +57,21 @@ class AudioResolverTest {
     }
 
     @Test
+    fun correctionFragments_fileExists() {
+        // Card 03b: every clip a Say It correction plays (release 2026-10-01, plus the card 05 carrier).
+        val assetsDir = listOf(
+            File("src/main/assets"),
+            File("app/src/main/assets")
+        ).firstOrNull { it.exists() } ?: error("assets not found")
+        listOf("fb_listen", "fb_letter_name", "fb_its_sound_is", "fb_almost_just", "fb_no_ah", "car_your_turn").forEach { id ->
+            val path = audioResolver.getTutorPath(id)
+            val file = File(assetsDir, path)
+            assertTrue("$path should exist", file.exists())
+            assertTrue("$path should not be empty", file.length() > 0L)
+        }
+    }
+
+    @Test
     fun getPhonemePath_returnsCorrectPathForSpecialLetters() {
         assertEquals("audio/phonemes/phoneme_ng.mp3", audioResolver.getPhonemePath("ng"))
         assertEquals("audio/phonemes/phoneme_enye.mp3", audioResolver.getPhonemePath("ñ"))

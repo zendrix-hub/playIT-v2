@@ -478,12 +478,77 @@ class SayItViewModelTest {
 
         verify {
             audioPlayer.playSequence(
-                listOf("sfx_path", "tutor/fb_letter_name.wav", "word_path", "tutor/car_your_turn.wav"),
+                listOf(
+                    "sfx_path", "tutor/fb_letter_name.wav", "tutor/fb_its_sound_is.wav",
+                    "test_path", "word_path", "tutor/car_your_turn.wav"
+                ),
                 any()
             )
         }
         assertEquals(TutorAction.Correct(SpeechErrorType.LETTER_NAME, 1), viewModel.tutorAction.value)
         assertFalse(viewModel.canContinue.value)
+    }
+
+    @Test
+    fun addedVowelError_triggersFbNoAhSpokenCorrection() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        every { speechValidator.judgeWord("ma", "mouse", "m") } returns
+            SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.ADDED_VOWEL, heard = "ma")
+
+        createViewModel()
+        advanceUntilIdle()
+
+        viewModel.evaluateSpeech("ma")
+        advanceUntilIdle()
+
+        // "Almost! Just /m/, no 'ah.' mouse. Your turn!" (spec §3.2)
+        verify {
+            audioPlayer.playSequence(
+                listOf(
+                    "sfx_path", "tutor/fb_almost_just.wav", "test_path",
+                    "tutor/fb_no_ah.wav", "word_path", "tutor/car_your_turn.wav"
+                ),
+                any()
+            )
+        }
+    }
+
+    @Test
+    fun otherWordMiss_playsListenRemodel() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+
+        createViewModel()
+        advanceUntilIdle()
+
+        viewModel.evaluateSpeech("cat")   // default judgement: OTHER_WORD
+        advanceUntilIdle()
+
+        verify {
+            audioPlayer.playSequence(
+                listOf("sfx_path", "tutor/fb_listen.wav", "test_path", "word_path", "tutor/car_your_turn.wav"),
+                any()
+            )
+        }
+    }
+
+    @Test
+    fun letterSoundMode_correctionDropsKeyWord() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns
+            fakePhoneme(letter = "ng", exampleWord = "PENDING_SME_REVIEW")
+        val sequences = mutableListOf<List<String>>()
+        every { audioPlayer.playSequence(capture(sequences), any()) } just Runs
+
+        createViewModel()
+        advanceUntilIdle()
+
+        viewModel.evaluateSpeech("na")    // validate() is false by default
+        advanceUntilIdle()
+
+        assertEquals(
+            listOf("sfx_path", "tutor/fb_listen.wav", "test_path", "tutor/car_your_turn.wav"),
+            sequences.single()
+        )
+        verify(exactly = 0) { audioResolver.getKeyWordPath(any()) }
     }
 
     @Test
