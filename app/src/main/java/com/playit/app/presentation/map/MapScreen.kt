@@ -70,7 +70,6 @@ import com.playit.app.domain.model.MapNode
 import com.playit.app.presentation.components.GummyBackButton
 import com.playit.app.presentation.components.GummyContainer
 import com.playit.app.presentation.components.GummyDialog
-import com.playit.app.presentation.components.MascotBubble
 import com.playit.app.presentation.components.MascotState
 import com.playit.app.presentation.components.breathingPulse
 import com.playit.app.presentation.components.idleBounce
@@ -84,7 +83,6 @@ import com.playit.app.presentation.map.components.MarungkoGroupBanner
 import com.playit.app.presentation.map.components.NodeActionPopupDialog
 import com.playit.app.presentation.map.components.TopStatsBar
 import com.playit.app.presentation.map.components.UnitGuidebookDialog
-import com.playit.app.presentation.map.components.calculateNodeXOffsetDp
 import com.playit.app.presentation.theme.ApricotGlow
 import com.playit.app.presentation.theme.Cloud
 import com.playit.app.presentation.theme.DarkBrownOutline
@@ -122,6 +120,13 @@ import com.playit.app.presentation.theme.Sky
 import com.playit.app.presentation.theme.SkyDeep
 import com.playit.app.presentation.theme.Ube
 import com.playit.app.presentation.theme.UbeShadow
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.material.icons.rounded.LockOpen
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import com.playit.app.presentation.theme.LocalPlayItDimens
+import com.playit.app.presentation.theme.PlayItMotion
 import kotlinx.coroutines.delay
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -129,10 +134,8 @@ import kotlinx.coroutines.delay
 // ═══════════════════════════════════════════════════════════════════════════
 
 private val MASCOT_SIZE = 64.dp
-private val PATH_AMPLITUDE_X = 50.dp
 private val MAP_BOTTOM_EXTENSION = 120.dp
 private val TERRAIN_PROPS_VERTICAL_SPACING = 130.dp
-private val LETTER_NODE_SIZE = 92.dp
 private val BLEND_IT_NODE_SIZE = 136.dp
 private val NODE_VERTICAL_SPACING = 38.dp
 private val BANNER_HEIGHT_ESTIMATE = 68.dp
@@ -148,8 +151,15 @@ fun MapScreen(
 
     val mapNodes by viewModel.mapNodes.collectAsStateWithLifecycle()
     val userStats by viewModel.userStats.collectAsStateWithLifecycle()
+    val newlyUnlockedNodeId by viewModel.newlyUnlockedNodeId.collectAsStateWithLifecycle()
     val isReducedMotion = LocalReducedMotion.current
+    val d = LocalPlayItDimens.current
     val scrollState = rememberScrollState()
+
+    // Unlock moment (card 22): the node that just opened pops in, with a chime and a chip.
+    val unlockPop = remember { Animatable(1f) }
+    var poppingNodeId by remember { mutableStateOf<String?>(null) }
+    var showUnlockChip by remember { mutableStateOf(false) }
 
     // Identify current active node for auto-scroll and companion mascot positioning
     val activeNodeIndex = remember(mapNodes) {
@@ -254,17 +264,11 @@ fun MapScreen(
                 activeBiomeTheme.mascotDialogue
             }
 
-            val animatedBubbleBg by animateColorAsState(
-                targetValue = activeBiomeTheme.backgroundTint.copy(alpha = 0.95f),
-                animationSpec = tween(durationMillis = 450, easing = FastOutSlowInEasing),
-                label = "bubbleBgAnim"
-            )
-
-            MascotBubble(
+            // One line, so the trail gets the screen; tapping Lily speaks the greeting.
+            LilyGreetingChip(
                 message = welcomeGreeting,
-                mascotState = MascotState.ENCOURAGING,
-                backgroundColor = animatedBubbleBg,
-                onMascotTap = { viewModel.playMascotTapReaction() },
+                backgroundColor = activeBiomeTheme.backgroundTint.copy(alpha = 0.95f),
+                onTap = { viewModel.playMascotTapReaction() },
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
             )
 
@@ -276,6 +280,7 @@ fun MapScreen(
                     .verticalScroll(scrollState)
             ) {
                 val density = LocalDensity.current
+                val mapWidth = maxWidth
                 val widthPx = with(density) { constraints.maxWidth.toDp().toPx() }
                 val spacingDp = NODE_VERTICAL_SPACING
                 val spacingPx = with(density) { spacingDp.toPx() }
@@ -284,10 +289,12 @@ fun MapScreen(
                 val bannerHeightPx = with(density) { BANNER_HEIGHT_ESTIMATE.toPx() }
                 val bannerSpacingPx = with(density) { BANNER_SPACING.toPx() }
 
-                val measuredCenters = remember { mutableStateMapOf<Int, Offset>() }
+                val measuredCenters = remember(mapNodes) { mutableStateMapOf<Int, Offset>() }
+                // Disc plus its 8 dp shelf and the stars row under a finished letter
+                val letterNodeHeight = d.mapNodeSize + 16.dp
 
                 // Fallback / initial estimated center coordinates
-                val fallbackNodeCenters = remember(mapNodes, widthPx) {
+                val fallbackNodeCenters = remember(mapNodes, widthPx, d.mapNodeSize) {
                     val centers = mutableListOf<Offset>()
                     var currentY = topPaddingPx
 
@@ -297,16 +304,16 @@ fun MapScreen(
                             currentY += bannerHeightPx + bannerSpacingPx
                         }
 
-                        val nodeHeightDp = if (node is MapNode.BlendItNode) 54.dp else LETTER_NODE_SIZE
+                        val nodeHeightDp = if (node is MapNode.BlendItNode) 54.dp else letterNodeHeight
                         val nodeHeightPx = with(density) { nodeHeightDp.toPx() }
                         val centerY = currentY + nodeHeightPx / 2f
-                        val xOffsetPx = with(density) { calculateNodeXOffsetDp(index, PATH_AMPLITUDE_X).toPx() }
+                        val xOffsetPx = with(density) { MapLayout.nodeXOffset(index, mapWidth, d.mapNodeSize).toPx() }
                         val centerX = widthPx / 2f + xOffsetPx
 
                         centers.add(Offset(centerX, centerY))
 
                         val nextNode = mapNodes.getOrNull(index + 1)
-                        val nextNodeHeightDp = if (nextNode is MapNode.BlendItNode) 54.dp else LETTER_NODE_SIZE
+                        val nextNodeHeightDp = if (nextNode is MapNode.BlendItNode) 54.dp else letterNodeHeight
                         val nextNodeHeightPx = with(density) { nextNodeHeightDp.toPx() }
 
                         currentY += nodeHeightPx / 2f + spacingPx + nextNodeHeightPx / 2f
@@ -348,6 +355,28 @@ fun MapScreen(
                             hasAutoScrolled = true
                         }
                     }
+                }
+
+                // Unlock moment: scroll to the new node, pop it, chime, show the chip, then clear.
+                LaunchedEffect(newlyUnlockedNodeId, nodeCenters) {
+                    val id = newlyUnlockedNodeId ?: return@LaunchedEffect
+                    val index = mapNodes.indexOfFirst { it.id == id }
+                    if (index !in nodeCenters.indices) return@LaunchedEffect
+                    val targetScrollPx = (nodeCenters[index].y - viewportHeightPx / 2.2f)
+                        .coerceIn(0f, scrollState.maxValue.toFloat()).toInt()
+                    if (isReducedMotion) scrollState.scrollTo(targetScrollPx) else scrollState.animateScrollTo(targetScrollPx)
+                    hasAutoScrolled = true
+                    viewModel.playUnlockChime()
+                    showUnlockChip = true
+                    if (!isReducedMotion) {
+                        poppingNodeId = id
+                        unlockPop.snapTo(0.6f)
+                        unlockPop.animateTo(1f, tween(PlayItMotion.CELEBRATION_MS))
+                        poppingNodeId = null
+                    }
+                    delay(2000L)
+                    showUnlockChip = false
+                    viewModel.onUnlockShown()
                 }
 
                 // Total calculated map height to ensure path canvas & terrain props span full scroll length
@@ -402,13 +431,16 @@ fun MapScreen(
                             )
                         }
 
-                        val xOffsetDp = calculateNodeXOffsetDp(index, PATH_AMPLITUDE_X)
+                        val xOffsetDp = MapLayout.nodeXOffset(index, mapWidth, d.mapNodeSize)
                         val isShaking = shakenNodeId == node.id
                         val shakeX = if (isShaking) shakeOffset.value.dp else 0.dp
 
+                        val popScale = if (poppingNodeId == node.id) unlockPop.value else 1f
                         Box(
                             modifier = Modifier
                                 .offset(x = xOffsetDp + shakeX)
+                                .graphicsLayer { scaleX = popScale; scaleY = popScale }
+                                .then(if (index == activeNodeIndex) Modifier.testTag("map_current_node") else Modifier)
                                 .onGloballyPositioned { coords ->
                                     val boundsInCol = coords.boundsInParent()
                                     measuredCenters[index] = Offset(
@@ -422,6 +454,7 @@ fun MapScreen(
                                 is MapNode.LetterNode -> {
                                     LetterMapNodeCard(
                                         node = node,
+                                        discSize = d.mapNodeSize,
                                         onClick = {
                                             if (node.isUnlocked) {
                                                 selectedNodeForAction = node
@@ -468,6 +501,15 @@ fun MapScreen(
                         .height(totalMapHeightDp)
                 )
             }
+        }
+
+        if (showUnlockChip) {
+            UnlockChip(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .navigationBarsPadding()
+                    .padding(bottom = 24.dp)
+            )
         }
 
         // Duolingo Signature Floating 3D Node Action Card
@@ -559,6 +601,7 @@ private val NodeLockedIcon = Color(0xFF94A3B8)
 @Composable
 fun LetterMapNodeCard(
     node: MapNode.LetterNode,
+    discSize: Dp = 76.dp,
     onClick: () -> Unit
 ) {
     val isCompleted = node.isUnlocked && node.starsEarned > 0
@@ -612,13 +655,13 @@ fun LetterMapNodeCard(
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.size(width = 76.dp, height = 84.dp)
+            modifier = Modifier.size(width = discSize, height = discSize + 8.dp)
         ) {
             // Active Pulsing Ring Focus Aura
             if (isCurrentActiveNode && !isReducedMotion) {
                 Box(
                     modifier = Modifier
-                        .size(76.dp)
+                        .size(discSize)
                         .graphicsLayer {
                             scaleX = ringScale
                             scaleY = ringScale
@@ -645,7 +688,7 @@ fun LetterMapNodeCard(
                 // 3D Extrusion Bottom Shelf (8dp extrusion)
                 Box(
                     modifier = Modifier
-                        .size(76.dp)
+                        .size(discSize)
                         .align(Alignment.BottomCenter)
                         .background(shelfColor, CircleShape)
                 )
@@ -653,7 +696,7 @@ fun LetterMapNodeCard(
                 // Top Disc Face
                 Box(
                     modifier = Modifier
-                        .size(76.dp)
+                        .size(discSize)
                         .align(Alignment.TopCenter)
                         .background(faceColor, CircleShape),
                     contentAlignment = Alignment.Center
@@ -930,3 +973,74 @@ fun BlendItChallengeNodeCard(
     }
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// One-line Lily greeting chip and the unlock chip
+// ═══════════════════════════════════════════════════════════════════════════
+
+@Composable
+private fun LilyGreetingChip(
+    message: String,
+    backgroundColor: Color,
+    onTap: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = 64.dp)
+            .background(backgroundColor, RoundedCornerShape(999.dp))
+            .border(1.5.dp, ModernBorderSoft, RoundedCornerShape(999.dp))
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onTap
+            )
+            .padding(horizontal = 10.dp, vertical = 6.dp)
+            .semantics(mergeDescendants = true) { contentDescription = "Lily says: $message. Tap to hear it." },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Image(
+            painter = rememberAssetPainter(MascotState.ENCOURAGING.assetPath),
+            contentDescription = null,
+            modifier = Modifier.size(44.dp)
+        )
+        Text(
+            text = message,
+            fontFamily = LexendFontFamily,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = TextMidnight,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+private fun UnlockChip(modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .background(EmeraldLeaf, RoundedCornerShape(999.dp))
+            .border(2.dp, DarkBrownOutline, RoundedCornerShape(999.dp))
+            .padding(horizontal = 20.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Rounded.LockOpen,
+            contentDescription = null,
+            tint = Color.White,
+            modifier = Modifier.size(24.dp)
+        )
+        Text(
+            text = "New letter open!",
+            fontFamily = LexendFontFamily,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Black,
+            color = Color.White,
+            maxLines = 1
+        )
+    }
+}

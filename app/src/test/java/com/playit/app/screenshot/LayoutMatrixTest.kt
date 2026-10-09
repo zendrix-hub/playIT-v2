@@ -41,6 +41,20 @@ import com.playit.app.presentation.blendit.BlendItScreen
 import com.playit.app.presentation.blendit.BlendItViewModel
 import com.playit.app.presentation.findit.FindItScreen
 import com.playit.app.presentation.findit.FindItViewModel
+import com.playit.app.domain.manager.GroupUnlockManager
+import com.playit.app.domain.manager.StreakTracker
+import com.playit.app.domain.manager.UnlockManager
+import com.playit.app.domain.model.LetterGroup
+import com.playit.app.domain.model.LetterGroupMember
+import com.playit.app.domain.model.Profile
+import com.playit.app.domain.repository.AchievementRepository
+import com.playit.app.domain.repository.LessonProgressRepository
+import com.playit.app.domain.repository.LetterGroupMemberRepository
+import com.playit.app.domain.repository.LetterGroupRepository
+import com.playit.app.domain.repository.ProfileRepository
+import com.playit.app.presentation.map.MapScreen
+import com.playit.app.presentation.map.MapViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.Flow
@@ -210,6 +224,40 @@ abstract class LayoutMatrixTest(private val deviceName: String) {
         compose.setContent { PlayItTheme { blendIt() } }
         compose.waitForIdle()
         assertOnScreen("blendit_tiles"); capture("blendit")
+    }
+    /** Built with the mocks of MapViewModelTest: 2 groups of 3 letters, M is the current lesson. */
+    @Composable private fun map() {
+        val vm = remember {
+            val letters = listOf("m", "s", "a", "t", "p", "i")
+            val phonemes = letters.mapIndexed { i, l -> Phoneme(i + 1, l, "p", "i", "w") }
+            val groups = listOf(LetterGroup(groupId = 1, groupNumber = 1), LetterGroup(groupId = 2, groupNumber = 2))
+            val members = phonemes.map { LetterGroupMember(memberId = it.id, groupId = if (it.id <= 3) 1 else 2, phonemeId = it.id, position = it.id) }
+            val session: SessionManager = mockk(relaxed = true) { every { activeProfileId } returns MutableStateFlow(1L) }
+            val unlock: UnlockManager = mockk { every { isPhonemeUnlocked(any(), any()) } answers { firstArg<Int>() == 1 } }
+            MapViewModel(
+                phonemeRepository = mockk { every { getAllPhonemes() } returns flowOf(phonemes) },
+                letterGroupRepository = mockk<LetterGroupRepository> { every { getAllGroups() } returns flowOf(groups) },
+                letterGroupMemberRepository = mockk<LetterGroupMemberRepository> { every { getAllMembers() } returns flowOf(members) },
+                lessonProgressRepository = mockk<LessonProgressRepository> { every { getProgressForProfile(1L) } returns flowOf(emptyList()) },
+                profileRepository = mockk<ProfileRepository> {
+                    every { getAllProfiles() } returns flowOf(listOf(Profile(id = 1L, name = "Maximilianoooooo", avatarResId = 2)))
+                },
+                achievementRepository = mockk<AchievementRepository> { every { getUnlockedAchievements(1L) } returns flowOf(emptyList()) },
+                sessionManager = session,
+                unlockManager = unlock,
+                groupUnlockManager = mockk<GroupUnlockManager>(relaxed = true),
+                streakTracker = mockk<StreakTracker>(relaxed = true),
+                audioPlayer = mockk<AudioPlayer>(relaxed = true),
+                audioResolver = mockk<AudioResolver>(relaxed = true)
+            )
+        }
+        MapScreen(vm, onNodeSelected = {}, onBack = {})
+    }
+
+    @Test fun map_currentNodeVisible() {
+        compose.setContent { PlayItTheme { map() } }
+        compose.waitForIdle()
+        assertOnScreen("map_current_node"); capture("map")
     }
 }
 

@@ -208,6 +208,74 @@ class MapViewModelTest {
         verify { audioPlayer.playAssetAudio("ui/ui_node_start.wav") }
     }
 
+    /** Node 2 is unlocked once letter 1 has progress; the stub mirrors that rule. */
+    private fun unlockNode2WhenProgress(progress: MutableStateFlow<List<LessonProgress>>) {
+        every { lessonProgressRepository.getProgressForProfile(1L) } returns progress
+        every { unlockManager.isPhonemeUnlocked(1, any()) } returns true
+        every { unlockManager.isPhonemeUnlocked(2, any()) } answers { secondArg<List<LessonProgress>>().isNotEmpty() }
+        every { groupUnlockManager.isBlendItUnlocked(any(), any(), any()) } returns false
+    }
+
+    private fun createViewModel() {
+        viewModel = MapViewModel(
+            phonemeRepository, letterGroupRepository, letterGroupMemberRepository,
+            lessonProgressRepository, profileRepository, achievementRepository,
+            sessionManager, unlockManager, groupUnlockManager, streakTracker,
+            audioPlayer, audioResolver
+        )
+    }
+
+    @Test
+    fun unlockBetweenLoads_setsNewlyUnlocked() = runTest {
+        val progress = MutableStateFlow<List<LessonProgress>>(emptyList())
+        unlockNode2WhenProgress(progress)
+        createViewModel()
+        val collectJob = launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.mapNodes.collect() }
+        advanceUntilIdle()
+        assertNull("first load is not an unlock", viewModel.newlyUnlockedNodeId.value)
+
+        progress.value = listOf(LessonProgress(profileId = 1L, phonemeId = 1, starsEarned = 3, isCompleted = true))
+        advanceUntilIdle()
+
+        assertEquals("2", viewModel.newlyUnlockedNodeId.value)
+        collectJob.cancel()
+    }
+
+    @Test
+    fun returnFromLesson_afterResubscribe_setsNewlyUnlocked() = runTest {
+        val progress = MutableStateFlow<List<LessonProgress>>(emptyList())
+        unlockNode2WhenProgress(progress)
+        createViewModel()
+        val mapVisible = launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.mapNodes.collect() }
+        advanceUntilIdle()
+        mapVisible.cancel()                 // the child opens a lesson; the map stops collecting
+        advanceTimeBy(6_000)                // past WhileSubscribed(5000): the upstream stops
+
+        progress.value = listOf(LessonProgress(profileId = 1L, phonemeId = 1, starsEarned = 3, isCompleted = true))
+        val mapAgain = launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.mapNodes.collect() }
+        advanceUntilIdle()
+
+        assertEquals("2", viewModel.newlyUnlockedNodeId.value)
+        mapAgain.cancel()
+    }
+
+    @Test
+    fun onUnlockShown_clears() = runTest {
+        val progress = MutableStateFlow<List<LessonProgress>>(emptyList())
+        unlockNode2WhenProgress(progress)
+        createViewModel()
+        val collectJob = launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.mapNodes.collect() }
+        advanceUntilIdle()
+        progress.value = listOf(LessonProgress(profileId = 1L, phonemeId = 1, starsEarned = 3, isCompleted = true))
+        advanceUntilIdle()
+        assertEquals("2", viewModel.newlyUnlockedNodeId.value)
+
+        viewModel.onUnlockShown()
+
+        assertNull(viewModel.newlyUnlockedNodeId.value)
+        collectJob.cancel()
+    }
+
     @Test
     fun clearSession_clearsActiveProfile() {
         viewModel = MapViewModel(
