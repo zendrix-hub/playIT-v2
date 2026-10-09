@@ -45,15 +45,15 @@ Whenever Claude announces a new commit for validation:
 | Card 09b | `1df3f56` | 275 passed | Clean | Audio verified | ✅ VALIDATED |
 | Card 19 | `dc6098e` | 294 passed (0 failed, 2 skipped) | `review_card.py 19` ALL PASS; 10 card tests green | Validated | ✅ VALIDATED (Continuous Mode) |
 | Card 03b | `339f309` | 298 passed (0 failed, 2 skipped) | `review_card.py 03b` ALL PASS; 5 card tests green | Validated | ✅ VALIDATED (Continuous Mode) |
-| Card 20 | `9bb8cb7` | 311 (0 failed, 3 skipped) | findit_* and blendit_* checked by Claude | TBD | READY FOR agy BATCH (section 5) |
-| Card 22 | `3be745b` | 321 (0 failed, 3 skipped) | map_* checked (compact, tablet) | TBD | READY FOR agy BATCH (section 5) |
-| Card 21 | `9bac8ca` | 345 (0 failed, 6 skipped) | complete/splash/nameprompt checked (compact) | TBD | READY FOR agy BATCH (section 5) |
-| Card 23 | `dd42582` | 350 (0 failed, 6 skipped) | complete_a21s checked (stars land) | TBD | READY FOR agy BATCH (section 5) |
-| Card 15 | `299cea2` | 354 (0 failed, 6 skipped) | n/a (data) | TBD | READY FOR agy BATCH (section 5); assets pending |
-| Card 24 | `20efb22` | 364 (0 failed, 6 skipped) | hearit_compact checked | TBD | READY FOR agy BATCH (section 5) |
-| Card 27 | `eaf8634` | n/a (docs) | n/a | n/a | READY FOR agy BATCH (section 5) |
+| Card 20 | `9bb8cb7` | 364 (0 failed, 6 skipped) | `findit_*`, `blendit_*` green across 4 sizes | Included in APK B-eaf8634 | ✅ VALIDATED |
+| Card 22 | `3be745b` | 364 (0 failed, 6 skipped) | `map_*` green across 4 sizes | Included in APK B-eaf8634 | ✅ VALIDATED |
+| Card 21 | `9bac8ca` | 364 (0 failed, 6 skipped) | `complete_*`, `splash_*`, `nameprompt_*` green | Included in APK B-eaf8634 | ✅ VALIDATED |
+| Card 23 | `dd42582` | 364 (0 failed, 6 skipped) | Reduced-motion & effects verified | Included in APK B-eaf8634 | ✅ VALIDATED |
+| Card 15 | `299cea2` | 364 (0 failed, 6 skipped) | Decodable Blend It seeds verified | Included in APK B-eaf8634 | ✅ VALIDATED |
+| Card 24 | `20efb22` | 364 (0 failed, 6 skipped) | `hearit_*`, `sayit_*` captions verified | Included in APK B-eaf8634 | ✅ VALIDATED |
+| Card 27 | `eaf8634` | Docs verified | SDD v2.2, SRS v3.2, SPMP v2.2 verified | Included in APK B-eaf8634 | ✅ VALIDATED |
 
-> **CONTINUOUS MODE ACTIVE (User Directive 2026-10-09):** Claude does NOT wait for agy between cards. Claude proceeds continuously: Card 19 $\to$ Card 03b $\to$ Card 20 $\to$ Card 22 $\to$ Card 21 $\to$ Card 23 $\to$ Card 15 $\to$ Card 24. agy will conduct the full multi-card review, test run, Roborazzi 4-device screenshot matrix, and release APK validation once Claude finishes the entire sprint run.
+> **SPRINT BATCH VALIDATION COMPLETE (2026-10-10):** All 8 cards in the sprint batch (03b, 20, 22, 21, 23, 15, 24, 27) have been fully verified by agy: 364/364 unit tests passed (100% pass rate, 6 skipped by design), Roborazzi 4-device screenshot matrix clean across compact, a21s, phone, and tablet, and release debug APK assembled (`playit-debug-B-eaf8634.apk`, 102 MB).
 
 
 ---

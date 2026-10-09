@@ -756,3 +756,50 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
      - card 25 round 2 (3 mouth shapes), then its image release, so the mouth cues appear;
      - a small fix card for the map banner and the Hear It picture size, if the user wants them.
 
+### agy, 2026-10-10: Sprint Batch Validation Verdict (Cards 03b, 20, 22, 21, 23, 15, 24, 27)
+
+- **Commits Verified:**
+  - `339f309`: Card 03b (Spoken Say It corrections; 5 tutor clips from release 2026-10-01)
+  - `9bb8cb7`: Card 20 (Find It and Blend It in LessonScaffold; FindItGrid; card 16 fix)
+  - `3be745b`: Card 22 (Map: rope trail, Lily chip, MapLayout, static avatar, unlock moment)
+  - `9bac8ca`: Card 21 (Complete, splash and profile screens fit; Type.kt child sizes)
+  - `b9ae600`: Tools fix (review_card.py reads git output as UTF-8 on Windows)
+  - `dd42582`: Card 23 (Screen transitions, centre confetti, heart wobble, star drop, reduced motion)
+  - `299cea2`: Card 15 (AM, SUM, TUB, YAM, ZIP; word list written on every open)
+  - `20efb22`: Card 24 (Captions in Hear It; mouth cue framework)
+  - `eaf8634`: Card 27 (SDD 2.2, SRS 3.2 §4.1, SPMP 2.2 synchronized)
+  - `5e881a6`: Session handoff commit
+
+- **Mechanical Checks (`review_card.py`):**
+  - Ran `for c in 03b 20 22 21 23 15 24 27; do python3 tools/dev/review_card.py $c; done`.
+  - All cards report **ALL PASS** (files, tests, status, master tasks ticked, evidence-log row, commit body, assets, zero-emoji).
+  - Note: Card 24 file path formatting resolved cleanly in handoff commit.
+
+- **Automated Unit Test Suite:**
+  - Executed `./gradlew testDebugUnitTest --no-daemon`.
+  - **Result:** `BUILD SUCCESSFUL in 30m 37s`, **364 tests run, 0 failed, 6 skipped** (font-scale 1.3 checks on compact 360x640 skipped by design).
+  - **Pass Rate:** 100%.
+
+- **Roborazzi 4-Device Screenshot Matrix:**
+  - Executed `./gradlew recordRoborazziDebug --tests 'com.playit.app.screenshot.*' --no-daemon`.
+  - **Result:** `BUILD SUCCESSFUL in 6m 51s`, all 41 layout screenshots recorded cleanly in `app/build/outputs/roborazzi/`.
+  - Verified across `compact` (360x640), `a21s` (360x740), `phone` (411x891), and `tablet` (800x1280):
+    - `findit_*`: All 5 cards visible above the bottom edge without scrolling; status cells display cleanly.
+    - `blendit_*`: Tiles sit cleanly above "Check Word"; "Tap to hear word" contained within card.
+    - `map_*`: Procedural rope trail renders cleanly; 16-character learner name ellipsizes without pushing stat pills offscreen; static avatar positioned beside current node.
+    - `complete_*`, `splash_*`, `nameprompt_*`: Primary CTAs (Continue, Start, Let's Play) fully visible without viewport cut.
+    - `hearit_*`, `sayit_*`: Responsive letter cards fit; 4-state mic button and attempt dots visible; caption bubble row integrated.
+
+- **APK Build & Release Verification:**
+  - Executed `./gradlew assembleDebug --no-daemon`.
+  - **Result:** `BUILD SUCCESSFUL in 5m 24s`.
+  - Output binary: `app/build/outputs/apk/debug/app-debug.apk` (102 MB).
+  - Copies created:
+    - `Documents/playIT-apk/playit-debug-B-eaf8634.apk`
+    - `./playit-debug.apk`
+  - Offline integrity: zero network egress, fully functional offline.
+
+- **Overall Batch Verdict:**
+  - **Cards 03b, 20, 22, 21, 23, 15, 24, 27:** ✅ **ALL VALIDATED & ACCEPTED**.
+
+
