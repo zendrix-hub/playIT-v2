@@ -18,7 +18,7 @@ All code paths are under `app/src/main/java/com/playit/app/` or `app/src/test/ja
 - Modify: `presentation/sayit/SayItViewModel.kt` (`showMouthCue: StateFlow<Boolean>`, true from attempt 2 and in LeadAndMoveOn)
 - Create: `presentation/components/CaptionBubble.kt`, `presentation/components/ArticulationCue.kt`
 - Modify: `presentation/hearit/HearItScreen.kt` and `presentation/sayit/SayItScreen.kt` (show the caption under the letter card; mouth cue beside it, 72 dp, larger, 96 dp, at Say It attempt 2)
-- Test: `domain/model/ArticulationGroupTest.kt`, `domain/manager/CaptionTextTest.kt`, `presentation/components/ArticulationCueTest.kt`, additions to `HearItViewModelTest` and `SayItViewModelTest`
+- Test: `domain/model/ArticulationGroupTest.kt`, `domain/manager/CaptionTextTest.kt`, `presentation/components/ArticulationCueTest.kt`, additions to `presentation/hearit/HearItViewModelTest.kt` and `presentation/sayit/SayItViewModelTest.kt`
 
 ## Tests
 | Test file | Test | Assertion |

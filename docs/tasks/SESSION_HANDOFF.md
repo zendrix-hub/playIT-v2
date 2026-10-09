@@ -721,3 +721,38 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - Claude proceeds continuously through the Tier 1 pipeline: **Card 03b** (`card-03b-tutor-policy-fixes.md`) $\to$ **Card 20** (`card-20-findit-blendit-fit.md`) $\to$ **Card 22** (`card-22-map-overhaul.md`).
   - agy will perform the full multi-card review, test suite execution, and APK build once Claude finishes the sprint run.
 
+### Claude, 2026-10-09 (overnight): continuous sprint, cards 03b, 20, 22, 21, 23, 15, 24, 27 pushed
+
+- **Environment:** Windows (Git Bash, Python 3.13, JDK 17, Android SDK in `%LOCALAPPDATA%`), not WSL. `review_card.py` got two Windows fixes (`6608552` path form, `b9ae600` UTF-8 output).
+- **Accepted:** card 19 (`80abe20`), after agy's verdict. Cards 13, 26b, 18 and 09b were accepted earlier (`6608552`).
+- **Pushed in order:** 03b `339f309`, 20 `9bb8cb7`, 22 `3be745b`, 21 `9bac8ca`, 23 `dd42582`, 15 `299cea2`, 24 `20efb22`, 27 `eaf8634`.
+  - Local suite after card 24: 364 tests, 0 failed, 6 skipped (font scale on 360x640, by design).
+  - CI green through `299cea2`.
+- **Decisions and deviations** (each is in its commit body):
+  - **03b:** the correction clips the code asked for never shipped, so the first miss was silent. It now ships the user-approved fragments from release 2026-10-01 and plays the spec §3.2 sequences. Claude rewrote the card (the draft named mp3 paths that don't exist).
+  - **20:** on compact the Blend It card drops to 168 dp with a 64 dp picture, so the tiles clear Check Word. Card 16's test now uses the unmerged node tree. Find It's two cells use icons plus "n / 3" and "/M/".
+  - **22:**
+    - The Lily chip plays the existing map greeting VO.
+    - The unlock comparison resets only on a profile change, so it survives the map flow resubscribing after a lesson; a test covers this.
+    - The background is recorded once per size into a Picture.
+  - **21:** not done, because the files are outside the card: `d.completeMascot` (DockedMascotWithBubble has no size parameter) and the adaptive avatar grid.
+  - **23:** `correctPop` is defined and tested but has no new consumer in this card's files.
+  - **15:**
+    - The word list is written on every open; the old seed never reached existing installs.
+    - Claude rewrote the card: the draft had the wrong group letters.
+    - **Assets missing:** audio for AM, TUB and YAM (approved takes in batch `2026-10-06-blendwords-card15`, no release yet) and pictures for AM, TUB, YAM and ZIP. These words are silent and have no picture until then.
+    - **If the user prefers, revert `299cea2` before the release APK.**
+  - **24:**
+    - A new `playSequence(paths, onItemStart, onComplete)` overload; the 2-argument form is unchanged.
+    - No mouth pictures yet (card 25 has 6 of 9 picks and no image release).
+  - **27:** the SDD/SRS/SPMP updates mark only what shipped. The card's draft test names (FindItGridTest, DatabaseSeedTest) don't exist and were replaced by real ones.
+- **Found, not fixed** (outside the cards' files):
+  - `MarungkoGroupBanner` clips its title line on the map;
+  - the Hear It key-word picture is small (about 40-60 dp).
+- **Next:**
+  1. agy runs `VALIDATOR_RUNBOOK_OCT10.md` section 5 (batch tests, 4-size screenshots, APK B, phone checks).
+  2. Claude accepts the batch, then:
+     - the card 15 asset release (word audio from the approved batch; pictures through an agy image round);
+     - card 25 round 2 (3 mouth shapes), then its image release, so the mouth cues appear;
+     - a small fix card for the map banner and the Hear It picture size, if the user wants them.
+

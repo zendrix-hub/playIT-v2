@@ -45,12 +45,13 @@ Whenever Claude announces a new commit for validation:
 | Card 09b | `1df3f56` | 275 passed | Clean | Audio verified | ✅ VALIDATED |
 | Card 19 | `dc6098e` | 294 passed (0 failed, 2 skipped) | `review_card.py 19` ALL PASS; 10 card tests green | Validated | ✅ VALIDATED (Continuous Mode) |
 | Card 03b | `339f309` | 298 passed (0 failed, 2 skipped) | `review_card.py 03b` ALL PASS; 5 card tests green | Validated | ✅ VALIDATED (Continuous Mode) |
-| Card 20 | *In Progress (Claude)* | *TBD* | *Find It grid & Blend It card visible on all 4 sizes* | *TBD* | *Continuous Execution* |
-| Card 22 | *Pending Claude* | *TBD* | *TopStatsBar pills visible with 16-char name* | *TBD* | *Continuous Execution* |
-| Card 21 | *Pending Claude* | *TBD* | *Complete, Splash, Profile screens fit* | *TBD* | *Continuous Execution* |
-| Card 23 | *Pending Claude* | *TBD* | *Purposeful effects & zero haptics* | *TBD* | *Continuous Execution* |
-| Card 15 | *Pending Claude* | *TBD* | *5 decodable Blend It replacement words* | *TBD* | *Continuous Execution* |
-| Card 24 | *Pending Claude* | *TBD* | *Sound captions & mouth-shape cues* | *TBD* | *Continuous Execution* |
+| Card 20 | `9bb8cb7` | 311 (0 failed, 3 skipped) | findit_* and blendit_* checked by Claude | TBD | READY FOR agy BATCH (section 5) |
+| Card 22 | `3be745b` | 321 (0 failed, 3 skipped) | map_* checked (compact, tablet) | TBD | READY FOR agy BATCH (section 5) |
+| Card 21 | `9bac8ca` | 345 (0 failed, 6 skipped) | complete/splash/nameprompt checked (compact) | TBD | READY FOR agy BATCH (section 5) |
+| Card 23 | `dd42582` | 350 (0 failed, 6 skipped) | complete_a21s checked (stars land) | TBD | READY FOR agy BATCH (section 5) |
+| Card 15 | `299cea2` | 354 (0 failed, 6 skipped) | n/a (data) | TBD | READY FOR agy BATCH (section 5); assets pending |
+| Card 24 | `20efb22` | 364 (0 failed, 6 skipped) | hearit_compact checked | TBD | READY FOR agy BATCH (section 5) |
+| Card 27 | `eaf8634` | n/a (docs) | n/a | n/a | READY FOR agy BATCH (section 5) |
 
 > **CONTINUOUS MODE ACTIVE (User Directive 2026-10-09):** Claude does NOT wait for agy between cards. Claude proceeds continuously: Card 19 $\to$ Card 03b $\to$ Card 20 $\to$ Card 22 $\to$ Card 21 $\to$ Card 23 $\to$ Card 15 $\to$ Card 24. agy will conduct the full multi-card review, test run, Roborazzi 4-device screenshot matrix, and release APK validation once Claude finishes the entire sprint run.
 
@@ -116,3 +117,63 @@ Build: `./gradlew assembleDebug`, then install. Run lesson M:
 9. Samsung font size Large: the mic is still visible without scrolling.
 
 Record the verdict in section 2 and in `SESSION_HANDOFF.md`. Then Claude accepts the card (hash and CI run in `docs/evidence-log.md`) and starts card 03b.
+
+---
+
+## 5. Ready for agy: sprint batch (cards 20, 22, 21, 23, 15, 24, 27)
+
+Commits, in order, on `refactor/hear-say-it`:
+
+| Card | Commit | What changed |
+|---|---|---|
+| 03b | `339f309` | Spoken Say It corrections; 5 tutor clips from audio release 2026-10-01 |
+| 20 | `9bb8cb7` | Find It and Blend It in LessonScaffold; FindItGrid; card 16 fix |
+| 22 | `3be745b` | Map: rope trail, Lily chip, MapLayout, static avatar, unlock moment |
+| 21 | `9bac8ca` | Complete, splash and profile screens fit; Type.kt child sizes |
+| tools | `b9ae600` | `review_card.py` reads git output as UTF-8 (Windows) |
+| 23 | `dd42582` | Screen transitions, centre confetti, heart wobble, star drop, reduced motion |
+| 15 | `299cea2` | AM, SUM, TUB, YAM, ZIP; word list written on every open |
+| 24 | `20efb22` | Captions in Hear It; mouth cue (pictures pending) |
+| 27 | `eaf8634` | SDD 2.2, SRS 3.2 (§4.1), SPMP 2.2 |
+
+### 5.1 Automated
+```bash
+git pull origin refactor/hear-say-it
+./gradlew testDebugUnitTest
+for c in 03b 20 22 21 23 15 24 27; do python3 tools/dev/review_card.py $c; done
+```
+Expected:
+- **Full suite:** 364 tests, 0 failed, 6 skipped. The skips are the font-scale checks on the 360x640 profile, by design.
+- **`review_card.py`:** all PASS except these known items:
+  - every card: WARN "no hash yet" (Claude fills hashes at acceptance);
+  - card 24: FAIL `files`. The card at that commit named `HearItViewModelTest`/`SayItViewModelTest` without paths. Both are listed test files; the card text is fixed in the handoff commit.
+- **CI:** green on every commit through `299cea2`. Confirm `20efb22` and `eaf8634` on the Actions page.
+
+### 5.2 Screenshot matrix (all 4 sizes)
+```bash
+./gradlew recordRoborazziDebug --tests 'com.playit.app.screenshot.*'
+```
+Check `app/build/outputs/roborazzi/`. The images Claude already looked at are marked (seen).
+
+| Images | Must be true |
+|---|---|
+| `findit_*` (compact seen, a21s seen) | All 5 cards visible above the bottom edge. The 5th card is centred at the same width. The two cells read "0 / 3" and "/M/". |
+| `blendit_*` (compact, phone, tablet seen) | "Tap to hear word" inside the card. The S-A-M tiles are above "Check Word". Known: on compact, about 2 dp of the tiles' bottom shadow touches the scroll edge. |
+| `map_*` (compact, tablet seen) | The rope trail is visible. The one-line Lily chip is shown. "Maximilianoooooo" is ellipsized and both stat pills are on screen. Known: the unit banner clips its title line (`MarungkoGroupBanner`, not in these cards). |
+| `complete_*`, `splash_*`, `nameprompt_*` (compact, a21s seen) | Continue / Start / Let's Play are visible. On compact the name grid scrolls (AvatarPicker not in card 21). |
+| `hearit_*`, `sayit_*` | As in section 4.2. Hear It now has an empty caption row under the card (the caption shows while audio plays). |
+
+### 5.3 APK and phone checks (A21s)
+- **Build:** `./gradlew assembleDebug`, then copy the APK to `Documents/playIT-apk/playit-debug-B-eaf8634.apk`. Don't overwrite A or A2.
+- **Card 20:** Find It on the A21s shows all 5 cards without scrolling. In Blend It the tiles sit above Check Word.
+- **Card 22:** finish letter M and return to the map. The S node pops in, a chime plays, and "New letter open!" shows for about 2 s. Only your avatar stands by the current node, and it doesn't move.
+- **Card 21:** with Samsung font size Large, the complete screen, splash and new profile still show their main button.
+- **Card 23:** screens fade and rise slightly when they change. Losing a heart in Find It wobbles that heart. Stars drop in on the complete screen. The confetti bursts from the centre.
+  - With Settings > Accessibility > Remove animations: no confetti, no shakes, and fades only.
+- **Card 15:** Blend It group 1 offers SAM, SIS, AM. **Known:** AM, TUB and YAM are silent on tap and have no picture; ZIP has no picture. The assets are pending (see the card's table).
+- **Card 24:** in Hear It a caption follows the audio ("Listen!", "This letter says...", "/m/", "mouse"). No mouth picture appears yet: card 25 has no image release, so this is expected.
+- **Card 03b:** in Say It (M), say "em": you hear "That's the letter's name. Its sound is /m/ ... mouse. Your turn!" Say "ma": you hear "Almost! Just /m/, no 'ah.' ...".
+- **Review Focus 2 (card 19) still holds:** press Home while listening, and the mic comes back as "Tap and say it".
+
+Record each verdict in section 2 and in `SESSION_HANDOFF.md`. Claude then accepts the batch (hashes and CI runs in `docs/evidence-log.md`).
+
