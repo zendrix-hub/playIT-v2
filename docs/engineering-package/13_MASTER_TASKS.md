@@ -280,7 +280,7 @@ Each card ticks its own item in its commit (see `docs/tasks/AGY_RUNBOOK.md`). A 
 - [x] Card 26b: Remove the unused AudioCompletenessCheck class (fix card from the card 26 review)
 - [x] Card 18: Adaptive layout foundation, LessonScaffold, 4-size layout tests (NFR-ACC-02)
 - [x] Card 19: Hear It and Say It fit; Say It mic states (FR-03, NFR-ACC-02)
-- [ ] Card 20: Find It and Blend It fit (FR-05, FR-13)
+- [x] Card 20: Find It and Blend It fit (FR-05, FR-13)
 - [ ] Card 21: Complete, splash and profile screens fit; child text styles (NFR-ACC-02)
 - [ ] Card 22: Map overhaul: rope trail, compact header, scales to every phone, unlock moment (FR-01)
 - [ ] Card 23: Purposeful effects: transitions, correct pop, heart wobble, star drop, centre confetti (NFR-ACC-02)

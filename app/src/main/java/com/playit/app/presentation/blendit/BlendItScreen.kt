@@ -1,5 +1,9 @@
 package com.playit.app.presentation.blendit
 
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.ui.platform.testTag
+import com.playit.app.presentation.components.LessonScaffold
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -16,12 +20,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -50,6 +51,7 @@ import com.playit.app.presentation.components.idleBounce
 import com.playit.app.presentation.theme.*
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun BlendItScreen(
     viewModel: BlendItViewModel,
@@ -66,6 +68,7 @@ fun BlendItScreen(
     val isPlayingPrompt by viewModel.isPlayingPrompt.collectAsStateWithLifecycle()
     val highlightedSlotIndex by viewModel.highlightedSlotIndex.collectAsStateWithLifecycle()
     val totalWords = words.size.coerceAtLeast(1)
+    val d = LocalPlayItDimens.current
 
     // Fires onSessionComplete once SessionComplete is emitted
     LaunchedEffect(uiState) {
@@ -107,21 +110,9 @@ fun BlendItScreen(
                 )
             )
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            LessonTopBar(
-                currentStep = LessonStep.BLEND_IT,
-                onBack = onBack,
-                hearts = hearts
-            )
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 20.dp, vertical = 6.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+        LessonScaffold(
+            topBar = { LessonTopBar(currentStep = LessonStep.BLEND_IT, onBack = onBack, hearts = hearts) },
+            header = {
                 MascotSpeechHeader(
                     message = when (uiState) {
                         is BlendItUiState.WordCorrect -> "Perfect! Great job!"
@@ -136,40 +127,80 @@ fun BlendItScreen(
                     isPlayingAudio = isPlayingPrompt,
                     onMascotTap = { viewModel.playBlendItIntroAudio() }
                 )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Word progress pill (24sp child reading floor)
-                Text(
-                    text = "Word: ${currentWordIndex + 1} / $totalWords",
-                    fontFamily = LexendFontFamily,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = PrimaryJoyDark,
+            },
+            bottomBar = {
+                val isReady = placedTiles.size == (currentWord?.word?.length ?: 3)
+                val isWordCorrect = uiState is BlendItUiState.WordCorrect
+                GummyContainer(
+                    onClick = {
+                        if (isReady && !isWordCorrect) {
+                            viewModel.submitWord()
+                        }
+                    },
+                    faceColor = if (isWordCorrect) EmeraldLeaf else SunnyGold,
+                    shadowColor = if (isWordCorrect) EmeraldLeafShadow else SunnyGoldShadow,
+                    shape = ButtonShape,
+                    strokeWidth = 2.5.dp,
+                    strokeColor = ModernBorder,
+                    depthHeight = 6.dp,
+                    isSquashed = isWordCorrect,
                     modifier = Modifier
-                        .background(color = PrimaryJoy.copy(alpha = 0.12f), shape = PillShape)
-                        .border(width = 1.5.dp, color = PrimaryJoy.copy(alpha = 0.35f), shape = PillShape)
-                        .padding(horizontal = 18.dp, vertical = 8.dp)
-                )
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                // Illustrated Target Word Card
-                currentWord?.let { wordItem ->
-                    BlendItCard(
-                        word = wordItem.word,
-                        isCorrect = uiState is BlendItUiState.WordCorrect,
-                        onReplayAudio = { viewModel.playTargetWordAudio() }
-                    )
+                        .fillMaxWidth()
+                        .heightIn(min = 64.dp)
+                        .graphicsLayer {
+                            alpha = if (isReady) 1f else 0.45f
+                        }
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = if (isWordCorrect) "Blending..." else "Check Word",
+                            fontFamily = LexendFontFamily,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Black,
+                            color = if (isWordCorrect) Color.White else TextMidnight
+                        )
+                    }
                 }
+            }
+        ) {
+            // Word progress pill (24sp child reading floor)
+            Text(
+                text = "Word: ${currentWordIndex + 1} / $totalWords",
+                fontFamily = LexendFontFamily,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = PrimaryJoyDark,
+                modifier = Modifier
+                    .background(color = PrimaryJoy.copy(alpha = 0.12f), shape = PillShape)
+                    .border(width = 1.5.dp, color = PrimaryJoy.copy(alpha = 0.35f), shape = PillShape)
+                    .padding(horizontal = 18.dp, vertical = 4.dp)
+            )
 
-                Spacer(modifier = Modifier.height(16.dp))
+            // Illustrated Target Word Card
+            currentWord?.let { wordItem ->
+                BlendItCard(
+                    word = wordItem.word,
+                    isCorrect = uiState is BlendItUiState.WordCorrect,
+                    onReplayAudio = { viewModel.playTargetWordAudio() },
+                    // On 360x640 the card (with its smaller compact picture) gives up 8 dp of its 176 dp
+                    // minimum so the tiles clear the bottom bar.
+                    modifier = if (d.profile == WindowProfile.COMPACT) Modifier.heightIn(max = 168.dp) else Modifier
+                )
+            }
 
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 // Target Letter Slots (Target Drop Area) with gentle wobble on incorrect and sequential sound-out bounce
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.graphicsLayer { rotationZ = wobble.value }
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth().graphicsLayer { rotationZ = wobble.value }
                 ) {
                     val wordLength = currentWord?.word?.length ?: 3
                     for (i in 0 until wordLength) {
@@ -211,7 +242,7 @@ fun BlendItScreen(
                             },
                             depthHeight = if (isHighlighted) 6.dp else 4.dp,
                             modifier = Modifier
-                                .size(68.dp)
+                                .size(d.tileSize)
                                 .graphicsLayer {
                                     scaleX = slotScale
                                     scaleY = slotScale
@@ -235,12 +266,11 @@ fun BlendItScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
-
                 // Available Tile Bank with idle interaction bounce
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth().testTag("blendit_tiles")
                 ) {
                     tileBank.forEachIndexed { _, tileLetter ->
                         GummyContainer(
@@ -256,7 +286,7 @@ fun BlendItScreen(
                             strokeColor = ModernBorder,
                             depthHeight = 5.dp,
                             modifier = Modifier
-                                .size(68.dp)
+                                .size(d.tileSize)
                                 .idleBounce()
                         ) {
                             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -269,53 +299,6 @@ fun BlendItScreen(
                                 )
                             }
                         }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(14.dp))
-            }
-
-            // Pinned Bottom Action Button (64dp floor)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .navigationBarsPadding()
-                    .padding(horizontal = 24.dp, vertical = 12.dp)
-            ) {
-                val isReady = placedTiles.size == (currentWord?.word?.length ?: 3)
-                val isWordCorrect = uiState is BlendItUiState.WordCorrect
-                GummyContainer(
-                    onClick = {
-                        if (isReady && !isWordCorrect) {
-                            viewModel.submitWord()
-                        }
-                    },
-                    faceColor = if (isWordCorrect) EmeraldLeaf else SunnyGold,
-                    shadowColor = if (isWordCorrect) EmeraldLeafShadow else SunnyGoldShadow,
-                    shape = ButtonShape,
-                    strokeWidth = 2.5.dp,
-                    strokeColor = ModernBorder,
-                    depthHeight = 6.dp,
-                    isSquashed = isWordCorrect,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 64.dp)
-                        .graphicsLayer {
-                            alpha = if (isReady) 1f else 0.45f
-                        }
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = if (isWordCorrect) "Blending..." else "Check Word",
-                            fontFamily = LexendFontFamily,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Black,
-                            color = if (isWordCorrect) Color.White else TextMidnight
-                        )
                     }
                 }
             }

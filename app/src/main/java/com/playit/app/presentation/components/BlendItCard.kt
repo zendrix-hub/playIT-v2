@@ -30,6 +30,8 @@ import com.playit.app.presentation.theme.DarkBrownOutline
 import com.playit.app.presentation.theme.InkSoft
 import com.playit.app.presentation.theme.Leaf
 import com.playit.app.presentation.theme.LexendFontFamily
+import com.playit.app.presentation.theme.LocalPlayItDimens
+import com.playit.app.presentation.theme.WindowProfile
 import com.playit.app.presentation.theme.Tan
 
 @Composable
@@ -41,6 +43,8 @@ fun BlendItCard(
 ) {
     val cleanWord = word.lowercase()
     val assetPath = "images/pictures/blendword_$cleanWord.png"
+    // Card 16 sizes; on 360x640 the picture is 16 dp smaller so the tiles below clear the bottom bar.
+    val pictureBox = if (LocalPlayItDimens.current.profile == WindowProfile.COMPACT) 64.dp else 80.dp
 
     GummyContainer(
         onClick = onReplayAudio,
@@ -60,10 +64,10 @@ fun BlendItCard(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(12.dp)
             ) {
-                Box(contentAlignment = Alignment.Center, modifier = Modifier.size(96.dp)) {
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.size(pictureBox)) {
                     Box(
                         modifier = Modifier
-                            .size(86.dp)
+                            .size(pictureBox * 0.9f)
                             .background(color = com.playit.app.presentation.theme.SunnyGold.copy(alpha = 0.15f), shape = CircleShape)
                     )
                     GummyMotionAsset(
@@ -71,10 +75,10 @@ fun BlendItCard(
                         contentDescription = "Blend word illustration: $cleanWord",
                         floatDistance = 4.dp,
                         celebrateTrigger = isCorrect,
-                        modifier = Modifier.size(92.dp)
+                        modifier = Modifier.size(pictureBox * 0.95f)
                     )
                 }
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,

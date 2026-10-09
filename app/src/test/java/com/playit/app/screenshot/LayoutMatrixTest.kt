@@ -31,6 +31,16 @@ import com.playit.app.presentation.hearit.HearItScreen
 import com.playit.app.presentation.hearit.HearItViewModel
 import com.playit.app.presentation.sayit.SayItScreen
 import com.playit.app.presentation.sayit.SayItViewModel
+import com.playit.app.domain.repository.BlendItWordRepository
+import com.playit.app.domain.manager.BlendItWordSelector
+import com.playit.app.domain.manager.GridGenerator
+import com.playit.app.domain.model.BlendItWord
+import com.playit.app.domain.repository.BlendItAttemptRepository
+import com.playit.app.domain.repository.FindItAttemptRepository
+import com.playit.app.presentation.blendit.BlendItScreen
+import com.playit.app.presentation.blendit.BlendItViewModel
+import com.playit.app.presentation.findit.FindItScreen
+import com.playit.app.presentation.findit.FindItViewModel
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.Flow
@@ -140,6 +150,66 @@ abstract class LayoutMatrixTest(private val deviceName: String) {
         compose.setContent { PlayItTheme { WithFontScale(1.3f) { sayIt() } } }
         compose.waitForIdle()
         assertOnScreen("sayit_mic")
+    }
+    /** Built as FindItScreenshotTest builds it. */
+    @Composable private fun findIt() {
+        val vm = remember {
+            val sun = Phoneme(id = 2, letter = "s", audioPath = "path2", imagePath = "images/pictures/picture_sun.png", exampleWord = "sun")
+            val repo: PhonemeRepository = mockk { every { getAllPhonemes() } returns flowOf(listOf(mouse, sun)) }
+            val h: SavedStateHandle = mockk { every { get<String>("phonemeId") } returns "1" }
+            FindItViewModel(
+                phonemeRepository = repo,
+                findItAttemptRepository = mockk<FindItAttemptRepository>(relaxed = true),
+                gridGenerator = GridGenerator(),
+                sessionManager = mockk<SessionManager>(relaxed = true),
+                audioPlayer = mockk<AudioPlayer>(relaxed = true),
+                audioResolver = mockk<AudioResolver>(relaxed = true),
+                savedStateHandle = h
+            )
+        }
+        FindItScreen(vm, onNext = { _, _ -> }, onBack = {})
+    }
+
+    /** Built as BlendItScreenshotTest builds it. */
+    @Composable private fun blendIt() {
+        val vm = remember {
+            val words = listOf(
+                BlendItWord(wordId = 1, groupId = 1, word = "SAM", wordPattern = "CVC", audioPath = "audio/words/word_sam.mp3", imagePath = "images/pictures/blendword_sam.png"),
+                BlendItWord(wordId = 2, groupId = 1, word = "SIS", wordPattern = "CVC", audioPath = "audio/words/word_sis.mp3", imagePath = "images/pictures/blendword_sis.png"),
+                BlendItWord(wordId = 3, groupId = 1, word = "AIM", wordPattern = "VVC", audioPath = "audio/words/word_aim.mp3", imagePath = "images/pictures/blendword_aim.png")
+            )
+            val repo: BlendItWordRepository = mockk { every { getWordsForGroup(1) } returns flowOf(words) }
+            val h: SavedStateHandle = mockk { every { get<String>("groupId") } returns "1" }
+            BlendItViewModel(
+                blendItWordRepository = repo,
+                blendItAttemptRepository = mockk<BlendItAttemptRepository>(relaxed = true),
+                blendItWordSelector = BlendItWordSelector(),
+                sessionManager = mockk<SessionManager>(relaxed = true),
+                audioPlayer = mockk<AudioPlayer>(relaxed = true),
+                audioResolver = mockk<AudioResolver>(relaxed = true),
+                savedStateHandle = h
+            )
+        }
+        BlendItScreen(vm, onSessionComplete = {}, onBack = {})
+    }
+
+    @Test fun findIt_wholeGridVisible() {
+        compose.setContent { PlayItTheme { findIt() } }
+        compose.waitForIdle()
+        assertOnScreen("findit_grid"); capture("findit")
+    }
+
+    @Test fun findIt_fontScale13() {
+        assumeFontScaleChecks()
+        compose.setContent { PlayItTheme { WithFontScale(1.3f) { findIt() } } }
+        compose.waitForIdle()
+        assertOnScreen("findit_grid")
+    }
+
+    @Test fun blendIt_tilesVisible() {
+        compose.setContent { PlayItTheme { blendIt() } }
+        compose.waitForIdle()
+        assertOnScreen("blendit_tiles"); capture("blendit")
     }
 }
 
