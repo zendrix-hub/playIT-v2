@@ -22,8 +22,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -70,6 +73,12 @@ class SayItViewModel @Inject constructor(
 
     private val _state = MutableStateFlow<SayItState>(SayItState.Idle)
     val state: StateFlow<SayItState> = _state.asStateFlow()
+
+    /** True once the recognizer returned any speech in the current listening window. */
+    private val _heardSpeech = MutableStateFlow(false)
+
+    val micStatus: StateFlow<MicStatus> = combine(_state, _heardSpeech) { s, h -> micStatusFor(s, h) }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, MicStatus.IDLE)
 
     val heartManager = HeartManager()
 
@@ -272,6 +281,7 @@ class SayItViewModel @Inject constructor(
         val letter = _phoneme.value?.letter?.lowercase() ?: "m"
         voskRecognizer.setGrammar(speechValidator.grammarFor(letter, targetWord))
 
+        _heardSpeech.value = false
         _state.value = SayItState.Listening
         _isNoisyEnvironment.value = false
 
@@ -289,6 +299,7 @@ class SayItViewModel @Inject constructor(
         voskRecognizer.startListening(
             onResult = { transcript, isFinal ->
                 if (transcript.isNotBlank() && _state.value is SayItState.Listening) {
+                    _heardSpeech.value = true
                     val judgement = judgeTranscript(transcript, targetWord, letter)
                     if (judgement.isCorrect || isFinal) {
                         autoStopJob?.cancel()
@@ -403,6 +414,20 @@ class SayItViewModel @Inject constructor(
                 _canContinue.value = true
             }
         }
+    }
+
+    /**
+     * The screen went to the background (MainActivity.onStop stops Vosk) or left composition.
+     * A listening attempt is dropped unjudged, so the mic is never stuck in Listening.
+     */
+    fun onScreenHidden() {
+        autoStopJob?.cancel()
+        if (_state.value is SayItState.Listening) {
+            voskRecognizer.stopListening()
+            _state.value = SayItState.Idle
+            _audioAmplitude.value = 0f
+        }
+        _heardSpeech.value = false
     }
 
     fun simulateCorrectForTesting() {

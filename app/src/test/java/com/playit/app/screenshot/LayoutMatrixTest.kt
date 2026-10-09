@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.getBoundsInRoot
@@ -17,6 +18,23 @@ import com.playit.app.presentation.components.AssetImageConfig
 import com.playit.app.presentation.components.LessonScaffold
 import com.playit.app.presentation.components.MascotSpeechHeader
 import com.playit.app.presentation.theme.PlayItTheme
+import androidx.lifecycle.SavedStateHandle
+import com.playit.app.data.audio.AudioPlayer
+import com.playit.app.data.audio.AudioResolver
+import com.playit.app.data.speech.VoskRecognizer
+import com.playit.app.domain.manager.SpeechValidator
+import com.playit.app.domain.model.Phoneme
+import com.playit.app.domain.repository.PhonemeRepository
+import com.playit.app.domain.repository.SayItAttemptRepository
+import com.playit.app.navigation.SessionManager
+import com.playit.app.presentation.hearit.HearItScreen
+import com.playit.app.presentation.hearit.HearItViewModel
+import com.playit.app.presentation.sayit.SayItScreen
+import com.playit.app.presentation.sayit.SayItViewModel
+import io.mockk.every
+import io.mockk.mockk
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Assert.assertTrue
@@ -78,6 +96,50 @@ abstract class LayoutMatrixTest(private val deviceName: String) {
         }
         val w = compose.onNodeWithTag("wide").getBoundsInRoot().let { it.right - it.left }
         assertTrue(w <= 560.dp)
+    }
+    private val mouse = Phoneme(1, "m", "p", "images/pictures/picture_mouse.png", "mouse")
+    private val phonemes = object : PhonemeRepository {
+        override fun getAllPhonemes(): Flow<List<Phoneme>> = flowOf(listOf(mouse))
+        override suspend fun getPhonemeById(id: Int): Phoneme? = mouse
+        override suspend fun getPhonemeByLetter(letter: String): Phoneme? = mouse
+    }
+    private fun handle(): SavedStateHandle = mockk { every { get<String>("phonemeId") } returns "1" }
+
+    /** Built as HearItScreenshotTest builds it. */
+    @Composable private fun hearIt() {
+        val vm = remember { HearItViewModel(phonemes, mockk<AudioPlayer>(relaxed = true), mockk<AudioResolver>(relaxed = true), handle()) }
+        HearItScreen(vm, onNext = {}, onBack = {})
+    }
+
+    /** Built with relaxed mocks as in SayItViewModelTest; the screen sits in Idle with the word "mouse". */
+    @Composable private fun sayIt() {
+        val vm = remember {
+            SayItViewModel(
+                phonemes, mockk<SayItAttemptRepository>(relaxed = true), mockk<SpeechValidator>(relaxed = true),
+                mockk<VoskRecognizer>(relaxed = true), mockk<AudioPlayer>(relaxed = true),
+                mockk<AudioResolver>(relaxed = true), mockk<SessionManager>(relaxed = true), handle()
+            )
+        }
+        SayItScreen(vm, onNext = {}, onBack = {})
+    }
+
+    @Test fun hearIt_playVisible() {
+        compose.setContent { PlayItTheme { hearIt() } }
+        compose.waitForIdle()
+        assertOnScreen("hearit_play"); capture("hearit")
+    }
+
+    @Test fun sayIt_micVisible() {
+        compose.setContent { PlayItTheme { sayIt() } }
+        compose.waitForIdle()
+        assertOnScreen("sayit_mic"); capture("sayit")
+    }
+
+    @Test fun sayIt_micVisible_fontScale13() {
+        assumeFontScaleChecks()
+        compose.setContent { PlayItTheme { WithFontScale(1.3f) { sayIt() } } }
+        compose.waitForIdle()
+        assertOnScreen("sayit_mic")
     }
 }
 

@@ -618,5 +618,47 @@ class SayItViewModelTest {
 
         assertNull(viewModel.lastHeard.value)
     }
+
+    @Test
+    fun partialSpeech_setsHeard() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        val cb = slot<(String, Boolean) -> Unit>()
+        every { voskRecognizer.startListening(capture(cb)) } just Runs
+
+        createViewModel()
+        advanceUntilIdle()
+
+        viewModel.startListening()
+        runCurrent()
+        assertEquals(MicStatus.LISTENING, viewModel.micStatus.value)
+
+        cb.captured("ma", false)          // wrong partial: keeps listening, but speech was heard
+        runCurrent()
+        assertEquals(MicStatus.HEARD, viewModel.micStatus.value)
+
+        // Drain the 3.8s auto-stop timer so runTest has no pending coroutines.
+        advanceUntilIdle()
+    }
+
+    @Test
+    fun recognizerStoppedExternally_returnsToIdle() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        every { voskRecognizer.startListening(any()) } just Runs
+
+        createViewModel()
+        advanceUntilIdle()
+
+        viewModel.startListening()
+        viewModel.onScreenHidden()        // MainActivity.onStop stopped Vosk while listening
+        runCurrent()
+
+        assertEquals(MicStatus.IDLE, viewModel.micStatus.value)
+        assertEquals(SayItState.Idle, viewModel.state.value)
+        assertTrue(viewModel.attempts.value.isEmpty())   // the dropped attempt is not scored
+
+        // The cancelled auto-stop must not judge the dropped attempt later.
+        advanceUntilIdle()
+        assertEquals(SayItState.Idle, viewModel.state.value)
+    }
 }
 
