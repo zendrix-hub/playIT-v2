@@ -215,7 +215,18 @@ class AudioPlayer @Inject constructor(
      * Plays multiple audio assets sequentially (e.g. SFX chime followed by mascot VO).
      */
     @Synchronized
-    fun playSequence(assetPaths: List<String>, onComplete: (() -> Unit)? = null) {
+    fun playSequence(assetPaths: List<String>, onComplete: (() -> Unit)? = null) =
+        playSequence(assetPaths, onItemStart = null, onComplete = onComplete)
+
+    /**
+     * Like [playSequence], and calls [onItemStart] with each item's index and path just before it
+     * plays (pauses included), so a screen can caption what is being said (card 24).
+     */
+    fun playSequence(
+        assetPaths: List<String>,
+        onItemStart: ((index: Int, path: String) -> Unit)?,
+        onComplete: (() -> Unit)?
+    ) {
         val validPaths = assetPaths.filter { it.isNotBlank() }
         if (validPaths.isEmpty()) {
             onComplete?.invoke()
@@ -223,10 +234,15 @@ class AudioPlayer @Inject constructor(
         }
 
         isSequencePlaying = true
-        playNextInSequence(validPaths, index = 0, onComplete = onComplete)
+        playNextInSequence(validPaths, index = 0, onItemStart = onItemStart, onComplete = onComplete)
     }
 
-    private fun playNextInSequence(paths: List<String>, index: Int, onComplete: (() -> Unit)?) {
+    private fun playNextInSequence(
+        paths: List<String>,
+        index: Int,
+        onItemStart: ((Int, String) -> Unit)?,
+        onComplete: (() -> Unit)?
+    ) {
         if (!isSequencePlaying || index >= paths.size) {
             isSequencePlaying = false
             onComplete?.invoke()
@@ -234,12 +250,13 @@ class AudioPlayer @Inject constructor(
         }
 
         val currentPath = paths[index]
+        onItemStart?.invoke(index, currentPath)
 
         val pauseMs = HearItSequenceBuilder.pauseMillis(currentPath)
         if (pauseMs != null) {
             mainHandler.postDelayed({
                 if (isSequencePlaying) {
-                    playNextInSequence(paths, index + 1, onComplete)
+                    playNextInSequence(paths, index + 1, onItemStart, onComplete)
                 }
             }, pauseMs)
             return
@@ -251,12 +268,12 @@ class AudioPlayer @Inject constructor(
             playSfxInternal(currentPath)
             mainHandler.postDelayed({
                 if (isSequencePlaying) {
-                    playNextInSequence(paths, index + 1, onComplete)
+                    playNextInSequence(paths, index + 1, onItemStart, onComplete)
                 }
             }, 300L)
         } else {
             playAssetAudio(currentPath) {
-                playNextInSequence(paths, index + 1, onComplete)
+                playNextInSequence(paths, index + 1, onItemStart, onComplete)
             }
         }
     }

@@ -5,7 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.playit.app.data.audio.AudioPlayer
 import com.playit.app.data.audio.AudioResolver
+import com.playit.app.domain.manager.CaptionText
 import com.playit.app.domain.manager.HearItSequenceBuilder
+import com.playit.app.domain.model.ArticulationGroup
+import com.playit.app.domain.model.articulationFor
 import com.playit.app.domain.model.Phoneme
 import com.playit.app.domain.repository.PhonemeRepository
 import com.playit.app.presentation.components.IdleTimer
@@ -42,6 +45,21 @@ class HearItViewModel @Inject constructor(
 
     private val _nextHighlighted = MutableStateFlow(false)
     val nextHighlighted: StateFlow<Boolean> = _nextHighlighted.asStateFlow()
+
+    /** Caption of the clip playing now (NFR-ACC-01); null when nothing is playing. */
+    private val _caption = MutableStateFlow<String?>(null)
+    val caption: StateFlow<String?> = _caption.asStateFlow()
+
+    /** Mouth-shape group of the current letter, for the articulation cue. */
+    val articulation: ArticulationGroup
+        get() = articulationFor(_phoneme.value?.letter ?: "m")
+
+    private fun onSequenceItem(@Suppress("UNUSED_PARAMETER") index: Int, path: String) {
+        val letter = _phoneme.value?.letter ?: "m"
+        val word = _phoneme.value?.exampleWord?.trim()?.lowercase().orEmpty()
+        // Pauses keep the last caption on screen.
+        CaptionText.forClip(path, letter, word)?.let { _caption.value = it }
+    }
 
     private val idleTimer = IdleTimer(
         scope = viewModelScope,
@@ -98,7 +116,8 @@ class HearItViewModel @Inject constructor(
         _isPlayingPrompt.value = true
         _isPlaying.value = true
         _playCount.value++
-        audioPlayer.playSequence(buildSequence(HearItSequenceBuilder.TEMPLATE)) {
+        audioPlayer.playSequence(buildSequence(HearItSequenceBuilder.TEMPLATE), ::onSequenceItem) {
+            _caption.value = null
             _isPlayingPrompt.value = false
             _isPlaying.value = false
             if (!firstPlaybackDone) {
@@ -119,7 +138,8 @@ class HearItViewModel @Inject constructor(
         _isPlayingPrompt.value = false
         _isPlaying.value = true
         _playCount.value++
-        audioPlayer.playSequence(buildSequence(HearItSequenceBuilder.replayTemplate())) {
+        audioPlayer.playSequence(buildSequence(HearItSequenceBuilder.replayTemplate()), ::onSequenceItem) {
+            _caption.value = null
             _isPlaying.value = false
             if (!firstPlaybackDone) {
                 firstPlaybackDone = true

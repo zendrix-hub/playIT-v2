@@ -98,6 +98,10 @@ class SayItViewModel @Inject constructor(
     private val _canContinue = MutableStateFlow(false)
     val canContinue: StateFlow<Boolean> = _canContinue.asStateFlow()
 
+    /** "Watch my lips": the mouth-shape cue shows from the second miss on (spec Table 7 attempt 2). */
+    private val _showMouthCue = MutableStateFlow(false)
+    val showMouthCue: StateFlow<Boolean> = _showMouthCue.asStateFlow()
+
     private val _attempts = MutableStateFlow<List<Boolean>>(emptyList())
     val attempts: StateFlow<List<Boolean>> = _attempts.asStateFlow()
 
@@ -125,6 +129,7 @@ class SayItViewModel @Inject constructor(
             _tutorAction.value = null
             _canContinue.value = false
             _lastHeard.value = null
+            _showMouthCue.value = false
             val p = phonemeRepository.getPhonemeById(id)
             if (p == null) {
                 _loadError.value = true
@@ -384,6 +389,7 @@ class SayItViewModel @Inject constructor(
                 _canContinue.value = true
             }
             is TutorAction.Correct -> {
+                if (action.supportLevel >= 2) _showMouthCue.value = true
                 val pop = audioResolver.getSfxPath(SfxEvent.INCORRECT_POP)
                 val yourTurn = audioResolver.getTutorPath("car_your_turn")
                 val sequence = if (action.supportLevel == 1) {
@@ -394,6 +400,7 @@ class SayItViewModel @Inject constructor(
                 audioPlayer.playSequence(sequence)
             }
             is TutorAction.LeadAndMoveOn -> {
+                _showMouthCue.value = true
                 // TODO(FR-NEW-REC): mark the letter NEEDS_PRACTICE and queue a recall check
                 audioPlayer.playSequence(
                     listOf(

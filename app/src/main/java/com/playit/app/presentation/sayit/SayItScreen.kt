@@ -1,5 +1,7 @@
 package com.playit.app.presentation.sayit
 
+import com.playit.app.domain.model.articulationFor
+import com.playit.app.presentation.components.ArticulationCue
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -153,6 +155,7 @@ fun SayItScreen(
     }
 
     val micStatus by viewModel.micStatus.collectAsStateWithLifecycle()
+    val showMouthCue by viewModel.showMouthCue.collectAsStateWithLifecycle()
     val showFeedback = state is SayItState.Correct || state is SayItState.Incorrect
 
     // MainActivity.onStop stops Vosk; drop the attempt here too so the mic is never stuck
@@ -335,12 +338,21 @@ fun SayItScreen(
             }
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                MicButton(
-                    status = micStatus,
-                    onTap = startAttempt,
-                    enabled = !isPlayingPhoneme && !isModelInitializing,
-                    labelOverride = if (isModelInitializing) "Lily is getting ready..." else null
-                )
+                // "Watch my lips": from the second miss the mouth shape shows beside the mic.
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (showMouthCue) {
+                        ArticulationCue(group = articulationFor(phoneme?.letter ?: "m"), size = 96.dp)
+                    }
+                    MicButton(
+                        status = micStatus,
+                        onTap = startAttempt,
+                        enabled = !isPlayingPhoneme && !isModelInitializing,
+                        labelOverride = if (isModelInitializing) "Lily is getting ready..." else null
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(8.dp))
 

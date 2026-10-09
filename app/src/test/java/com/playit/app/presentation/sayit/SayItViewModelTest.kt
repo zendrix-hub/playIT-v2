@@ -552,6 +552,21 @@ class SayItViewModelTest {
     }
 
     @Test
+    fun secondMiss_showsMouthCue() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+
+        createViewModel()
+        advanceUntilIdle()
+
+        viewModel.evaluateSpeech("cat")
+        assertFalse("first miss: no cue yet", viewModel.showMouthCue.value)
+        viewModel.evaluateSpeech("cat")
+        advanceUntilIdle()
+
+        assertTrue(viewModel.showMouthCue.value)
+    }
+
+    @Test
     fun secondMiss_playsWatchMyLips() = runTest {
         coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
         val sequences = mutableListOf<List<String>>()

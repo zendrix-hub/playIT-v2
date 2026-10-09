@@ -1,5 +1,7 @@
 package com.playit.app.presentation.hearit
 
+import com.playit.app.presentation.components.CaptionBubble
+import com.playit.app.presentation.components.ArticulationCue
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
@@ -76,6 +78,7 @@ fun HearItScreen(
     val playCount by viewModel.playCount.collectAsStateWithLifecycle()
     val nextHighlighted by viewModel.nextHighlighted.collectAsStateWithLifecycle()
     val loadError by viewModel.loadError.collectAsStateWithLifecycle()
+    val caption by viewModel.caption.collectAsStateWithLifecycle()
     val targetLetter = phoneme?.letter?.uppercase() ?: "M"
     val d = LocalPlayItDimens.current
 
@@ -210,6 +213,17 @@ fun HearItScreen(
                 wordOverride = phoneme?.exampleWord,
                 onTapReplay = { if (!isPlaying) viewModel.playPhonemeSound() }
             )
+
+            // Mouth cue and caption of what Lily is saying (NFR-ACC-01). The row keeps its height,
+            // so the play button doesn't jump when a caption appears.
+            Row(
+                modifier = Modifier.heightIn(min = 48.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ArticulationCue(group = viewModel.articulation, size = 72.dp)
+                CaptionBubble(caption = caption)
+            }
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 // Pulsating PrimaryJoy Speaker Replay Button; the ring draws outside its bounds

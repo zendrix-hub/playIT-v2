@@ -1,6 +1,6 @@
 # Card 24: Captions and mouth-shape cues (NFR-ACC-01, FR-02, FR-03)
 
-Status: ready after 23 is accepted
+Status: done
 
 **This card's steps, code and test code are in the plan:** `docs/superpowers/plans/2026-10-06-ui-fit-effects-overhaul.md`, section "Task 8". Follow Steps 1-5 there exactly, in order (failing test first). Read the plan's "Global Constraints" before you start; they apply to every card. This card holds what the review checks: the Files list, the Tests table and the commit.
 
