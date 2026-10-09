@@ -43,13 +43,17 @@ graph TD
         C25[Card 25: 3 Mouth Shapes Round 2]
     end
 
-    subgraph Validation_Gate [Validation Gate: Sat Night]
+    subgraph Tier_4 [Tier 4: Academic Documentation Refactoring - Sat Night]
+        C27[Card 27: Refactor SDD v2.0, SRS v3.0, SPMP v2.0]
+    end
+
+    subgraph Validation_Gate [Validation Gate: agy Batch Review & APK]
         VAL[Full Validation: 280+ Tests & Roborazzi 4-Sizes]
         APK[Assemble Final Debug APK: playit-debug.apk]
         VAL --> APK
     end
 
-    Tier_1 --> Tier_2 --> Tier_3 --> Validation_Gate
+    Tier_1 --> Tier_2 --> Tier_3 --> Tier_4 --> Validation_Gate
 ```
 
 ### Staged Prioritization Breakdown:
@@ -66,6 +70,8 @@ graph TD
    - **Card 15**: Purge 5 non-decodable Blend It words in `DatabaseModule.kt` (replace with AM, SUM, TUB, YAM, ZIP; QUIZ exception).
    - **Card 24**: Sound captions and mouth-shape cues (`ArticulationGroup`, `CaptionBubble`, `ArticulationCue`).
    - **Card 25**: Generate remaining 3 mouth shapes (`mouth_wide_open`, `mouth_smile`, `mouth_open_breath`).
+4. **Tier 4 (Academic Documentation Refactoring & RTM Synchronization):**
+   - **Card 27**: Synchronize `docs/SDD_v2.0_Refactored.md` (status table §2.0, architecture), `docs/SRS_v3.0_Refactored.md` (RTM v3.0 to test classes), and `docs/SPMP_v2.0_Refactored.md` (WBS, milestone completion) with the actual codebase implementation.
 
 
 ---
