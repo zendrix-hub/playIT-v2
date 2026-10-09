@@ -3,9 +3,9 @@
 **Course:** IT411 — Capstone & Research 2 | Semester 1, AY 2026–2027  
 **Degree Program:** Bachelor of Science in Information Technology  
 **Department:** College of Computer Studies, Cebu Institute of Technology – University  
-**Document Version:** 3.0 (Renewed & Fully Refactored Post-MVP Validation)  
+**Document Version:** 3.2 (Renewed & Fully Refactored Post-MVP Validation; automated coverage recorded 2026-10-09)  
 **Publication Date:** September 26, 2026  
-**Document Status:** Draft for adviser review (revised 2026-10-05; items marked **[proposed]** await adviser approval)  
+**Document Status:** Draft for adviser review (revised 2026-10-05 and 2026-10-09; items marked **[proposed]** await adviser approval)  
 
 ---
 
@@ -17,6 +17,7 @@
 | **2.0** | May 4, 2026 | Requirements Lead | Comprehensive revision strictly aligned with approved proposal details, including Vosk offline engine, 28-letter sequence, Room DB, and preliminary gamification rules. |
 | **3.0** | September 26, 2026 | Requirements Lead & Capstone Team | **Comprehensive Renewal and Refactoring Based on Weeks 1–2 MVP Field Validation (N=25):**<br>• **Curricular Re-alignment (§1.2):** Standardized curriculum to 26 letters (7 chapters); removed Ñ (purely Spanish/Filipino orthography) and deferred NG to Chapter 8 (advanced digraphs).<br>• **Pure Phoneme Modeling (FR-02, P0):** Eliminated schwa / letter-name vocal intrusion (e.g., "ma" → /m/ [m:]); mandated runtime carrier-phoneme-keyword sequence (≤15s) with persistent audio replay.<br>• **Microphone Visualizer & Tutoring Loop (FR-03, P1):** Replaced static button with dynamic 4-state visualizer (Idle, Listening with live RMS ripple, Processing, Result); added We Do/You Do prompt ladder; **eliminated heart deductions in Say It**.<br>• **Spaced Retrieval Mastery (FR-NEW-REC, P1):** Introduced un-modeled warm-up retrieval checks and end-of-session recall checks to establish true memory retention beyond immediate imitation.<br>• **Vosk Accuracy & Fairness (NFR-ASR-01, P1):** Established ≥80% agreement with teacher ratings, false rejects ≤15%, Philippine English acoustic calibration, and discrete error classification (`LETTER_NAME`, `ADDED_VOWEL`, `SUBSTITUTION`, `UNKNOWN`).<br>• **Latency Standards (NFR-PERF-01, P1):** Redefined latency from speech termination (`speech_end`) to feedback (P90 ≤0.5s); Find It tap latency (P90 ≤0.3s).<br>• **Decodable Word Bank (FR-13, P1):** Purged 5 non-decodable CVC words (AIM, BEE, TOY, BOY, ZOO) containing untaught vowel teams/diphthongs; replaced with AM, SUM, TUB, YAM, ZIP; flagged QUIZ as documented exception.<br>• **Classroom Multi-Profile (FR-14, P1):** Added independent profile management (up to 6 child profiles per device) for shared reading stations.<br>• **Offline Telemetry Logging & CSV Export (FR-NEW-TEL, P1):** Local event logging in Room DB; PIN-gated CSV/PDF export via Android Share Sheet with zero network transmission.<br>• **Pediatric Inclusivity & Ergonomics (NFR-ACC-01 / ACC-02, P2):** Integrated visual mouth articulation guides and sound captions; enforced minimum 64dp touch targets with ≥8dp margins.<br>• **Removed Requirement:** Eliminated acoustic pitch deviation (±10 cents) as inapplicable to speech phonetics. |
 | **3.1** | October 5, 2026 | Capstone Team (Claude review) | Corrections for adviser review: status changed from "Approved" to draft; FR-03 states the hybrid scoring mode (word mode scored; pure sound only if the Vosk test passes); open items marked **[proposed]** (≤15 s sequence, automatic mic, ≥70% recall, 12-minute session, Chatterbox held sounds); teacher names replaced by codes T-1 to T-4 (RA 10173); Room schema v4 (v3 is the current version). |
+| **3.2** | October 9, 2026 | Capstone Team (Claude, sprint synchronization) | Added §4.1, the automated test coverage of the requirements refactored in the Oct 9–10 sprint (FR-02, FR-03, FR-05, FR-13, NFR-ASR-01, NFR-ACC-01, NFR-ACC-02): each requirement is mapped to the shipped components and the passing unit-test classes (364 tests on 2026-10-09, 0 failures). Field targets in §4 (Round 2 instruments, Gate 3 teacher audit) are unchanged and still pending. |
 
 ---
 
@@ -333,6 +334,21 @@ The following Requirements Traceability Matrix (RTM v3.0) demonstrates the bidir
 | **F-14** | **Adviser Review:** Learning model must guarantee child can succeed without an adult co-present. | **HI-3, SI-3** (Autonomy) | **NFR-IND-01, FR-03** | `TutorPolicy`, Spoken Carriers, 10s Idle Re-prompt | **TC-IND-01 to 03:** Spoken instruction & idle prompts | **Silent Observer Protocol:** $\ge 85\%$ unprompted completion | **P1** |
 | **F-15** | **Adviser Review:** Echoing an immediate model shows imitation, not true phonemic mastery. | **SI-4** (Spaced Recall) | **FR-NEW-REC** | `LearnerModel`, Review Scheduler | **TC-REV-01 to 03:** Warm-up & end-of-session checks | **Instrument B:** $\ge 70\%$ recall retention rate | **P1** |
 | **F-16** | **Proposal Contradiction:** Proposal's parent override conflicts with child independence. | **SI-1** (ASR Fairness) | **NFR-ASR-01** | Tuned Vosk thresholds, Prompt Ladder (No Hearts) | **TC-ASR-06:** False reject $\le 15\%$ on child voices | **Field Pilot:** Zero parental overrides needed | **P1** |
+
+
+### 4.1 Automated Test Coverage of Refactored Requirements (RTM v3.2, checked 2026-10-09)
+
+The table records which automated tests now verify each requirement refactored during the Oct 9–10 sprint (branch `refactor/hear-say-it`, `./gradlew testDebugUnitTest`: 364 tests, 0 failures, 6 font-scale checks skipped on the 360x640 profile by design). It complements, and does not replace, the field verification targets in §4.
+
+| Req. ID | Implemented components (code) | Automated test classes | Still pending (not automatable) |
+|:---:|---|---|---|
+| **FR-02** | `HearItSequenceBuilder`, `HearItViewModel`, `AudioResolver` (released held /m/ and /s/) | `HearItSequenceBuilderTest`, `HearItViewModelTest`, `AudioResolverTest` | Gate 3 teacher audit of every phoneme clip; short vowels (ElevenLabs, due Oct 11) |
+| **FR-03** | `MicStatus`, `MicButton`, `SayItViewModel` (spoken corrections, `onScreenHidden`), `TutorPolicy`, `SayItFeedbackCopy` | `MicStatusTest`, `SayItViewModelTest`, `TutorPolicyTest`, `SayItFeedbackCopyTest` | Round 2 hesitation measure (Instrument B / D-10); RMS-driven ripple (planned) |
+| **FR-05** | `FindItScreen`, `FindItGrid`, `GridGenerator`, `HeartManager` | `FindItViewModelTest`, `GridGeneratorTest`, `PictureAssetsTest`, `LayoutMatrixTest` (`findIt_wholeGridVisible`, `findIt_fontScale13`) | — |
+| **FR-13** | `BLEND_IT_WORD_SEEDS` (`DatabaseModule`), `BlendItWordSelector`, `BlendItScreen`, `BlendItCard` | `BlendItWordSeedsTest`, `BlendItWordSelectorTest`, `BlendItViewModelTest`, `BlendItCardLayoutTest`, `LayoutMatrixTest` (`blendIt_tilesVisible`) | Teacher decodability audit (Instrument A Part 2); word audio for AM, TUB, YAM and pictures for AM, TUB, YAM, ZIP |
+| **NFR-ASR-01** | `SpeechValidator` (word-mode judge, foil grammars, error types), `SayItViewModel` (judges wrong partials only on a final result) | `SpeechValidatorTest`, `SayItViewModelTest` | Agreement with teachers $\ge 80\%$ and false rejects $\le 15\%$ (Instruments B and C) |
+| **NFR-ACC-01** | `ArticulationGroup`, `CaptionText`, `CaptionBubble`, `ArticulationCue`, `AudioPlayer.playSequence(onItemStart)` | `ArticulationGroupTest`, `CaptionTextTest`, `ArticulationCueTest`, `HearItViewModelTest` (`caption_followsSequence`), `SayItViewModelTest` (`secondMiss_showsMouthCue`) | Mouth-shape pictures (card 25: 6 of 9 picked, release pending); D-09 inspection |
+| **NFR-ACC-02** | `PlayItDimens`, `LessonScaffold`, `GummyContainer` layout, `PlayItMotion`, `FeedbackEffects`, reduced-motion handling | `DimensTest`, `GummyContainerLayoutTest`, `LayoutMatrixTest` (4 sizes, font scale 1.3), `TopStatsBarLayoutTest`, `MapLayoutTest`, `FeedbackEffectsTest`, `PlayItMotionTest`, `ZeroEmojiPolicyTest` | Physical layout verification on the A21s (D-07) |
 
 ---
 

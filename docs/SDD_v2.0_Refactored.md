@@ -3,9 +3,9 @@
 **Course:** IT411 — Capstone & Research 2 | Semester 1, AY 2026–2027  
 **Degree Program:** Bachelor of Science in Information Technology  
 **Department:** College of Computer Studies, Cebu Institute of Technology – University  
-**Document Version:** 2.0 (Renewed & Fully Refactored Post-MVP Validation)  
+**Document Version:** 2.2 (Renewed & Fully Refactored Post-MVP Validation; implementation status synchronized 2026-10-09)  
 **Publication Date:** September 26, 2026  
-**Document Status:** Draft for adviser review (revised 2026-10-05; items marked **[proposed]** await adviser approval). Components are marked by implementation status in §2.0  
+**Document Status:** Draft for adviser review (revised 2026-10-05 and 2026-10-09; items marked **[proposed]** await adviser approval). Components are marked by implementation status in §2.0  
 
 ---
 
@@ -18,6 +18,7 @@
 | **1.0** | May 20, 2026 | System Architect & Dev Team | Final Capstone 1 SDD: decoupled game modules, established baseline Room DB schema v1. |
 | **2.0** | September 26, 2026 | Lead Architect & Capstone Team | **Comprehensive Renewal & Architectural Refactoring Based on MVP Validation (design; see §2.0 for what is implemented):**<br>• **Tutoring & Pedagogy Layer (§2.2):** Designs `LessonEngine`, `TutorPolicy` finite state machine (FSM), and `SayItJudge` with per-letter dynamic grammars and error tagging; **eliminated heart deductions in Say It**.<br>• **Audio Subsystem Architecture (§3.1):** Refactored `AudioPlaybackManager` with `AudioComposer` and pre-cached `SoundPool` for instant phoneme playback; isolated pure phoneme (`ph_m.wav`) and key-word (`kw_m_mouse.wav`) assets (FR-02, NFR-AUD-01).<br>• **Speech Recognition Subsystem (§3.2):** Plans to replace `SpeechService` (still used today) with an asynchronous `AudioRecord` 16kHz mono loop streaming raw PCM buffers to calculate normalized RMS amplitude for `MicStateVisualizer` while feeding Vosk `Recognizer.acceptWaveForm()`; guaranteed tap-to-listening transition in ≤100ms (FR-03, NFR-PERF-01).<br>• **Decodable Word Bank Refactoring (§3.4):** Purged 5 invalid CVC words (AIM, BEE, TOY, BOY, ZOO) containing untaught vowel teams/diphthongs; replaced with AM, SUM, TUB, YAM, ZIP; flagged QUIZ exception (FR-13).<br>• **Persistence & Telemetry (Room Schema v4, planned, §4):** Extends the existing `ProfileEntity` (multi-profile up to 6) and plans `LetterProgressEntity` (spaced retrieval mastery), and `TelemetryEventEntity` (microsecond-accurate monotonic timestamps); added local PIN-gated CSV/PDF exporters (FR-14, FR-NEW-TEL).<br>• **Pediatric Tokens & Accessibility (§3.6):** Plans `Modifier.pediatricTouchTarget(64.dp)` and an `ArticulationCue` composable (NFR-ACC-01, NFR-ACC-02). |
 | **2.1** | October 5, 2026 | Capstone Team (Claude review) | Corrections for adviser review: new §2.0 implementation-status table (implemented vs planned); §3.3.1 judge uses word mode as in the code, with no fixed confidence threshold; Room schema v4 (v3 is current) with explicit migrations; revision 2.0 entries reworded as design, not completed work. |
+| **2.2** | October 9, 2026 | Capstone Team (Claude, sprint synchronization) | §2.0 re-checked against branch `refactor/hear-say-it` after the Oct 9–10 sprint (cards 18–24, 03b, 15). Newly **Implemented**: adaptive dimensions and `LessonScaffold`; 4-state Say It mic (`MicStatus`, `MicButton`, time-based ripple); spoken Say It corrections; decodable Blend It word list; purposeful effects and screen transitions; responsive map (`MapLayout`); sound captions and `ArticulationCue`. §3.4 chapter letters corrected to the seeded groups; §3.6 replaced the design sketches with the implemented components. `LessonEngine`, `AudioComposer`, Room schema v4, telemetry and CSV export remain **Planned**. |
 
 ---
 
@@ -56,7 +57,7 @@ This design document governs the entire PlayIT Android mobile application:
 
 ## 2. Architectural Design
 
-### 2.0 Implementation Status (checked against the code on 2026-10-05)
+### 2.0 Implementation Status (checked against the code on 2026-10-09, branch `refactor/hear-say-it`)
 This document describes the target design for Weeks 4–9. The table separates what the app does today from what is planned, so the design is not read as a description of the current build.
 
 | Component | Status | Where / note |
@@ -69,11 +70,18 @@ This document describes the target design for Weeks 4–9. The table separates w
 | `HeartManager`, `StarCalculator`, `GridGenerator`, `ArithmeticGateManager` | Implemented | `domain/manager/` |
 | `ProfileEntity`, `SessionManager` (up to 6 profiles) | Implemented | Room schema version 3 (`PlayItDatabase.kt`) |
 | Parent PDF report | Implemented | `data/pdf/PdfExporter.kt` |
+| Adaptive dimensions and lesson layout (`WindowProfile`, `PlayItDimens`, `LessonScaffold`) | Implemented | `presentation/theme/Dimens.kt`, `presentation/components/LessonScaffold.kt`; 64 dp touch and 16 sp text floors; tested in `DimensTest`, `GummyContainerLayoutTest`, `LayoutMatrixTest` (4 device sizes, font scale 1.3) |
+| Say It mic states (Idle, Listening, Heard, Result) | Implemented | `presentation/sayit/MicStatus.kt`, `presentation/sayit/components/MicButton.kt`; time-based ripple, no red; returns to Idle when the app is backgrounded; tested in `MicStatusTest`, `SayItViewModelTest` |
+| Spoken Say It corrections (letter name, added vowel, remodel) | Implemented | `presentation/sayit/SayItViewModel.kt`; tutor fragments `fb_letter_name`, `fb_its_sound_is`, `fb_almost_just`, `fb_no_ah`, `fb_listen` (Kokoro, audio release 2026-10-01; teacher audit pending); tested in `SayItViewModelTest`, `AudioResolverTest` |
+| Decodable Blend It word list (§3.4) | Implemented | `di/DatabaseModule.kt` `BLEND_IT_WORD_SEEDS`, written on every open; tested in `BlendItWordSeedsTest`. Teacher confirmation and the AM, TUB, YAM, ZIP word audio and pictures are pending |
+| Purposeful effects and screen transitions | Implemented | `presentation/components/FeedbackEffects.kt`, `navigation/NavGraph.kt`, `CelebrationOverlay.kt`; reduced motion gives fades only; no haptics; tested in `FeedbackEffectsTest`, `PlayItMotionTest` |
+| Responsive map trail, compact header, unlock moment | Implemented | `presentation/map/MapLayout.kt`, `MapScreen.kt`, `MapViewModel.newlyUnlockedNodeId`; tested in `MapLayoutTest`, `TopStatsBarLayoutTest`, `MapViewModelTest` |
+| Sound captions and `ArticulationCue` (§3.6.2) | Implemented | `domain/model/ArticulationGroup.kt`, `domain/manager/CaptionText.kt`, `presentation/components/CaptionBubble.kt`, `ArticulationCue.kt`; mouth pictures await their image release (card 25), until then the cue draws nothing; tested in `ArticulationGroupTest`, `CaptionTextTest`, `ArticulationCueTest` |
 | `LessonEngine`, `LearnerModel` (review scheduler) | Planned | — |
 | `AudioComposer`, `AudioPlaybackManager` | Planned | Playback today goes through `data/audio/AudioPlayer.kt`, which already uses a `SoundPool` for short clips |
-| `MicStateVisualizer` (4 mic states, RMS ripple) | Planned | — |
+| RMS-driven mic ripple (`MicStateVisualizer` with the `AudioRecord` loop of §3.2) | Planned | The 4 mic states are implemented (row above); the voice-driven ripple follows the planned `AudioRecord` loop (post-Round-2, user decision 2026-10-06) |
 | `LetterProgressEntity`, `TelemetryEventEntity`, `TelemetryLogger`, `CsvExportManager` | Planned | Needs Room schema v4 and a migration |
-| `Modifier.pediatricTouchTarget()`, `ArticulationCue` | Planned | — |
+| `Modifier.pediatricTouchTarget()` as a single global modifier | Planned | The 64 dp floor is enforced today through `PlayItDimens` tokens and `heightIn(min = 64.dp)` on every child-facing control |
 
 
 ### 2.1 System Architecture Paradigm
@@ -305,16 +313,16 @@ Vosk is instantiated with a constrained per-letter runtime grammar rather than o
 ---
 
 ### 3.4 Decodable Blend It Word Bank Refactoring (FR-13)
-The seeded database entity `BlendItWord` is updated by the content reseed (planned; card 15), with the word list confirmed by a teacher. The 5 invalid words identified during MVP validation are formally replaced:
+The seeded `BlendItWord` list (`BLEND_IT_WORD_SEEDS` in `di/DatabaseModule.kt`) carries the replacements below and is written on every app start, so existing installs receive them; each replacement keeps the word id it replaces, so learner progress is unaffected (card 15, implemented 2026-10-09; teacher confirmation of the list pending). The 5 invalid words identified during MVP validation are replaced:
 
 | Chapter | Unlocked Letters | Purged Word | Violation Reason | Replacement Word | Valid Letters Used |
 |:---:|---|:---:|---|:---:|:---:|
 | **Ch 1** | m, s, a, i | **AIM** | Contains vowel team *ai* | **AM** | a, m |
-| **Ch 2** | + o, b, u, t | **BEE** | Contains vowel team *ee* | **SUM** | s, u, m |
-| **Ch 3** | + k, l, y, n | **TOY** | Contains diphthong *oy* | **TUB** | t, u, b |
-| **Ch 3** | + k, l, y, n | **BOY** | Contains diphthong *oy* | **YAM** | y, a, m |
-| **Ch 7** | + q, x, z | **ZOO** | Contains vowel team *oo* | **ZIP** | z, i, p |
-| **Ch 7** | + q, x, z | **QUIZ** | *qu* = /kw/ digraph | **QUIZ** | Flagged with `isDocumentedException = true` |
+| **Ch 2** | + o, b, e, u | **BEE** | Contains vowel team *ee* | **SUM** | s, u, m |
+| **Ch 3** | + t, k, l, y | **TOY** | Contains diphthong *oy* | **TUB** | t, u, b |
+| **Ch 3** | + t, k, l, y | **BOY** | Contains diphthong *oy* | **YAM** | y, a, m |
+| **Ch 7** | + q, v, x, z | **ZOO** | Contains vowel team *oo* | **ZIP** | z, i, p |
+| **Ch 7** | + q, v, x, z | **QUIZ** | *qu* = /kw/ digraph | **QUIZ** | Kept as the documented exception (named in the seed comment and excluded by `BlendItWordSeedsTest`) |
 
 ---
 
@@ -398,46 +406,30 @@ A local exporter reads `telemetry_events` for the active profile, formats record
 
 ### 3.6 Pediatric Design System Tokens & Accessibility (NFR-ACC-01, NFR-ACC-02)
 
-#### 3.6.1 MinTouchTarget Modifier
-All clickable Jetpack Compose elements apply a global ergonomic modifier ensuring compliance with the $64\times 64\,\text{dp}$ touch bounding box:
-```kotlin
-fun Modifier.pediatricTouchTarget(): Modifier = this.then(
-    Modifier
-        .defaultMinSize(minWidth = 64.dp, minHeight = 64.dp)
-        .padding(4.dp)
-)
-```
-
-#### 3.6.2 ArticulationCue Composable
+#### 3.6.1 Touch Targets and Adaptive Dimensions (implemented)
+The 64 dp touch floor and the 16 sp text floor are carried by design tokens rather than one global modifier. `windowProfileFor(widthDp, heightDp)` picks `COMPACT` (under 700 dp tall), `REGULAR` or `WIDE` (600 dp and wider), and `LocalPlayItDimens` provides the matching `PlayItDimens` (letter card height, primary button, mic size, Find It card size, tile size, map node size). Every child-facing control uses `heightIn(min = 64.dp)` or a token at least that large. `LessonScaffold` pins the top bar, header and bottom bar, and lets the body fit or scroll, capped at 560 dp wide on tablets:
 ```kotlin
 @Composable
-fun ArticulationCue(
-    letter: String,
-    cueDrawableRes: Int,
-    captionText: String, // e.g. "mmm"
-    isHighlighted: Boolean,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .background(Color.White, RoundedCornerShape(16.dp))
-            .border(2.dp, if (isHighlighted) Color(0xFF2B7A78) else Color(0xFFCBD5E0), RoundedCornerShape(16.dp))
-            .padding(8.dp)
-    ) {
-        Image(
-            painter = painterResource(id = cueDrawableRes),
-            contentDescription = "Mouth articulation guide for $letter",
-            modifier = Modifier.size(80.dp)
-        )
-        Text(
-            text = captionText,
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-            color = Color(0xFF1F3A3D)
-        )
-    }
-}
+fun LessonScaffold(
+    topBar: @Composable () -> Unit,
+    header: @Composable () -> Unit,
+    bottomBar: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit,
+)
 ```
+`LayoutMatrixTest` renders Hear It, Say It, Find It, Blend It, the map, the complete screens, splash and the name prompt at 360x640, 360x740, 411x891 and 800x1280 dp (and at font scale 1.3), and fails if the main action is below the window.
+
+#### 3.6.2 Articulation Cue and Sound Captions (implemented; pictures pending)
+Each letter maps to one of 9 mouth-shape groups (`ArticulationGroup`, pure Kotlin), an approximation for a child that a teacher checks during Gate 3. Captions come from `CaptionText.forClip(path, letter, word)`: a phoneme clip shows `/m/`, a key word shows the word, a carrier shows its line, and a pause shows nothing. `AudioPlayer.playSequence(paths, onItemStart, onComplete)` reports each clip as it starts, so Hear It captions the modeling sequence live.
+```kotlin
+@Composable
+fun ArticulationCue(group: ArticulationGroup, size: Dp, modifier: Modifier = Modifier)
+
+@Composable
+fun CaptionBubble(caption: String?, modifier: Modifier = Modifier)
+```
+`ArticulationCue` draws nothing until its picture is in `assets/images/mouth/` (image release of card 25). Hear It shows a 72 dp cue with the caption under the letter card; Say It shows a 96 dp cue beside the mic from the second miss ("Watch my lips", spec Table 7).
 
 ---
 

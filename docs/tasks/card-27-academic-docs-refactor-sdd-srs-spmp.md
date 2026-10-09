@@ -1,6 +1,6 @@
 # Card 27: Academic Documentation Refactoring & Synchronization (SDD v2.0, SRS v3.0, SPMP v2.0)
 
-Status: ready (runs after code cards 20, 22, 21, 23, 15, 24)
+Status: done
 
 ## Why
 Per IT411 course guidelines (`midterm_goal/midterm_goal.md`) and the institutional deliverable `docs/MVP_Validation_Findings_and_Refactoring_Priorities_Filled.md`, the empirical findings from the Weeks 1–2 MVP validation must be reflected across all three foundational academic engineering documents:
