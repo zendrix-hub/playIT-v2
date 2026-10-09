@@ -121,7 +121,7 @@ def main(argv=None):
     a = ap.parse_args(argv)
     nn = a.card
     cf = card_file(nn)
-    rel_card = str(cf.relative_to(REPO))
+    rel_card = cf.relative_to(REPO).as_posix()
     commit = a.commit or find_commit(nn)
     if not commit:
         sys.exit(f"no commit with 'Card: {nn}' in its body; pass --commit")
