@@ -665,4 +665,28 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - `mouth_open_breath` (variants 1 & 2)
   - Note: Quota on `gemini-3.1-flash-image` has reset. Ready for Round 2 generation when directed.
 
+### agy, 2026-10-09 (night): Sprint Orchestration & MVP Validation Deliverable
+
+- **Sprint Mission:** Complete the Hear It / Say It refactoring on branch `refactor/hear-say-it` by **Saturday, October 10, 2026**.
+- **Role Alignment (User Decision 2026-10-09):**
+  - **Claude (in WSL):** **The Mind & Implementator** — conducts `"run and review"`, refines sprint roadmap, directly writes/implements Kotlin & Compose code and unit tests, and creates validator checklists for agy.
+  - **agy (Antigravity):** **The Orchestrator & Validator** — orchestrates documentation/context for Claude, executes automated test validation (`./gradlew testDebugUnitTest`), Roborazzi layout matrix screenshots across 4 display sizes, and builds APKs.
+- **Deliverables Completed by agy:**
+  1. `docs/MVP_Validation_Findings_and_Refactoring_Priorities_Filled.md`: Fully populated institutional deliverable linking empirical data (N=25, SUS 75.5, DepEd teacher findings) to SRS v3.0, SDD v2.0, and SPMP v2.0.
+  2. `docs/MVP_Validation_Findings_and_Refactoring_Priorities_Filled.docx`: Official Word document programmatically populated via `tools/docs/fill_mvp_validation_form.py` with all sections, paragraphs, tables, and reflections.
+  3. `docs/tasks/SPRINT_OCT10_ORCHESTRATION.md`: Master roadmap detailing the 4-phase sprint for Cards 19, 03b, 20, 22, 21, 23, 24, and 25.
+  4. `docs/tasks/VALIDATOR_RUNBOOK_OCT10.md`: Verification schema for agy.
+  5. `CLAUDE.md`: Updated shortcut command `"run and review"` directing Claude to execute as the Implementator.
+- **Current Baseline Status:**
+  - Head commits ready for Claude acceptance: `b909329` (Card 13), `0886ec4` (Card 26b), `5489293` (Card 18), `1df3f56` (Card 09b).
+  - Mechanical checks via `python3 tools/dev/review_card.py 13/26b/18/09b`: ALL PASS.
+  - Full local test suite: `./gradlew testDebugUnitTest` is **100% green (BUILD SUCCESSFUL, 36 actionable tasks, 0 failures)**.
+- **Next Immediate Action for Claude:**
+  - Pull branch `refactor/hear-say-it`.
+  - Type `"run and review"`.
+  - Accept commits in `docs/evidence-log.md`.
+  - Implement **Card 19 (`card-19-hearit-sayit-fit-mic-states.md`)** per Task 3 in `docs/superpowers/plans/2026-10-06-ui-fit-effects-overhaul.md`.
+  - Update `docs/tasks/VALIDATOR_RUNBOOK_OCT10.md` with Card 19 verification specs and push to origin.
+
+
 

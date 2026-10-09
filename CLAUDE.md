@@ -2,13 +2,27 @@
 
 ## Shortcut Command: "run and review"
 
-When the user enters `"run and review"` (or `"review"`), Claude:
+When the user enters `"run and review"` (or `"review"`), Claude operates as **The Mind and Implementator** for the 2-day refactoring sprint (finishing Saturday, October 10, 2026), guided by `docs/tasks/SPRINT_OCT10_ORCHESTRATION.md`:
 
-1. **Pulls and reads the newest state.** `git pull`. Read the newest entries at the end of `docs/tasks/SESSION_HANDOFF.md`: the last "Claude review" entry and every agy entry after it.
-2. **Finds the agy commits to review:** every commit since Claude's last review whose body has `Card: NN`. List them with `git log --grep='^Card: ' --format='%h %s'`.
-3. **Runs the mechanical checks** for each card: `python3 tools/dev/review_card.py NN`. Every line should be `PASS`. A `refs` FAIL means a deleted asset is still named in app code, and needs a fix card if the card didn't list that file. A `hash` WARN means the evidence-log row still needs its hash, which is filled in at acceptance.
-4. **Runs the tests and checks CI.** Run `ROBOLECTRIC_DEPS_DIR=~/.playit-env/robolectric-deps tools/dev/gradlew_wsl.sh --offline testDebugUnitTest`; drop `--offline` only if a dependency is missing from the cache. Then run `tools/dev/ci_status.sh`. For UI cards, also check the 4 sizes in the `playIT-screenshots` CI artifact.
-5. **Reads each diff against its card.** Check the Files list, the exact code given in the card, and stale references outside the card.
-6. **Accepts or writes a fix card.** Accepting means the evidence-log row gets `(accepted)`, the hash and the CI run. A fix card is `card-NNb`. Then a "Claude review" entry goes in the handoff and the queue in `AGY_RUNBOOK.md` is updated.
-7. **Checks the user's review pages.** Look for new `*_review.csv` files in `Documents/playIT-audio-batches/` and `Documents/playIT-image-batches/`. Turn approved picks into releases and set the cards that wait on them to `ready`.
-8. **Does the next Claude-owned step** from the newest "Claude" handoff entry.
+1. **Pull and read newest state:**
+   - `git pull origin refactor/hear-say-it`.
+   - Read `docs/tasks/SPRINT_OCT10_ORCHESTRATION.md` and the latest handoff notes at the end of `docs/tasks/SESSION_HANDOFF.md`.
+2. **Review & Accept prior commits:**
+   - Commits awaiting acceptance: `b909329` (Card 13), `0886ec4` (Card 26b), `5489293` (Card 18), `1df3f56` (Card 09b).
+   - Verify mechanical checks: `python3 tools/dev/review_card.py NN` (all PASS).
+   - Update `docs/evidence-log.md` with commit hashes and set status to `(accepted)`.
+3. **Plan & Implement the next Sprint Card:**
+   - Follow the sequence in `docs/tasks/SPRINT_OCT10_ORCHESTRATION.md` (Card 19 $\to$ Card 03b $\to$ Card 20 $\to$ Card 22 $\to$ Card 21 $\to$ Card 23 $\to$ Card 24).
+   - For Card 19, follow Task 3 in `docs/superpowers/plans/2026-10-06-ui-fit-effects-overhaul.md`.
+   - Write the Kotlin/Compose code and unit tests directly in WSL.
+   - Run local unit tests: `tools/dev/gradlew_wsl.sh testDebugUnitTest`.
+   - Ensure Zero-Emoji Policy compliance (`ZeroEmojiPolicyTest`).
+   - Commit on `refactor/hear-say-it` with standard card commit headers and push to `origin refactor/hear-say-it`.
+4. **Emit Validator Specification for agy:**
+   - Update `docs/tasks/VALIDATOR_RUNBOOK_OCT10.md` specifying:
+     * Card and commit hash ready for agy validation.
+     * Automated test verification commands.
+     * Layout matrix & Roborazzi screenshot checks across the 4 profiles (`compact`, `a21s`, `phone`, `tablet`).
+     * APK build verification targets.
+5. **Maintain Handoff Documentation:**
+   - Append a structured entry to `docs/tasks/SESSION_HANDOFF.md` detailing changes implemented, tests passing, and the next active task.
