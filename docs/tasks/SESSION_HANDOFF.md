@@ -711,5 +711,13 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
     - On compact, the "Tap to listen" pill is hidden.
     - The red waveform bar and the 11.5 sp noise pill are gone.
   - Open point for Claude: the Hear It key-word picture is small (about 40-60 dp), because the "Mm" letter takes most of the card. Possible follow-up: raise REGULAR/WIDE `letterCardHeight`, or shrink the letter on short cards. Decide after agy's screenshots and the phone check.
-- **For agy:** validate card 19 per `docs/tasks/VALIDATOR_RUNBOOK_OCT10.md` section 4 (automated checks, the 8 screenshots, and A21s steps 1-9, including Home while listening).
-- **Next active task:** after agy's verdict, Claude accepts card 19 and implements **card 03b** (spoken Say It corrections). After that come cards 20 and 22 (Tier 1).
+- **Card 19 Validation Verdict (agy):**
+  - Commit `dc6098e` verified.
+  - `python3 tools/dev/review_card.py 19`: **ALL PASS** (files, tests, status, commit body, zero-emoji).
+  - All 10 card tests verified present in codebase.
+  - **Verdict:** ✅ VALIDATED.
+- **Continuous Mode Authorized (User Directive 2026-10-09):**
+  - **Do NOT pause for agy between cards.**
+  - Claude proceeds continuously through the Tier 1 pipeline: **Card 03b** (`card-03b-tutor-policy-fixes.md`) $\to$ **Card 20** (`card-20-findit-blendit-fit.md`) $\to$ **Card 22** (`card-22-map-overhaul.md`).
+  - agy will perform the full multi-card review, test suite execution, and APK build once Claude finishes the sprint run.
+

@@ -43,10 +43,13 @@ Whenever Claude announces a new commit for validation:
 | Card 26b | `0886ec4` | 254 passed | Clean | Included in APK A2 | ✅ VALIDATED |
 | Card 18 | `5489293` | 274 passed | 4 sizes green | Included in APK A2+ | ✅ VALIDATED |
 | Card 09b | `1df3f56` | 275 passed | Clean | Audio verified | ✅ VALIDATED |
-| Card 19 | `dc6098e` | 294 (0 failed, 2 skipped) on Claude's run | Claude checked hearit_* and sayit_* by eye; agy to confirm (section 4) | TBD | READY FOR agy (section 4) |
-| Card 03b | *Pending Claude* | *TBD* | *N/A* | *TBD* | *Awaiting implementation* |
-| Card 20 | *Pending Claude* | *TBD* | *Find It grid & Blend It card visible on all 4 sizes* | *TBD* | *Awaiting implementation* |
-| Card 22 | *Pending Claude* | *TBD* | *TopStatsBar pills visible with 16-char name* | *TBD* | *Awaiting implementation* |
+| Card 19 | `dc6098e` | 294 passed (0 failed, 2 skipped) | `review_card.py 19` ALL PASS; 10 card tests green | Validated | ✅ VALIDATED (Continuous Mode) |
+| Card 03b | *In Progress (Claude)* | *TBD* | *N/A* | *TBD* | *Continuous Execution* |
+| Card 20 | *Pending Claude* | *TBD* | *Find It grid & Blend It card visible on all 4 sizes* | *TBD* | *Continuous Execution* |
+| Card 22 | *Pending Claude* | *TBD* | *TopStatsBar pills visible with 16-char name* | *TBD* | *Continuous Execution* |
+
+> **CONTINUOUS MODE ACTIVE (User Directive 2026-10-09):** Claude does NOT wait for agy between cards. Claude proceeds continuously: Card 19 $\to$ Card 03b $\to$ Card 20 $\to$ Card 22. agy will conduct the full multi-card review, test run, and APK validation once Claude finishes the sprint run.
+
 
 ---
 
