@@ -22,39 +22,51 @@
 
 ---
 
-## 2. Sprint Roadmap (Oct 9 Night – Oct 10 Night)
+## 2. Sprint Roadmap (Oct 9 Night – Oct 10 Night): Staged Execution
+
+Per user decision (2026-10-09), we execute the **Maximum Scope (Cards 19–24, 03b, 15)** via **Staged Execution** to guarantee the mandatory cut line first before expanding into high-value polish and accessibility:
 
 ```mermaid
 graph TD
-    subgraph Sprint_1 [Sprint 1: Friday Night Oct 9]
-        C19[Card 19: Hear It & Say It Fit + 4-State Mic]
-        C03b[Card 03b: Spoken Say It Corrections]
-        C25[Card 25 Round 2: 3 Mouth Shapes Generation]
-        C19 --> C03b
+    subgraph Tier_1 [Tier 1: Guaranteed Core Cut Line - Fri Night / Sat Morning]
+        C19[Card 19: Hear It & Say It Fit + 4-State Mic] --> C03b[Card 03b: Spoken Say It Corrections]
+        C03b --> C20[Card 20: Find It & Blend It Fit]
+        C20 --> C22[Card 22: Map Overhaul & Scaling]
     end
 
-    subgraph Sprint_2 [Sprint 2: Saturday Morning Oct 10]
-        C20[Card 20: Find It & Blend It Fit]
-        C22[Card 22: Map Overhaul & Scaling]
-        C20 --> C22
+    subgraph Tier_2 [Tier 2: Presentation & Motion Polish - Sat Afternoon]
+        C21[Card 21: Complete, Splash & Profile Fit] --> C23[Card 23: Purposeful Effects & Zero Haptics]
     end
 
-    subgraph Sprint_3 [Sprint 3: Saturday Afternoon Oct 10]
-        C21[Card 21: Complete, Splash & Profile Fit]
-        C23[Card 23: Purposeful Effects & Motion]
-        C24[Card 24: Sound Captions & Mouth Cues]
-        C21 --> C23 --> C24
+    subgraph Tier_3 [Tier 3: Curriculum, Accessibility & Stretch - Sat Evening]
+        C15[Card 15: Decodable Blend It Word Bank] --> C24[Card 24: Sound Captions & Mouth Cues]
+        C25[Card 25: 3 Mouth Shapes Round 2]
     end
 
-    subgraph Sprint_4 [Sprint 4: Saturday Evening Oct 10]
+    subgraph Validation_Gate [Validation Gate: Sat Night]
         VAL[Full Validation: 280+ Tests & Roborazzi 4-Sizes]
         APK[Assemble Final Debug APK: playit-debug.apk]
-        DOC[Deliverable Check: MVP Validation Priorities Form]
-        VAL --> APK --> DOC
+        VAL --> APK
     end
 
-    Sprint_1 --> Sprint_2 --> Sprint_3 --> Sprint_4
+    Tier_1 --> Tier_2 --> Tier_3 --> Validation_Gate
 ```
+
+### Staged Prioritization Breakdown:
+1. **Tier 1 (Mandatory Core Cut Line):**
+   - **Card 19**: Hear It & Say It fit; 4-State Mic (`MicStatus`, `MicButton`, `LessonScaffold`). Fixes MVP Finding #2.
+   - **Card 03b**: Spoken Say It corrections (`fb_no_ah`, tutor prompt fragments) in `SayItViewModel.kt`.
+   - **Card 20**: Find It & Blend It fit (`LessonScaffold`, responsive card scaling).
+   - **Card 22**: Map overhaul (`MapLayout.kt`, responsive rope trail, compact header, 16-char name fit).
+   *Milestone Checkpoint: Core gameplay loop 100% responsive and verified across 4 display sizes.*
+2. **Tier 2 (High-Value Presentation & Motion Polish):**
+   - **Card 21**: Complete, Splash, and Profile screens fit without clipping.
+   - **Card 23**: Purposeful effects (tap, correct pop, heart wobble, star drop, center confetti, reduced motion, zero haptics).
+3. **Tier 3 (Curriculum, Accessibility & Stretch):**
+   - **Card 15**: Purge 5 non-decodable Blend It words in `DatabaseModule.kt` (replace with AM, SUM, TUB, YAM, ZIP; QUIZ exception).
+   - **Card 24**: Sound captions and mouth-shape cues (`ArticulationGroup`, `CaptionBubble`, `ArticulationCue`).
+   - **Card 25**: Generate remaining 3 mouth shapes (`mouth_wide_open`, `mouth_smile`, `mouth_open_breath`).
+
 
 ---
 
