@@ -1,7 +1,7 @@
 # Card 25: Mouth-shape pictures, in rounds until the user is happy (asset card)
 
 Type: asset
-Status: ready (runs now, in parallel with card 17, in its own agy session)
+Status: done
 
 Run this in a separate agy session ("This is the image session"), alongside the code relay. During the rounds it writes only into the batch folder below. The one exception is the hand-off at the end (see Done), because Claude works on a different PC and can only reach the picks through git.
 
@@ -82,3 +82,9 @@ The pictures reach the app through card 24, or through a small copy card (24b) i
 
 ## Commit
 Only the hand-off commit in Done. Claude records the result in the evidence log.
+
+## Result (Claude, 2026-10-10)
+- **Picks:** agy handed off the 9 picks in `80d019e`, after rounds 1 and 2. Claude cut them out and audited them: 0 FAIL and 0 WARN, and they look right on the 4 backgrounds.
+- **Approval:** the user approved all 9 in chat ("Ship all 9 now"). They mix two face designs, 6 and 3; the user accepted the mix, and the 3 may be redrawn later (`QUESTIONS.md`).
+- **Release:** `make_release.py` built it, with the user's verdicts recorded in the batch's final review CSV. It is staged in `docs/assets/briefs/2026-10-07-mouth-shapes/release-2026-10-10-mouth/`, not in `docs/image-release/`. The reason: `PictureAssetsTest` fails for any release there whose files are not in the app yet.
+- **Next:** copy card 24b moves the release into `docs/image-release/2026-10-10-mouth/` and copies the pictures into the app, in one commit.

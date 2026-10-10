@@ -861,3 +861,20 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - Card 28b (to write): the 10-second idle wiggle on the main button (grill decision 8), and `MarungkoGroupBanner` clipping its title on every size (visible in the map screenshots).
   - Card 29 runs in an agy image session with the new brief.
 - **Next for agy:** validate card 28 (`VALIDATOR_RUNBOOK_OCT10.md`, section 6): review_card, the full suite, 4-size screenshots, APK C, and the phone checks in the evidence-log row.
+
+### Claude, 2026-10-10 (late): card 25 released; copy card 24b ready for agy
+- **Card 25 is done.** The user approved all 9 mouth pictures in chat ("Ship all 9 now"; the 3 odd faces can be redrawn later and replaced by a new release).
+  - `make_release.py` built the release: 9 entries, with each SHA-256 checked against its file.
+  - It is staged in `docs/assets/briefs/2026-10-07-mouth-shapes/release-2026-10-10-mouth/`, not in `docs/image-release/`. The reason: `PictureAssetsTest.releasedPicturesMatchManifest` fails for any release there whose files are not in the app, so the release moves in together with the copy.
+  - The draft manifest is deleted.
+- **Card 24b is ready for agy.** Claude ran it locally first: pictures copied and code changed, then all of it reverted; nothing under `app/` is committed.
+  - **A pure copy would break Hear It on the A21s.** The cue's 72 dp row pushes the step dots under Next (670 dp against 664 dp). The cue moves beside the play button, as in Say It, which adds no height.
+  - **`LayoutMatrixTest.assertOnScreen` used clipped bounds.** They stop at the lesson body's edge, so the check could never fail for body content.
+    - 24b switches it to unclipped bounds; all 77 screenshot tests still pass.
+    - 24b adds `assertAbove`. The new `hearIt_stepsAboveNext` fails on the old layout and passes on the new one.
+  - **Results:** full suite 386 passed, 0 failed, 6 skipped. Screenshots checked on 4 sizes: Hear It, and Say It's "Watch my lips" state.
+- **Card 28b (to write) gets one more item.** On compact (360x640), Say It's attempt dots are half hidden behind the bottom banner. This was already there before the pictures.
+- **Order for agy:**
+  1. Validate card 28 (`VALIDATOR_RUNBOOK_OCT10.md` section 6).
+  2. Run card 24b (section 7).
+  3. Claude then reviews 24b.

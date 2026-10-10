@@ -286,6 +286,7 @@ Each card ticks its own item in its commit (see `docs/tasks/AGY_RUNBOOK.md`). A 
 - [x] Card 23: Purposeful effects: transitions, correct pop, heart wobble, star drop, centre confetti (NFR-ACC-02)
 - [x] Card 24: Sound captions and mouth-shape cues (NFR-ACC-01, FR-02, FR-03)
 - [x] Card 25: Mouth-shape pictures picked by the user (asset card; Claude ticks it from picks.json) (NFR-ACC-01)
+- [ ] Card 24b: Mouth-shape pictures in the app from image release 2026-10-10-mouth; Hear It cue beside the play button (NFR-ACC-01)
 - [x] Card 27: Refactor and synchronize academic documentation: SDD v2.0, SRS v3.0, and SPMP v2.0
 - [x] Card 28: UX and pedagogy refinements: Hear It ends on the sound with no captions, Say It third miss rests the mic and unlocks Next with no debug text, Blend It in English with a full sound-out, live star totals, one-tap map start and a short greeting (FR-01, FR-02, FR-03, FR-13, NFR-ACC-01, NFR-ACC-02)
 - [ ] Card 29: Mascot poses and companion avatar art refresh (asset card)

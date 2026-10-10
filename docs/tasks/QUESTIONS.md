@@ -1,13 +1,14 @@
 # Questions from agy for the user (one entry per stop; see AGY_RUNBOOK.md "Stop and ask")
 
-## Card 25: final OK on the 9 mouth pictures (Claude, 2026-10-10)
+## Card 25: final OK on the 9 mouth pictures (Claude, 2026-10-10; answered)
+- **Answer (user, in chat, 2026-10-10):** "Ship all 9 now": ship the set as it is. The 3 odd faces can be redrawn later and replaced by a new release. Claude recorded the verdicts in the batch's final review CSV and built the release; copy card 24b brings the pictures into the app.
 - **Question:** Are the 9 cut-out mouth pictures OK to ship? And is the mix of two face designs acceptable?
 - **What I found:** All 9 cut cleanly: no halo on any of the 4 app backgrounds, outline within 15 of #4A2E18, 77 px padding, no harsh red (`audit.py`: 0 FAIL, 0 WARN). But the set has two face designs:
   - 6 pictures share one face (curl nose, pink blush, white highlight): `mouth_back`, `mouth_teeth_close`, `mouth_teeth_on_lip`, `mouth_tongue_up`, `mouth_round`, `mouth_open_breath`.
   - 3 have a different face (long nose line, brown cheek shading, no blush): `mouth_lips_together`, `mouth_smile`, `mouth_wide_open`.
   - Chapter 1 (m, s, a, i) would show the second face three times and the first once. The card asked for "only the mouth shape changes".
 - **Options:** (a) ship all 9 now; (b) redo the 3 in an agy round, with the 6 as references; (c) ship now and redo the 3 later.
-- **How to answer:** open `Documents\playIT-image-batches\2026-10-07-mouth-shapes\final\index.html`, mark OK or FIX per picture, and click Export CSV. Save the CSV in that batch folder. Claude then runs `make_release.py` and writes `docs/image-release/2026-10-10-mouth/`.
+- **How to answer (no longer needed):** open `Documents\playIT-image-batches\2026-10-07-mouth-shapes\final\index.html`, mark OK or FIX per picture, and click Export CSV. Save the CSV in that batch folder. Claude then runs `make_release.py` and writes the release.
 
 ## Card 28: captions leave the child view, but NFR-ACC-01 asks for them (Claude, 2026-10-10)
 - **Question:** Do you confirm dropping on-screen sound captions (SRS NFR-ACC-01 item 2), and will you tell the adviser?

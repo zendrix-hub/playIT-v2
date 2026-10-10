@@ -1,6 +1,6 @@
 {
  "release": "2026-10-10-mouth",
- "approvedBy": "PENDING: the user's final OK on final/index.html; then run make_release.py without --draft",
+ "approvedBy": "user, in chat on 2026-10-10 ('Ship all 9 now'), after the final review page; verdicts recorded by Claude in 2026-10-07-mouth-shapes_final_review.csv",
  "images": [
   {
    "itemId": "mouth_back",
@@ -21,9 +21,9 @@
     "colours": "PASS 346",
     "red": "PASS 0.0%"
    },
-   "reviewCsv": null,
-   "userVerdict": "pending",
-   "userNote": "",
+   "reviewCsv": "2026-10-07-mouth-shapes_final_review.csv",
+   "userVerdict": "OK",
+   "userNote": "user in chat 2026-10-10: Ship all 9 now (face mix of 6+3 accepted; the 3 may be redrawn later)",
    "sha256": "f877d330175d4d269fc1ea6daea5c7cfb6674c0d91af561a8d3118c8f695bb88"
   },
   {
@@ -45,9 +45,9 @@
     "colours": "PASS 256",
     "red": "PASS 0.0%"
    },
-   "reviewCsv": null,
-   "userVerdict": "pending",
-   "userNote": "",
+   "reviewCsv": "2026-10-07-mouth-shapes_final_review.csv",
+   "userVerdict": "OK",
+   "userNote": "user in chat 2026-10-10: Ship all 9 now (face mix of 6+3 accepted; the 3 may be redrawn later)",
    "sha256": "9d1b0d086f47344ee629c3795c3780b69d8ba775001ec56e9aeef9956a7848ad"
   },
   {
@@ -69,9 +69,9 @@
     "colours": "PASS 432",
     "red": "PASS 0.0%"
    },
-   "reviewCsv": null,
-   "userVerdict": "pending",
-   "userNote": "",
+   "reviewCsv": "2026-10-07-mouth-shapes_final_review.csv",
+   "userVerdict": "OK",
+   "userNote": "user in chat 2026-10-10: Ship all 9 now (face mix of 6+3 accepted; the 3 may be redrawn later)",
    "sha256": "6ba3d41ae0f1fede788f82aa8a61e2cade73cd2333ee467b038ec1c13f703a0f"
   },
   {
@@ -93,9 +93,9 @@
     "colours": "PASS 257",
     "red": "PASS 0.0%"
    },
-   "reviewCsv": null,
-   "userVerdict": "pending",
-   "userNote": "",
+   "reviewCsv": "2026-10-07-mouth-shapes_final_review.csv",
+   "userVerdict": "OK",
+   "userNote": "user in chat 2026-10-10: Ship all 9 now (face mix of 6+3 accepted; the 3 may be redrawn later)",
    "sha256": "fd3b3751bfade84994e003ed5959bcbf467d4fdfd6be45c8846702a174859e86"
   },
   {
@@ -117,9 +117,9 @@
     "colours": "PASS 415",
     "red": "PASS 0.0%"
    },
-   "reviewCsv": null,
-   "userVerdict": "pending",
-   "userNote": "",
+   "reviewCsv": "2026-10-07-mouth-shapes_final_review.csv",
+   "userVerdict": "OK",
+   "userNote": "user in chat 2026-10-10: Ship all 9 now (face mix of 6+3 accepted; the 3 may be redrawn later)",
    "sha256": "0684a409a32eb8b3ca5c05e6409ac12d9b5e53221512437179bf15cdd3222960"
   },
   {
@@ -141,9 +141,9 @@
     "colours": "PASS 372",
     "red": "PASS 0.0%"
    },
-   "reviewCsv": null,
-   "userVerdict": "pending",
-   "userNote": "",
+   "reviewCsv": "2026-10-07-mouth-shapes_final_review.csv",
+   "userVerdict": "OK",
+   "userNote": "user in chat 2026-10-10: Ship all 9 now (face mix of 6+3 accepted; the 3 may be redrawn later)",
    "sha256": "9102ee425f16eb679945eaf6766335cbbec4afdee5d92a9e35441785b0167027"
   },
   {
@@ -165,9 +165,9 @@
     "colours": "PASS 331",
     "red": "PASS 0.0%"
    },
-   "reviewCsv": null,
-   "userVerdict": "pending",
-   "userNote": "",
+   "reviewCsv": "2026-10-07-mouth-shapes_final_review.csv",
+   "userVerdict": "OK",
+   "userNote": "user in chat 2026-10-10: Ship all 9 now (face mix of 6+3 accepted; the 3 may be redrawn later)",
    "sha256": "7af32f94406e0777208f9489edd3bdfdb17adc602bc74d816a28bbcd2a8a8666"
   },
   {
@@ -189,9 +189,9 @@
     "colours": "PASS 430",
     "red": "PASS 0.0%"
    },
-   "reviewCsv": null,
-   "userVerdict": "pending",
-   "userNote": "",
+   "reviewCsv": "2026-10-07-mouth-shapes_final_review.csv",
+   "userVerdict": "OK",
+   "userNote": "user in chat 2026-10-10: Ship all 9 now (face mix of 6+3 accepted; the 3 may be redrawn later)",
    "sha256": "1b28e3b936aade1d641defe2a5ea697c8385bc65eb68245465634c560c58fc27"
   },
   {
@@ -213,11 +213,10 @@
     "colours": "PASS 401",
     "red": "PASS 0.0%"
    },
-   "reviewCsv": null,
-   "userVerdict": "pending",
-   "userNote": "",
+   "reviewCsv": "2026-10-07-mouth-shapes_final_review.csv",
+   "userVerdict": "OK",
+   "userNote": "user in chat 2026-10-10: Ship all 9 now (face mix of 6+3 accepted; the 3 may be redrawn later)",
    "sha256": "54ab3b3c519f18d522fa844b8edd88f14a328e5f798d167e59d6694715ba79a5"
   }
- ],
- "draft": true
+ ]
 }

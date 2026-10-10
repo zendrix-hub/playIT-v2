@@ -218,6 +218,17 @@ Claude looked at all four groups below on all 4 sizes.
 - **Blend It (group 1, SAM):** each tile lights while its sound plays to the end (the /s/ hiss is not cut off). Then all three tiles light together for half a second, then "Sam", then the chime. The card only says "Tap to hear word".
 - **Stars:** finish letter M. The map's star pill and the profile card show the same total as the Parent Dashboard. After Blend It 1, the total also counts its stars.
 - **Map:** tap the green (current) node once: the lesson starts with no pop-up. Tap a finished node: the pop-up opens for replay. Tap a locked node: it shakes and explains, as before.
-- **Still expected:** no mouth picture in Hear It or Say It yet. Card 25 waits for the user's final OK and its image release.
+- **Still expected:** no mouth picture in Hear It or Say It yet. The user approved card 25's pictures; card 24b brings them in (section 7).
 
 Record the verdict in section 2 and in `SESSION_HANDOFF.md`. Claude then accepts card 28 (hash and CI run in `docs/evidence-log.md`).
+
+## 7. Next for agy: card 24b (after section 6)
+
+Card 24b is an implementation card, not a validation: by the image gate, only an agy card brings pictures into the app. Run it as a normal card session (`AGY_RUNBOOK.md`), from `docs/tasks/card-24b-mouth-pictures-into-app.md`. It moves the approved card 25 release into `docs/image-release/2026-10-10-mouth/`, copies the 9 mouth pictures into the app, and moves the Hear It cue beside the play button.
+
+Claude ran the whole card locally before writing it. Expected:
+- **Full suite:** 386 tests, 0 failed, 6 skipped.
+- **`python3 tools/dev/review_card.py 24b`:** all PASS, plus the usual WARN "no hash yet". The `assets` lines show each of the 9 pictures matching `2026-10-10-mouth/mouth/<id>.png`.
+- **Screenshots and phone:** as in the card's "Screenshots" and "Phone checks" sections. Build APK D after the commit and copy it to `Documents/playIT-apk/playit-debug-D-<hash>.apk`; don't overwrite A, A2, B or C.
+
+Push, then report the hash. Claude reviews card 24b.
