@@ -285,6 +285,8 @@ Each card ticks its own item in its commit (see `docs/tasks/AGY_RUNBOOK.md`). A 
 - [x] Card 22: Map overhaul: rope trail, compact header, scales to every phone, unlock moment (FR-01)
 - [x] Card 23: Purposeful effects: transitions, correct pop, heart wobble, star drop, centre confetti (NFR-ACC-02)
 - [x] Card 24: Sound captions and mouth-shape cues (NFR-ACC-01, FR-02, FR-03)
-- [ ] Card 25: Mouth-shape pictures picked by the user (asset card; Claude ticks it from picks.json) (NFR-ACC-01)
+- [x] Card 25: Mouth-shape pictures picked by the user (asset card; Claude ticks it from picks.json) (NFR-ACC-01)
 - [x] Card 27: Refactor and synchronize academic documentation: SDD v2.0, SRS v3.0, and SPMP v2.0
+- [ ] Card 28: UX and pedagogy refinements: Hear It sequence closure & subtitle removal, Say It 3rd-miss resolution & debug text removal, Blend It sound-out cadence & pure English, Map direct launch & typography, and dynamic total stars calculation (FR-01, FR-02, FR-03, FR-13, NFR-ACC-02)
+- [ ] Card 29: Mascot poses and companion avatar art refresh (asset card)
 

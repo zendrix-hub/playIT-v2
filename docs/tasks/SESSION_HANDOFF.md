@@ -816,3 +816,30 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
 - **Checked:** every page of the 4 PDFs by eye; a scan finds no leftover Markdown, LaTeX or placeholders; the DOCX tables of contents are filled in. The evidence log has accepted rows for all 8 batch cards (03b, 20, 22, 21, 23, 15, 24, 27). Their CI column says "pass" from local and agy runs, without GitHub Actions run links.
 - **Open for the team:** confirm the adviser's name (taken from `PROMPT_FOR_CLAUDE_TRANSMITTAL_REVIEW.md`), the group name and the section ("IT411 G1–G8"); sign the declaration if a wet signature is needed.
 - **Rebuild:** `python3 tools/docs/render_submission_package.py` (python-docx plus Word through PowerShell; works from Windows or WSL).
+
+### agy & User, 2026-10-10: Post-APK Hardware Testing & Pedagogical Grill Session
+
+- **Context & Source**:
+  - User conducted hands-on field testing of `playit-debug.apk` (APK B) on physical Android hardware and initiated a `/grill-me` session covering 7 critical experiential and pedagogical friction points.
+  - Design tree was fully explored in two rounds of rigorous grilling; all branches settled with user-approved Option A.
+
+- **Settled Design Decisions (for Claude Review & Technical Acceptance)**:
+  1. **Hear It Screen Closure**: Remove `car_say_it_with_me` from `HearItSequenceBuilder.TEMPLATE`. Hear It is purely receptive ("I Do"); ending on letter sound and keyword avoids confusion. On sequence completion, it fires `ui_hearit_next.wav` (*"Great listening! Tap the big button."*) and activates an energetic breathing pulse on the bottom CTA.
+  2. **Subtitle Removal**: Remove on-screen `CaptionBubble` text completely from child view. Beginning 6-year-old Grade 1 learners cannot read multi-word carrier English sentences, and text distracts from letter glyph and keyword illustration focus. Vertical space is reallocated to enlarge `LetterCard` (+20%).
+  3. **Debug Telemetry Removal**: Remove `Heard: "..."` debug text overlay from `SayItScreen.kt`. Keep diagnostic telemetry strictly in Logcat and Room.
+  4. **Say It 3rd-Miss Trapping Resolution**: On 3rd miss (`LeadAndMoveOn`), transition the banner from orange retry to warm encouraging copy (*"Nice try! Let's keep going!"*), visually disable the mic, mark the phoneme as `NEEDS_PRACTICE`, and unlock the green Next CTA with celebratory chime and spring bounce so the child never gets trapped.
+  5. **Blend It Purity & Cadence**: Replace `"Pindutin para marinig"` in `BlendItCard.kt` with `"Tap to hear word"` (100% pure English). Slow down phoneme loop delay in `BlendItViewModel.kt` from 400ms to **750ms** per letter tile highlight + **500ms group pause** before pronouncing the blended whole word.
+  6. **Dynamic Star Counting Architecture**: Fix the 0-star bug on Map and Profile screens by implementing a dynamic SQL aggregate in `ProfileRepository` querying `lesson_progress` + `blend_it_progress` stars, guaranteeing a single source of truth that is 100% reactive and synchronized with reports.
+  7. **Map Screen Autonomy**: Tapping the active pulsing green node directly launches the lesson without an intermediate 2-tap popup dialog. Shorten `LilyGreetingChip` message to prevent ellipsis cutoffs on phone viewports. Raise companion speech bubble font from 11sp to 16sp pediatric floor.
+  8. **Zero-Teacher Autonomy**: Voice-first prompts on screen entry, 10-second idle visual wiggles on actionable targets, and self-evident pulsing Next CTAs.
+
+- **Status of New Task Cards**:
+  - **Card 25 (`card-25-mouth-shape-pictures.md`)**: User has finalized and committed all 9 mouth shape picks (`80d019e`) in `docs/assets/briefs/2026-10-07-mouth-shapes/picks/` (`picks.json` + 9 PNGs). **Action for Claude**: run `python3 tools/images/cutout_batch.py 2026-10-07-mouth-shapes` to cut out backgrounds, build review/release, and prepare image release manifest.
+  - **Card 28 (`card-28-ux-pedagogy-refinements.md`)**: Formally drafted covering all 7 code refinements above.
+  - **Card 29 (`card-29-mascot-avatar-art-refresh.md`)**: Formally drafted covering the visual consistency refresh of 8 Lily mascot poses and 6 companion animal avatars.
+
+- **Handoff Directive for Claude**:
+  - Please review, re-evaluate, and critique Card 28 and Card 29.
+  - Stress-test the technical implementation details (e.g. Room DAO queries, StateFlow lifecycle, Roborazzi test bounds).
+  - Process Card 25 mouth shape cutouts.
+  - Once validated, orchestrate execution overnight.
