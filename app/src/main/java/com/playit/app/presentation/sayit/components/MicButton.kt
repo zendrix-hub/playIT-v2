@@ -55,6 +55,8 @@ import com.playit.app.presentation.theme.PrimaryJoyDark
 import com.playit.app.presentation.theme.PrimaryJoyLight
 import com.playit.app.presentation.theme.SunnyGold
 import com.playit.app.presentation.theme.SunnyGoldShadow
+import com.playit.app.presentation.theme.SurfaceCard
+import com.playit.app.presentation.theme.SurfaceCardShadow
 import com.playit.app.presentation.theme.TextMidnight
 import com.playit.app.presentation.theme.TextMuted
 
@@ -66,12 +68,13 @@ private fun lookFor(status: MicStatus): MicLook = when (status) {
     MicStatus.HEARD -> MicLook(PrimaryJoyLight, PrimaryJoyDark, PrimaryJoyDark, Icons.Rounded.Mic, "I hear you!")
     MicStatus.RESULT_CORRECT -> MicLook(EmeraldLeafDark, EmeraldLeafShadow, Color.White, Icons.Rounded.Check, "Yes!")
     MicStatus.RESULT_TRY_AGAIN -> MicLook(GentleCorrectionOrange, GentleCorrectionOrangeShadow, TextMidnight, Icons.Rounded.Hearing, "Let's try again")
+    MicStatus.DONE -> MicLook(SurfaceCard, SurfaceCardShadow, TextMuted, Icons.Rounded.Mic, "Nice try!")
 }
 
 /**
  * The Say It mic. Colour, icon, motion and label change together for each [MicStatus],
  * so no state relies on colour alone, and none of them is red (03 :24, :54).
- * Taps reach [onTap] only in IDLE and RESULT_TRY_AGAIN.
+ * Taps reach [onTap] only in IDLE and RESULT_TRY_AGAIN; DONE (after the third miss) rests.
  */
 @Composable
 fun MicButton(

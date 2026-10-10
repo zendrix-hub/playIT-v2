@@ -17,9 +17,11 @@ object SayItFeedbackCopy {
                 mascot = "Yes! You said it!",
                 banner = "Great listening!"
             )
+            // Third miss: warm, and it points forward; Lily's voice says "Nice try! We'll practice
+            // this one again later." (fb_try_later) (user decision 2026-10-10, card 28).
             is TutorAction.LeadAndMoveOn -> FeedbackCopy(
                 mascot = "Let's say it together. We'll practice later.",
-                banner = "Let's say it together"
+                banner = "Nice try! Let's keep going!"
             )
             is TutorAction.Correct -> {
                 if (action.supportLevel == 2) {

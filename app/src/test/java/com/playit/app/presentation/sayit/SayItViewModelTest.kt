@@ -3,6 +3,7 @@ package com.playit.app.presentation.sayit
 import androidx.lifecycle.SavedStateHandle
 import com.playit.app.data.audio.AudioPlayer
 import com.playit.app.data.audio.AudioResolver
+import com.playit.app.data.audio.SfxEvent
 import com.playit.app.data.speech.VoskRecognizer
 import com.playit.app.domain.manager.SpeechValidator
 import com.playit.app.domain.manager.TutorAction
@@ -607,10 +608,32 @@ class SayItViewModelTest {
         assertEquals(initialHearts, viewModel.hearts.value)
         verify {
             audioPlayer.playSequence(
-                listOf("tutor/car_lets_say_together.wav", "word_path", "tutor/fb_try_later.wav"),
+                listOf("tutor/car_lets_say_together.wav", "word_path", "tutor/fb_try_later.wav", "sfx_path"),
                 any()
             )
         }
+    }
+
+    @Test
+    fun thirdMiss_micRestsAndNextUnlocks() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        every { audioResolver.getSfxPath(SfxEvent.NODE_UNLOCK_CHIME) } returns "sfx_unlock"
+        every { audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME) } returns "sfx_correct"
+        val sequences = mutableListOf<List<String>>()
+        every { audioPlayer.playSequence(capture(sequences), any()) } just Runs
+
+        createViewModel()
+        advanceUntilIdle()
+        repeat(3) { viewModel.evaluateSpeech("cat") }
+        advanceUntilIdle()
+
+        // Card 28: the mic rests (no retry it would ignore), Next is open, and the chime is the
+        // unlock chime; the correct chime stays for right answers.
+        assertEquals(MicStatus.DONE, viewModel.micStatus.value)
+        assertTrue(viewModel.canContinue.value)
+        val third = sequences.last()
+        assertEquals("sfx_unlock", third.last())
+        assertFalse(third.contains("sfx_correct"))
     }
 
     @Test

@@ -37,6 +37,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.ui.graphics.graphicsLayer
+import com.playit.app.domain.manager.TutorAction
+import com.playit.app.presentation.components.breathingPulse
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.playit.app.BuildConfig
 import com.playit.app.domain.manager.SayItFeedbackCopy
@@ -88,6 +94,7 @@ fun SayItScreen(
     val loadError by viewModel.loadError.collectAsStateWithLifecycle()
     val targetLetter = phoneme?.letter?.uppercase() ?: "M"
     val d = LocalPlayItDimens.current
+    val reducedMotion = LocalReducedMotion.current
     val targetWord by viewModel.targetWord.collectAsStateWithLifecycle()
     val wordMode = targetWord != null
     val displayWord = targetWord?.replaceFirstChar { it.uppercase() }
@@ -223,6 +230,8 @@ fun SayItScreen(
                         exit = fadeOut() + slideOutVertically(targetOffsetY = { 20 })
                     ) {
                         val isCorrect = state is SayItState.Correct
+                        // Third miss: a calm cream banner, not the orange "try again" (card 28).
+                        val movedOn = tutorAction is TutorAction.LeadAndMoveOn
                         Column(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally
@@ -231,36 +240,53 @@ fun SayItScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(bottom = 8.dp)
-                                    .background(color = if (isCorrect) EmeraldLeaf else ApricotGlow, shape = Squircle16)
+                                    .background(
+                                        color = when {
+                                            isCorrect -> EmeraldLeaf
+                                            movedOn -> SunnyGoldLight
+                                            else -> ApricotGlow
+                                        },
+                                        shape = Squircle16
+                                    )
                                     .border(2.5.dp, ModernBorder, Squircle16)
                                     .padding(vertical = 8.dp, horizontal = 16.dp),
                                 contentAlignment = Alignment.Center
                             ) {
+                                // One line: a second line makes the pinned bar taller and pushes the mic
+                                // label off small phones, so a long banner shrinks (never below 16 sp).
+                                val bannerText = currentFeedbackCopy?.banner
+                                    ?: if (isCorrect) "Great listening!" else "Listen again"
+                                var bannerSize by remember(bannerText) { mutableStateOf(24.sp) }
                                 Text(
-                                    text = currentFeedbackCopy?.banner
-                                        ?: if (isCorrect) "Great listening!" else "Listen again",
+                                    text = bannerText,
                                     color = if (isCorrect) Color.White else TextMidnight,
                                     fontWeight = FontWeight.Black,
                                     fontFamily = LexendFontFamily,
-                                    fontSize = 24.sp,
-                                    maxLines = 2,
-                                    textAlign = TextAlign.Center
+                                    fontSize = bannerSize,
+                                    maxLines = 1,
+                                    softWrap = false,
+                                    textAlign = TextAlign.Center,
+                                    onTextLayout = { layout ->
+                                        if (layout.hasVisualOverflow && bannerSize.value > 16f) {
+                                            bannerSize = (bannerSize.value - 2f).sp
+                                        }
+                                    }
                                 )
                             }
-
-                            if (BuildConfig.DEBUG && lastHeard != null) {
-                                Text(
-                                    text = "Heard: \"${lastHeard?.transcript}\" -> ${lastHeard?.errorType} (attempt ${lastHeard?.attempt})",
-                                    color = TextMidnight.copy(alpha = 0.7f),
-                                    fontWeight = FontWeight.Medium,
-                                    fontFamily = LexendFontFamily,
-                                    fontSize = 12.sp,
-                                    modifier = Modifier.padding(bottom = 4.dp)
-                                )
-                            }
+                            // What Vosk heard goes to Logcat only (see the LaunchedEffect above), never on screen.
                         }
                     }
 
+                    // Next pulses once it unlocks (praise or the third miss) and pops on the change.
+                    val nextPop = remember { Animatable(1f) }
+                    var wasUnlocked by remember { mutableStateOf(canContinue) }
+                    LaunchedEffect(canContinue) {
+                        if (canContinue && !wasUnlocked && !reducedMotion) {
+                            nextPop.animateTo(1.12f, spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium))
+                            nextPop.animateTo(1f, spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium))
+                        }
+                        wasUnlocked = canContinue
+                    }
                     GummyButton(
                         text = "Next: Find It",
                         onClick = { if (canContinue) onNext(phoneme?.id?.toString() ?: "1") },
@@ -268,7 +294,14 @@ fun SayItScreen(
                         backgroundColor = EmeraldLeaf,
                         shadowColor = EmeraldLeafShadow,
                         contentColor = Color.White,
-                        modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 64.dp)
+                            .breathingPulse(enabled = canContinue)
+                            .graphicsLayer {
+                                scaleX = nextPop.value
+                                scaleY = nextPop.value
+                            }
                     )
                 }
             }

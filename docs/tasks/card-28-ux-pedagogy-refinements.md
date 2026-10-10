@@ -1,7 +1,7 @@
 # Card 28: UX and pedagogy refinements from the APK B phone test (FR-01, FR-02, FR-03, FR-13, NFR-ACC-01, NFR-ACC-02)
 
 Type: code
-Status: ready
+Status: done
 
 ## Why
 The user tested APK B on a phone and settled 7 changes in a grill session (user decisions 2026-10-10, Option A on every branch):

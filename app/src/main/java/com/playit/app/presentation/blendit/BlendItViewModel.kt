@@ -15,6 +15,9 @@ import com.playit.app.domain.repository.BlendItAttemptRepository
 import com.playit.app.domain.repository.BlendItWordRepository
 import com.playit.app.navigation.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -99,6 +102,20 @@ class BlendItViewModel @Inject constructor(
     val lockedHintCount: StateFlow<Int> = _lockedHintCount.asStateFlow()
 
     private var soundOutJob: kotlinx.coroutines.Job? = null
+
+    /**
+     * Plays [path] and returns when it ends, but no later than [maxMs] (a clip that never reports its end
+     * cannot stall the lesson) and no sooner than [minMs]. A null path just waits [minMs].
+     */
+    private suspend fun playAndAwait(path: String?, minMs: Long, maxMs: Long) = coroutineScope {
+        val minimum = launch { kotlinx.coroutines.delay(minMs) }
+        if (path != null) {
+            val ended = CompletableDeferred<Unit>()
+            audioPlayer.playAssetAudio(path) { ended.complete(Unit) }
+            withTimeoutOrNull(maxMs) { ended.await() }
+        }
+        minimum.join()
+    }
 
     private val _highlightedSlotIndex = MutableStateFlow<Int?>(null)
     val highlightedSlotIndex: StateFlow<Int?> = _highlightedSlotIndex.asStateFlow()
@@ -258,22 +275,19 @@ class BlendItViewModel @Inject constructor(
             _uiState.value = BlendItUiState.WordCorrect
             soundOutJob?.cancel()
             soundOutJob = viewModelScope.launch {
-                // Sequential phoneme sound-out loop
+                // Sound out each letter and wait for its clip: AudioPlayer stops a clip when the next one
+                // starts, and held sounds run over a second (ph_s.wav is 1.19 s). At least 750 ms per tile
+                // (user decision 2026-10-10, card 28).
                 for (i in targetWord.indices) {
                     _highlightedSlotIndex.value = i
-                    val letter = targetWord[i].toString()
-                    val phonemeAudio = audioResolver.getPhonemePath(letter)
-                    if (phonemeAudio != null) {
-                        audioPlayer.playAssetAudio(phonemeAudio)
-                    }
-                    kotlinx.coroutines.delay(400)
+                    playAndAwait(audioResolver.getPhonemePath(targetWord[i].toString()), LETTER_MIN_MS, LETTER_MAX_MS)
                 }
-                _highlightedSlotIndex.value = null
 
-                // Whole word audio
-                val wordAudio = audioResolver.getWordPath(targetWord)
-                audioPlayer.playAssetAudio(wordAudio)
-                kotlinx.coroutines.delay(600)
+                // Blend: every tile lights together for a moment, and stays lit while the whole word plays.
+                _highlightedSlotIndex.value = ALL_SLOTS
+                kotlinx.coroutines.delay(BLEND_PAUSE_MS)
+                playAndAwait(audioResolver.getWordPath(targetWord), 0L, WORD_MAX_MS)
+                _highlightedSlotIndex.value = null
 
                 // Celebration chime and VO
                 val sfx = audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME)
@@ -363,5 +377,14 @@ class BlendItViewModel @Inject constructor(
         super.onCleared()
         idleTimer.stop()
         audioPlayer.stop()
+    }
+
+    companion object {
+        /** [highlightedSlotIndex] value that lights every tile: the blend moment before the whole word. */
+        const val ALL_SLOTS = -1
+        internal const val LETTER_MIN_MS = 750L
+        internal const val LETTER_MAX_MS = 2000L
+        internal const val BLEND_PAUSE_MS = 500L
+        internal const val WORD_MAX_MS = 2500L
     }
 }

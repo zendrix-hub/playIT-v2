@@ -843,3 +843,21 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - Stress-test the technical implementation details (e.g. Room DAO queries, StateFlow lifecycle, Roborazzi test bounds).
   - Process Card 25 mouth shape cutouts.
   - Once validated, orchestrate execution overnight.
+
+### Claude, 2026-10-10 (evening): cards 28 and 29 reviewed, card 25 cut out, card 28 done
+
+- **Review (`88021c5`):** cards 28 and 29 rewritten in the `review_card.py` format, user decisions kept. Main findings:
+  - Card 28's `NEEDS_PRACTICE` write is out: `PlayItDatabase` is version 3 with `fallbackToDestructiveMigration()`, so a new table would wipe every child's progress.
+  - The third-miss trap was visual (`canContinue` was already true).
+  - `AudioPlayer` stops a clip when the next starts, so Blend It's 400 ms loop cut its sounds.
+  - The "11 sp companion bubble" was dead code, not called in APK B either.
+  - Card 29 named unused files: the app reads `images/characters/` and `images/mascot/avatar_0N`, byte-identical copies. New brief: `docs/assets/briefs/2026-10-11-mascot-refresh/items.json`.
+- **Card 25:** the 9 picks are cut out in `Documents\playIT-image-batches\2026-10-07-mouth-shapes\final\` (`audit.py`: 0 FAIL, 0 WARN; checked on the 4 backgrounds by eye). The set mixes two face designs (6 + 3). **Waiting for the user's final OK** (`QUESTIONS.md`): open `final\index.html`, mark OK or FIX, Export CSV into the batch folder. Claude then runs `make_release.py <batch> --out docs/image-release/2026-10-10-mouth --dest mouth --generator "Nano Banana Pro (agy, card 25)"` and writes the copy card 25b. Until then `ArticulationCue` draws nothing.
+- **Card 28 (this commit):** Hear It ends on the key word and the sound, with no captions in the child view. Say It's third miss gives mic `DONE`, a cream banner, a pulsing Next and the unlock chime; the debug line is gone. Blend It has one English hint and a sound-out that waits for each clip (at least 750 ms per letter, then 500 ms with all tiles lit, then the word). Star totals are live, from one SQL sum in `ProfileDao` with no schema change. The map's active node starts on one tap, and the chip says "Hi, {name}!". SRS 3.4 and SDD 2.4 record the amendments.
+  - Tests: full suite 376 passed, 0 failed, 6 skipped by design (local, Windows, JDK 17). New: `ProfileDaoStarsTest` (in-memory Room, 4 tests, including live re-emission), `MapTapRulesTest`, and Blend It and Say It timing and state tests.
+  - Screenshots: Roborazzi 41 images; `hearit`, `sayit`, `blendit` and `map` checked on 4 sizes, plus the third-miss Say It state on 4 sizes (a throwaway test, not committed). The long banner shrinks to one line, so the mic label stays visible on 360 dp phones.
+- **Open:**
+  - `QUESTIONS.md`: the card 25 final OK and face mix; captions vs NFR-ACC-01 (tell the adviser); which 11 sp map text to raise.
+  - Card 28b (to write): the 10-second idle wiggle on the main button (grill decision 8), and `MarungkoGroupBanner` clipping its title on every size (visible in the map screenshots).
+  - Card 29 runs in an agy image session with the new brief.
+- **Next for agy:** validate card 28 (`VALIDATOR_RUNBOOK_OCT10.md`, section 6): review_card, the full suite, 4-size screenshots, APK C, and the phone checks in the evidence-log row.

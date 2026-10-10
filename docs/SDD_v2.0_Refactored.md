@@ -3,7 +3,7 @@
 **Course:** IT411 — Capstone & Research 2 | Semester 1, AY 2026–2027  
 **Degree Program:** Bachelor of Science in Information Technology  
 **Department:** College of Computer Studies, Cebu Institute of Technology – University  
-**Document Version:** 2.3 (Renewed & Fully Refactored Post-MVP Validation; implementation status synchronized 2026-10-09; reviewed for submission 2026-10-10)  
+**Document Version:** 2.4 (Renewed & Fully Refactored Post-MVP Validation; implementation status synchronized 2026-10-09; reviewed for submission 2026-10-10; card 28 2026-10-10)  
 **Publication Date:** September 26, 2026  
 **Document Status:** Draft for adviser review (revised 2026-10-05, 2026-10-09 and 2026-10-10; items marked **[proposed]** await adviser approval). Components are marked by implementation status in §2.0  
 **Prepared by:** Group 56 — PlayIT Capstone Team: Riva, Z. (Team Lead); Palis, J. J.; Miel, K.; Durano, A. S.; Bien, E. S.  
@@ -22,6 +22,7 @@
 | **2.1** | October 5, 2026 | Capstone Team (Claude review) | Corrections for adviser review: new §2.0 implementation-status table (implemented vs planned); §3.3.1 judge uses word mode as in the code, with no fixed confidence threshold; Room schema v4 (v3 is current) with explicit migrations; revision 2.0 entries reworded as design, not completed work. |
 | **2.2** | October 9, 2026 | Capstone Team (Claude, sprint synchronization) | §2.0 re-checked against branch `refactor/hear-say-it` after the Oct 9–10 sprint (cards 18–24, 03b, 15). Newly **Implemented**: adaptive dimensions and `LessonScaffold`; 4-state Say It mic (`MicStatus`, `MicButton`, time-based ripple); spoken Say It corrections; decodable Blend It word list; purposeful effects and screen transitions; responsive map (`MapLayout`); sound captions and `ArticulationCue`. §3.4 chapter letters corrected to the seeded groups; §3.6 replaced the design sketches with the implemented components. `LessonEngine`, `AudioComposer`, Room schema v4, telemetry and CSV export remain **Planned**. |
 | **2.3** | October 10, 2026 | Capstone Team (Claude, submission review) | Review for the IT411 submission, no design change: §3.1.1 and §3.1.2 use the shipped `assets/audio/` layout and the dated release manifests; §2.2 notes that the planned `tutoring/` classes live in `domain/manager/` today; §3.1, §3.2 and §3.2.2 label the planned components; §4.2 uses the shipped Heard mic state (user decision 2026-10-06); §5 lists the short-vowel source; diagram alignment and §3.5.1 comment wrapping fixed. |
+| **2.4** | October 10, 2026 | Capstone Team (Claude, card 28) | Phone-test refinements (user decisions 2026-10-10): §2.0 adds the card 28 row (Hear It ends on the sound, Say It mic `DONE` after the third miss, Blend It sound-out that waits for each clip, live star totals from one SQL aggregate, one-tap map start) and marks captions as kept in code but not shown; §3.6.2 and §4.1 step 7 follow. |
 
 ---
 
@@ -74,12 +75,14 @@ This document describes the target design for Weeks 4–9. The table separates w
 | `ProfileEntity`, `SessionManager` (up to 6 profiles) | Implemented | Room schema version 3 (`PlayItDatabase.kt`) |
 | Parent PDF report | Implemented | `data/pdf/PdfExporter.kt` |
 | Adaptive dimensions and lesson layout (`WindowProfile`, `PlayItDimens`, `LessonScaffold`) | Implemented | `presentation/theme/Dimens.kt`, `presentation/components/LessonScaffold.kt`; 64 dp touch and 16 sp text floors; tested in `DimensTest`, `GummyContainerLayoutTest`, `LayoutMatrixTest` (4 device sizes, font scale 1.3) |
-| Say It mic states (Idle, Listening, Heard, Result) | Implemented | `presentation/sayit/MicStatus.kt`, `presentation/sayit/components/MicButton.kt`; time-based ripple, no red; returns to Idle when the app is backgrounded; tested in `MicStatusTest`, `SayItViewModelTest` |
+| Say It mic states (Idle, Listening, Heard, Result, and Done after the third miss) | Implemented | `presentation/sayit/MicStatus.kt`, `presentation/sayit/components/MicButton.kt`; time-based ripple, no red; returns to Idle when the app is backgrounded; Done takes no taps (card 28); tested in `MicStatusTest`, `SayItViewModelTest` |
 | Spoken Say It corrections (letter name, added vowel, remodel) | Implemented | `presentation/sayit/SayItViewModel.kt`; tutor fragments `fb_letter_name`, `fb_its_sound_is`, `fb_almost_just`, `fb_no_ah`, `fb_listen` (Kokoro, audio release 2026-10-01; teacher audit pending); tested in `SayItViewModelTest`, `AudioResolverTest` |
 | Decodable Blend It word list (§3.4) | Implemented | `di/DatabaseModule.kt` `BLEND_IT_WORD_SEEDS`, written on every open; tested in `BlendItWordSeedsTest`. Teacher confirmation and the AM, TUB, YAM, ZIP word audio and pictures are pending |
 | Purposeful effects and screen transitions | Implemented | `presentation/components/FeedbackEffects.kt`, `navigation/NavGraph.kt`, `CelebrationOverlay.kt`; reduced motion gives fades only; no haptics; tested in `FeedbackEffectsTest`, `PlayItMotionTest` |
 | Responsive map trail, compact header, unlock moment | Implemented | `presentation/map/MapLayout.kt`, `MapScreen.kt`, `MapViewModel.newlyUnlockedNodeId`; tested in `MapLayoutTest`, `TopStatsBarLayoutTest`, `MapViewModelTest` |
-| Sound captions and `ArticulationCue` (§3.6.2) | Implemented | `domain/model/ArticulationGroup.kt`, `domain/manager/CaptionText.kt`, `presentation/components/CaptionBubble.kt`, `ArticulationCue.kt`; mouth pictures await their image release (card 25), until then the cue draws nothing; tested in `ArticulationGroupTest`, `CaptionTextTest`, `ArticulationCueTest` |
+| Mouth-shape cue `ArticulationCue` (§3.6.2); sound captions kept in code, not shown in the child view since card 28 (user decision 2026-10-10) | Implemented | `domain/model/ArticulationGroup.kt`, `domain/manager/CaptionText.kt`, `presentation/components/CaptionBubble.kt`, `ArticulationCue.kt`; mouth pictures await their image release (card 25), until then the cue draws nothing; tested in `ArticulationGroupTest`, `CaptionTextTest`, `ArticulationCueTest` |
+| Phone-test refinements (card 28): Hear It ends on the key word and the sound; the third Say It miss rests the mic and unlocks Next; Blend It sounds out each letter to the end (at least 750 ms) before the whole word; one-tap start of the active map node | Implemented | `domain/manager/HearItSequenceBuilder.kt`, `presentation/sayit/MicStatus.kt`, `presentation/blendit/BlendItViewModel.kt`, `presentation/map/MapTapRules.kt`; tested in `HearItSequenceBuilderTest`, `SayItViewModelTest`, `BlendItViewModelTest`, `MapTapRulesTest` |
+| Live star totals on the map, the profile cards and the parent report | Implemented | `data/local/dao/ProfileDao.kt` sums `lesson_progress` and `blend_it_progress` in SQL, the same sum as `ReportGenerator`; no schema change (card 28); tested in `ProfileDaoStarsTest` on an in-memory Room database |
 | `LessonEngine`, `LearnerModel` (review scheduler) | Planned | — |
 | `AudioComposer`, `AudioPlaybackManager` | Planned | Playback today goes through `data/audio/AudioPlayer.kt`, which already uses a `SoundPool` for short clips |
 | RMS-driven mic ripple (`MicStateVisualizer` with the `AudioRecord` loop of §3.2) | Planned | The 4 mic states are implemented (row above); the voice-driven ripple follows the planned `AudioRecord` loop (post-Round-2, user decision 2026-10-06) |
@@ -433,7 +436,7 @@ fun ArticulationCue(group: ArticulationGroup, size: Dp, modifier: Modifier = Mod
 @Composable
 fun CaptionBubble(caption: String?, modifier: Modifier = Modifier)
 ```
-`ArticulationCue` draws nothing until its picture is in `assets/images/mouth/` (image release of card 25). Hear It shows a 72 dp cue with the caption under the letter card; Say It shows a 96 dp cue beside the mic from the second miss ("Watch my lips", spec Table 7).
+`ArticulationCue` draws nothing until its picture is in `assets/images/mouth/` (image release of card 25). Hear It shows a 72 dp cue under the letter card (no caption in the child view since card 28); Say It shows a 96 dp cue beside the mic from the second miss ("Watch my lips", spec Table 7).
 
 ---
 
@@ -449,7 +452,8 @@ User selects Letter -> Screen Loads -> SoundPool Preloads Letter Clips
              accompanied by ArticulationCue highlight and caption
   -> Step 5: Mascot plays Keyword audio ("mouse") + Keyword image
   -> Step 6: Pure phoneme plays 1 time
-  -> Step 7: Mascot plays "Say it with me!" -> Transition to Say It
+  -> Step 7: "Great listening! Tap the big button." -> Next pulses -> Say It
+     (card 28: Hear It no longer ends with "Say it with me!")
 ```
 
 ### 4.2 Say It Interaction & Correction Workflow

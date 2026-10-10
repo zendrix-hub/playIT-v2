@@ -182,6 +182,22 @@ fun MapScreen(
 
     // Shake animation state for locked node taps
     var shakenNodeId by remember { mutableStateOf<String?>(null) }
+
+    // The active node starts on one tap; finished nodes open the pop-up for replay (card 28).
+    val onNodeTap: (MapNode, Int) -> Unit = { node, index ->
+        when (nodeTapAction(node.isUnlocked, index, activeNodeIndex)) {
+            NodeTapAction.LAUNCH -> onNodeSelected(node.id)
+            NodeTapAction.POPUP -> {
+                selectedNodeForAction = node
+                viewModel.onUnlockedNodeTapped()
+            }
+            NodeTapAction.LOCKED -> {
+                shakenNodeId = node.id
+                selectedNodeForAction = node
+                viewModel.onLockedNodeTapped()
+            }
+        }
+    }
     var lockedBlendItDialogGroup by remember { mutableStateOf<String?>(null) }
     val shakeOffset = remember { Animatable(0f) }
 
@@ -262,16 +278,11 @@ fun MapScreen(
                 )
             }
 
-            // ── Mascot Prompt Header (Personalized Instant Greeting & Biome Guidance) ─
-            val welcomeGreeting = if (userStats.profileName.isNotBlank()) {
-                "${userStats.profileName}, ${activeBiomeTheme.mascotDialogue}"
-            } else {
-                activeBiomeTheme.mascotDialogue
-            }
-
-            // One line, so the trail gets the screen; tapping Lily speaks the greeting.
+            // ── Mascot Prompt Header (Personalized Instant Greeting) ─
+            // One short line, so the trail gets the screen and a 16-character name is never cut off;
+            // tapping Lily says "Let's go! Tap a letter to begin our adventure!" (card 28).
             LilyGreetingChip(
-                message = welcomeGreeting,
+                message = greetingFor(userStats.profileName),
                 backgroundColor = activeBiomeTheme.backgroundTint.copy(alpha = 0.95f),
                 onTap = { viewModel.playMascotTapReaction() },
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
@@ -460,31 +471,13 @@ fun MapScreen(
                                     LetterMapNodeCard(
                                         node = node,
                                         discSize = d.mapNodeSize,
-                                        onClick = {
-                                            if (node.isUnlocked) {
-                                                selectedNodeForAction = node
-                                                viewModel.onUnlockedNodeTapped()
-                                            } else {
-                                                shakenNodeId = node.id
-                                                selectedNodeForAction = node
-                                                viewModel.onLockedNodeTapped()
-                                            }
-                                        }
+                                        onClick = { onNodeTap(node, index) }
                                     )
                                 }
                                 is MapNode.BlendItNode -> {
                                     BlendItChallengeNodeCard(
                                         node = node,
-                                        onClick = {
-                                            if (node.isUnlocked) {
-                                                selectedNodeForAction = node
-                                                viewModel.onUnlockedNodeTapped()
-                                            } else {
-                                                shakenNodeId = node.id
-                                                selectedNodeForAction = node
-                                                viewModel.onLockedNodeTapped()
-                                            }
-                                        }
+                                        onClick = { onNodeTap(node, index) }
                                     )
                                 }
                             }
@@ -548,41 +541,6 @@ fun MapScreen(
                 onDismiss = { lockedBlendItDialogGroup = null },
                 confirmColor = Mango,
                 confirmShadowColor = MangoShadow
-            )
-        }
-    }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// Mini Dialogue Bubble above Companion Mascot
-// ═══════════════════════════════════════════════════════════════════════════
-
-@Composable
-fun MascotMapDialogueBubble(
-    message: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    GummyContainer(
-        onClick = onClick,
-        faceColor = SurfaceCard,
-        shadowColor = SurfaceCardShadow,
-        strokeColor = ModernBorder,
-        strokeWidth = 2.dp,
-        depthHeight = 3.dp,
-        shape = RoundedCornerShape(12.dp),
-        modifier = modifier
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = message,
-                fontFamily = LexendFontFamily,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Black,
-                color = TextMidnight
             )
         }
     }

@@ -9,11 +9,13 @@ package com.playit.app.domain.manager
  */
 object HearItSequenceBuilder {
 
-    // Spec §2.1 Table 3 / §6.2, without the SHOW_LETTER animation token.
+    // Spec §2.1 Table 3 / §6.2, without the SHOW_LETTER animation token. Hear It is listen-only, so it
+    // ends on the key word and the sound; "Say it with me!" no longer closes it (user decision
+    // 2026-10-10, card 28), and "Great listening! Tap the big button." follows instead.
     val TEMPLATE = listOf(
         "car_listen", "car_this_letter_says",
         "PHONEME", "PAUSE_500", "PHONEME", "PAUSE_500", "PHONEME",
-        "KEYWORD", "PHONEME", "car_say_it_with_me"
+        "KEYWORD", "PHONEME"
     )
 
     private val PAUSE_TOKEN = Regex("PAUSE_(\\d+)")

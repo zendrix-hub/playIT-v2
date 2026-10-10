@@ -284,4 +284,79 @@ class BlendItViewModelTest {
         assertTrue(capturedSequences.any { it.contains("sfx_pop.mp3") })
         assertFalse(capturedSequences.any { it.contains("sfx_buzz.mp3") })
     }
+
+    /** Builds the view model with S, A, M placed, ready to submit; returns nothing, uses [viewModel]. */
+    private fun TestScope.placeSam() {
+        viewModel = BlendItViewModel(
+            blendItWordRepository, blendItAttemptRepository, blendItWordSelector,
+            sessionManager, audioPlayer, audioResolver, savedStateHandle
+        )
+        advanceUntilIdle()
+        viewModel.placeTile('S')
+        viewModel.placeTile('A')
+        viewModel.placeTile('M')
+        advanceUntilIdle()
+    }
+
+    @Test
+    fun soundOut_waitsForEachSound() = runTest {
+        // Card 28: AudioPlayer stops a clip when the next starts, so each letter waits for its sound.
+        val played = mutableListOf<String>()
+        val endings = mutableListOf<() -> Unit>()
+        every { audioResolver.getPhonemePath(any()) } answers { "ph_${firstArg<String>().lowercase()}" }
+        every { audioPlayer.playAssetAudio(any(), any()) } answers {
+            played += firstArg<String>()
+            secondArg<(() -> Unit)?>()?.let { endings += it }
+        }
+        placeSam()
+        played.clear() // placing a tile plays its sound too
+        endings.clear()
+        val phonemes = { played.filter { it.startsWith("ph_") } }
+
+        viewModel.submitWord()
+        runCurrent()
+        assertEquals(listOf("ph_s"), phonemes())
+        assertEquals(0, viewModel.highlightedSlotIndex.value)
+
+        // A held /s/ still playing after 1 s: the next tile waits for it.
+        advanceTimeBy(1000)
+        runCurrent()
+        assertEquals(listOf("ph_s"), phonemes())
+        endings.last().invoke()
+        runCurrent()
+        assertEquals(listOf("ph_s", "ph_a"), phonemes())
+        assertEquals(1, viewModel.highlightedSlotIndex.value)
+
+        // A short /a/ ends at once, but its tile still holds for at least 750 ms.
+        endings.last().invoke()
+        advanceTimeBy(BlendItViewModel.LETTER_MIN_MS - 50)
+        runCurrent()
+        assertEquals(listOf("ph_s", "ph_a"), phonemes())
+        advanceTimeBy(60)
+        runCurrent()
+        assertEquals(listOf("ph_s", "ph_a", "ph_m"), phonemes())
+    }
+
+    @Test
+    fun soundOut_lightsAllTilesBeforeWord() = runTest {
+        // Every clip ends at once, so each letter takes exactly LETTER_MIN_MS.
+        val played = mutableListOf<String>()
+        every { audioResolver.getWordPath(any()) } returns "word_sam"
+        every { audioPlayer.playAssetAudio(any(), any()) } answers {
+            played += firstArg<String>()
+            secondArg<(() -> Unit)?>()?.invoke()
+        }
+        placeSam()
+        played.clear()
+
+        viewModel.submitWord()
+        advanceTimeBy(3 * BlendItViewModel.LETTER_MIN_MS + 10)
+        runCurrent()
+        assertEquals(BlendItViewModel.ALL_SLOTS, viewModel.highlightedSlotIndex.value)
+        assertFalse(played.contains("word_sam"))
+
+        advanceTimeBy(BlendItViewModel.BLEND_PAUSE_MS)
+        runCurrent()
+        assertTrue(played.contains("word_sam"))
+    }
 }

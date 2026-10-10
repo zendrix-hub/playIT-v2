@@ -17,7 +17,10 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
-/** Card 16 (in card 20): the Blend It word card's second line stays inside the card. */
+/**
+ * Card 16 (in card 20): the Blend It word card's hint line stays inside the card.
+ * Card 28: the hint is English only; the Filipino line is gone.
+ */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [34], qualifiers = "w411dp-h891dp-xxhdpi")
@@ -27,7 +30,7 @@ class BlendItCardLayoutTest {
     @Before fun syncImages() { AssetImageConfig.decodeSynchronously = true }
 
     @Test
-    fun secondLine_staysInsideCard() {
+    fun hintLine_staysInsideCard() {
         compose.setContent {
             PlayItTheme {
                 BlendItCard(word = "SAM", isCorrect = false, onReplayAudio = {}, modifier = Modifier.testTag("blendCard"))
@@ -37,6 +40,7 @@ class BlendItCardLayoutTest {
         // Unmerged: the clickable card merges its text into one node with the card's own bounds.
         val line = compose.onNodeWithText("Tap to hear word", useUnmergedTree = true).getBoundsInRoot()
         val card = compose.onNodeWithTag("blendCard").getBoundsInRoot()
-        assertTrue("second line bottom ${line.bottom} must be at most ${card.bottom - 6.dp}", line.bottom <= card.bottom - 6.dp)
+        assertTrue("hint line bottom ${line.bottom} must be at most ${card.bottom - 6.dp}", line.bottom <= card.bottom - 6.dp)
+        compose.onNodeWithText("Pindutin para marinig", useUnmergedTree = true).assertDoesNotExist()
     }
 }

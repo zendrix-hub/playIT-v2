@@ -79,32 +79,23 @@ fun BlendItCard(
                     )
                 }
                 Spacer(modifier = Modifier.height(4.dp))
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
-                            contentDescription = null,
-                            tint = com.playit.app.presentation.theme.TextMuted,
-                            modifier = Modifier.size(22.dp)
-                        )
-                        Text(
-                            text = "Pindutin para marinig",
-                            fontFamily = LexendFontFamily,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = com.playit.app.presentation.theme.TextMuted
-                        )
-                    }
+                // One English hint line (card 28: no Filipino line in gameplay).
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
+                        contentDescription = null,
+                        tint = com.playit.app.presentation.theme.TextMuted,
+                        modifier = Modifier.size(22.dp)
+                    )
                     Text(
                         text = "Tap to hear word",
                         fontFamily = LexendFontFamily,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = com.playit.app.presentation.theme.TextMuted,
-                        modifier = Modifier.padding(top = 2.dp)
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = com.playit.app.presentation.theme.TextMuted
                     )
                 }
             }

@@ -77,8 +77,13 @@ class SayItViewModel @Inject constructor(
     /** True once the recognizer returned any speech in the current listening window. */
     private val _heardSpeech = MutableStateFlow(false)
 
-    val micStatus: StateFlow<MicStatus> = combine(_state, _heardSpeech) { s, h -> micStatusFor(s, h) }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, MicStatus.IDLE)
+    private val _tutorAction = MutableStateFlow<TutorAction?>(null)
+    val tutorAction: StateFlow<TutorAction?> = _tutorAction.asStateFlow()
+
+    /** After the third miss the mic rests (DONE) instead of offering a retry it would ignore (card 28). */
+    val micStatus: StateFlow<MicStatus> = combine(_state, _heardSpeech, _tutorAction) { s, h, action ->
+        micStatusFor(s, h, movedOn = action is TutorAction.LeadAndMoveOn)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, MicStatus.IDLE)
 
     val heartManager = HeartManager()
 
@@ -87,9 +92,6 @@ class SayItViewModel @Inject constructor(
 
     private val tutorPolicy = TutorPolicy()
     private var attemptNumber = 0
-
-    private val _tutorAction = MutableStateFlow<TutorAction?>(null)
-    val tutorAction: StateFlow<TutorAction?> = _tutorAction.asStateFlow()
 
     private val _lastHeard = MutableStateFlow<HeardAttempt?>(null)
     val lastHeard: StateFlow<HeardAttempt?> = _lastHeard.asStateFlow()
@@ -401,12 +403,17 @@ class SayItViewModel @Inject constructor(
             }
             is TutorAction.LeadAndMoveOn -> {
                 _showMouthCue.value = true
-                // TODO(FR-NEW-REC): mark the letter NEEDS_PRACTICE and queue a recall check
+                // TODO(FR-NEW-REC): mark the letter NEEDS_PRACTICE and queue a recall check. Not before
+                // Room v4 with real migrations: PlayItDatabase is v3 with fallbackToDestructiveMigration(),
+                // so a new table now would wipe every child's progress (card 28). The three misses are
+                // already saved as SayItAttempt rows.
+                // The unlock chime says "Next is open"; the correct chime stays for right answers.
                 audioPlayer.playSequence(
                     listOf(
                         audioResolver.getTutorPath("car_lets_say_together"),
                         model,
-                        audioResolver.getTutorPath("fb_try_later")
+                        audioResolver.getTutorPath("fb_try_later"),
+                        audioResolver.getSfxPath(SfxEvent.NODE_UNLOCK_CHIME)
                     )
                 )
                 _canContinue.value = true

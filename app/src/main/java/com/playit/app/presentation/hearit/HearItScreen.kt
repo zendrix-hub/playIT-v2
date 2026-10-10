@@ -1,6 +1,5 @@
 package com.playit.app.presentation.hearit
 
-import com.playit.app.presentation.components.CaptionBubble
 import com.playit.app.presentation.components.ArticulationCue
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.RepeatMode
@@ -58,6 +57,7 @@ import com.playit.app.presentation.theme.CreamWhite
 import com.playit.app.presentation.theme.DarkBrownOutline
 import com.playit.app.presentation.theme.Ink
 import com.playit.app.presentation.theme.LocalPlayItDimens
+import com.playit.app.presentation.theme.WindowProfile
 import com.playit.app.presentation.theme.Mango
 import com.playit.app.presentation.theme.MangoShadow
 import com.playit.app.presentation.theme.Sand
@@ -78,7 +78,6 @@ fun HearItScreen(
     val playCount by viewModel.playCount.collectAsStateWithLifecycle()
     val nextHighlighted by viewModel.nextHighlighted.collectAsStateWithLifecycle()
     val loadError by viewModel.loadError.collectAsStateWithLifecycle()
-    val caption by viewModel.caption.collectAsStateWithLifecycle()
     val targetLetter = phoneme?.letter?.uppercase() ?: "M"
     val d = LocalPlayItDimens.current
 
@@ -205,24 +204,26 @@ fun HearItScreen(
                 )
             }
         ) {
-            // 3D Bento Animated Letter Card with breathing pulse & 24sp floor
+            // 3D Bento Animated Letter Card with breathing pulse & 24sp floor. 1.2x tall where the
+            // window has room; on COMPACT the play button would leave the window (card 28).
             LetterCard(
                 letter = targetLetter,
                 soundText = "Sound: /${phoneme?.letter ?: "m"}/",
                 cardRotation = cardRotation,
                 wordOverride = phoneme?.exampleWord,
-                onTapReplay = { if (!isPlaying) viewModel.playPhonemeSound() }
+                onTapReplay = { if (!isPlaying) viewModel.playPhonemeSound() },
+                height = if (d.profile == WindowProfile.COMPACT) d.letterCardHeight else d.letterCardHeight * 1.2f
             )
 
-            // Mouth cue and caption of what Lily is saying (NFR-ACC-01). The row keeps its height,
-            // so the play button doesn't jump when a caption appears.
+            // Mouth-shape cue (NFR-ACC-01). No caption in the child view: pre-readers cannot read the
+            // carrier sentences (user decision 2026-10-10, card 28). The row keeps its height, so the
+            // play button doesn't jump when the cue's picture loads.
             Row(
                 modifier = Modifier.heightIn(min = 48.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 ArticulationCue(group = viewModel.articulation, size = 72.dp)
-                CaptionBubble(caption = caption)
             }
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {

@@ -19,7 +19,9 @@ class HearItSequenceBuilderTest {
         )
 
         assertEquals("audio/vo/tutor/car_listen.wav", sequence.first())
-        assertEquals("audio/vo/tutor/car_say_it_with_me.wav", sequence.last())
+        // Listen-only screen: it ends on the key word and the sound, never "Say it with me!" (card 28).
+        assertEquals(listOf(keyWordPath, phonemePath), sequence.takeLast(2))
+        assertFalse(sequence.any { it.contains("car_say_it_with_me") })
 
         val keywordIndex = sequence.indexOf(keyWordPath)
         assertTrue("KEYWORD must be present in sequence", keywordIndex != -1)

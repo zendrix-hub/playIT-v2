@@ -205,7 +205,7 @@ fun BlendItScreen(
                     val wordLength = currentWord?.word?.length ?: 3
                     for (i in 0 until wordLength) {
                         val tile = placedTiles.getOrNull(i)
-                        val isHighlighted = highlightedSlotIndex == i
+                        val isHighlighted = highlightedSlotIndex == i || highlightedSlotIndex == BlendItViewModel.ALL_SLOTS
                         val slotScale by animateFloatAsState(
                             targetValue = if (isHighlighted) 1.14f else 1f,
                             animationSpec = spring(

@@ -103,7 +103,7 @@ class SayItFeedbackCopyTest {
             word = "mouse"
         )
         assertEquals("Let's say it together. We'll practice later.", result.mascot)
-        assertEquals("Let's say it together", result.banner)
+        assertEquals("Nice try! Let's keep going!", result.banner)
         assertFalse(result.mascot.contains("try again", ignoreCase = true))
         assertFalse(result.banner.contains("try again", ignoreCase = true))
     }

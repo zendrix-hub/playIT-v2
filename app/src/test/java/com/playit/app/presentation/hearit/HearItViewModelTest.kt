@@ -98,7 +98,13 @@ class HearItViewModelTest {
         viewModel = HearItViewModel(phonemeRepository, audioPlayer, audioResolver, savedStateHandle)
         advanceUntilIdle()
 
-        verify { audioPlayer.playSequence(expectedSequence, any(), any()) }
+        // Card 28: Hear It no longer closes with "Say it with me!".
+        verify {
+            audioPlayer.playSequence(
+                match { played -> played == expectedSequence && played.none { it.contains("car_say_it_with_me") } },
+                any(), any()
+            )
+        }
         verify { audioResolver.getKeyWordPath("mouse") }
     }
 

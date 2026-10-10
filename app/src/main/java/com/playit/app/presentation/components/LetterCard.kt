@@ -31,7 +31,9 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.sp
 import com.playit.app.presentation.theme.*
 
@@ -52,7 +54,8 @@ fun LetterCard(
     onTapReplay: () -> Unit = {},
     promptMode: Boolean = false,
     showSpeakerIcon: Boolean = false,
-    isPlaying: Boolean = false
+    isPlaying: Boolean = false,
+    height: Dp = Dp.Unspecified
 ) {
     val letterMap = mapOf(
         "a" to "apple", "b" to "ball", "c" to "cat", "d" to "dog",
@@ -78,8 +81,10 @@ fun LetterCard(
     val d = LocalPlayItDimens.current
     val compact = d.profile == WindowProfile.COMPACT
 
-    // Height comes from the profile (a caller's heightIn(max) can lower it); width is the column
-    // up to 320 dp. A 0.97 aspect ratio made the compact card 204 dp wide and cut "M is for Mouse".
+    // Height comes from the profile unless the caller passes one (a caller's heightIn(max) can lower
+    // it); width is the column up to 320 dp. A 0.97 aspect ratio made the compact card 204 dp wide
+    // and cut "M is for Mouse".
+    val cardHeight = if (height.isSpecified) height else d.letterCardHeight
     GummyContainer(
         onClick = onTapReplay,
         faceColor = SurfaceCard,
@@ -91,7 +96,7 @@ fun LetterCard(
         modifier = modifier
             .widthIn(max = 320.dp)
             .fillMaxWidth()
-            .height(d.letterCardHeight)
+            .height(cardHeight)
             .graphicsLayer { rotationZ = cardRotation }
     ) {
         Box(

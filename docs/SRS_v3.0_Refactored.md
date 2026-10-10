@@ -3,7 +3,7 @@
 **Course:** IT411 — Capstone & Research 2 | Semester 1, AY 2026–2027  
 **Degree Program:** Bachelor of Science in Information Technology  
 **Department:** College of Computer Studies, Cebu Institute of Technology – University  
-**Document Version:** 3.3 (Renewed & Fully Refactored Post-MVP Validation; automated coverage recorded 2026-10-09; reviewed for submission 2026-10-10)  
+**Document Version:** 3.4 (Renewed & Fully Refactored Post-MVP Validation; automated coverage recorded 2026-10-09; reviewed for submission 2026-10-10; card 28 amendments 2026-10-10)  
 **Publication Date:** September 26, 2026  
 **Document Status:** Draft for adviser review (revised 2026-10-05, 2026-10-09 and 2026-10-10; items marked **[proposed]** await adviser approval)  
 **Prepared by:** Group 56 — PlayIT Capstone Team: Riva, Z. (Team Lead); Palis, J. J.; Miel, K.; Durano, A. S.; Bien, E. S.  
@@ -21,6 +21,7 @@
 | **3.1** | October 5, 2026 | Capstone Team (Claude review) | Corrections for adviser review: status changed from "Approved" to draft; FR-03 states the hybrid scoring mode (word mode scored; pure sound only if the Vosk test passes); open items marked **[proposed]** (≤15 s sequence, automatic mic, ≥70% recall, 12-minute session, Chatterbox held sounds); teacher names replaced by codes T-1 to T-4 (RA 10173); Room schema v4 (v3 is the current version). |
 | **3.2** | October 9, 2026 | Capstone Team (Claude, sprint synchronization) | Added §4.1, the automated test coverage of the requirements refactored in the Oct 9–10 sprint (FR-02, FR-03, FR-05, FR-13, NFR-ASR-01, NFR-ACC-01, NFR-ACC-02): each requirement is mapped to the shipped components and the passing unit-test classes (364 tests on 2026-10-09, 0 failures). Field targets in §4 (Round 2 instruments, Gate 3 teacher audit) are unchanged and still pending. |
 | **3.3** | October 10, 2026 | Capstone Team (Claude, submission review) | Checked against `docs/specs/validation-report.md` and the code: SUS grade corrected to B (§1.1); FR-03 mic states match the shipped design (Idle, Listening, Heard, Result; user decision 2026-10-06); the validation findings of FR-03, FR-14, FR-NEW-TEL and NFR-ACC-02 and RTM rows F-07, F-10 and F-16 now state only what the validation data show; RTM design components name the shipped classes, and TC-AUD-01 matches SDD §6; NFR-AUD-01 adds the short-vowel source and the dated manifest path; FR-01 names the Kokoro voice mix. |
+| **3.4** | October 10, 2026 | Capstone Team (Claude, card 28) | Amendments from the user's phone test of APK B (user decisions 2026-10-10, adviser confirmation pending): FR-02 item 4, Hear It ends on the key word and the sound, then *"Great listening! Tap the big button."* instead of *"Say it with me!"*; NFR-ACC-01 item 2, captions are not shown in the child view and the mouth-shape cue is the visual support. |
 
 ---
 
@@ -138,7 +139,7 @@ PlayIT is an independent, self-contained mobile application executing natively o
      - Pure Phoneme (3 iterations with $500\,\text{ms}$ pauses accompanied by visual lip articulation cues)
      - Key Word Audio (e.g., *"mouse"*)
      - Pure Phoneme (1 iteration)
-     - Carrier (*"Say it with me!"*)
+     - Carrier (*"Great listening! Tap the big button."*), which points to the Next button. Hear It is listen-only, so it no longer ends with *"Say it with me!"* (user decision 2026-10-10, card 28; **[proposed]**, adviser confirmation pending).
   5. **[proposed]** The entire modeling sequence shall execute within $\le 15\,\text{s}$.
   6. A persistent Audio Replay ("Ear") button shall be present on screen to allow immediate replay of steps 3–6 at any time.
 - **Acceptance Criteria:** 26 of 26 phoneme clips rated "Pure" by at least 3 of 4 DepEd reading teachers (HI-1); modeling sequence completed within $\le 15\,\text{s}$ (HI-2).
@@ -296,7 +297,7 @@ PlayIT is an independent, self-contained mobile application executing natively o
 - **Validation Finding:** Accessibility checklist revealed a 60% score on hearing accommodations (`ACC-06`) due to absence of visual phonetic cues.
 - **Requirement:**
   1. Hear It and Say It shall display a synchronized `ArticulationCue` component illustrating proper mouth, lip, and teeth placement for each phoneme.
-  2. On-screen text captions representing the pure phonetic sound (e.g., *"mmm"*, *"sss"*, *"aaa"*) shall accompany audio playback to assist hearing-impaired learners.
+  2. On-screen text captions representing the pure phonetic sound (e.g., *"mmm"*, *"sss"*, *"aaa"*) shall accompany audio playback to assist hearing-impaired learners. **Amended (user decision 2026-10-10, card 28; adviser confirmation pending):** captions are not shown in the child view, because pre-readers cannot read the carrier sentences and the text pulls their eyes from the letter; the mouth-shape cue (item 1) is the visual support. The caption logic stays in the code for a possible accessibility option.
 
 ##### [NFR-ACC-02] Pediatric Touch Target Ergonomics (Refactored · P2)
 - **Validation Finding:** One of five caregivers reported difficulty for learners with motor challenges, linked to tight padding around the corner menu toggles (`ACC-07`, 4 of 5 Yes).
