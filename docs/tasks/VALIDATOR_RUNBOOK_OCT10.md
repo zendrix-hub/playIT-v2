@@ -177,3 +177,47 @@ Check `app/build/outputs/roborazzi/`. The images Claude already looked at are ma
 
 Record each verdict in section 2 and in `SESSION_HANDOFF.md`. Claude then accepts the batch (hashes and CI runs in `docs/evidence-log.md`).
 
+
+## 6. Ready for agy: card 28 (`ac8e8c7`)
+
+Commits on `refactor/hear-say-it`: `88021c5` (Claude's review of cards 28 and 29; docs and tools only), then `ac8e8c7` (card 28).
+
+### 6.1 Automated
+```bash
+git pull origin refactor/hear-say-it
+./gradlew testDebugUnitTest
+python3 tools/dev/review_card.py 28
+```
+Expected:
+- **Full suite:** 376 tests, 0 failed, 6 skipped (the font-scale checks on the 360x640 profile, by design). Claude's local run on Windows gave the same.
+- **`review_card.py 28`:** all PASS. One WARN is expected: "no hash yet" (Claude fills it at acceptance).
+- **CI:** confirm `ac8e8c7` is green on the Actions page.
+
+### 6.2 Screenshot matrix (all 4 sizes)
+```bash
+./gradlew recordRoborazziDebug --tests 'com.playit.app.screenshot.*'
+```
+Claude looked at all four groups below on all 4 sizes.
+
+| Images | Must be true |
+|---|---|
+| `hearit_*` | No caption under the letter card. The card is taller on a21s, phone and tablet (1.2x) and unchanged on compact. The play button and Next are on screen. |
+| `sayit_*` | Unchanged idle screen: green mic, "Tap and say it". |
+| `blendit_*` | One hint line, a speaker icon and "Tap to hear word", inside the card. No Filipino line. |
+| `map_*` | Lily's chip reads "Hi, Maximilianoooooo!" on one line on every size. Known: the unit banner clips its title line (`MarungkoGroupBanner`, follow-up card 28b). |
+
+### 6.3 APK and phone checks (A21s)
+- **Build:** `./gradlew assembleDebug`, then copy the APK to `Documents/playIT-apk/playit-debug-C-ac8e8c7.apk`. Don't overwrite A, A2 or B.
+- **Hear It (M):** the sequence ends "... mouse, mmm", then "Great listening! Tap the big button." No "Say it with me!". No caption text on screen. Next pulses.
+- **Say It (M):** say "cat" three times. After the third:
+  - Lily says "Let's say it together ... Nice try! We'll practice this one again later.", then the map's unlock chime (not the correct-answer chime).
+  - The mic turns white, says "Nice try!" and ignores taps.
+  - The banner is cream and reads "Nice try! Let's keep going!" on one line.
+  - Next pulses and opens Find It.
+  - The debug build shows no "Heard: ..." line.
+- **Blend It (group 1, SAM):** each tile lights while its sound plays to the end (the /s/ hiss is not cut off). Then all three tiles light together for half a second, then "Sam", then the chime. The card only says "Tap to hear word".
+- **Stars:** finish letter M. The map's star pill and the profile card show the same total as the Parent Dashboard. After Blend It 1, the total also counts its stars.
+- **Map:** tap the green (current) node once: the lesson starts with no pop-up. Tap a finished node: the pop-up opens for replay. Tap a locked node: it shakes and explains, as before.
+- **Still expected:** no mouth picture in Hear It or Say It yet. Card 25 waits for the user's final OK and its image release.
+
+Record the verdict in section 2 and in `SESSION_HANDOFF.md`. Claude then accepts card 28 (hash and CI run in `docs/evidence-log.md`).
