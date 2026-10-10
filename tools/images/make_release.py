@@ -36,6 +36,8 @@ def main(argv=None):
     ap.add_argument("batch")
     ap.add_argument("--out", required=True)
     ap.add_argument("--dest", default="pictures", help="folder under app/src/main/assets/images/")
+    ap.add_argument("--generator", default="Nano Banana Pro (agy, card 08)",
+                    help="how the picks were made, recorded per image")
     a = ap.parse_args(argv)
 
     batch, out = pathlib.Path(a.batch), pathlib.Path(a.out)
@@ -54,15 +56,17 @@ def main(argv=None):
         if verdict != "OK" or fails:
             refused.append(f"{item}: verdict {verdict or 'none'}{', audit FAIL ' + ','.join(fails) if fails else ''}")
             continue
-        (out / a.dest).mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(final / name, out / a.dest / name)
+        # An item's "app_file" (e.g. "characters/avatar_01_cat.png") picks its own folder; else --dest.
+        rel = items.get(item, {}).get("app_file", f"{a.dest}/{name}")
+        (out / rel).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(final / name, out / rel)
         entries.append({
-            "itemId": item, "file": f"{a.dest}/{name}", "appPath": f"images/{a.dest}/{name}",
+            "itemId": item, "file": rel, "appPath": f"images/{rel}",
             "word": items.get(item, {}).get("word"), "letter": items.get(item, {}).get("letter"),
             "sourceBatch": batch.name, "pick": picks.get(item), "tool": "tools/images/cutout.py",
-            "generator": "Nano Banana Pro (agy, card 08)", "audit": audit[name],
+            "generator": a.generator, "audit": audit[name],
             "reviewCsv": review.name, "userVerdict": verdict, "userNote": rows[item].get("note", ""),
-            "sha256": sha256(out / a.dest / name),
+            "sha256": sha256(out / rel),
         })
     if not entries:
         sys.exit("nothing approved; no release written\n" + "\n".join(refused))

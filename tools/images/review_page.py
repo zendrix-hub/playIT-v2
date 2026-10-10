@@ -111,7 +111,8 @@ def write_page(batch, n, app_folder=None):
             continue
         now = ""
         if app_folder:
-            src = pathlib.Path(app_folder) / f"{it['id']}.png"
+            # An item's "app_file" (relative to --app) wins, for batches that span two app folders (card 29).
+            src = pathlib.Path(app_folder) / it.get("app_file", f"{it['id']}.png")
             if src.exists():
                 cur.mkdir(exist_ok=True)
                 if not (cur / src.name).exists():

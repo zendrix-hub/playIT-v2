@@ -67,6 +67,7 @@ def check(path):
 
 def write_page(final, results, app_dir, items, batch_name):
     words = {i["id"]: i.get("word", i["id"]) for i in items}
+    app_files = {i["id"]: i["app_file"] for i in items if "app_file" in i}  # relative to --app (card 29)
     app = pathlib.Path(app_dir).resolve() if app_dir else None
     rows = []
     for name, res in results.items():
@@ -75,8 +76,9 @@ def write_page(final, results, app_dir, items, batch_name):
             f'<div class="bg" style="background:{c}" title="{html.escape(t)}"><img src="{html.escape(name)}" width="96"></div>'
             for t, c in BACKGROUNDS.items())
         cur = ""
-        if app and (app / name).exists():
-            src = pathlib.Path(os.path.relpath(app / name, final.resolve())).as_posix()  # works in a Windows browser
+        today = app / app_files.get(item, name) if app else None
+        if today and today.exists():
+            src = pathlib.Path(os.path.relpath(today, final.resolve())).as_posix()  # works in a Windows browser
             cur = f'<div class="bg" style="background:#FFFDF8"><img src="{html.escape(src)}" width="96"><br><small>today</small></div>'
         else:
             cur = '<div class="bg"><small>new</small></div>'
