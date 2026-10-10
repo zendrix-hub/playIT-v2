@@ -3,9 +3,11 @@
 **Course:** IT411 — Capstone & Research 2 | Semester 1, AY 2026–2027  
 **Degree Program:** Bachelor of Science in Information Technology  
 **Department:** College of Computer Studies, Cebu Institute of Technology – University  
-**Document Version:** 2.2 (Renewed & Fully Refactored Post-MVP Validation; implementation status synchronized 2026-10-09)  
+**Document Version:** 2.3 (Renewed & Fully Refactored Post-MVP Validation; implementation status synchronized 2026-10-09; reviewed for submission 2026-10-10)  
 **Publication Date:** September 26, 2026  
-**Document Status:** Draft for adviser review (revised 2026-10-05 and 2026-10-09; items marked **[proposed]** await adviser approval). Components are marked by implementation status in §2.0  
+**Document Status:** Draft for adviser review (revised 2026-10-05, 2026-10-09 and 2026-10-10; items marked **[proposed]** await adviser approval). Components are marked by implementation status in §2.0  
+**Prepared by:** Group 56 — PlayIT Capstone Team: Riva, Z. (Team Lead); Palis, J. J.; Miel, K.; Durano, A. S.; Bien, E. S.  
+**Adviser:** Mr. Joemarie C. Amparo  
 
 ---
 
@@ -16,9 +18,10 @@
 | **0.1** | May 11, 2026 | System Architect | Initial SDD draft based on SRS v2.0 (MVVM, Clean Architecture, Room SQLite, Vosk ASR). |
 | **0.2** | May 15, 2026 | System Architect | Added Word Challenge (Blend It) CVC synthesis checkpoint per adviser directive. |
 | **1.0** | May 20, 2026 | System Architect & Dev Team | Final Capstone 1 SDD: decoupled game modules, established baseline Room DB schema v1. |
-| **2.0** | September 26, 2026 | Lead Architect & Capstone Team | **Comprehensive Renewal & Architectural Refactoring Based on MVP Validation (design; see §2.0 for what is implemented):**<br>• **Tutoring & Pedagogy Layer (§2.2):** Designs `LessonEngine`, `TutorPolicy` finite state machine (FSM), and `SayItJudge` with per-letter dynamic grammars and error tagging; **eliminated heart deductions in Say It**.<br>• **Audio Subsystem Architecture (§3.1):** Refactored `AudioPlaybackManager` with `AudioComposer` and pre-cached `SoundPool` for instant phoneme playback; isolated pure phoneme (`ph_m.wav`) and key-word (`kw_m_mouse.wav`) assets (FR-02, NFR-AUD-01).<br>• **Speech Recognition Subsystem (§3.2):** Plans to replace `SpeechService` (still used today) with an asynchronous `AudioRecord` 16kHz mono loop streaming raw PCM buffers to calculate normalized RMS amplitude for `MicStateVisualizer` while feeding Vosk `Recognizer.acceptWaveForm()`; guaranteed tap-to-listening transition in ≤100ms (FR-03, NFR-PERF-01).<br>• **Decodable Word Bank Refactoring (§3.4):** Purged 5 invalid CVC words (AIM, BEE, TOY, BOY, ZOO) containing untaught vowel teams/diphthongs; replaced with AM, SUM, TUB, YAM, ZIP; flagged QUIZ exception (FR-13).<br>• **Persistence & Telemetry (Room Schema v4, planned, §4):** Extends the existing `ProfileEntity` (multi-profile up to 6) and plans `LetterProgressEntity` (spaced retrieval mastery), and `TelemetryEventEntity` (microsecond-accurate monotonic timestamps); added local PIN-gated CSV/PDF exporters (FR-14, FR-NEW-TEL).<br>• **Pediatric Tokens & Accessibility (§3.6):** Plans `Modifier.pediatricTouchTarget(64.dp)` and an `ArticulationCue` composable (NFR-ACC-01, NFR-ACC-02). |
+| **2.0** | September 26, 2026 | Lead Architect & Capstone Team | **Comprehensive Renewal & Architectural Refactoring Based on MVP Validation (design; see §2.0 for what is implemented):**<br>• **Tutoring & Pedagogy Layer (§2.2):** Designs `LessonEngine`, `TutorPolicy` finite state machine (FSM), and `SayItJudge` with per-letter dynamic grammars and error tagging; **eliminated heart deductions in Say It**.<br>• **Audio Subsystem Architecture (§3.1):** Refactored `AudioPlaybackManager` with `AudioComposer` and pre-cached `SoundPool` for instant phoneme playback; isolated pure phoneme (`ph_m.wav`) and key-word (`kw_m_mouse.wav`) assets (FR-02, NFR-AUD-01).<br>• **Speech Recognition Subsystem (§3.2):** Plans to replace `SpeechService` (still used today) with an asynchronous `AudioRecord` 16kHz mono loop streaming raw PCM buffers to calculate normalized RMS amplitude for `MicStateVisualizer` while feeding Vosk `Recognizer.acceptWaveForm()`; guaranteed tap-to-listening transition in ≤100ms (FR-03, NFR-PERF-01).<br>• **Decodable Word Bank Refactoring (§3.4):** Purged 5 invalid CVC words (AIM, BEE, TOY, BOY, ZOO) containing untaught vowel teams/diphthongs; replaced with AM, SUM, TUB, YAM, ZIP; flagged QUIZ exception (FR-13).<br>• **Persistence & Telemetry (Room Schema v4, planned, §3.5):** Extends the existing `ProfileEntity` (multi-profile up to 6) and plans `LetterProgressEntity` (spaced retrieval mastery), and `TelemetryEventEntity` (microsecond-accurate monotonic timestamps); added local PIN-gated CSV/PDF exporters (FR-14, FR-NEW-TEL).<br>• **Pediatric Tokens & Accessibility (§3.6):** Plans `Modifier.pediatricTouchTarget(64.dp)` and an `ArticulationCue` composable (NFR-ACC-01, NFR-ACC-02). |
 | **2.1** | October 5, 2026 | Capstone Team (Claude review) | Corrections for adviser review: new §2.0 implementation-status table (implemented vs planned); §3.3.1 judge uses word mode as in the code, with no fixed confidence threshold; Room schema v4 (v3 is current) with explicit migrations; revision 2.0 entries reworded as design, not completed work. |
 | **2.2** | October 9, 2026 | Capstone Team (Claude, sprint synchronization) | §2.0 re-checked against branch `refactor/hear-say-it` after the Oct 9–10 sprint (cards 18–24, 03b, 15). Newly **Implemented**: adaptive dimensions and `LessonScaffold`; 4-state Say It mic (`MicStatus`, `MicButton`, time-based ripple); spoken Say It corrections; decodable Blend It word list; purposeful effects and screen transitions; responsive map (`MapLayout`); sound captions and `ArticulationCue`. §3.4 chapter letters corrected to the seeded groups; §3.6 replaced the design sketches with the implemented components. `LessonEngine`, `AudioComposer`, Room schema v4, telemetry and CSV export remain **Planned**. |
+| **2.3** | October 10, 2026 | Capstone Team (Claude, submission review) | Review for the IT411 submission, no design change: §3.1.1 and §3.1.2 use the shipped `assets/audio/` layout and the dated release manifests; §2.2 notes that the planned `tutoring/` classes live in `domain/manager/` today; §3.1, §3.2 and §3.2.2 label the planned components; §4.2 uses the shipped Heard mic state (user decision 2026-10-06); §5 lists the short-vowel source; diagram alignment and §3.5.1 comment wrapping fixed. |
 
 ---
 
@@ -119,7 +122,7 @@ PlayIT is structured around **Clean Architecture** principles combined with **MV
 |  +--------------------+  +----------------------+  +---------------------------+  |
 |  | Vosk Engine        |  | Audio Subsystem      |  | Room Database (Schema v4) |  |
 |  | - AudioRecord Loop |  | - SoundPool Cache    |  | - ProfileEntity           |  |
-|  | - 16kHz PCM Buffer |  | - MediaPlayer Fallback| | - LetterProgressEntity    |  |
+|  | - 16kHz PCM Buffer |  | - MediaPlayer backup |  | - LetterProgressEntity    |  |
 |  | - RMS Calculator   |  | - Asset Manifest     |  | - TelemetryEventEntity    |  |
 |  +--------------------+  +----------------------+  +---------------------------+  |
 +-----------------------------------------------------------------------------------+
@@ -127,7 +130,7 @@ PlayIT is structured around **Clean Architecture** principles combined with **MV
 
 ### 2.2 Decomposition & Architectural Layers
 1. **Presentation Layer (`presentation/`):** Contains UI composables and ViewModels. ViewModels observe domain StateFlows and emit immutable UI state objects. Composables remain purely declarative and react to state mutations without containing gameplay logic.
-2. **Tutoring & Pedagogy Layer (`tutoring/`):** Governs learner pacing, scaffolding, and formative remediation. Decouples educational decision-making from UI view code:
+2. **Tutoring & Pedagogy Layer (`tutoring/`, planned package):** Governs learner pacing, scaffolding, and formative remediation. Decouples educational decision-making from UI view code. Today `TutorPolicy` and `SpeechValidator` (in the role of `SayItJudge`) live in `domain/manager/` (§2.0):
    - `LessonEngine`: Executes letter lesson scripts in sequential steps.
    - `TutorPolicy`: Implements a finite state machine managing We Do, You Do, error corrections, and lead steps.
    - `SayItJudge`: Evaluates captured speech buffers against constrained per-letter grammars, returning decisions and diagnostic error codes.
@@ -142,16 +145,16 @@ PlayIT is structured around **Clean Architecture** principles combined with **MV
 ### 3.1 Audio Subsystem Refactoring (FR-02, NFR-AUD-01)
 To ensure pure phoneme delivery with zero trailing vowel intrusion and instantaneous acoustic response, the audio subsystem decouples short acoustic phoneme bursts from long musical playback.
 
-#### 3.1.1 AudioPlaybackManager Implementation
+#### 3.1.1 AudioPlaybackManager (planned)
 - **Underlying Driver:** Android native `SoundPool` API with `AudioAttributes.USAGE_GAME`.
 - **Preloading Lifecycle:** When the learner navigates to a chapter node on the Map Screen, all phoneme bursts for that letter (`ph_<letter>.wav`) are loaded into uncompressed memory.
 - **Physical Asset Segregation:**
-  - `res/raw/ph_<letter>.wav`: Pure phoneme burst ($800\,\text{ms}$ continuous; $\le 250\,\text{ms}$ stops). Zero schwa trailing.
-  - `res/raw/kw_<letter>_<word>.wav`: Key word pronunciation (e.g., `kw_m_mouse.wav`).
-  - `res/raw/car_<phrase>.wav`: Spoken carrier phrases (e.g., `car_listen.wav`, `car_this_letter_says.wav`, `car_say_it_with_me.wav`, `car_your_turn.wav`).
+  - `assets/audio/phonemes/ph_<letter>.wav`: Pure phoneme burst ($800\,\text{ms}$ continuous; $\le 250\,\text{ms}$ stops). Zero schwa trailing (released so far: `ph_m.wav`, `ph_s.wav`).
+  - `assets/audio/keywords/kw_<word>.wav`: Key word pronunciation (e.g., `kw_mouse.wav`).
+  - `assets/audio/vo/tutor/car_<phrase>.wav`: Spoken carrier phrases (e.g., `car_listen.wav`, `car_this_letter_says.wav`, `car_say_it_with_me.wav`, `car_your_turn.wav`).
 
-#### 3.1.2 AudioComposer Component
-`AudioComposer` manages runtime assembly of the modeling sequence using duration metadata from `docs/audio-release/manifest.json`:
+#### 3.1.2 AudioComposer Component (planned)
+`AudioComposer` will manage runtime assembly of the modeling sequence using duration metadata from the audio release manifests (`docs/audio-release/<date>/manifest.json`); today `HearItSequenceBuilder` builds the sequence (§2.0):
 ```kotlin
 class AudioComposer @Inject constructor(
     private val playbackManager: AudioPlaybackManager,
@@ -189,7 +192,7 @@ class AudioComposer @Inject constructor(
 ---
 
 ### 3.2 Speech Recognition Subsystem & Visualizer (FR-03, NFR-ASR-01, NFR-PERF-01)
-To eliminate child hesitation at the mic and enable real-time visualization, the standard Vosk `SpeechService` wrapper is replaced with a low-level, non-blocking `AudioRecord` pipeline.
+To eliminate child hesitation at the mic and enable real-time visualization, the standard Vosk `SpeechService` wrapper is to be replaced with a low-level, non-blocking `AudioRecord` pipeline (planned for after Round 2; the shipped mic shows its four states with a time-based ripple, §2.0).
 
 #### 3.2.1 AudioRecord Loop & RMS Amplitude Pipeline
 ```
@@ -212,7 +215,7 @@ To eliminate child hesitation at the mic and enable real-time visualization, the
   $$\text{RMS} = \sqrt{\frac{1}{N}\sum_{i=1}^N x_i^2}, \quad \text{Normalized Level} = \text{coerceIn}\left(\frac{20 \log_{10}(\text{RMS} + 10^{-5}) - \text{Floor}}{\text{Range}}, 0.0, 1.0\right)$$
 - **Tap-to-Listening Transition:** When the user taps the mic button (or carrier finishes), the ViewModel immediately mutates UI state to `MicState.LISTENING` in $\le 20\,\text{ms}$, while the background recording coroutine initializes.
 
-#### 3.2.2 MicStateVisualizer Composable
+#### 3.2.2 MicStateVisualizer Composable (planned)
 ```kotlin
 @Composable
 fun MicStateVisualizer(
@@ -299,12 +302,12 @@ Vosk is instantiated with a constrained per-letter runtime grammar rather than o
 |           |                                          |
 |           +---> Match == Target -------------------> | PRAISE -> Advance Node
 |           |                                          |
-|           +---> Match == Foil / Silence (Attempt < 3) |
+|           +---> Foil / Silence (Attempt < 3)         |
 |           |     |                                    |
 |           |     v                                    |
-|           |  [ERROR_CORRECTION] (Formative prompt) -+
+|           |  [ERROR_CORRECTION] (Formative prompt) --+
 |           |
-|           +---> Match == Foil / Silence (Attempt == 3)
+|           +---> Foil / Silence (Attempt == 3)
 |                 |
 |                 v
 |              [LEAD] ("Let's say it together" -> Mark NEEDS_PRACTICE -> Advance)
@@ -330,9 +333,10 @@ The seeded `BlendItWord` list (`BLEND_IT_WORD_SEEDS` in `di/DatabaseModule.kt`) 
 
 #### 3.5.1 Room Database Entities
 ```kotlin
-// Profile Entity: Multi-Profile Management (FR-14). EXISTS in schema v3 (data/local/entity/ProfileEntity.kt);
-// unchanged in v4. The name is optional for the child: onboarding is avatar-only and the default name is the
-// avatar's name; a parent can rename the profile in the Parent Zone.
+// Profile Entity: Multi-Profile Management (FR-14).
+// EXISTS in schema v3 (data/local/entity/ProfileEntity.kt); unchanged in v4.
+// The name is optional for the child: onboarding is avatar-only and the default
+// name is the avatar's name; a parent can rename the profile in the Parent Zone.
 @Entity(tableName = "profiles")
 data class ProfileEntity(
     @PrimaryKey(autoGenerate = true) val profileId: Long = 0,
@@ -452,10 +456,11 @@ User selects Letter -> Screen Loads -> SoundPool Preloads Letter Clips
 ```
 Screen Enters -> Mascot leads 2 Choral Turns ("Say it with me!")
   -> Mascot plays "Your turn!"
-  -> MicState changes to LISTENING (<= 100ms)
-  -> Child vocalizes -> AudioRecord computes RMS -> MicStateVisualizer pulses
-  -> Vosk signals End-of-Speech -> MicState changes to PROCESSING
-  -> SayItJudge evaluates audio buffer against per-letter grammar:
+  -> MicState changes to LISTENING (<= 100ms); the ripple animates
+     (time-based today; RMS-driven once the AudioRecord loop lands)
+  -> Child vocalizes -> Vosk reports speech -> MicState changes to HEARD
+  -> Vosk signals End-of-Speech
+  -> SayItJudge (SpeechValidator today) checks the result against the per-letter grammar:
        [Branch A: Target Match]
          -> MicState changes to RESULT (Green)
          -> Success chime plays + specific praise ("Yes! /m/, lips together!")
@@ -482,7 +487,7 @@ Screen Enters -> Mascot leads 2 Choral Turns ("Say it with me!")
 | **Audio I/O** | Android AudioRecord / SoundPool | Native | Non-blocking 16kHz PCM recording and zero-latency SoundPool playback. |
 | **Local Database** | Android Jetpack Room | 2.6.1 | SQLite ORM managing profiles, spaced retrieval states, and telemetry. |
 | **Document Export** | Android PdfDocument | Native | Zero-dependency local PDF progress report generation. |
-| **Audio Synthesis** | Kokoro-82M / Chatterbox-Turbo | Apache-2.0 / MIT | Offline neural TTS for carrier phrases and cloned held phonemes. |
+| **Audio Synthesis** | Kokoro-82M / Chatterbox-Turbo | Apache-2.0 / MIT | Offline neural TTS for carrier phrases and cloned held phonemes (build-time tools, not shipped in the app). Short vowels: a team member's recordings voice-converted with ElevenLabs (**[proposed]**, adviser confirmation pending). |
 
 ---
 

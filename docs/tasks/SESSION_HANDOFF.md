@@ -802,4 +802,17 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
 - **Overall Batch Verdict:**
   - **Cards 03b, 20, 22, 21, 23, 15, 24, 27:** ✅ **ALL VALIDATED & ACCEPTED**.
 
+### Claude, 2026-10-10: IT411 submission package review (`docs/submission/`)
 
+- **Problems in the package built at `f09070f`:**
+  - **MVP form** (the course template, filled by `fill_mvp_validation_form.py`): only Refactoring Priority #1 of 6 was in the form; the Section 5 summary matrix was empty; every Section 6 row still read "Yes / No"; Findings #3 and #4 were packed into heading paragraphs; template placeholders ("Paragraph response.", "Reference Finding #___") stayed in; the adviser was "Prof. [Adviser Name]".
+  - **Facts the validation report contradicts** (`docs/specs/validation-report.md`, `04_MVP_VALIDATION_HIGHLIGHTS.md`): 3 technical evaluators and a decision-maker respondent were listed, but none took part in Round 1; Finding #4 was credited to teachers, but teachers did not rate the word bank in Round 1 (a post-pilot design review found it); Priority #4 cited a Finding #5 that did not exist; the SRS gave the SUS as grade B+ (the report says B).
+  - **SDD/SRS/SPMP PDFs:** raw Markdown and LaTeX in the output (`**0.1**`, `<br>`, `$\ge 64\,\text{dp}$`), the ASCII architecture diagram turned into a broken table, code blocks reflowed as body text, and list numbering continued across the document.
+- **What changed:**
+  - `tools/docs/md_to_docx.py` (new): Markdown to .docx (tables with inline formatting, code blocks and diagrams in a monospace box, LaTeX to Unicode, nested lists).
+  - `tools/docs/render_submission_package.py`: cover page with authors and adviser, a table of contents that Word fills in, page numbers, landscape pages for the RTM and the risk register, PDF bookmarks. No text-only fallback PDF any more: without Word (or LibreOffice) the script stops with an error.
+  - `tools/docs/fill_mvp_validation_form.py`: rewritten. It fills the official template from the Markdown, keeps the template wording, ticks the selected options (unselected ones show an empty box), repeats the Finding and Priority blocks per item, and fills both tables.
+  - Sources: the MVP form Markdown was rewritten against the validation report (5 findings, 6 priorities). SDD 2.3, SRS 3.3 and SPMP 2.3 each have a revision row that lists their corrections.
+- **Checked:** every page of the 4 PDFs by eye; a scan finds no leftover Markdown, LaTeX or placeholders; the DOCX tables of contents are filled in. The evidence log has accepted rows for all 8 batch cards (03b, 20, 22, 21, 23, 15, 24, 27). Their CI column says "pass" from local and agy runs, without GitHub Actions run links.
+- **Open for the team:** confirm the adviser's name (taken from `PROMPT_FOR_CLAUDE_TRANSMITTAL_REVIEW.md`), the group name and the section ("IT411 G1–G8"); sign the declaration if a wet signature is needed.
+- **Rebuild:** `python3 tools/docs/render_submission_package.py` (python-docx plus Word through PowerShell; works from Windows or WSL).

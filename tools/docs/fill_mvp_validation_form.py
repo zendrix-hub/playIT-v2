@@ -1,201 +1,662 @@
 #!/usr/bin/env python3
-"""Populates the official MVP Validation Findings & Refactoring Priorities.docx form
-with complete data from the Weeks 1-2 MVP validation and Week 3 refactoring specs.
-Outputs: docs/MVP_Validation_Findings_and_Refactoring_Priorities_Filled.docx
+"""Fill the course's MVP Validation Findings & Refactoring Priorities form.
+
+Source:   docs/MVP_Validation_Findings_and_Refactoring_Priorities_Filled.md
+Template: docs/MVP Validation Findings & Refactoring Priorities.docx (as issued by the course)
+Output:   docs/MVP_Validation_Findings_and_Refactoring_Priorities_Filled.docx
+
+The template's wording is kept. Each answer replaces the italic placeholder under its
+question, every option list becomes a row of ticked or empty boxes, the Finding and
+Refactoring Priority blocks are repeated once per item in the Markdown, and both
+tables are filled. render_submission_package.py calls build_form() and makes the PDF.
 """
 
+from __future__ import annotations
+
+import copy
+import re
+import sys
+from pathlib import Path
+
 import docx
-from docx.shared import Pt, RGBColor
-import pathlib
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
+from docx.shared import Inches, Pt, RGBColor
+from docx.text.paragraph import Paragraph
 
-REPO = pathlib.Path(__file__).resolve().parents[2]
-TEMPLATE_PATH = REPO / "docs" / "MVP Validation Findings & Refactoring Priorities.docx"
-OUTPUT_PATH = REPO / "docs" / "MVP_Validation_Findings_and_Refactoring_Priorities_Filled.docx"
+from md_to_docx import SYMBOL_FONT, add_inline, set_run_font, split_row
 
-def set_run_font(run, size=10, bold=False, italic=False, color=(30, 41, 59)):
-    run.font.name = "Arial"
-    run.font.size = Pt(size)
-    run.bold = bold
-    run.italic = italic
-    run.font.color.rgb = RGBColor(*color)
+REPO = Path(__file__).resolve().parents[2]
+SOURCE = REPO / "docs" / "MVP_Validation_Findings_and_Refactoring_Priorities_Filled.md"
+TEMPLATE = REPO / "docs" / "MVP Validation Findings & Refactoring Priorities.docx"
+OUTPUT = REPO / "docs" / "MVP_Validation_Findings_and_Refactoring_Priorities_Filled.docx"
 
-def add_response(p, text, italic=False):
-    p.paragraph_format.space_after = Pt(4)
-    run = p.add_run(f"\n{text}")
-    set_run_font(run, size=9.5, italic=italic, color=(15, 23, 42))
+ANSWER_SIZE = 10
+TABLE_SIZE = 8
+GUIDE_COLOR = RGBColor(0x71, 0x80, 0x96)
+W14 = "{http://schemas.microsoft.com/office/word/2010/wordml}"
 
-def fill_form():
-    doc = docx.Document(TEMPLATE_PATH)
 
-    # --- Section 1: Project Information ---
-    doc.paragraphs[2].text = "Team/Group Name: Group 56 — PlayIT Capstone Team"
-    doc.paragraphs[3].text = "Project/System Title: PlayIT: An Offline-First Gamified Early Literacy Mobile Application Using the DepEd Marungko Approach"
-    doc.paragraphs[4].text = "Program / Section: Bachelor of Science in Information Technology / IT411 G1–G8"
-    doc.paragraphs[5].text = "Team Members: Zendrix Riva (Lead), J. J. Palis, K. Miel, A. S. Durano, E. S. Bien"
-    doc.paragraphs[6].text = "Adviser: Prof. [Adviser Name]"
-    doc.paragraphs[7].text = "System URL / MVP Link: Offline Android Application (playit-debug.apk, Package: com.playit.app, Min SDK 26)"
-    doc.paragraphs[8].text = "Date of MVP Validation: September 16–23, 2026"
-    doc.paragraphs[9].text = "Number of respondents/participants: Total N = 25 (16 Early Learners, 5 Caregivers/Supervising Teachers, 4 DepEd Teachers)"
-    doc.paragraphs[10].text = "Types of respondents involved:"
-    doc.paragraphs[11].text = "[✓] Customer: Parents / Caregivers & Supervising Teachers (N = 5)"
-    doc.paragraphs[12].text = "[✓] End User: Grade 1 & Early Learners (Ages 5–7) (N = 16)"
-    doc.paragraphs[13].text = "[✓] Subject Matter Expert: Certified DepEd Grade 1 Reading Teachers (N = 4)"
-    doc.paragraphs[14].text = "[✓] Decision Maker: School Reading Coordinators"
-    doc.paragraphs[15].text = "Other: Technical Evaluators (N = 3) for offline performance and accessibility audits"
+# ---------------------------------------------------------------------------
+# Markdown parsing
+# ---------------------------------------------------------------------------
 
-    for i in range(2, 16):
-        for run in doc.paragraphs[i].runs:
-            set_run_font(run, size=9.5, bold=(i in [2,3,4,5,6,7,8,9,10]))
+_ITEM = re.compile(r"^(\d+)\.\s+\*\*(.+?)\*\*\s*$")
+_LABELED = re.compile(r"^\*\*(.+?):?\*\*:?\s*(.*)$")
 
-    # --- Section 2: MVP Validation Overview ---
-    doc.paragraphs[19].text = (
-        "The primary purpose of the Weeks 1–2 MVP validation was formative and diagnostic. "
-        "The team evaluated whether the MVP's foundational learning loop—Hear It (phoneme modeling), "
-        "Say It (speech production with on-device ASR), Find It (sound discrimination), and Blend It (CVC blending)—"
-        "could achieve its intended outcomes in low-resource Philippine settings. "
-        "The validation investigated pedagogical fidelity (especially phonemic accuracy), learner autonomy, "
-        "speech recognition friction points, and accessibility floors to identify necessary requirements refactoring "
-        "before full-scale deployment."
-    )
-    set_run_font(doc.paragraphs[19].runs[0], size=9.5)
 
-    doc.paragraphs[22].text = "Framework/Model: Usability, Pedagogy, and Accessibility (UPA) Framework integrated with Brooke's (1996) SUS and Read & MacFarlane's (2006) Smileyometer."
-    doc.paragraphs[23].text = "Key constructs/criteria evaluated: DepEd Grade 1 alignment, phonemic sound purity, Marungko sequence logic, child ease of use, mic hesitation, feedback latency (P90 ≤ 0.5s), caregiver usability (target SUS ≥ 75), and pediatric accessibility (≥64dp touch targets, hearing cues)."
-    doc.paragraphs[24].text = "Why was this framework/model appropriate: Educational software for early literacy requires both pedagogical validity and child-appropriate interaction design. The UPA framework directly captures curriculum alignment, child developmental usability, and offline accessibility under low-resource constraints."
-    for idx in [22, 23, 24]:
-        set_run_font(doc.paragraphs[idx].runs[0], size=9.5)
+def _label_detail(text: str) -> tuple[str, str]:
+    """'**Customer:** detail', 'Customer: detail' or 'Customer' -> ('Customer', 'detail')."""
+    text = text.strip()
+    m = re.match(r"^\*\*(.+?)\*\*\s*(.*)$", text)
+    if m:
+        label, rest = m.group(1).rstrip(":"), m.group(2).lstrip(":").strip()
+        return label.strip(), rest
+    if ":" in text:
+        label, rest = text.split(":", 1)
+        return label.strip(), rest.strip()
+    return text, ""
 
-    doc.paragraphs[27].text = "Who participated: 16 Grade 1 learners (ages 5–7), 5 caregivers/supervising teachers, 4 certified DepEd Grade 1 reading teachers, and 3 technical evaluators."
-    doc.paragraphs[28].text = "How they interacted: Learners used physical Android tablets/phones running playit-debug.apk under airplane mode (zero internet connection) in quiet settings (≤40 dB ambient noise)."
-    doc.paragraphs[29].text = "What activities they performed: Children completed Chapter 1 letter nodes (m, s, a, i) across Hear It, Say It, Find It, and Blend It (SAM). Teachers completed an independent 12-item curriculum and phoneme audit. Caregivers completed the 10-item SUS and 7-item accessibility checklist."
-    doc.paragraphs[30].text = "How data was collected: Three synchronized Google Forms (Master responses.xlsx), structured facilitator observation logs, post-session child Smileyometer interviews, and qualitative teacher debriefs."
-    for idx in [27, 28, 29, 30]:
-        set_run_font(doc.paragraphs[idx].runs[0], size=9.5)
 
-    # --- Section 3: MVP Validation Findings ---
-    # Finding 1
-    doc.paragraphs[35].text = (
-        "Finding #1: Phonemic Audio Impurity and Added Schwas.\n"
-        "Stakeholder feedback revealed that synthetic phoneme audio clips in Hear It and Say It suffered from phonetic impurity: "
-        "several clips added an intrusive trailing schwa (/ə/) or sounded like letter names. Specifically, /m/ sounded like 'ma, ma, ma' or 'em' "
-        "rather than a pure continuous hum [m:]."
-    )
-    doc.paragraphs[36].text = (
-        "Evidence supporting Finding #1:\n"
-        "• Pedagogical Checklist Item PED-08 ('Letter sounds pronounced correctly'): 2 of 4 DepEd teachers flagged this item as a critical defect.\n"
-        "• Teacher T-1 (DepEd Reading Specialist): 'The sound of M should be pronounced as /m/ (mmm, mmm, mmm) rather than ma, ma, ma. Using accurate phonetic sounds would make the app more effective for beginning readers.'\n"
-        "• Teacher T-2: 'My only concern is the sounding of letters better to have it sounds correctly so that children will not get confused with it.'"
-    )
-    doc.paragraphs[44].text = "Stakeholder: [✓] Subject Matter Expert (Certified DepEd Grade 1 Reading Teachers)"
-    doc.paragraphs[50].text = "SMART Objective Affected: Objective O1 (Hear It) — 100% of modeled phoneme clips are pure (no intrusive vowel); playback per letter ≤ 5 s."
-    doc.paragraphs[52].text = "Measurable Outcome Impacted: Accuracy and Pedagogical Effectiveness"
-    doc.paragraphs[62].text = (
-        "Explanation: In the Marungko synthetic phonics approach, children blend isolated letter sounds to form words. If /m/ is modeled as 'ma' "
-        "and /s/ as 'sa', the child decodes SAM as 'sa-a-ma' instead of /s/-/a/-/m/. Trailing vowels directly break word blending, impairing literacy acquisition."
-    )
-    for idx in [35, 36, 44, 50, 52, 62]:
-        set_run_font(doc.paragraphs[idx].runs[0], size=9.5)
+def _sections(lines: list[str]) -> dict[str, list[str]]:
+    out, current = {}, None
+    for line in lines:
+        m = re.match(r"^## (Section \d+|Final Declaration)", line)
+        if m:
+            current = m.group(1)
+            out[current] = []
+        elif current:
+            if line.strip() == "---":
+                continue
+            out[current].append(line)
+    return out
 
-    # Finding 2 (Paragraph 65)
-    doc.paragraphs[65].text = (
-        "Finding #2: Say It Microphone Hesitation and State Ambiguity.\n"
-        "Learners hesitated at the microphone CTA because the screen lacked immediate, real-time visual feedback indicating when the app was listening, "
-        "when speech was detected, and when processing occurred."
-    )
-    doc.paragraphs[66].text = (
-        "Evidence supporting Finding #2:\n"
-        "• Child Smileyometer Perceived Ease: 7 of 16 children (43.8%) did not choose the top smiling face. Ease was the lowest rated item.\n"
-        "• Facilitator observation sheets noted repeated hesitation at the mic; children tapped the button but delayed speaking due to uncertainty.\n"
-        "Stakeholder: [✓] End User (Grade 1 Learners) & Facilitators.\n"
-        "SMART Objective Affected: Objective O2c (≥85% unhesitating mic turns) and Objective O2a (ASR agreement ≥80%).\n"
-        "Measurable Outcome Impacted: Usability, Task Completion Rate, and Learner Autonomy.\n"
-        "Explanation: Hesitation leads to clipped audio, false timeouts, and ASR rejection, creating frustration and requiring adult prompting."
-    )
-    set_run_font(doc.paragraphs[65].runs[0], size=9.5, bold=True)
-    set_run_font(doc.paragraphs[66].runs[0], size=9.5)
 
-    # Finding 3 (Paragraph 67)
-    doc.paragraphs[67].text = (
-        "Finding #3: Structural Accessibility Deficits (Hearing Accommodations & Motor Navigation).\n"
-        "Caregiver ratings identified a lack of accommodations for learners with hearing difficulties, and observations noted tight touch targets on corner buttons.\n"
-        "Evidence supporting Finding #3:\n"
-        "• Accessibility Checklist Item ACC-06 (Hearing): Rated 3 of 5 Yes (40% negative). No visual articulation cues or sound captions.\n"
-        "• Accessibility Checklist Item ACC-07 (Motor): Rated 4 of 5 Yes. Tight padding around top-bar and navigation controls.\n"
-        "Stakeholder: [✓] Customer (Caregivers & Supervising Teachers).\n"
-        "SMART Objective Affected: Objective O6 (Pediatric Accessibility & Architecture Compliance).\n"
-        "Measurable Outcome Impacted: Usability and Inclusivity.\n"
-        "Explanation: Purely auditory feedback excludes hearing-impaired learners and fails noisy classrooms. Sub-64dp touch targets create accidental misses."
-    )
-    set_run_font(doc.paragraphs[67].runs[0], size=9.5, bold=True)
-    set_run_font(doc.paragraphs[67].runs[0], size=9.5)
+def _subsections(lines: list[str]) -> list[tuple[str, list[str]]]:
+    out = []
+    for line in lines:
+        if line.startswith("### "):
+            out.append((line[4:].strip(), []))
+        elif out:
+            out[-1][1].append(line)
+    return out
 
-    # Finding 4 (Paragraph 68)
-    doc.paragraphs[68].text = (
-        "Finding #4: Non-Decodable Blend It Word Bank Entries.\n"
-        "Curriculum review revealed that 6 of 33 seeded Blend It words violated short-vowel rules taught in early chapters.\n"
-        "Evidence: Expert linguistic audit of DatabaseModule.kt identified AIM, BEE, TOY, BOY, ZOO, and QUIZ as unlocked prematurely.\n"
-        "Stakeholder: [✓] Subject Matter Expert (DepEd Teachers & Reading Curriculum Review).\n"
-        "SMART Objective Affected: Objective O4 (Blend It Word Decodability — 100% decodable with taught letter-sounds).\n"
-        "Measurable Outcome Impacted: Pedagogical Effectiveness and Task Success Rate.\n"
-        "Explanation: Teaching irregular vowel teams in early CVC lessons contradicts systematic phonics and leads to blending failure."
-    )
-    set_run_font(doc.paragraphs[68].runs[0], size=9.5, bold=True)
-    set_run_font(doc.paragraphs[68].runs[0], size=9.5)
 
-    # --- Section 4: Potential Refactoring Priorities ---
-    # Priority 1 (p 74..111)
-    doc.paragraphs[74].text = "Refactoring Priority #1: Pure Phoneme Acoustic Modeling (FR-02)"
-    doc.paragraphs[75].text = "1. Validation Finding: Finding #1 (Phonemic Audio Impurity; PED-08)"
-    doc.paragraphs[77].text = "2. What needs to be improved: Re-master all 26 letter-sound clips as acoustically pure phonemes: held continuous sounds (≈800ms) and clipped short stops without trailing vowels."
-    doc.paragraphs[79].text = "3. Type of refactoring: [✓] Functional requirement (FR-02), [✓] Data/Audio assets, [✓] Multi-stage audio pipeline"
-    doc.paragraphs[90].text = "4. Current MVP approach: Single-letter Edge-TTS synthesis producing letter names ('ma', 'es', 'bee')."
-    doc.paragraphs[92].text = "5. Proposed refactored approach: Multi-stage pipeline combining Kokoro-82M neural TTS and Chatterbox-Turbo voice cloning, governed by strict SHA-256 release manifests and teacher audit."
-    doc.paragraphs[94].text = "6. Why necessary: Eliminates schwa intrusion so children can blend sounds into words without extra syllables."
-    doc.paragraphs[96].text = "7. Expected improvement: 100% of clips rated 'Pure' by at least 3 of 4 DepEd teachers; 0 trailing schwas."
-    doc.paragraphs[98].text = "8. How measured: Teacher Phoneme and Content Audit (Instrument A, Part 1)."
-    doc.paragraphs[108].text = "9. Priority: 🔴 High (P0 Urgent) — Essential to achieving SMART Objective O1."
+def _paragraphs(lines: list[str]) -> list[str]:
+    paras, buf = [], []
+    for line in lines:
+        if line.strip():
+            buf.append(line.strip())
+        elif buf:
+            paras.append(" ".join(buf))
+            buf = []
+    if buf:
+        paras.append(" ".join(buf))
+    return paras
 
-    for idx in [74, 75, 77, 79, 90, 92, 94, 96, 98, 108]:
-        set_run_font(doc.paragraphs[idx].runs[0], size=9.5, bold=(idx in [74, 108]))
 
-    # --- Section 5: Matrix (already filled in table 0) ---
-    # --- Section 6: Non-priorities (already filled in table 1) ---
-    doc.paragraphs[121].text = "Explanation of Scope Discipline: The team focused refactoring strictly on issues directly impacting the project's SMART objectives and pedagogical validity. Routine bugs, visual polish, and advanced phonics features were appropriately separated from core architectural refactoring."
-    set_run_font(doc.paragraphs[121].runs[0], size=9.5, italic=True)
+def _parse_item_body(lines: list[str]) -> dict:
+    item = {"paras": [], "bullets": [], "checks": [], "evidence": []}
+    buf = []
 
-    # --- Section 7: Final Team Reflection ---
-    doc.paragraphs[125].text = "1. What is the single most important thing your team learned from the MVP validation?"
-    doc.paragraphs[126].text = (
-        "Pedagogical accuracy must strictly govern technology implementation in early literacy applications. "
-        "In adult software, slight acoustic variations in synthetic speech are inconsequential; for Grade 1 readers, "
-        "even a fraction of a second of trailing schwa (/m/ as 'ma') breaks the mechanics of synthetic phonics blending. "
-        "An engaging and stable application is educationally ineffective if it reinforces phonetic errors."
-    )
-    doc.paragraphs[127].text = "2. What is the most important change your team should make based on this learning?"
-    doc.paragraphs[128].text = (
-        "The complete restructuring of our acoustic modeling and tutoring architecture: re-mastering all 26 letter-sounds into pure phonemes, "
-        "separating pure sounds from key-word carrier phrases, implementing an encouraging 4-state mic visualizer without penalty hearts, "
-        "and validating every asset through certified DepEd teacher release gates."
-    )
-    doc.paragraphs[129].text = "3. How will this change help your project achieve its SMART objectives more effectively?"
-    doc.paragraphs[130].text = (
-        "By modeling acoustically pure phonemes and eliminating mic hesitation, learners internalize accurate phonological representations. "
-        "This directly satisfies Objective O1 (100% pure phonemes), Objective O2 (unprompted speech production), and Objective O4 (successful blending), "
-        "ensuring measurable reading gains in the Capstone 2 evaluation."
-    )
-    doc.paragraphs[131].text = "4. What requirements and/or design documents will need to be updated as a result?"
-    doc.paragraphs[132].text = "[✓] SRS v3.0: Updated FR-02 (pure phonemes), FR-03 (mic states/ladder), FR-13 (word bank), FR-14 (profiles), FR-NEW-TEL (telemetry), NFR-ACC-01/02."
-    doc.paragraphs[133].text = "[✓] SDD v2.0: Audio Subsystem (SoundPool + AudioResolver), Tutoring FSM (TutorPolicy), Room schema v3/v4, and adaptive LessonScaffold."
-    doc.paragraphs[134].text = "[✓] SPMP v2.0: 9-WBS master schedule, Kokoro/Chatterbox compute allocations, tablet hardware protocols, and 8-point Risk Register (R1–R8)."
-    doc.paragraphs[135].text = "[✓] RTM v3.0: Full 16-row bidirectional traceability linking empirical findings F-01..F-16 to SRS, SDD, and STD test cases."
+    def flush():
+        if buf:
+            item["paras"].append(" ".join(buf))
+            buf.clear()
 
-    doc.paragraphs[139].text = "Team Lead: Zendrix Riva                                                    Date: October 10, 2026"
+    for raw in lines:
+        line = raw.strip()
+        if not line:
+            flush()
+        elif line.startswith("- [x] ") or line.startswith("- [X] "):
+            flush()
+            item["checks"].append(_label_detail(line[6:]))
+        elif line.startswith("- [ ] "):
+            flush()
+        elif line.startswith("- "):
+            flush()
+            item["bullets"].append(line[2:].strip())
+        elif line.startswith("*Evidence type:*"):
+            flush()
+            for part in line[len("*Evidence type:*"):].split(";"):
+                if part.strip():
+                    item["evidence"].append(_label_detail(part))
+        else:
+            buf.append(line)
+    flush()
+    return item
 
-    for idx in [126, 128, 130, 132, 133, 134, 135, 139]:
-        set_run_font(doc.paragraphs[idx].runs[0], size=9.5)
 
-    doc.save(OUTPUT_PATH)
-    print(f"Complete document successfully populated and saved at: {OUTPUT_PATH}")
+def _parse_blocks(lines: list[str], prefix: str) -> list[dict]:
+    blocks = []
+    for title, body in _subsections(lines):
+        m = re.match(rf"^{prefix} #(\d+):\s*(.+)$", title)
+        if not m:
+            continue
+        items, current = {}, None
+        for line in body:
+            im = _ITEM.match(line.strip()) if not line.startswith(" ") else None
+            if im:
+                current = int(im.group(1))
+                items[current] = []
+            elif current is not None:
+                items[current].append(line)
+        blocks.append({
+            "number": int(m.group(1)),
+            "title": m.group(2).strip(),
+            "items": {k: _parse_item_body(v) for k, v in items.items()},
+        })
+    return blocks
+
+
+def _table(lines: list[str]) -> list[list[str]]:
+    rows = [split_row(l) for l in lines if l.strip().startswith("|")]
+    return [r for r in rows[2:]]  # drop header and separator
+
+
+def parse_form_md(path: Path) -> dict:
+    lines = path.read_text(encoding="utf-8").splitlines()
+    sec = _sections(lines)
+
+    project, members, respondents, current = {}, [], [], None
+    for line in sec["Section 1"]:
+        s = line.strip()
+        if line.startswith("- "):
+            label, value = _label_detail(s[2:])
+            project[label] = value
+            current = label
+        elif re.match(r"^\d+\.\s+", s) and current == "Team Members":
+            members.append(re.sub(r"^\d+\.\s+", "", s))
+        elif s.startswith("- [x] ") and current == "Types of respondents involved":
+            respondents.append(_label_detail(s[6:]))
+    project["Team Members"] = members
+
+    overview = {}
+    for title, body in _subsections(sec["Section 2"]):
+        number = int(title.split(".")[0])
+        if number == 1:
+            overview["purpose"] = _paragraphs(body)
+        else:
+            fields, last = {}, None
+            for line in body:
+                s = line.strip()
+                if line.startswith("- "):
+                    last, value = _label_detail(s[2:])
+                    fields[last] = {"value": value, "sub": []}
+                elif s and last and line.startswith(" "):
+                    fields[last]["sub"].append(re.sub(r"^(\d+\.|-)\s+", "", s))
+            overview[number] = fields
+
+    section6 = sec["Section 6"]
+    important = []
+    for title, body in _subsections(section6):
+        if title.startswith("Important Question"):
+            important = _paragraphs(body)
+
+    reflection = {}
+    for title, body in _subsections(sec["Section 7"]):
+        number = int(title.split(".")[0])
+        if number == 4:
+            reflection[4] = [_label_detail(l.strip()[6:]) for l in body if l.strip().startswith("- [x] ")]
+        else:
+            reflection[number] = _paragraphs(body)
+
+    declaration = {}
+    for line in sec["Final Declaration"]:
+        m = re.match(r"^\*\*(.+?):\*\*\s*(.+?)\s*$", line.strip())
+        if m:
+            declaration[m.group(1)] = m.group(2)
+
+    form = {
+        "project": project,
+        "respondents": respondents,
+        "overview": overview,
+        "findings": _parse_blocks(sec["Section 3"], "Finding"),
+        "priorities": _parse_blocks(sec["Section 4"], "Refactoring Priority"),
+        "matrix": _table(sec["Section 5"]),
+        "non_priorities": _table([l for l in section6 if l.strip().startswith("|")]),
+        "important": important,
+        "reflection": reflection,
+        "declaration": declaration,
+    }
+    _check(form)
+    return form
+
+
+def _check(form: dict):
+    for f in form["findings"]:
+        missing = set(range(1, 7)) - set(f["items"])
+        if missing:
+            raise ValueError(f"Finding #{f['number']} is missing questions {sorted(missing)}")
+    for p in form["priorities"]:
+        missing = set(range(1, 10)) - set(p["items"])
+        if missing:
+            raise ValueError(f"Refactoring Priority #{p['number']} is missing questions {sorted(missing)}")
+    if len(form["non_priorities"]) != 9:
+        raise ValueError("Section 6 needs exactly the 9 rows of the form's table")
+    for key in ("Team Lead", "Date"):
+        if key not in form["declaration"]:
+            raise ValueError(f"Final Declaration needs **{key}:**")
+
+
+# ---------------------------------------------------------------------------
+# Template editing helpers
+# ---------------------------------------------------------------------------
+
+def _clear_runs(p: Paragraph):
+    for child in list(p._p):
+        if child.tag in (qn("w:r"), qn("w:hyperlink")):
+            p._p.remove(child)
+    p_pr = p._p.pPr
+    if p_pr is not None:
+        r_pr = p_pr.find(qn("w:rPr"))
+        if r_pr is not None:
+            p_pr.remove(r_pr)
+
+
+def _truncate_at_break(p: Paragraph):
+    """Keep the bold question and drop the line break and hint that follow it."""
+    found = False
+    for run in list(p._p.findall(qn("w:r"))):
+        if found:
+            p._p.remove(run)
+            continue
+        br = run.find(qn("w:br"))
+        if br is not None:
+            for el in list(run):
+                if found:
+                    run.remove(el)
+                elif el is br:
+                    run.remove(el)
+                    found = True
+
+
+def _new_paragraph_after(anchor, body) -> Paragraph:
+    el = OxmlElement("w:p")
+    anchor.addnext(el)
+    p = Paragraph(el, body)
+    p.paragraph_format.space_before = Pt(0)
+    p.paragraph_format.space_after = Pt(6)
+    return p
+
+
+def _write_answer(p: Paragraph, text: str):
+    add_inline(p, text, size=ANSWER_SIZE)
+
+
+def _guide(p: Paragraph):
+    """Show template instructions as small grey guidance text."""
+    for run in p.runs:
+        run.italic = True
+        run.font.size = Pt(9)
+        run.font.color.rgb = GUIDE_COLOR
+
+
+def _bullet(p: Paragraph, text: str, left_twips=720):
+    p_pr = p._p.get_or_add_pPr()
+    ind = OxmlElement("w:ind")
+    ind.set(qn("w:left"), str(left_twips))
+    ind.set(qn("w:hanging"), "280")
+    p_pr.append(ind)
+    p.paragraph_format.space_after = Pt(3)
+    set_run_font(p.add_run("•\t"), size=ANSWER_SIZE)
+    add_inline(p, text, size=ANSWER_SIZE)
+
+
+def _option_key(text: str) -> str:
+    text = re.sub(r"^[^\w]+", "", text.strip())
+    text = re.split(r"\s+—\s+|:", text)[0]
+    return text.strip().lower()
+
+
+def _set_checkbox(p: Paragraph, checked: bool, detail: str = "", detail_on_new_line=False):
+    """Turn a template option (a bulleted list item) into a ticked or empty box."""
+    label = p.text.strip()
+    p_pr = p._p.get_or_add_pPr()
+    num_pr = p_pr.find(qn("w:numPr"))
+    level = 0
+    if num_pr is not None:
+        ilvl = num_pr.find(qn("w:ilvl"))
+        level = int(ilvl.get(qn("w:val"))) if ilvl is not None else 0
+        p_pr.remove(num_pr)
+    for old in p_pr.findall(qn("w:ind")):
+        p_pr.remove(old)
+    ind = OxmlElement("w:ind")
+    ind.set(qn("w:left"), str(720 * (level + 1)))
+    ind.set(qn("w:hanging"), "360")
+    p_pr.append(ind)
+    _clear_runs(p)
+    glyph = p.add_run("☒\t" if checked else "☐\t")
+    set_run_font(glyph, SYMBOL_FONT, ANSWER_SIZE + 1)
+    if _option_key(label) == "other" and checked:
+        label = "Other:"
+    if checked:
+        run = p.add_run(label)
+        set_run_font(run, size=ANSWER_SIZE, bold=True)
+        if detail:
+            if detail_on_new_line:
+                p.add_run().add_break()
+            else:
+                p.add_run(" " if label.endswith(":") else ": ")
+            add_inline(p, detail, size=ANSWER_SIZE)
+    else:
+        set_run_font(p.add_run(label), size=ANSWER_SIZE)
+
+
+def _fill_options(options: list[Paragraph], checks: list[tuple[str, str]], what: str, detail_on_new_line=False):
+    keys = {_option_key(p.text): p for p in options}
+    chosen = {}
+    for label, detail in checks:
+        key = _option_key(label)
+        if key not in keys:
+            raise ValueError(f"'{label}' is not an option of '{what}'. Options: {[p.text for p in options]}")
+        chosen[key] = detail
+    for p in options:
+        key = _option_key(p.text)
+        _set_checkbox(p, key in chosen, chosen.get(key, ""), detail_on_new_line)
+
+
+def _replace_with_answer(p: Paragraph, paras: list[str], body):
+    """Replace an italic placeholder paragraph with the answer paragraph(s)."""
+    _clear_runs(p)
+    p.paragraph_format.space_before = Pt(0)
+    p.paragraph_format.space_after = Pt(6)
+    if not paras:
+        return p
+    _write_answer(p, paras[0])
+    last = p
+    for text in paras[1:]:
+        last = _new_paragraph_after(last._p, body)
+        _write_answer(last, text)
+    return last
+
+
+def _insert_answers_after(anchor: Paragraph, item: dict, body, left_twips=720) -> Paragraph:
+    last = anchor
+    for text in item["paras"]:
+        last = _new_paragraph_after(last._p, body)
+        _write_answer(last, text)
+    for text in item["bullets"]:
+        last = _new_paragraph_after(last._p, body)
+        _bullet(last, text, left_twips)
+    return last
+
+
+def _strip_ids(el):
+    for node in el.iter():
+        for attr in (W14 + "paraId", W14 + "textId"):
+            if attr in node.attrib:
+                del node.attrib[attr]
+
+
+def _set_heading(p: Paragraph, text: str):
+    _clear_runs(p)
+    run = p.add_run(text)
+    run.bold = True
+
+
+def _body_paragraphs(doc) -> list[Paragraph]:
+    return [Paragraph(el, doc._body) for el in doc.element.body if el.tag == qn("w:p")]
+
+
+def _find(paras: list[Paragraph], prefix: str, start: int = 0) -> int:
+    for idx in range(start, len(paras)):
+        if paras[idx].text.strip().startswith(prefix):
+            return idx
+    raise ValueError(f"Template paragraph starting with '{prefix}' not found")
+
+
+def _following_options(paras: list[Paragraph], idx: int) -> list[Paragraph]:
+    """The bulleted option list right after paragraph idx."""
+    out = []
+    for p in paras[idx + 1:]:
+        if p._p.pPr is not None and p._p.pPr.find(qn("w:numPr")) is not None:
+            out.append(p)
+        elif out:
+            break
+        elif p.text.strip() in ("", "Examples:"):
+            continue
+        else:
+            break
+    return out
+
+
+# ---------------------------------------------------------------------------
+# Section fillers
+# ---------------------------------------------------------------------------
+
+def _fill_section1(doc, form):
+    paras = _body_paragraphs(doc)
+    project = form["project"]
+    for label in ("Team/Group Name", "Project/System Title", "Program / Section", "Team Members", "Adviser",
+                  "System URL / MVP Link", "Date of MVP Validation", "Number of respondents/participants"):
+        p = paras[_find(paras, label)]
+        value = project[label]
+        if isinstance(value, list):
+            p.add_run(":")
+            for member in value:
+                p.add_run().add_break()
+                add_inline(p, member, size=ANSWER_SIZE)
+        else:
+            p.add_run(": ")
+            add_inline(p, value, size=ANSWER_SIZE)
+    idx = _find(paras, "Types of respondents involved")
+    paras[idx].add_run(":")
+    _fill_options(_following_options(paras, idx), form["respondents"], "Types of respondents involved")
+
+
+def _fill_section2(doc, form):
+    body = doc._body
+    paras = _body_paragraphs(doc)
+    ov = form["overview"]
+
+    q1 = _find(paras, "1. What was the primary purpose")
+    placeholder, instruction = paras[q1 + 1], paras[q1 + 2]
+    paras[q1]._p.addnext(instruction._p)
+    _guide(instruction)
+    _replace_with_answer(placeholder, ov["purpose"], body)
+
+    for label, key in (("Framework/Model", "Framework/Model"),
+                       ("Key constructs/criteria evaluated", "Key constructs/criteria evaluated"),
+                       ("Why was this framework/model appropriate", "Why was this framework/model appropriate for your project?")):
+        p = paras[_find(paras, label)]
+        field = ov[2][key]
+        template_label = p.text.split("__")[0].strip()
+        _clear_runs(p)
+        set_run_font(p.add_run(template_label), bold=True)
+        p.add_run(" " if template_label.endswith(("?", ":")) else ": ")
+        if field["value"]:
+            add_inline(p, field["value"], size=ANSWER_SIZE)
+        for n, sub in enumerate(field["sub"], start=1):
+            p.add_run().add_break()
+            add_inline(p, f"{n}. {sub}", size=ANSWER_SIZE)
+
+    include = paras[_find(paras, "Include:")]
+    _guide(include)
+    for label, key in (("Who participated", "Who participated"),
+                       ("How they interacted with the MVP", "How they interacted with the MVP"),
+                       ("What activities/tasks they performed", "What activities/tasks they performed"),
+                       ("How feedback/data was collected", "How feedback/data was collected")):
+        p = paras[_find(paras, label)]
+        _clear_runs(p)
+        set_run_font(p.add_run(label + ": "), bold=True)
+        add_inline(p, ov[3][key]["value"], size=ANSWER_SIZE)
+
+
+def _fill_finding(block: list[Paragraph], finding: dict, body):
+    items = finding["items"]
+    _set_heading(block[0], f"Finding #{finding['number']}: {finding['title']}")
+    q = {n: next(i for i, p in enumerate(block) if p.text.strip().startswith(f"{n}. ")) for n in range(1, 7)}
+
+    _truncate_at_break(block[q[1]])
+    _insert_answers_after(block[q[1]], items[1], body)
+
+    _truncate_at_break(block[q[2]])
+    last = _insert_answers_after(block[q[2]], items[2], body)
+    label = _new_paragraph_after(last._p, body)
+    label.paragraph_format.space_after = Pt(2)
+    label.add_run("Type of evidence (examples from the form):")
+    _guide(label)
+    _fill_options(block[q[2] + 1:q[3]], items[2]["evidence"], "evidence")
+
+    _fill_options(block[q[3] + 1:q[4]], items[3]["checks"], "stakeholder")
+    _replace_with_answer(block[q[4] + 1], items[4]["paras"], body)
+    _fill_options(block[q[5] + 1:q[6]], items[5]["checks"], "measurable outcome")
+    _replace_with_answer(block[q[6] + 1], items[6]["paras"], body)
+
+
+def _fill_priority(block: list[Paragraph], prio: dict, body):
+    items = prio["items"]
+    _set_heading(block[0], f"Refactoring Priority #{prio['number']}: {prio['title']}")
+    q = {n: next(i for i, p in enumerate(block) if p.text.strip().startswith(f"{n}. ")) for n in range(1, 10)}
+    for n in (1, 2, 4, 5, 6, 7):
+        _replace_with_answer(block[q[n] + 1], items[n]["paras"], body)
+    _fill_options(block[q[3] + 1:q[4]], items[3]["checks"], "type of refactoring")
+
+    examples = block[q[8] + 1]
+    _insert_answers_after(block[q[8]], items[8], body)
+    _guide(examples)
+    _fill_options(block[q[8] + 2:q[9]], items[8]["checks"], "measurement")
+    _fill_options([p for p in block[q[9] + 1:] if p.text.strip()], items[9]["checks"], "priority",
+                  detail_on_new_line=True)
+
+
+def _clone_blocks(doc, start_prefix: str, end_prefix: str, count: int):
+    """Copy the template block [start, end) count times in place; returns each copy's paragraphs."""
+    paras = _body_paragraphs(doc)
+    start, end = _find(paras, start_prefix), _find(paras, end_prefix)
+    proto = [p._p for p in paras[start:end]]
+    anchor = proto[0].getprevious()
+    copies = []
+    for _ in range(count):
+        els = [copy.deepcopy(el) for el in proto]
+        for el in els:
+            _strip_ids(el)
+            anchor.addnext(el)
+            anchor = el
+        copies.append([Paragraph(el, doc._body) for el in els])
+    for el in proto:
+        el.getparent().remove(el)
+    return copies
+
+
+def _fill_section3(doc, form):
+    paras = _body_paragraphs(doc)
+    # The template has "Finding #2 / #3: Repeat the same fields." after the Finding #1 block.
+    first_repeat = _find(paras, "Finding #2")
+    recommended = _find(paras, "Recommended:")
+    for p in paras[first_repeat:recommended]:
+        if p.text.strip():
+            p._p.getparent().remove(p._p)
+    for block, finding in zip(_clone_blocks(doc, "Finding #1", "Recommended:", len(form["findings"])),
+                              form["findings"]):
+        _fill_finding(block, finding, doc._body)
+
+
+def _fill_section4(doc, form):
+    copies = _clone_blocks(doc, "Refactoring Priority #1", "Section 5", len(form["priorities"]))
+    for block, prio in zip(copies, form["priorities"]):
+        _fill_priority(block, prio, doc._body)
+
+
+def _fill_cell(cell, text: str, bold=False):
+    p = cell.paragraphs[0]
+    _clear_runs(p)
+    for extra in cell.paragraphs[1:]:
+        extra._p.getparent().remove(extra._p)
+    add_inline(p, text, size=TABLE_SIZE, bold=bold, break_code=True)
+
+
+def _set_widths(table, inches: list[float], header_size: float):
+    """Widen the template's columns so no header word breaks, and keep the header on each page."""
+    grid = table._tbl.tblGrid.findall(qn("w:gridCol"))
+    for col, width in zip(grid, inches):
+        col.set(qn("w:w"), str(int(width * 1440)))
+    for row in table.rows:
+        for cell, width in zip(row.cells, inches):
+            cell.width = Inches(width)
+    for p in table.rows[0].cells[0]._tc.getparent().iter(qn("w:p")):
+        for r in Paragraph(p, table).runs:
+            r.font.size = Pt(header_size)
+    tr_pr = table.rows[0]._tr.get_or_add_trPr()
+    header = OxmlElement("w:tblHeader")
+    header.set(qn("w:val"), "true")
+    tr_pr.append(header)
+
+
+def _fill_section5(doc, form):
+    table = doc.tables[0]
+    rows = form["matrix"]
+    while len(table.rows) - 1 < len(rows):
+        table._tbl.append(copy.deepcopy(table.rows[-1]._tr))
+    for r_idx, values in enumerate(rows, start=1):
+        for c_idx, value in enumerate(values):
+            _fill_cell(table.rows[r_idx].cells[c_idx], value, bold=(c_idx == 0))
+    _set_widths(table, [0.35, 1.05, 1.0, 1.05, 1.05, 1.05, 0.75], header_size=9)
+
+
+def _fill_section6(doc, form):
+    table = doc.tables[1]
+    for r_idx, (item, identified, justification) in enumerate(form["non_priorities"], start=1):
+        row = table.rows[r_idx]
+        if _option_key(row.cells[0].text) != _option_key(item):
+            raise ValueError(f"Section 6 row {r_idx}: '{item}' does not match the form's '{row.cells[0].text}'")
+        for t in row.cells[0]._tc.iter(qn("w:t")):
+            t.text = t.text.replace("/", "/\u200b")  # let the long "a/b/c/d" label wrap at slashes
+        _fill_cell(row.cells[1], identified, bold=True)
+        action = row.cells[2]
+        p = action.add_paragraph()
+        p.paragraph_format.space_before = Pt(2)
+        add_inline(p, justification, size=TABLE_SIZE)
+    _set_widths(table, [2.35, 0.95, 3.2], header_size=10)
+
+    paras = _body_paragraphs(doc)
+    instruction = paras[_find(paras, "Provide evidence-based justification")]
+    _guide(instruction)
+    last = instruction
+    for text in form["important"]:
+        last = _new_paragraph_after(last._p, doc._body)
+        _write_answer(last, text)
+
+
+def _fill_section7(doc, form):
+    paras = _body_paragraphs(doc)
+    refl = form["reflection"]
+    start = _find(paras, "Section 7")
+    for n in (1, 2, 3):
+        q = _find(paras, f"{n}. ", start)
+        _replace_with_answer(paras[q + 1], refl[n], doc._body)
+    q4 = _find(paras, "4. What requirements and/or design documents", start)
+    _fill_options(_following_options(paras, q4), refl[4], "documents to update")
+
+
+def _fill_declaration(doc, form):
+    paras = _body_paragraphs(doc)
+    p = paras[_find(paras, "Team Lead:")]
+    _clear_runs(p)
+    set_run_font(p.add_run("Team Lead: "), bold=True)
+    add_inline(p, form["declaration"]["Team Lead"], size=ANSWER_SIZE + 1)
+    p.add_run().add_break()
+    set_run_font(p.add_run("Date: "), bold=True)
+    add_inline(p, form["declaration"]["Date"], size=ANSWER_SIZE + 1)
+
+
+def build_form(source: Path = SOURCE, template: Path = TEMPLATE, output: Path = OUTPUT) -> Path:
+    form = parse_form_md(source)
+    doc = docx.Document(template)
+    _fill_section1(doc, form)
+    _fill_section2(doc, form)
+    _fill_section3(doc, form)
+    _fill_section4(doc, form)
+    _fill_section5(doc, form)
+    _fill_section6(doc, form)
+    _fill_section7(doc, form)
+    _fill_declaration(doc, form)
+    doc.save(output)
+    print(f"[OK] DOCX  {output.relative_to(REPO)} "
+          f"({len(form['findings'])} findings, {len(form['priorities'])} refactoring priorities)")
+    return output
+
 
 if __name__ == "__main__":
-    fill_form()
+    sys.exit(0 if build_form() else 1)
