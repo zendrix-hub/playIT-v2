@@ -15,6 +15,9 @@ import com.playit.app.domain.repository.BlendItAttemptRepository
 import com.playit.app.domain.repository.BlendItWordRepository
 import com.playit.app.navigation.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,6 +26,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import com.playit.app.presentation.components.IdleTimer
 import javax.inject.Inject
 
 sealed class BlendItUiState {
@@ -32,6 +36,13 @@ sealed class BlendItUiState {
     object HeartDepleted : BlendItUiState() // Triggers standard 3-heart restart dialog
     object SessionComplete : BlendItUiState()
 }
+
+data class BlendItResult(
+    val groupId: Int,
+    val heartsLost: Int,
+    val wordsCorrect: Int,
+    val totalWords: Int
+)
 
 @HiltViewModel
 class BlendItViewModel @Inject constructor(
@@ -59,6 +70,16 @@ class BlendItViewModel @Inject constructor(
 
     val heartManager = HeartManager()
 
+    private var wordsSolvedFirstTry: Int = 0
+    private var consecutiveCorrectWords: Int = 0
+
+    fun result(): BlendItResult = BlendItResult(
+        groupId = groupId,
+        heartsLost = heartManager.sessionHeartsLost,
+        wordsCorrect = wordsSolvedFirstTry,
+        totalWords = _words.value.size
+    )
+
     private val _hearts = MutableStateFlow(heartManager.currentHearts)
     val hearts: StateFlow<Int> = _hearts.asStateFlow()
 
@@ -82,15 +103,25 @@ class BlendItViewModel @Inject constructor(
 
     private var soundOutJob: kotlinx.coroutines.Job? = null
 
+    /**
+     * Plays [path] and returns when it ends, but no later than [maxMs] (a clip that never reports its end
+     * cannot stall the lesson) and no sooner than [minMs]. A null path just waits [minMs].
+     */
+    private suspend fun playAndAwait(path: String?, minMs: Long, maxMs: Long) = coroutineScope {
+        val minimum = launch { kotlinx.coroutines.delay(minMs) }
+        if (path != null) {
+            val ended = CompletableDeferred<Unit>()
+            audioPlayer.playAssetAudio(path) { ended.complete(Unit) }
+            withTimeoutOrNull(maxMs) { ended.await() }
+        }
+        minimum.join()
+    }
+
     private val _highlightedSlotIndex = MutableStateFlow<Int?>(null)
     val highlightedSlotIndex: StateFlow<Int?> = _highlightedSlotIndex.asStateFlow()
 
     private val _uiState = MutableStateFlow<BlendItUiState>(BlendItUiState.Idle)
     val uiState: StateFlow<BlendItUiState> = _uiState.asStateFlow()
-
-    init {
-        loadSessionWords()
-    }
 
     private fun loadSessionWords() {
         viewModelScope.launch {
@@ -100,7 +131,7 @@ class BlendItViewModel @Inject constructor(
                 listOf(
                     BlendItWord(1, 1, "SAM", "S-A-M", "audio/words/word_sam.mp3", "images/pictures/blendword_sam.png"),
                     BlendItWord(2, 1, "SIS", "S-I-S", "audio/words/word_sis.mp3", "images/pictures/blendword_sis.png"),
-                    BlendItWord(3, 1, "AIM", "A-I-M", "audio/words/word_aim.mp3", "images/pictures/blendword_aim.png")
+                    BlendItWord(3, 1, "AM", "A-M", "audio/words/word_am.mp3", "images/pictures/blendword_am.png")
                 )
             }
             setupWordAtIndex(0)
@@ -109,6 +140,31 @@ class BlendItViewModel @Inject constructor(
 
     private val _isPlayingPrompt = MutableStateFlow(false)
     val isPlayingPrompt: StateFlow<Boolean> = _isPlayingPrompt.asStateFlow()
+
+    private val _nextHighlighted = MutableStateFlow(false)
+    val nextHighlighted: StateFlow<Boolean> = _nextHighlighted.asStateFlow()
+
+    private val idleTimer = IdleTimer(
+        scope = viewModelScope,
+        isBusy = { _isPlayingPrompt.value },
+        onIdle = { playBlendItIntroAudio() }
+    )
+
+    init {
+        loadSessionWords()
+    }
+
+    fun onScreenVisible() {
+        idleTimer.start()
+    }
+
+    fun onScreenHidden() {
+        idleTimer.stop()
+    }
+
+    fun onUserInteraction() {
+        idleTimer.touch()
+    }
 
     private fun setupWordAtIndex(index: Int) {
         val wordObj = _words.value.getOrNull(index) ?: return
@@ -209,25 +265,29 @@ class BlendItViewModel @Inject constructor(
         }
 
         if (isCorrect) {
+            if (_wrongAttemptsForCurrentWord.value == 0) {
+                wordsSolvedFirstTry++
+            }
+            consecutiveCorrectWords++
+            heartManager.checkRecovery(consecutiveCorrectWords)
+            _hearts.value = heartManager.currentHearts
+
             _uiState.value = BlendItUiState.WordCorrect
             soundOutJob?.cancel()
             soundOutJob = viewModelScope.launch {
-                // Sequential phoneme sound-out loop
+                // Sound out each letter and wait for its clip: AudioPlayer stops a clip when the next one
+                // starts, and held sounds run over a second (ph_s.wav is 1.19 s). At least 750 ms per tile
+                // (user decision 2026-10-10, card 28).
                 for (i in targetWord.indices) {
                     _highlightedSlotIndex.value = i
-                    val letter = targetWord[i].toString()
-                    val phonemeAudio = audioResolver.getPhonemePath(letter)
-                    if (phonemeAudio != null) {
-                        audioPlayer.playAssetAudio(phonemeAudio)
-                    }
-                    kotlinx.coroutines.delay(400)
+                    playAndAwait(audioResolver.getPhonemePath(targetWord[i].toString()), LETTER_MIN_MS, LETTER_MAX_MS)
                 }
-                _highlightedSlotIndex.value = null
 
-                // Whole word audio
-                val wordAudio = audioResolver.getWordPath(targetWord)
-                audioPlayer.playAssetAudio(wordAudio)
-                kotlinx.coroutines.delay(600)
+                // Blend: every tile lights together for a moment, and stays lit while the whole word plays.
+                _highlightedSlotIndex.value = ALL_SLOTS
+                kotlinx.coroutines.delay(BLEND_PAUSE_MS)
+                playAndAwait(audioResolver.getWordPath(targetWord), 0L, WORD_MAX_MS)
+                _highlightedSlotIndex.value = null
 
                 // Celebration chime and VO
                 val sfx = audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME)
@@ -242,15 +302,16 @@ class BlendItViewModel @Inject constructor(
                 }
             }
         } else {
+            consecutiveCorrectWords = 0
             val isGameOver = heartManager.deductHeart()
             _hearts.value = heartManager.currentHearts
-            _totalHeartsLost.value = heartManager.heartsLost
+            _totalHeartsLost.value = heartManager.sessionHeartsLost
             _wrongAttemptsForCurrentWord.value += 1
 
-            val sfxBuzz = audioResolver.getSfxPath(SfxEvent.BLENDIT_BUZZ)
+            val sfxPop = audioResolver.getSfxPath(SfxEvent.INCORRECT_POP)
             val sfxWhoosh = audioResolver.getSfxPath(SfxEvent.HEART_LOSS_WHOOSH)
             val voEncourage = audioResolver.getRotatingEncourageVo()
-            audioPlayer.playSequence(listOf(sfxBuzz, sfxWhoosh, voEncourage))
+            audioPlayer.playSequence(listOf(sfxPop, sfxWhoosh, voEncourage))
 
             if (isGameOver) {
                 _uiState.value = BlendItUiState.HeartDepleted
@@ -304,14 +365,26 @@ class BlendItViewModel @Inject constructor(
     }
 
     fun restartSession() {
-        heartManager.reset()
+        wordsSolvedFirstTry = 0
+        consecutiveCorrectWords = 0
+        heartManager.resetForRestart()
         _hearts.value = heartManager.currentHearts
-        _totalHeartsLost.value = 0
+        _totalHeartsLost.value = heartManager.sessionHeartsLost
         setupWordAtIndex(0)
     }
 
     override fun onCleared() {
         super.onCleared()
+        idleTimer.stop()
         audioPlayer.stop()
+    }
+
+    companion object {
+        /** [highlightedSlotIndex] value that lights every tile: the blend moment before the whole word. */
+        const val ALL_SLOTS = -1
+        internal const val LETTER_MIN_MS = 750L
+        internal const val LETTER_MAX_MS = 2000L
+        internal const val BLEND_PAUSE_MS = 500L
+        internal const val WORD_MAX_MS = 2500L
     }
 }

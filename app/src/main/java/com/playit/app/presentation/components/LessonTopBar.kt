@@ -1,5 +1,10 @@
 package com.playit.app.presentation.components
 
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -23,6 +28,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import com.playit.app.domain.model.GameplayConstants
 import com.playit.app.presentation.theme.*
 
 enum class LessonStep(val stepIndex: Int) {
@@ -42,7 +48,7 @@ fun LessonTopBar(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     hearts: Int? = null,
-    maxHearts: Int = 3
+    maxHearts: Int = GameplayConstants.STARTING_HEARTS
 ) {
     Row(
         modifier = modifier
@@ -94,7 +100,14 @@ fun LessonTopBar(
             }
         }
 
-        // Hearts Status Indicator
+        // Hearts Status Indicator. When the count drops, the heart just lost wobbles once.
+        var lossCount by remember { mutableIntStateOf(0) }
+        var previousHearts by remember { mutableStateOf(hearts) }
+        LaunchedEffect(hearts) {
+            val before = previousHearts
+            if (before != null && hearts != null && hearts < before) lossCount++
+            previousHearts = hearts
+        }
         if (hearts != null) {
             Row(
                 modifier = Modifier
@@ -112,6 +125,7 @@ fun LessonTopBar(
                         contentDescription = if (isAlive) "Heart Active" else "Heart Lost",
                         modifier = Modifier
                             .size(20.dp)
+                            .then(if (i == hearts + 1) Modifier.heartLossWobble(lossCount) else Modifier)
                             .graphicsLayer { alpha = if (isAlive) 1f else 0.22f }
                     )
                 }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -22,10 +23,13 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +44,7 @@ import com.playit.app.presentation.dashboard.components.BadgeCollectionCase
 import com.playit.app.presentation.dashboard.components.LearnerHeroCard
 import com.playit.app.presentation.dashboard.components.MasteredSoundsShelf
 import com.playit.app.presentation.dashboard.components.PracticeFocusSection
+import com.playit.app.presentation.dashboard.components.PrivacyNoticeDialog
 import com.playit.app.presentation.dashboard.components.ProfileSwitcherDropdown
 import com.playit.app.presentation.dashboard.components.WordBlendingShelf
 import androidx.compose.ui.graphics.Color
@@ -50,10 +55,19 @@ import java.io.File
 fun ParentDashboardScreen(
     viewModel: ParentDashboardViewModel,
     onBack: () -> Unit,
-    onReportPreview: (File) -> Unit
+    onReportPreview: (File) -> Unit,
+    onAllProfilesDeleted: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val noProfilesLeft by viewModel.noProfilesLeft.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    var showPrivacyDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(noProfilesLeft) {
+        if (noProfilesLeft) {
+            onAllProfilesDeleted()
+        }
+    }
 
     LaunchedEffect(uiState.exportStatus) {
         when (val status = uiState.exportStatus) {
@@ -148,7 +162,7 @@ fun ParentDashboardScreen(
                     contentColor = Color.White,
                     enabled = uiState.exportStatus !is ExportStatus.Exporting && uiState.selectedProfile != null,
                     fontSize = 13,
-                    modifier = Modifier.height(52.dp)
+                    modifier = Modifier.heightIn(min = 52.dp)
                 )
             }
 
@@ -181,7 +195,13 @@ fun ParentDashboardScreen(
                             .fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        item { LearnerHeroCard(data = dashboardData) }
+                        item {
+                            LearnerHeroCard(
+                                data = dashboardData,
+                                onRename = { viewModel.renameProfile(dashboardData.profile, it) },
+                                onDelete = { viewModel.deleteProfile(dashboardData.profile) }
+                            )
+                        }
                         item { MasteredSoundsShelf(letterPerformances = dashboardData.letterPerformances) }
                         item { PracticeFocusSection(atRiskLetters = dashboardData.atRiskLetters) }
                         item {
@@ -191,6 +211,27 @@ fun ParentDashboardScreen(
                             )
                         }
                         item { BadgeCollectionCase(completedLettersCount = dashboardData.completedLettersCount) }
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                TextButton(
+                                    onClick = { showPrivacyDialog = true },
+                                    modifier = Modifier.height(48.dp)
+                                ) {
+                                    Text(
+                                        text = "Privacy",
+                                        fontFamily = LexendFontFamily,
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = TextMuted
+                                    )
+                                }
+                            }
+                        }
                     }
                 } else {
                     Box(
@@ -208,6 +249,10 @@ fun ParentDashboardScreen(
                     }
                 }
             }
+        }
+
+        if (showPrivacyDialog) {
+            PrivacyNoticeDialog(onDismiss = { showPrivacyDialog = false })
         }
 
         SnackbarHost(

@@ -1,23 +1,18 @@
 package com.playit.app.presentation.sayit
 
+import com.playit.app.domain.model.articulationFor
+import com.playit.app.presentation.components.ArticulationCue
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,40 +21,42 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
+import android.util.Log
 import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material.icons.rounded.Mic
-import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.ui.graphics.graphicsLayer
+import com.playit.app.domain.manager.TutorAction
+import com.playit.app.presentation.components.breathingPulse
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.playit.app.BuildConfig
+import com.playit.app.domain.manager.SayItFeedbackCopy
+import com.playit.app.domain.model.SpeechErrorType
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import com.playit.app.presentation.components.AudioWaveformBar
 import com.playit.app.presentation.components.ErrorStateContent
 import com.playit.app.presentation.components.GummyButton
 import com.playit.app.presentation.components.GummyContainer
@@ -69,10 +66,14 @@ import com.playit.app.presentation.components.LessonTopBar
 import com.playit.app.presentation.components.MascotSpeechHeader
 import com.playit.app.presentation.components.MascotState
 import com.playit.app.presentation.components.shake
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import com.playit.app.presentation.components.LessonScaffold
+import com.playit.app.presentation.sayit.components.MicButton
 import com.playit.app.presentation.theme.*
-
-private val MIC_CTA_SIZE = 88.dp
-private val MIC_CTA_RING_BOUNDS = 180.dp
 
 @Composable
 fun SayItScreen(
@@ -84,7 +85,7 @@ fun SayItScreen(
     val phoneme by viewModel.phoneme.collectAsStateWithLifecycle()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isModelInitializing by viewModel.isModelInitializing.collectAsStateWithLifecycle()
-    val hearts by viewModel.hearts.collectAsStateWithLifecycle()
+    val canContinue by viewModel.canContinue.collectAsStateWithLifecycle()
     val attempts by viewModel.attempts.collectAsStateWithLifecycle()
     val audioAmplitude by viewModel.audioAmplitude.collectAsStateWithLifecycle()
     val isNoisyEnvironment by viewModel.isNoisyEnvironment.collectAsStateWithLifecycle()
@@ -92,11 +93,33 @@ fun SayItScreen(
     val isPlayingPrompt by viewModel.isPlayingPrompt.collectAsStateWithLifecycle()
     val loadError by viewModel.loadError.collectAsStateWithLifecycle()
     val targetLetter = phoneme?.letter?.uppercase() ?: "M"
+    val d = LocalPlayItDimens.current
+    val reducedMotion = LocalReducedMotion.current
     val targetWord by viewModel.targetWord.collectAsStateWithLifecycle()
     val wordMode = targetWord != null
     val displayWord = targetWord?.replaceFirstChar { it.uppercase() }
-    val isListening = state is SayItState.Listening
     var permissionDeniedMessage by remember { mutableStateOf(false) }
+
+    val tutorAction by viewModel.tutorAction.collectAsStateWithLifecycle()
+    val lastHeard by viewModel.lastHeard.collectAsStateWithLifecycle()
+
+    if (BuildConfig.DEBUG) {
+        LaunchedEffect(lastHeard) {
+            lastHeard?.let {
+                Log.d("PlayIT-SayIt", "Heard: \"${it.transcript}\" -> ${it.errorType} (attempt ${it.attempt})")
+            }
+        }
+    }
+
+    val currentFeedbackCopy = if ((state is SayItState.Correct || state is SayItState.Incorrect) && tutorAction != null) {
+        val errorType = (state as? SayItState.Incorrect)?.errorType ?: SpeechErrorType.NONE
+        SayItFeedbackCopy.forResult(
+            action = tutorAction!!,
+            errorType = errorType,
+            wordMode = wordMode,
+            word = targetWord
+        )
+    } else null
 
     if (loadError) {
         Box(
@@ -124,42 +147,37 @@ fun SayItScreen(
         }
     }
 
-    val toggleListening = {
-        if (isListening) {
-            viewModel.stopListening()
-        } else {
-            val hasPermission = ContextCompat.checkSelfPermission(
-                context, Manifest.permission.RECORD_AUDIO
-            ) == PackageManager.PERMISSION_GRANTED
+    // The mic takes taps only in Idle and Try again; listening ends on a result or the timeout.
+    val startAttempt = {
+        val hasPermission = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.RECORD_AUDIO
+        ) == PackageManager.PERMISSION_GRANTED
 
-            if (hasPermission) {
-                permissionDeniedMessage = false
-                viewModel.startListening()
-            } else {
-                permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-            }
+        if (hasPermission) {
+            permissionDeniedMessage = false
+            viewModel.startListening()
+        } else {
+            permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
         }
     }
 
-    val infiniteTransition = rememberInfiniteTransition(label = "micPulse")
-    val micPulseScale by infiniteTransition.animateFloat(
-        initialValue = 0.95f,
-        targetValue = 1.4f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1200, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "micPulseScale"
-    )
-    val micPulseAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.5f,
-        targetValue = 0.0f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1200, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "micPulseAlpha"
-    )
+    val micStatus by viewModel.micStatus.collectAsStateWithLifecycle()
+    val showMouthCue by viewModel.showMouthCue.collectAsStateWithLifecycle()
+    val showFeedback = state is SayItState.Correct || state is SayItState.Incorrect
+
+    // MainActivity.onStop stops Vosk; drop the attempt here too so the mic is never stuck
+    // in Listening when the child comes back (Review Focus 2).
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_STOP) viewModel.onScreenHidden()
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            viewModel.onScreenHidden()
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -174,17 +192,9 @@ fun SayItScreen(
                 )
             )
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            LessonTopBar(currentStep = LessonStep.SAY_IT, onBack = onBack, hearts = hearts)
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 20.dp, vertical = 6.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+        LessonScaffold(
+            topBar = { LessonTopBar(currentStep = LessonStep.SAY_IT, onBack = onBack, hearts = null) },
+            header = {
                 MascotSpeechHeader(
                     message = when {
                         permissionDeniedMessage -> "Please allow microphone access so Lily can hear you."
@@ -192,8 +202,9 @@ fun SayItScreen(
                         isNoisyEnvironment -> "It's a little noisy right now. Let's find a quiet spot to practice!"
                         state is SayItState.Listening ->
                             if (wordMode) "Listening... Say $displayWord!" else "Listening... Say /${phoneme?.letter ?: "m"}/ into the microphone!"
-                        state is SayItState.Correct -> "Yes! That's it! Great job!"
-                        state is SayItState.Incorrect -> "Good try! Let's listen again."
+                        currentFeedbackCopy != null -> currentFeedbackCopy.mascot
+                        state is SayItState.Correct -> "Yes! You said it!"
+                        state is SayItState.Incorrect -> "Good try! Listen again."
                         wordMode -> "Now it's your turn! Say the whole word clearly into the microphone!"
                         else -> "Now it's your turn. Say the sound clearly into the microphone!"
                     },
@@ -210,139 +221,175 @@ fun SayItScreen(
                     amplitude = audioAmplitude,
                     onMascotTap = { viewModel.playSayItIntroAudio() }
                 )
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                if (wordMode) {
-                    // Word prompt card — reuses the exact Hear It LetterCard (same
-                    // picture_<word>.png illustration, same gummy rendering), so the
-                    // image that shows in Hear It shows here too. Tap replays the word
-                    // audio.
-                    LetterCard(
-                        letter = targetLetter,
-                        soundText = "Say the word $displayWord",
-                        wordOverride = displayWord,
-                        promptMode = true,
-                        showSpeakerIcon = true,
-                        isPlaying = isPlayingPhoneme,
-                        modifier = Modifier.shake(trigger = state is SayItState.Incorrect),
-                        onTapReplay = { viewModel.playWordAudio() }
-                    )
-                } else {
-                    // Legacy letter-sound card (ng/ñ SME-pending letters) — pure phoneme audio
-                    GummyContainer(
-                        onClick = { viewModel.playPhonemeSound() },
-                        faceColor = SurfaceCard,
-                        shadowColor = SurfaceCardShadow,
-                        shape = CardShape,
-                        strokeWidth = 2.5.dp,
-                        strokeColor = ModernBorder,
-                        depthHeight = 6.dp,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(116.dp)
-                            .padding(horizontal = 16.dp)
-                            .shake(trigger = state is SayItState.Incorrect)
+            },
+            bottomBar = {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    AnimatedVisibility(
+                        visible = showFeedback,
+                        enter = fadeIn() + slideInVertically(initialOffsetY = { 20 }),
+                        exit = fadeOut() + slideOutVertically(targetOffsetY = { 20 })
                     ) {
+                        val isCorrect = state is SayItState.Correct
+                        // Third miss: a calm cream banner, not the orange "try again" (card 28).
+                        val movedOn = tutorAction is TutorAction.LeadAndMoveOn
                         Column(
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 14.dp, horizontal = 16.dp),
+                            modifier = Modifier.fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 8.dp)
+                                    .background(
+                                        color = when {
+                                            isCorrect -> EmeraldLeaf
+                                            movedOn -> SunnyGoldLight
+                                            else -> ApricotGlow
+                                        },
+                                        shape = Squircle16
+                                    )
+                                    .border(2.5.dp, ModernBorder, Squircle16)
+                                    .padding(vertical = 8.dp, horizontal = 16.dp),
+                                contentAlignment = Alignment.Center
                             ) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
-                                    contentDescription = "Hear Sound",
-                                    tint = if (isPlayingPhoneme) SunnyGold else PrimaryJoyDark,
-                                    modifier = Modifier.size(24.dp)
-                                )
+                                // One line: a second line makes the pinned bar taller and pushes the mic
+                                // label off small phones, so a long banner shrinks (never below 16 sp).
+                                val bannerText = currentFeedbackCopy?.banner
+                                    ?: if (isCorrect) "Great listening!" else "Listen again"
+                                var bannerSize by remember(bannerText) { mutableStateOf(24.sp) }
                                 Text(
-                                    text = "Sound: /${phoneme?.letter ?: "m"}/",
+                                    text = bannerText,
+                                    color = if (isCorrect) Color.White else TextMidnight,
+                                    fontWeight = FontWeight.Black,
                                     fontFamily = LexendFontFamily,
-                                    fontSize = 24.sp,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = if (isPlayingPhoneme) SunnyGoldDark else PrimaryJoyDark
+                                    fontSize = bannerSize,
+                                    maxLines = 1,
+                                    softWrap = false,
+                                    textAlign = TextAlign.Center,
+                                    onTextLayout = { layout ->
+                                        if (layout.hasVisualOverflow && bannerSize.value > 16f) {
+                                            bannerSize = (bannerSize.value - 2f).sp
+                                        }
+                                    }
                                 )
                             }
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = targetLetter,
-                                fontFamily = LexendFontFamily,
-                                fontSize = 48.sp,
-                                fontWeight = FontWeight.Black,
-                                color = TextMidnight
-                            )
+                            // What Vosk heard goes to Logcat only (see the LaunchedEffect above), never on screen.
                         }
                     }
+
+                    // Next pulses once it unlocks (praise or the third miss) and pops on the change.
+                    val nextPop = remember { Animatable(1f) }
+                    var wasUnlocked by remember { mutableStateOf(canContinue) }
+                    LaunchedEffect(canContinue) {
+                        if (canContinue && !wasUnlocked && !reducedMotion) {
+                            nextPop.animateTo(1.12f, spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium))
+                            nextPop.animateTo(1f, spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium))
+                        }
+                        wasUnlocked = canContinue
+                    }
+                    GummyButton(
+                        text = "Next: Find It",
+                        onClick = { if (canContinue) onNext(phoneme?.id?.toString() ?: "1") },
+                        enabled = canContinue,
+                        backgroundColor = EmeraldLeaf,
+                        shadowColor = EmeraldLeafShadow,
+                        contentColor = Color.White,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 64.dp)
+                            .breathingPulse(enabled = canContinue)
+                            .graphicsLayer {
+                                scaleX = nextPop.value
+                                scaleY = nextPop.value
+                            }
+                    )
                 }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                AudioWaveformBar(isRecording = isListening, activeColor = CoralBerry)
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Box(modifier = Modifier.size(MIC_CTA_RING_BOUNDS), contentAlignment = Alignment.Center) {
-                    if (isListening) {
-                        val dynamicBoost = 1f + (audioAmplitude * 0.35f)
-                        Box(
-                            modifier = Modifier
-                                .size(MIC_CTA_SIZE * dynamicBoost)
-                                .scale(micPulseScale)
-                                .clip(CircleShape)
-                                .background(CoralBerry.copy(alpha = micPulseAlpha))
-                        )
-                    }
-
-                    GummyContainer(
-                        onClick = if (isPlayingPhoneme || isModelInitializing) null else toggleListening,
-                        enabled = !isPlayingPhoneme && !isModelInitializing,
-                        faceColor = when {
-                            isModelInitializing -> CanvasLight
-                            isListening -> CoralBerry
-                            else -> SunnyGold
-                        },
-                        shadowColor = when {
-                            isModelInitializing -> SurfaceCardShadow
-                            isListening -> CoralBerryDark
-                            else -> SunnyGoldShadow
-                        },
-                        shape = CircleShape,
-                        strokeWidth = 2.5.dp,
-                        strokeColor = ModernBorder,
-                        depthHeight = 6.dp,
-                        modifier = Modifier.size(MIC_CTA_SIZE)
-                    ) {
-                        Icon(
-                            imageVector = if (isListening) Icons.Rounded.Stop else Icons.Rounded.Mic,
-                            contentDescription = if (isListening) "Stop Listening" else "Record Voice",
-                            tint = if (isModelInitializing) TextMuted else Color.White,
-                            modifier = Modifier.size(44.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = when {
-                        isModelInitializing -> "Lily is getting ready..."
-                        isListening -> if (wordMode) "Listening... Say $displayWord!" else "Listening... Say the sound!"
-                        else -> "Tap to speak"
-                    },
-                    fontFamily = LexendFontFamily,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = when {
-                        isListening -> CoralBerry
-                        else -> TextMuted
-                    }
+            }
+        ) {
+            if (wordMode) {
+                // Word prompt card: reuses the Hear It LetterCard (same picture_<word>.png
+                // illustration, same gummy rendering). Tap replays the word audio.
+                LetterCard(
+                    letter = targetLetter,
+                    soundText = "Say the word $displayWord",
+                    wordOverride = displayWord,
+                    promptMode = true,
+                    showSpeakerIcon = true,
+                    isPlaying = isPlayingPhoneme,
+                    // Shorter than in Hear It: the mic, its label and the attempt dots sit below it.
+                    modifier = Modifier.heightIn(max = d.letterCardHeight * 0.8f).shake(trigger = state is SayItState.Incorrect),
+                    onTapReplay = { viewModel.playWordAudio() }
                 )
+            } else {
+                // Legacy letter-sound card (ng/ñ SME-pending letters): pure phoneme audio
+                GummyContainer(
+                    onClick = { viewModel.playPhonemeSound() },
+                    faceColor = SurfaceCard,
+                    shadowColor = SurfaceCardShadow,
+                    shape = CardShape,
+                    strokeWidth = 2.5.dp,
+                    strokeColor = ModernBorder,
+                    depthHeight = 6.dp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = d.letterCardHeight * 0.8f)
+                        .shake(trigger = state is SayItState.Incorrect)
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp, horizontal = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
+                                contentDescription = "Hear Sound",
+                                tint = if (isPlayingPhoneme) SunnyGold else PrimaryJoyDark,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(
+                                text = "Sound: /${phoneme?.letter ?: "m"}/",
+                                fontFamily = LexendFontFamily,
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                maxLines = 1,
+                                color = if (isPlayingPhoneme) SunnyGoldDark else PrimaryJoyDark
+                            )
+                        }
+                        Text(
+                            text = targetLetter,
+                            fontFamily = LexendFontFamily,
+                            fontSize = 48.sp,
+                            fontWeight = FontWeight.Black,
+                            maxLines = 1,
+                            color = TextMidnight
+                        )
+                    }
+                }
+            }
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                // "Watch my lips": from the second miss the mouth shape shows beside the mic.
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (showMouthCue) {
+                        ArticulationCue(group = articulationFor(phoneme?.letter ?: "m"), size = 96.dp)
+                    }
+                    MicButton(
+                        status = micStatus,
+                        onTap = startAttempt,
+                        enabled = !isPlayingPhoneme && !isModelInitializing,
+                        labelOverride = if (isModelInitializing) "Lily is getting ready..." else null
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
+                // Attempt dots: a check for a correct try, a plain orange dot for a miss.
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                     val maxAttempts = 3
                     for (i in 0 until maxAttempts) {
@@ -371,67 +418,6 @@ fun SayItScreen(
                         }
                     }
                 }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row(
-                    modifier = Modifier
-                        .background(SurfaceCard, PillShape)
-                        .border(1.5.dp, ModernBorderSoft, PillShape)
-                        .padding(horizontal = 12.dp, vertical = 5.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(if (isNoisyEnvironment) ApricotGlow else EmeraldLeaf))
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = if (isNoisyEnvironment) "Noise: High" else "Noise: Good",
-                        color = TextMuted,
-                        fontSize = 11.5.sp,
-                        fontFamily = LexendFontFamily,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                AnimatedVisibility(
-                    visible = state is SayItState.Correct || state is SayItState.Incorrect,
-                    enter = fadeIn() + slideInVertically(initialOffsetY = { 20 }),
-                    exit = fadeOut() + slideOutVertically(targetOffsetY = { 20 })
-                ) {
-                    val isCorrect = state is SayItState.Correct
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 6.dp)
-                            .background(color = if (isCorrect) EmeraldLeaf else ApricotGlow, shape = Squircle16)
-                            .border(2.5.dp, ModernBorder, Squircle16)
-                            .padding(vertical = 10.dp, horizontal = 16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = if (isCorrect) "Awesome pronunciation!" else "Good try! Let's try again.",
-                            color = if (isCorrect) Color.White else TextMidnight,
-                            fontWeight = FontWeight.Black,
-                            fontFamily = LexendFontFamily,
-                            fontSize = 24.sp
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-
-            Box(modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 24.dp, vertical = 12.dp)) {
-                GummyButton(
-                    text = "Next: Find It",
-                    onClick = { if (state is SayItState.Correct) onNext(phoneme?.id?.toString() ?: "1") },
-                    enabled = state is SayItState.Correct,
-                    backgroundColor = EmeraldLeaf,
-                    shadowColor = EmeraldLeafShadow,
-                    contentColor = Color.White,
-                    modifier = Modifier.fillMaxWidth().height(64.dp)
-                )
             }
         }
     }

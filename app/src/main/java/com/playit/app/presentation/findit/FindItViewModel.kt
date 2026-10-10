@@ -14,6 +14,7 @@ import com.playit.app.domain.model.Phoneme
 import com.playit.app.domain.repository.FindItAttemptRepository
 import com.playit.app.domain.repository.PhonemeRepository
 import com.playit.app.navigation.SessionManager
+import com.playit.app.presentation.components.IdleTimer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -60,6 +61,11 @@ class FindItViewModel @Inject constructor(
 
     val heartManager = HeartManager()
 
+    val sessionHeartsLost: Int
+        get() = heartManager.sessionHeartsLost
+
+    private var consecutiveCorrect: Int = 0
+
     private val _hearts = MutableStateFlow(heartManager.currentHearts)
     val hearts: StateFlow<Int> = _hearts.asStateFlow()
 
@@ -69,8 +75,30 @@ class FindItViewModel @Inject constructor(
     private val _loadError = MutableStateFlow(false)
     val loadError: StateFlow<Boolean> = _loadError.asStateFlow()
 
-    init {
-        loadGrid()
+    private val _nextHighlighted = MutableStateFlow(false)
+    val nextHighlighted: StateFlow<Boolean> = _nextHighlighted.asStateFlow()
+
+    private val idleTimer = IdleTimer(
+        scope = viewModelScope,
+        isBusy = { _isPlaying.value || _isPlayingPrompt.value }
+    ) {
+        if (_nextHighlighted.value) {
+            audioPlayer.playAssetAudio(audioResolver.getUiPath("ui_findit_next"))
+        } else {
+            playFindItIntroAudio()
+        }
+    }
+
+    fun onScreenVisible() {
+        idleTimer.start()
+    }
+
+    fun onScreenHidden() {
+        idleTimer.stop()
+    }
+
+    fun onUserInteraction() {
+        idleTimer.touch()
     }
 
     private fun loadGrid() {
@@ -99,6 +127,10 @@ class FindItViewModel @Inject constructor(
 
     private val _isPlayingPrompt = MutableStateFlow(false)
     val isPlayingPrompt: StateFlow<Boolean> = _isPlayingPrompt.asStateFlow()
+
+    init {
+        loadGrid()
+    }
 
     fun playIntroThenTargetSound() {
         audioPlayer.stop()
@@ -150,6 +182,10 @@ class FindItViewModel @Inject constructor(
         }
 
         if (item.isCorrect) {
+            consecutiveCorrect++
+            heartManager.checkRecovery(consecutiveCorrect)
+            _hearts.value = heartManager.currentHearts
+
             val newFound = _foundItemIds.value + item.id
             _foundItemIds.value = newFound
             _foundCount.value = newFound.size
@@ -158,13 +194,16 @@ class FindItViewModel @Inject constructor(
 
             if (newFound.size >= 3) {
                 _state.value = FindItState.Completed(target.letter)
+                _nextHighlighted.value = true
                 val vo = audioResolver.getRotatingCorrectVo()
-                audioPlayer.playSequence(listOf(sfx, vo))
+                val nextCue = audioResolver.getUiPath("ui_findit_next")
+                audioPlayer.playSequence(listOf(sfx, vo, nextCue))
             } else {
                 _state.value = FindItState.FoundOne(item, newFound.size)
                 audioPlayer.playAssetAudio(sfx)
             }
         } else {
+            consecutiveCorrect = 0
             val isGameOver = heartManager.deductHeart()
             _hearts.value = heartManager.currentHearts
 
@@ -183,14 +222,17 @@ class FindItViewModel @Inject constructor(
     }
 
     fun restartSession() {
+        consecutiveCorrect = 0
         heartManager.resetForRestart()
         _hearts.value = heartManager.currentHearts
+        _nextHighlighted.value = false
         _state.value = FindItState.Idle
         loadGrid()
     }
 
     override fun onCleared() {
         super.onCleared()
+        idleTimer.stop()
         audioPlayer.stop()
     }
 }

@@ -1,5 +1,6 @@
 package com.playit.app.di
 
+import com.playit.app.domain.model.BlendItWord
 import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -48,6 +49,21 @@ object DatabaseModule {
             }
 
             private fun seedDatabaseRaw(db: SupportSQLiteDatabase) {
+                seedPhonemesAndGroups(db)
+                // Every open: word ids never change, so progress keyed on them is untouched (card 15).
+                try {
+                    BLEND_IT_WORD_SEEDS.forEach { w ->
+                        db.execSQL(
+                            "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (?, ?, ?, ?, ?, ?)",
+                            arrayOf<Any>(w.wordId, w.groupId, w.word, w.wordPattern, w.audioPath, w.imagePath)
+                        )
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("DatabaseModule", "Failed to seed Blend It words", e)
+                }
+            }
+
+            private fun seedPhonemesAndGroups(db: SupportSQLiteDatabase) {
                 try {
                     val cursor = db.query("SELECT COUNT(*) FROM phonemes")
                     var count = 0
@@ -117,56 +133,6 @@ object DatabaseModule {
                                 }
                             }
 
-                            // 4. Seed 33 BlendIt Words
-                            val words = listOf(
-                                // Group 1 (3 words: M, S, A, I)
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (1, 1, 'SAM', 'S-A-M', 'audio/words/word_sam.mp3', 'images/pictures/blendword_sam.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (2, 1, 'SIS', 'S-I-S', 'audio/words/word_sis.mp3', 'images/pictures/blendword_sis.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (3, 1, 'AIM', 'A-I-M', 'audio/words/word_aim.mp3', 'images/pictures/blendword_aim.png');",
-
-                                // Group 2 (5 words: + O, B, E, U)
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (4, 2, 'BUS', 'B-U-S', 'audio/words/word_bus.mp3', 'images/pictures/blendword_bus.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (5, 2, 'SUB', 'S-U-B', 'audio/words/word_sub.mp3', 'images/pictures/blendword_sub.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (6, 2, 'MOM', 'M-O-M', 'audio/words/word_mom.mp3', 'images/pictures/blendword_mom.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (7, 2, 'BEE', 'B-E-E', 'audio/words/word_bee.mp3', 'images/pictures/blendword_bee.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (8, 2, 'BIB', 'B-I-B', 'audio/words/word_bib.mp3', 'images/pictures/blendword_bib.png');",
-
-                                // Group 3 (5 words: + T, K, L, Y)
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (9, 3, 'BAT', 'B-A-T', 'audio/words/word_bat.mp3', 'images/pictures/blendword_bat.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (10, 3, 'MAT', 'M-A-T', 'audio/words/word_mat.mp3', 'images/pictures/blendword_mat.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (11, 3, 'KIT', 'K-I-T', 'audio/words/word_kit.mp3', 'images/pictures/blendword_kit.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (12, 3, 'TOY', 'T-O-Y', 'audio/words/word_toy.mp3', 'images/pictures/blendword_toy.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (13, 3, 'BOY', 'B-O-Y', 'audio/words/word_boy.mp3', 'images/pictures/blendword_boy.png');",
-
-                                // Group 4 (5 words: + N, G, P)
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (14, 4, 'PIG', 'P-I-G', 'audio/words/word_pig.mp3', 'images/pictures/blendword_pig.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (15, 4, 'PAN', 'P-A-N', 'audio/words/word_pan.mp3', 'images/pictures/blendword_pan.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (16, 4, 'BUG', 'B-U-G', 'audio/words/word_bug.mp3', 'images/pictures/blendword_bug.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (17, 4, 'PIN', 'P-I-N', 'audio/words/word_pin.mp3', 'images/pictures/blendword_pin.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (18, 4, 'NAP', 'N-A-P', 'audio/words/word_nap.mp3', 'images/pictures/blendword_nap.png');",
-
-                                // Group 5 (5 words: + R, D, H, W)
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (19, 5, 'DOG', 'D-O-G', 'audio/words/word_dog.mp3', 'images/pictures/blendword_dog.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (20, 5, 'HAT', 'H-A-T', 'audio/words/word_hat.mp3', 'images/pictures/blendword_hat.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (21, 5, 'HEN', 'H-E-N', 'audio/words/word_hen.mp3', 'images/pictures/blendword_hen.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (22, 5, 'BED', 'B-E-D', 'audio/words/word_bed.mp3', 'images/pictures/blendword_bed.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (23, 5, 'WEB', 'W-E-B', 'audio/words/word_web.mp3', 'images/pictures/blendword_web.png');",
-
-                                // Group 6 (5 words: + C, F, J)
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (24, 6, 'CAT', 'C-A-T', 'audio/words/word_cat.mp3', 'images/pictures/blendword_cat.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (25, 6, 'FAN', 'F-A-N', 'audio/words/word_fan.mp3', 'images/pictures/blendword_fan.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (26, 6, 'CAP', 'C-A-P', 'audio/words/word_cap.mp3', 'images/pictures/blendword_cap.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (27, 6, 'CUP', 'C-U-P', 'audio/words/word_cup.mp3', 'images/pictures/blendword_cup.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (28, 6, 'JAM', 'J-A-M', 'audio/words/word_jam.mp3', 'images/pictures/blendword_jam.png');",
-
-                                // Group 7 (5 words: + Q, V, X, Z)
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (29, 7, 'VAN', 'V-A-N', 'audio/words/word_van.mp3', 'images/pictures/blendword_van.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (30, 7, 'BOX', 'B-O-X', 'audio/words/word_box.mp3', 'images/pictures/blendword_box.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (31, 7, 'FOX', 'F-O-X', 'audio/words/word_fox.mp3', 'images/pictures/blendword_fox.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (32, 7, 'ZOO', 'Z-O-O', 'audio/words/word_zoo.mp3', 'images/pictures/blendword_zoo.png');",
-                                "INSERT OR REPLACE INTO blend_it_words (wordId, groupId, word, wordPattern, audioPath, imagePath) VALUES (33, 7, 'QUIZ', 'Q-U-I-Z', 'audio/words/word_quiz.mp3', 'images/pictures/blendword_quiz.png');"
-                            )
-                            words.forEach { db.execSQL(it) }
 
                             db.setTransactionSuccessful()
                         } finally {
@@ -215,3 +181,44 @@ object DatabaseModule {
     @Provides
     fun provideAchievementDao(db: PlayItDatabase): AchievementDao = db.achievementDao()
 }
+
+/**
+ * The 33 Blend It words, 3 in group 1 and 5 in each later group. Each word uses only letters
+ * taught up to its group (QUIZ is the documented exception: qu). Card 15 (2026-10-09) replaced
+ * the non-decodable AIM, BEE, TOY, BOY and ZOO with AM, SUM, TUB, YAM and ZIP.
+ */
+internal val BLEND_IT_WORD_SEEDS: List<BlendItWord> = listOf(
+    BlendItWord(1, 1, "SAM", "S-A-M", "audio/words/word_sam.mp3", "images/pictures/blendword_sam.png"),
+    BlendItWord(2, 1, "SIS", "S-I-S", "audio/words/word_sis.mp3", "images/pictures/blendword_sis.png"),
+    BlendItWord(3, 1, "AM", "A-M", "audio/words/word_am.mp3", "images/pictures/blendword_am.png"),
+    BlendItWord(4, 2, "BUS", "B-U-S", "audio/words/word_bus.mp3", "images/pictures/blendword_bus.png"),
+    BlendItWord(5, 2, "SUB", "S-U-B", "audio/words/word_sub.mp3", "images/pictures/blendword_sub.png"),
+    BlendItWord(6, 2, "MOM", "M-O-M", "audio/words/word_mom.mp3", "images/pictures/blendword_mom.png"),
+    BlendItWord(7, 2, "SUM", "S-U-M", "audio/words/word_sum.mp3", "images/pictures/blendword_sum.png"),
+    BlendItWord(8, 2, "BIB", "B-I-B", "audio/words/word_bib.mp3", "images/pictures/blendword_bib.png"),
+    BlendItWord(9, 3, "BAT", "B-A-T", "audio/words/word_bat.mp3", "images/pictures/blendword_bat.png"),
+    BlendItWord(10, 3, "MAT", "M-A-T", "audio/words/word_mat.mp3", "images/pictures/blendword_mat.png"),
+    BlendItWord(11, 3, "KIT", "K-I-T", "audio/words/word_kit.mp3", "images/pictures/blendword_kit.png"),
+    BlendItWord(12, 3, "TUB", "T-U-B", "audio/words/word_tub.mp3", "images/pictures/blendword_tub.png"),
+    BlendItWord(13, 3, "YAM", "Y-A-M", "audio/words/word_yam.mp3", "images/pictures/blendword_yam.png"),
+    BlendItWord(14, 4, "PIG", "P-I-G", "audio/words/word_pig.mp3", "images/pictures/blendword_pig.png"),
+    BlendItWord(15, 4, "PAN", "P-A-N", "audio/words/word_pan.mp3", "images/pictures/blendword_pan.png"),
+    BlendItWord(16, 4, "BUG", "B-U-G", "audio/words/word_bug.mp3", "images/pictures/blendword_bug.png"),
+    BlendItWord(17, 4, "PIN", "P-I-N", "audio/words/word_pin.mp3", "images/pictures/blendword_pin.png"),
+    BlendItWord(18, 4, "NAP", "N-A-P", "audio/words/word_nap.mp3", "images/pictures/blendword_nap.png"),
+    BlendItWord(19, 5, "DOG", "D-O-G", "audio/words/word_dog.mp3", "images/pictures/blendword_dog.png"),
+    BlendItWord(20, 5, "HAT", "H-A-T", "audio/words/word_hat.mp3", "images/pictures/blendword_hat.png"),
+    BlendItWord(21, 5, "HEN", "H-E-N", "audio/words/word_hen.mp3", "images/pictures/blendword_hen.png"),
+    BlendItWord(22, 5, "BED", "B-E-D", "audio/words/word_bed.mp3", "images/pictures/blendword_bed.png"),
+    BlendItWord(23, 5, "WEB", "W-E-B", "audio/words/word_web.mp3", "images/pictures/blendword_web.png"),
+    BlendItWord(24, 6, "CAT", "C-A-T", "audio/words/word_cat.mp3", "images/pictures/blendword_cat.png"),
+    BlendItWord(25, 6, "FAN", "F-A-N", "audio/words/word_fan.mp3", "images/pictures/blendword_fan.png"),
+    BlendItWord(26, 6, "CAP", "C-A-P", "audio/words/word_cap.mp3", "images/pictures/blendword_cap.png"),
+    BlendItWord(27, 6, "CUP", "C-U-P", "audio/words/word_cup.mp3", "images/pictures/blendword_cup.png"),
+    BlendItWord(28, 6, "JAM", "J-A-M", "audio/words/word_jam.mp3", "images/pictures/blendword_jam.png"),
+    BlendItWord(29, 7, "VAN", "V-A-N", "audio/words/word_van.mp3", "images/pictures/blendword_van.png"),
+    BlendItWord(30, 7, "BOX", "B-O-X", "audio/words/word_box.mp3", "images/pictures/blendword_box.png"),
+    BlendItWord(31, 7, "FOX", "F-O-X", "audio/words/word_fox.mp3", "images/pictures/blendword_fox.png"),
+    BlendItWord(32, 7, "ZIP", "Z-I-P", "audio/words/word_zip.mp3", "images/pictures/blendword_zip.png"),
+    BlendItWord(33, 7, "QUIZ", "Q-U-I-Z", "audio/words/word_quiz.mp3", "images/pictures/blendword_quiz.png")
+)

@@ -23,7 +23,7 @@ class GridGenerator @Inject constructor() {
         "o" to listOf("Orange" to "images/pictures/picture_orange.png", "Owl" to "images/pictures/picture_owl.png", "Ox" to "images/pictures/picture_ox.png"),
         "b" to listOf("Ball" to "images/pictures/picture_ball.png", "Bat" to "images/pictures/blendword_bat.png", "Bus" to "images/pictures/blendword_bus.png"),
         "e" to listOf("Elephant" to "images/pictures/picture_elephant.png", "Egg" to "images/pictures/picture_egg.png", "Envelope" to "images/pictures/picture_envelope.png"),
-        "u" to listOf("Umbrella" to "images/pictures/picture_umbrella.png", "Up" to "images/pictures/blendword_sub.png", "Uncle" to "images/pictures/picture_uncle.png"),
+        "u" to listOf("Umbrella" to "images/pictures/picture_umbrella.png", "Up" to "images/pictures/picture_up.png", "Uncle" to "images/pictures/picture_uncle.png"),
         "t" to listOf("Tiger" to "images/pictures/picture_tiger.png", "Tree" to "images/pictures/picture_tree.png", "Top" to "images/pictures/picture_top.png"),
         "k" to listOf("Kite" to "images/pictures/picture_kite.png", "Kit" to "images/pictures/blendword_kit.png", "Key" to "images/pictures/picture_key.png"),
         "l" to listOf("Lion" to "images/pictures/picture_lion.png", "Lit" to "images/pictures/blendword_lit.png", "Leaf" to "images/pictures/picture_leaf.png"),
@@ -45,6 +45,16 @@ class GridGenerator @Inject constructor() {
         "x" to listOf("Box" to "images/pictures/picture_box.png", "Fox" to "images/pictures/blendword_fox.png", "Six" to "images/pictures/picture_six.png"),
         "z" to listOf("Zebra" to "images/pictures/picture_zebra.png", "Zoo" to "images/pictures/blendword_zoo.png", "Zip" to "images/pictures/picture_zip.png")
     )
+
+    /** Banks that never give distractors: x lists words that END in x; ng and ñ are not curriculum letters (pending SME). */
+    private val noDistractorBanks = setOf("x", "ng", "ñ")
+    /** Letters that share a first sound; a distractor never comes from the target's group. */
+    private val sameSoundGroups = listOf(setOf("c", "k", "q"))
+
+    internal fun distractorLettersFor(target: String): List<String> {
+        val group = sameSoundGroups.firstOrNull { target in it } ?: setOf(target)
+        return pictureBank.keys.filter { it !in group && it !in noDistractorBanks }
+    }
 
     /**
      * Generates a 5-item grid with EXACTLY 3 correct target pictures and 2 distractors.
@@ -68,7 +78,7 @@ class GridGenerator @Inject constructor() {
         }
 
         // Pick 2 distractors from other phonemes
-        val distractorLetters = pictureBank.keys.filter { it != cleanTarget }.shuffled()
+        val distractorLetters = distractorLettersFor(cleanTarget).shuffled()
         val distractorItems = mutableListOf<FindItPictureItem>()
         for (distLetter in distractorLetters) {
             val distList = pictureBank[distLetter] ?: continue

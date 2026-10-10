@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.playit.app.presentation.components.IdleTimer
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,19 +31,56 @@ class BlendItCompleteViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val groupIdArg: String? = savedStateHandle["groupId"]
+    private val heartsLostArg: String? = savedStateHandle["heartsLost"]
+    private val wordsCorrectArg: String? = savedStateHandle["wordsCorrect"]
+    private val totalWordsArg: String? = savedStateHandle["totalWords"]
+
     val groupId: Int = groupIdArg?.toIntOrNull() ?: 1
 
     private val _starsEarned = MutableStateFlow(3)
     val starsEarned: StateFlow<Int> = _starsEarned.asStateFlow()
+
+    private val _isPlaying = MutableStateFlow(false)
+    val isPlaying: StateFlow<Boolean> = _isPlaying.asStateFlow()
+
+    private val _nextHighlighted = MutableStateFlow(false)
+    val nextHighlighted: StateFlow<Boolean> = _nextHighlighted.asStateFlow()
+
+    private val idleTimer = IdleTimer(
+        scope = viewModelScope,
+        isBusy = { _isPlaying.value },
+        onIdle = { audioPlayer.playAssetAudio(audioResolver.getUiPath("ui_complete_next")) }
+    )
+
+    fun onScreenVisible() {
+        idleTimer.start()
+    }
+
+    fun onScreenHidden() {
+        idleTimer.stop()
+    }
+
+    fun onUserInteraction() {
+        idleTimer.touch()
+    }
 
     init {
         completeSession()
     }
 
     private fun completeSession() {
+        val heartsLost = heartsLostArg?.toIntOrNull()?.coerceAtLeast(0) ?: 0
+        val wordsCorrect = wordsCorrectArg?.toIntOrNull()?.coerceAtLeast(0) ?: 5
+        val totalWords = totalWordsArg?.toIntOrNull()?.coerceAtLeast(1) ?: 5
         val profileId = sessionManager.activeProfileId.value ?: 1L
+
         viewModelScope.launch {
-            val stars = BlendItStarThresholds.calculateStars(groupId, totalHeartsLost = 0)
+            val stars = BlendItStarThresholds.calculateStars(
+                groupId = groupId,
+                totalHeartsLost = heartsLost,
+                wordsCorrect = wordsCorrect,
+                totalWords = totalWords
+            )
             _starsEarned.value = stars
 
             blendItProgressRepository.saveProgress(
@@ -50,25 +88,31 @@ class BlendItCompleteViewModel @Inject constructor(
                     profileId = profileId,
                     groupId = groupId,
                     starsEarned = stars,
-                    heartsLost = 0,
+                    heartsLost = heartsLost,
                     isCompleted = true,
                     completedAt = System.currentTimeMillis()
                 )
             )
             streakTracker.recordActivity(profileId)
 
-            // Play completion fanfare + complete VO line + milestone/streak badge unlock audio
+            // Play completion fanfare + complete VO line + milestone/streak badge unlock audio + next cue
             val fanfareSfx = audioResolver.getSfxPath(SfxEvent.LEVEL_COMPLETE_FANFARE)
             val completeVo = audioResolver.getVoPath(VoContext.COMPLETE_01)
             val streakSfx = audioResolver.getSfxPath(SfxEvent.STREAK_BADGE_UNLOCK)
             val streakVo = audioResolver.getVoPath(VoContext.STREAK_01)
+            val nextCue = audioResolver.getUiPath("ui_complete_next")
 
-            audioPlayer.playSequence(listOf(fanfareSfx, completeVo, streakSfx, streakVo))
+            _nextHighlighted.value = true
+            _isPlaying.value = true
+            audioPlayer.playSequence(listOf(fanfareSfx, completeVo, streakSfx, streakVo, nextCue)) {
+                _isPlaying.value = false
+            }
         }
     }
 
     override fun onCleared() {
         super.onCleared()
+        idleTimer.stop()
         audioPlayer.stop()
     }
 }

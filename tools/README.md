@@ -13,7 +13,8 @@ tools/
 ├── mcp servers.png           # Reference: Awesome MCP Servers (92K stars)
 ├── tool 1.png                # Reference: AI Media, Audio & Video Generation Suite
 ├── README.md                 # This guide
-├── elevenlabs_voice_studio.py# Filipina Voice Synthesizer (ElevenLabs API + Zero-Cost Edge Neural)
+├── audio/                    # Kokoro-82M audio pipeline (kokoro_local.py, voice_candidates.py; playit_audio.ipynb as the Colab backup)
+├── dev/                      # WSL build env: setup_wsl_env.sh (JDK 17, Android SDK 34), gradlew_wsl.sh (runs Gradle with it)
 ├── dictionary_validator.py   # Phonics Curriculum & CVC Discovery via Public APIs
 └── asset_pipeline_optimizer.py # Alpha Background Removal & 4-Benchmark Outline Styler
 ```
@@ -46,17 +47,19 @@ tools/
 
 ## 3. How to Use the Integrated Tools
 
-### A. Voice Studio (`elevenlabs_voice_studio.py`)
+### A. Voice Studio (archived: `docs/archive/tools/elevenlabs_voice_studio.py`)
+
+> Superseded for audio by `docs/specs/hear-say-refactor.md` §2.3 (Kokoro, Sep 2026). The current pipeline is `tools/audio/kokoro_local.py` (run locally), with `tools/audio/playit_audio.ipynb` as the Colab backup. The archived script is kept for reference only.
 
 ```bash
 # 1. Synthesize using the natural Filipina English Neural Voice (Free, no API key required)
-python tools/elevenlabs_voice_studio.py --preset rosa --text "Welcome to PlayIT! Let's learn phonics together."
+python docs/archive/tools/elevenlabs_voice_studio.py --preset rosa --text "Welcome to PlayIT! Let's learn phonics together."
 
 # 2. Synthesize using ElevenLabs with your API Key & custom Filipina Voice ID
-python tools/elevenlabs_voice_studio.py --preset elevenlabs_custom --voice-id <YOUR_VOICE_ID> --api-key <YOUR_KEY> --text "Great job! You found the letter M!"
+python docs/archive/tools/elevenlabs_voice_studio.py --preset elevenlabs_custom --voice-id <YOUR_VOICE_ID> --api-key <YOUR_KEY> --text "Great job! You found the letter M!"
 
 # 3. Batch synthesize all 24 mascot voice-over lines directly into the app
-python tools/elevenlabs_voice_studio.py --preset rosa --batch-all
+python docs/archive/tools/elevenlabs_voice_studio.py --preset rosa --batch-all
 ```
 
 ---
@@ -87,4 +90,4 @@ python tools/asset_pipeline_optimizer.py --input raw_character.png --out app/src
 
 ### D. Automated CI/CD (GitHub Actions)
 
-Located in [`.github/workflows/android_ci.yml`](../.github/workflows/android_ci.yml), this workflow automatically runs unit tests and compiles the fresh debug APK on every commit to `main`.
+Located in [`.github/workflows/android_ci.yml`](../.github/workflows/android_ci.yml), this workflow runs the unit tests and compiles a debug APK on every push to `main` and on every pull request to `main` (including each push to a branch with an open PR).

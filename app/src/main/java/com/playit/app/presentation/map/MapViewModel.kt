@@ -18,8 +18,10 @@ import com.playit.app.domain.repository.PhonemeRepository
 import com.playit.app.domain.repository.ProfileRepository
 import com.playit.app.navigation.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -55,17 +57,6 @@ class MapViewModel @Inject constructor(
 
     val activeProfileId: StateFlow<Long?> = sessionManager.activeProfileId
 
-    init {
-        viewModelScope.launch {
-            activeProfileId.collect { profileId ->
-                if (profileId != null) {
-                    streakTracker.resetIfInactive(profileId)
-                    streakTracker.recordActivity(profileId)
-                }
-            }
-        }
-    }
-
     fun playHeartRecoverySound() {
         val sfx = audioResolver.getSfxPath(SfxEvent.HEART_RECOVERY_SPARKLE)
         audioPlayer.playAssetAudio(sfx)
@@ -79,12 +70,43 @@ class MapViewModel @Inject constructor(
 
     fun onLockedNodeTapped() {
         val sfx = audioResolver.getSfxPath(SfxEvent.INCORRECT_POP)
-        val vo = audioResolver.getRotatingEncourageVo()
+        val vo = audioResolver.getUiPath("ui_node_locked")
         audioPlayer.playSequence(listOf(sfx, vo))
+    }
+
+    fun onUnlockedNodeTapped() {
+        val vo = audioResolver.getUiPath("ui_node_start")
+        audioPlayer.playAssetAudio(vo)
     }
 
     fun clearSession() {
         sessionManager.clearActiveProfile()
+    }
+
+    private val _newlyUnlockedNodeId = MutableStateFlow<String?>(null)
+
+    /** A node that went from locked to unlocked between two loads (the child just earned it); null after it is shown. */
+    val newlyUnlockedNodeId: StateFlow<String?> = _newlyUnlockedNodeId.asStateFlow()
+
+    /** Unlocked node ids of the previous load; null until the first load, which is never an unlock. */
+    private var previousUnlockedIds: Set<String>? = null
+    private var trackedProfileId: Long? = null
+
+    private fun trackUnlocks(nodes: List<MapNode>) {
+        val unlocked = nodes.filter { it.isUnlocked }.map { it.id }.toSet()
+        val before = previousUnlockedIds
+        if (before != null) {
+            nodes.firstOrNull { it.isUnlocked && it.id !in before }?.let { _newlyUnlockedNodeId.value = it.id }
+        }
+        previousUnlockedIds = unlocked
+    }
+
+    fun onUnlockShown() {
+        _newlyUnlockedNodeId.value = null
+    }
+
+    fun playUnlockChime() {
+        audioPlayer.playAssetAudio(audioResolver.getSfxPath(SfxEvent.NODE_UNLOCK_CHIME))
     }
 
     val userStats: StateFlow<UserMapStats> = activeProfileId.flatMapLatest { profileId ->
@@ -109,6 +131,12 @@ class MapViewModel @Inject constructor(
     )
 
     val mapNodes: StateFlow<List<MapNode>> = activeProfileId.flatMapLatest { profileId ->
+        // Another child's map: its first load is not an unlock. The same child coming back from a
+        // lesson resubscribes here too, and keeps the comparison.
+        if (profileId != trackedProfileId) {
+            trackedProfileId = profileId
+            previousUnlockedIds = null
+        }
         if (profileId == null) return@flatMapLatest flowOf(emptyList())
 
         combine(
@@ -154,6 +182,7 @@ class MapViewModel @Inject constructor(
                 )
             }
 
+            trackUnlocks(nodesList)
             nodesList
         }
     }.stateIn(
@@ -161,6 +190,17 @@ class MapViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
+
+    init {
+        viewModelScope.launch {
+            activeProfileId.collect { profileId ->
+                if (profileId != null) {
+                    streakTracker.resetIfInactive(profileId)
+                    streakTracker.recordActivity(profileId)
+                }
+            }
+        }
+    }
 
     override fun onCleared() {
         super.onCleared()

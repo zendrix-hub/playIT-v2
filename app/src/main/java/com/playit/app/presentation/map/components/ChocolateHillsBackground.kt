@@ -1,18 +1,23 @@
 package com.playit.app.presentation.map.components
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
@@ -63,34 +68,50 @@ fun ChocolateHillsBackground(
             .height(totalHeight)
             .background(backgroundBrush)
     ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val w = size.width
-            val h = size.height
-
-            val zoneHeight = h / 6f
-
-            // ── Zone 1: Chocolate Hills & Clear Morning Sun (0% - 17%) ───────
-            drawVisibleSunAndClouds(w)
-            drawChocolateHillsZone(w, baseY = zoneHeight * 0.95f)
-
-            // ── Zone 2: Loboc River Valley (17% - 34%) ───────────────────────
-            drawLobocRiverZone(w, startY = zoneHeight * 1.0f, height = zoneHeight)
-
-            // ── Zone 3: Panglao Coral Shore (34% - 50%) ───────────────────────
-            drawPanglaoCoralZone(w, startY = zoneHeight * 2.0f, height = zoneHeight)
-
-            // ── Zone 4: Tarsier Rainforest Sanctuary (50% - 67%) ─────────────
-            drawTarsierRainforestZone(w, startY = zoneHeight * 3.0f, height = zoneHeight)
-
-            // ── Zone 5: Bohol Mountain Summit (67% - 84%) ─────────────────────
-            drawMountainSummitZone(w, startY = zoneHeight * 4.0f, height = zoneHeight)
-
-            // ── Zone 6: Baclayon Heritage (84% - 100%) ────────────────────────
-            drawBaclayonHeritageZone(w, startY = zoneHeight * 5.0f, height = zoneHeight)
-        }
+        // The scene is recorded once per size into a Picture (drawWithCache), so redraws while the
+        // map scrolls replay it instead of rebuilding every hill, river and cloud path.
+        Spacer(
+            Modifier
+                .fillMaxSize()
+                .drawWithCache {
+                    val picture = android.graphics.Picture()
+                    val recording = Canvas(picture.beginRecording(size.width.toInt(), size.height.toInt()))
+                    CanvasDrawScope().draw(this, layoutDirection, recording, size) { drawBoholScene() }
+                    picture.endRecording()
+                    onDrawBehind { drawIntoCanvas { it.nativeCanvas.drawPicture(picture) } }
+                }
+        )
 
         content()
     }
+}
+
+
+/** The six Bohol zones, top to bottom, each one sixth of the map height. */
+private fun DrawScope.drawBoholScene() {
+    val w = size.width
+    val h = size.height
+
+    val zoneHeight = h / 6f
+
+    // ── Zone 1: Chocolate Hills & Clear Morning Sun (0% - 17%) ───────
+    drawVisibleSunAndClouds(w)
+    drawChocolateHillsZone(w, baseY = zoneHeight * 0.95f)
+
+    // ── Zone 2: Loboc River Valley (17% - 34%) ───────────────────────
+    drawLobocRiverZone(w, startY = zoneHeight * 1.0f, height = zoneHeight)
+
+    // ── Zone 3: Panglao Coral Shore (34% - 50%) ───────────────────────
+    drawPanglaoCoralZone(w, startY = zoneHeight * 2.0f, height = zoneHeight)
+
+    // ── Zone 4: Tarsier Rainforest Sanctuary (50% - 67%) ─────────────
+    drawTarsierRainforestZone(w, startY = zoneHeight * 3.0f, height = zoneHeight)
+
+    // ── Zone 5: Bohol Mountain Summit (67% - 84%) ─────────────────────
+    drawMountainSummitZone(w, startY = zoneHeight * 4.0f, height = zoneHeight)
+
+    // ── Zone 6: Baclayon Heritage (84% - 100%) ────────────────────────
+    drawBaclayonHeritageZone(w, startY = zoneHeight * 5.0f, height = zoneHeight)
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════

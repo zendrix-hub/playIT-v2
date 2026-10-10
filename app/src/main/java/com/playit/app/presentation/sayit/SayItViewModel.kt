@@ -10,16 +10,23 @@ import com.playit.app.data.audio.VoContext
 import com.playit.app.data.speech.VoskRecognizer
 import com.playit.app.domain.manager.HeartManager
 import com.playit.app.domain.manager.SpeechValidator
+import com.playit.app.domain.manager.TutorAction
+import com.playit.app.domain.manager.TutorPolicy
 import com.playit.app.domain.model.Phoneme
 import com.playit.app.domain.repository.PhonemeRepository
+import com.playit.app.domain.model.SpeechErrorType
+import com.playit.app.domain.model.SpeechJudgement
 import com.playit.app.domain.repository.SayItAttemptRepository
 import com.playit.app.navigation.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,8 +34,18 @@ sealed class SayItState {
     object Idle : SayItState()
     object Listening : SayItState()
     data class Correct(val transcript: String) : SayItState()
-    data class Incorrect(val transcript: String) : SayItState()
+    data class Incorrect(
+        val transcript: String,
+        val errorType: SpeechErrorType = SpeechErrorType.OTHER_WORD
+    ) : SayItState()
 }
+
+data class HeardAttempt(
+    val transcript: String,
+    val errorType: SpeechErrorType,
+    val isCorrect: Boolean,
+    val attempt: Int
+)
 
 @HiltViewModel
 class SayItViewModel @Inject constructor(
@@ -57,10 +74,35 @@ class SayItViewModel @Inject constructor(
     private val _state = MutableStateFlow<SayItState>(SayItState.Idle)
     val state: StateFlow<SayItState> = _state.asStateFlow()
 
+    /** True once the recognizer returned any speech in the current listening window. */
+    private val _heardSpeech = MutableStateFlow(false)
+
+    private val _tutorAction = MutableStateFlow<TutorAction?>(null)
+    val tutorAction: StateFlow<TutorAction?> = _tutorAction.asStateFlow()
+
+    /** After the third miss the mic rests (DONE) instead of offering a retry it would ignore (card 28). */
+    val micStatus: StateFlow<MicStatus> = combine(_state, _heardSpeech, _tutorAction) { s, h, action ->
+        micStatusFor(s, h, movedOn = action is TutorAction.LeadAndMoveOn)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, MicStatus.IDLE)
+
     val heartManager = HeartManager()
 
     private val _hearts = MutableStateFlow(heartManager.currentHearts)
     val hearts: StateFlow<Int> = _hearts.asStateFlow()
+
+    private val tutorPolicy = TutorPolicy()
+    private var attemptNumber = 0
+
+    private val _lastHeard = MutableStateFlow<HeardAttempt?>(null)
+    val lastHeard: StateFlow<HeardAttempt?> = _lastHeard.asStateFlow()
+
+    /** True after praise or lead-and-move-on: no more scored attempts until the phoneme reloads. */
+    private val _canContinue = MutableStateFlow(false)
+    val canContinue: StateFlow<Boolean> = _canContinue.asStateFlow()
+
+    /** "Watch my lips": the mouth-shape cue shows from the second miss on (spec Table 7 attempt 2). */
+    private val _showMouthCue = MutableStateFlow(false)
+    val showMouthCue: StateFlow<Boolean> = _showMouthCue.asStateFlow()
 
     private val _attempts = MutableStateFlow<List<Boolean>>(emptyList())
     val attempts: StateFlow<List<Boolean>> = _attempts.asStateFlow()
@@ -82,13 +124,14 @@ class SayItViewModel @Inject constructor(
 
     private var autoStopJob: Job? = null
 
-    init {
-        loadPhoneme()
-    }
-
     private fun loadPhoneme() {
         val id = phonemeIdArg?.toIntOrNull() ?: 1
         viewModelScope.launch {
+            attemptNumber = 0
+            _tutorAction.value = null
+            _canContinue.value = false
+            _lastHeard.value = null
+            _showMouthCue.value = false
             val p = phonemeRepository.getPhonemeById(id)
             if (p == null) {
                 _loadError.value = true
@@ -161,6 +204,10 @@ class SayItViewModel @Inject constructor(
     private var lastAudioPlayTime: Long = 0L
     private val AUDIO_DEBOUNCE_MS = 500L
 
+    init {
+        loadPhoneme()
+    }
+
     /**
      * Plays the target example-word audio (e.g. audio/words/word_mouse.mp3) as the model
      * utterance. Falls back to the pure phoneme sound in legacy (letter-sound) mode.
@@ -186,7 +233,7 @@ class SayItViewModel @Inject constructor(
         }
         audioPlayer.stop()
         _isPlayingPrompt.value = false
-        val path = audioResolver.getWordPath(target)
+        val path = audioResolver.getKeyWordPath(target)
         _isPlayingPhoneme.value = true
         audioPlayer.playAssetAudio(path) {
             _isPlayingPhoneme.value = false
@@ -230,23 +277,18 @@ class SayItViewModel @Inject constructor(
 
     fun startListening() {
         if (_state.value is SayItState.Listening) return
+        if (_canContinue.value) return
 
         // Instantly silence any voiceover or phoneme audio so it never bleeds into the mic
         audioPlayer.stop()
         _isPlayingPhoneme.value = false
 
         autoStopJob?.cancel()
-        // Word mode: target = the example word to say (e.g. "mouse"). Legacy mode: the
-        // letter sound. Grammar is scoped to the accepted variants + generic decoy words.
         val targetWord = _targetWord.value
-        val target = targetWord ?: _phoneme.value?.letter?.lowercase() ?: "m"
-        val acceptedList = if (targetWord != null) {
-            speechValidator.getAcceptedWordVariants(targetWord)
-        } else {
-            speechValidator.getAcceptedVariants(target)
-        }
-        voskRecognizer.setGrammar((acceptedList + listOf("cat", "dog", "sun", "ball", "yes", "no")).distinct())
+        val letter = _phoneme.value?.letter?.lowercase() ?: "m"
+        voskRecognizer.setGrammar(speechValidator.grammarFor(letter, targetWord))
 
+        _heardSpeech.value = false
         _state.value = SayItState.Listening
         _isNoisyEnvironment.value = false
 
@@ -258,15 +300,15 @@ class SayItViewModel @Inject constructor(
             }
         }
 
+        // Stop early only on a correct result. A wrong partial can be the start of the
+        // target word ("ma" in "mouse", "a" in "apple"), so wrong answers are judged only
+        // on a final result or at the timeout.
         voskRecognizer.startListening(
-            onResult = { transcript ->
+            onResult = { transcript, isFinal ->
                 if (transcript.isNotBlank() && _state.value is SayItState.Listening) {
-                    val isCorrect = if (targetWord != null) {
-                        speechValidator.validateWord(transcript, targetWord)
-                    } else {
-                        speechValidator.validate(transcript, target)
-                    }
-                    if (isCorrect) {
+                    _heardSpeech.value = true
+                    val judgement = judgeTranscript(transcript, targetWord, letter)
+                    if (judgement.isCorrect || isFinal) {
                         autoStopJob?.cancel()
                         voskRecognizer.stopListening()
                         evaluateSpeech(transcript)
@@ -274,6 +316,21 @@ class SayItViewModel @Inject constructor(
                 }
             }
         )
+    }
+
+    private fun judgeTranscript(transcript: String, targetWord: String?, letter: String): SpeechJudgement {
+        return when {
+            targetWord != null -> speechValidator.judgeWord(transcript, targetWord, letter)
+            letter == "ng" || letter == "ñ" -> {
+                val ok = speechValidator.validate(transcript, letter)
+                SpeechJudgement(
+                    isCorrect = ok,
+                    errorType = if (ok) SpeechErrorType.NONE else SpeechErrorType.OTHER_WORD,
+                    heard = transcript
+                )
+            }
+            else -> speechValidator.judgeSound(transcript, letter, null)
+        }
     }
 
     fun stopListening() {
@@ -286,17 +343,24 @@ class SayItViewModel @Inject constructor(
     }
 
     fun evaluateSpeech(transcript: String) {
+        attemptNumber++
         autoStopJob?.cancel()
         _audioAmplitude.value = 0f
         val targetWord = _targetWord.value
-        val targetLetter = _phoneme.value?.letter ?: "m"
-        val isCorrect = if (targetWord != null) {
-            speechValidator.validateWord(transcript, targetWord)
-        } else {
-            speechValidator.validate(transcript, targetLetter)
-        }
+        val letter = _phoneme.value?.letter?.lowercase() ?: "m"
+        val judgement = judgeTranscript(transcript, targetWord, letter)
+        val isCorrect = judgement.isCorrect
+        _lastHeard.value = HeardAttempt(
+            transcript = transcript,
+            errorType = judgement.errorType,
+            isCorrect = isCorrect,
+            attempt = attemptNumber
+        )
         val profileId = sessionManager.activeProfileId.value ?: 1L
         val phonemeId = _phoneme.value?.id ?: 1
+
+        val action = tutorPolicy.next(attemptNumber, judgement)
+        _tutorAction.value = action
 
         _attempts.value = _attempts.value + isCorrect
 
@@ -305,20 +369,93 @@ class SayItViewModel @Inject constructor(
         }
 
         if (isCorrect) {
-            _state.value = SayItState.Correct(transcript.ifBlank { targetWord ?: targetLetter })
-            val sfx = audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME)
-            val vo = audioResolver.getRotatingCorrectVo()
-            audioPlayer.playSequence(listOf(sfx, vo))
+            _state.value = SayItState.Correct(transcript.ifBlank { targetWord ?: letter })
         } else {
-            heartManager.deductHeart()
-            _hearts.value = heartManager.currentHearts
-            _state.value = SayItState.Incorrect(transcript.ifBlank { "Try again!" })
-
-            val sfxPop = audioResolver.getSfxPath(SfxEvent.INCORRECT_POP)
-            val sfxWhoosh = audioResolver.getSfxPath(SfxEvent.HEART_LOSS_WHOOSH)
-            val voEncourage = audioResolver.getRotatingEncourageVo()
-            audioPlayer.playSequence(listOf(sfxPop, sfxWhoosh, voEncourage))
+            _state.value = SayItState.Incorrect(
+                transcript = transcript.ifBlank { "Try again!" },
+                errorType = judgement.errorType
+            )
         }
+
+        val model = if (targetWord != null) {
+            audioResolver.getKeyWordPath(targetWord)
+        } else {
+            audioResolver.getPhonemePath(letter)
+        }
+
+        when (action) {
+            is TutorAction.Praise -> {
+                val sfx = audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME)
+                val vo = audioResolver.getRotatingCorrectVo()
+                audioPlayer.playSequence(listOf(sfx, vo))
+                _canContinue.value = true
+            }
+            is TutorAction.Correct -> {
+                if (action.supportLevel >= 2) _showMouthCue.value = true
+                val pop = audioResolver.getSfxPath(SfxEvent.INCORRECT_POP)
+                val yourTurn = audioResolver.getTutorPath("car_your_turn")
+                val sequence = if (action.supportLevel == 1) {
+                    listOf(pop) + levelOneCorrection(action.errorType, letter, targetWord) + yourTurn
+                } else {
+                    listOf(pop, audioResolver.getTutorPath("car_watch_my_lips"), model, yourTurn)
+                }
+                audioPlayer.playSequence(sequence)
+            }
+            is TutorAction.LeadAndMoveOn -> {
+                _showMouthCue.value = true
+                // TODO(FR-NEW-REC): mark the letter NEEDS_PRACTICE and queue a recall check. Not before
+                // Room v4 with real migrations: PlayItDatabase is v3 with fallbackToDestructiveMigration(),
+                // so a new table now would wipe every child's progress (card 28). The three misses are
+                // already saved as SayItAttempt rows.
+                // The unlock chime says "Next is open"; the correct chime stays for right answers.
+                audioPlayer.playSequence(
+                    listOf(
+                        audioResolver.getTutorPath("car_lets_say_together"),
+                        model,
+                        audioResolver.getTutorPath("fb_try_later"),
+                        audioResolver.getSfxPath(SfxEvent.NODE_UNLOCK_CHIME)
+                    )
+                )
+                _canContinue.value = true
+            }
+        }
+    }
+
+    /**
+     * First-miss correction between the pop and "Your turn!" (spec §3.2; tools/audio/tutor_script.py
+     * COMPOSE corr_letter_name, corr_added_vowel, remodel). The key word is left out in
+     * letter-sound mode (ng, ñ).
+     */
+    private fun levelOneCorrection(errorType: SpeechErrorType, letter: String, word: String?): List<String> {
+        val sound = audioResolver.getPhonemePath(letter)
+        val keyWord = listOfNotNull(word?.let { audioResolver.getKeyWordPath(it) })
+        return when (errorType) {
+            SpeechErrorType.LETTER_NAME -> listOf(
+                audioResolver.getTutorPath("fb_letter_name"),
+                audioResolver.getTutorPath("fb_its_sound_is"),
+                sound
+            ) + keyWord
+            SpeechErrorType.ADDED_VOWEL -> listOf(
+                audioResolver.getTutorPath("fb_almost_just"),
+                sound,
+                audioResolver.getTutorPath("fb_no_ah")
+            ) + keyWord
+            else -> listOf(audioResolver.getTutorPath("fb_listen"), sound) + keyWord
+        }
+    }
+
+    /**
+     * The screen went to the background (MainActivity.onStop stops Vosk) or left composition.
+     * A listening attempt is dropped unjudged, so the mic is never stuck in Listening.
+     */
+    fun onScreenHidden() {
+        autoStopJob?.cancel()
+        if (_state.value is SayItState.Listening) {
+            voskRecognizer.stopListening()
+            _state.value = SayItState.Idle
+            _audioAmplitude.value = 0f
+        }
+        _heardSpeech.value = false
     }
 
     fun simulateCorrectForTesting() {

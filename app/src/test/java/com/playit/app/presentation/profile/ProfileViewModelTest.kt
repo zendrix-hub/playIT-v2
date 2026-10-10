@@ -35,6 +35,7 @@ class ProfileViewModelTest {
         every { profileRepository.getAllProfiles() } returns profilesFlow
         every { audioResolver.getSfxPath(any()) } returns "sfx_path.mp3"
         every { audioResolver.getVoPath(any()) } returns "vo_path.mp3"
+        every { audioResolver.getUiPath(any()) } answers { "ui/${firstArg<String>()}.wav" }
         viewModel = ProfileViewModel(profileRepository, sessionManager, audioPlayer, audioResolver)
     }
 
@@ -44,13 +45,34 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun createProfile_withBlankName_emitsError() = runTest {
-        viewModel.createProfile("   ", 1)
+    fun createProfile_blankName_usesAvatarName() = runTest {
+        coEvery { profileRepository.createProfile("Bunny", 3) } returns Result.success(42L)
+
+        viewModel.createProfile("", 3)
         advanceUntilIdle()
 
-        assertTrue(viewModel.uiState.value is ProfileUiState.Error)
-        assertEquals("Please enter a valid name.", (viewModel.uiState.value as ProfileUiState.Error).message)
-        coVerify(exactly = 0) { profileRepository.createProfile(any(), any()) }
+        assertTrue(viewModel.uiState.value is ProfileUiState.Created)
+        assertEquals(42L, (viewModel.uiState.value as ProfileUiState.Created).profileId)
+        coVerify { profileRepository.createProfile("Bunny", 3) }
+        verify { sessionManager.setActiveProfile(42L) }
+    }
+
+    @Test
+    fun createProfile_typedName_isKept() = runTest {
+        coEvery { profileRepository.createProfile("Ana", 1) } returns Result.success(10L)
+
+        viewModel.createProfile("  Ana ", 1)
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value is ProfileUiState.Created)
+        coVerify { profileRepository.createProfile("Ana", 1) }
+    }
+
+    @Test
+    fun namePromptIntro_playsPickAvatar() {
+        viewModel.playNamePromptIntro()
+
+        verify { audioPlayer.playAssetAudio("ui/ui_pick_avatar.wav", any()) }
     }
 
     @Test

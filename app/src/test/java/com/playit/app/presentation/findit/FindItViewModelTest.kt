@@ -60,6 +60,7 @@ class FindItViewModelTest {
         every { audioResolver.getRotatingCorrectVo() } returns "correct_vo"
         every { audioResolver.getRotatingEncourageVo() } returns "encourage_vo"
         every { audioResolver.getVoPath(any()) } returns "vo_path.mp3"
+        every { audioResolver.getUiPath(any()) } answers { "ui/${firstArg<String>()}.wav" }
     }
 
     @After
@@ -183,5 +184,101 @@ class FindItViewModelTest {
         assertEquals(3, viewModel.hearts.value) // DEPLETED_RESTART_HEARTS = 3
         assertEquals(0, viewModel.foundCount.value)
         assertFalse(viewModel.state.value is FindItState.GameOver)
+    }
+
+    @Test
+    fun completion_appendsNextCue() = runTest {
+        viewModel = FindItViewModel(
+            phonemeRepository, findItAttemptRepository, gridGenerator,
+            sessionManager, audioPlayer, audioResolver, savedStateHandle
+        )
+        advanceUntilIdle()
+
+        viewModel.selectPictureItem(mockPictureGrid[0])
+        viewModel.selectPictureItem(mockPictureGrid[1])
+        viewModel.selectPictureItem(mockPictureGrid[2])
+        advanceUntilIdle()
+
+        assertTrue(viewModel.nextHighlighted.value)
+        val sequences = mutableListOf<List<String>>()
+        verify { audioPlayer.playSequence(capture(sequences), any()) }
+        assertTrue(sequences.any { it.last() == "ui/ui_findit_next.wav" })
+    }
+
+    @Test
+    fun idle_replaysIntro() = runTest {
+        every { audioPlayer.playAssetAudio(any(), any()) } answers {
+            secondArg<(() -> Unit)?>()?.invoke()
+        }
+
+        viewModel = FindItViewModel(
+            phonemeRepository, findItAttemptRepository, gridGenerator,
+            sessionManager, audioPlayer, audioResolver, savedStateHandle
+        )
+        advanceUntilIdle()
+
+        clearMocks(audioPlayer, answers = false)
+        viewModel.onScreenVisible()
+        advanceTimeBy(10_001)
+
+        verify(exactly = 1) { audioPlayer.playAssetAudio("vo_path.mp3", any()) }
+    }
+
+    @Test
+    fun wrongTaps_countIntoSessionHeartsLost() = runTest {
+        viewModel = FindItViewModel(
+            phonemeRepository, findItAttemptRepository, gridGenerator,
+            sessionManager, audioPlayer, audioResolver, savedStateHandle
+        )
+        advanceUntilIdle()
+
+        viewModel.selectPictureItem(mockPictureGrid[3])
+        viewModel.selectPictureItem(mockPictureGrid[4])
+        advanceUntilIdle()
+
+        assertEquals(2, viewModel.sessionHeartsLost)
+    }
+
+    @Test
+    fun sessionHeartsLost_survivesRestart() = runTest {
+        viewModel = FindItViewModel(
+            phonemeRepository, findItAttemptRepository, gridGenerator,
+            sessionManager, audioPlayer, audioResolver, savedStateHandle
+        )
+        advanceUntilIdle()
+
+        repeat(5) {
+            viewModel.selectPictureItem(mockPictureGrid[3])
+        }
+        advanceUntilIdle()
+
+        viewModel.restartSession()
+        advanceUntilIdle()
+
+        viewModel.selectPictureItem(mockPictureGrid[3])
+        advanceUntilIdle()
+
+        assertEquals(6, viewModel.sessionHeartsLost)
+        assertEquals(2, viewModel.hearts.value)
+    }
+
+    @Test
+    fun threeCorrectInARow_recoversAHeart() = runTest {
+        viewModel = FindItViewModel(
+            phonemeRepository, findItAttemptRepository, gridGenerator,
+            sessionManager, audioPlayer, audioResolver, savedStateHandle
+        )
+        advanceUntilIdle()
+
+        viewModel.selectPictureItem(mockPictureGrid[3])
+        advanceUntilIdle()
+        assertEquals(4, viewModel.hearts.value)
+
+        viewModel.selectPictureItem(mockPictureGrid[0])
+        viewModel.selectPictureItem(mockPictureGrid[1])
+        viewModel.selectPictureItem(mockPictureGrid[2])
+        advanceUntilIdle()
+
+        assertEquals(5, viewModel.hearts.value)
     }
 }

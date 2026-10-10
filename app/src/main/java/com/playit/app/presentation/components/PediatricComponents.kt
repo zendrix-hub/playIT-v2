@@ -285,7 +285,7 @@ fun StarDisplay(
                 contentDescription = if (isEarned) "Star Earned" else "Star Locked",
                 modifier = Modifier
                     .size(starSize)
-                    .popIn(delayMillis = (i - 1) * 120)
+                    .starDrop(index = i - 1)
                     .graphicsLayer { alpha = if (isEarned) 1f else 0.3f }
             )
         }

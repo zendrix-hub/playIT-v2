@@ -27,6 +27,16 @@ jobs:
       - name: Run Unit Tests
         run: ./gradlew testDebugUnitTest
 
+      - name: Record Screenshots
+        run: ./gradlew recordRoborazziDebug --tests 'com.playit.app.screenshot.*'
+
+      - name: Upload Screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: playIT-screenshots
+          path: app/build/outputs/roborazzi/
+          if-no-files-found: error
+
       - name: Assemble Debug APK
         run: ./gradlew assembleDebug
 

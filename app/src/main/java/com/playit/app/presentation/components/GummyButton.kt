@@ -37,12 +37,12 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.unit.Constraints
 import com.playit.app.presentation.theme.*
 import kotlin.math.roundToInt
 
@@ -67,7 +67,6 @@ fun GummyContainer(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val isReducedMotion = LocalReducedMotion.current
-    val haptic = LocalHapticFeedback.current
 
     val effectiveFace = if (enabled) faceColor else DisabledColor
     val effectiveShadow = if (enabled) shadowColor else DisabledColorShadow
@@ -108,55 +107,68 @@ fun GummyContainer(
             indication = null,
             enabled = enabled,
             onClick = {
-                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                 onClick()
             }
         )
     } else Modifier
 
-    Box(
+    // Custom layout: the container is as big as its content's natural size, clamped to the caller's
+    // limits (size/heightIn/fillMaxWidth). Big content grows it instead of spilling out, and content
+    // that uses fillMaxSize still fills only the container (Claude dry run 2026-10-06).
+    Layout(
         modifier = modifier
             .graphicsLayer {
                 scaleX = squashScaleX
                 scaleY = squashScaleY
             }
             .then(clickableModifier),
-        contentAlignment = Alignment.Center
-    ) {
-        // Bottom depth band layer (shadow color)
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .offset(y = depthHeight)
-                .background(effectiveShadow, shape)
-                .border(strokeWidth, strokeColor, shape)
-        )
-
-        // Top face layer (face color + content) translated down on press
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .offset { IntOffset(0, pressOffsetY.dp.roundToPx()) }
-                .background(effectiveFace, shape)
-                .border(strokeWidth, strokeColor, shape),
-            contentAlignment = Alignment.Center
-        ) {
-            // Modern subtle top gloss highlight sheen
+        content = {
+            // Bottom depth band layer (shadow color)
             Box(
                 modifier = Modifier
-                    .matchParentSize()
-                    .clip(shape)
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                Color.White.copy(alpha = 0.22f),
-                                Color.White.copy(alpha = 0.04f),
-                                Color.Transparent
+                    .offset(y = depthHeight)
+                    .background(effectiveShadow, shape)
+                    .border(strokeWidth, strokeColor, shape)
+            )
+            // Top face layer (face color + content) translated down on press
+            Box(
+                modifier = Modifier
+                    .offset { IntOffset(0, pressOffsetY.dp.roundToPx()) }
+                    .background(effectiveFace, shape)
+                    .border(strokeWidth, strokeColor, shape),
+                contentAlignment = Alignment.Center
+            ) {
+                // Modern subtle top gloss highlight sheen
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clip(shape)
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.White.copy(alpha = 0.22f),
+                                    Color.White.copy(alpha = 0.04f),
+                                    Color.Transparent
+                                )
                             )
                         )
-                    )
-            )
-            content()
+                )
+                content()
+            }
+        }
+    ) { measurables, constraints ->
+        val band = measurables[0]
+        val face = measurables[1]
+        val width = if (constraints.hasFixedWidth) constraints.maxWidth
+            else face.maxIntrinsicWidth(constraints.maxHeight).coerceIn(constraints.minWidth, constraints.maxWidth)
+        val height = if (constraints.hasFixedHeight) constraints.maxHeight
+            else face.minIntrinsicHeight(width).coerceIn(constraints.minHeight, constraints.maxHeight)
+        val exact = Constraints.fixed(width, height)
+        val bandPlaceable = band.measure(exact)
+        val facePlaceable = face.measure(exact)
+        layout(width, height) {
+            bandPlaceable.place(0, 0)
+            facePlaceable.place(0, 0)
         }
     }
 }

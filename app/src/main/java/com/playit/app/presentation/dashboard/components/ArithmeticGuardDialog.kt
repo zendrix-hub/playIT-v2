@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -221,7 +222,7 @@ fun ArithmeticGuardDialog(
                         contentColor = Color.White,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(52.dp),
+                            .heightIn(min = 52.dp),
                         onClick = {
                             if (gateManager.validateAnswer(problem, answerInput)) {
                                 onCorrectSound()
@@ -273,7 +274,7 @@ private fun KeypadNumberButton(
         strokeWidth = 1.5.dp,
         strokeColor = ModernBorderSoft,
         depthHeight = 3.dp,
-        modifier = modifier.height(50.dp)
+        modifier = modifier.heightIn(min = 50.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
@@ -300,7 +301,7 @@ private fun KeypadDeleteButton(
         strokeWidth = 1.5.dp,
         strokeColor = CoralBerry.copy(alpha = 0.4f),
         depthHeight = 3.dp,
-        modifier = modifier.height(50.dp)
+        modifier = modifier.heightIn(min = 50.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Icon(
@@ -326,7 +327,7 @@ private fun KeypadClearButton(
         strokeWidth = 1.5.dp,
         strokeColor = ModernBorderSoft,
         depthHeight = 3.dp,
-        modifier = modifier.height(50.dp)
+        modifier = modifier.heightIn(min = 50.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(

@@ -11,5 +11,6 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.23")
         classpath("com.google.dagger:hilt-android-gradle-plugin:2.51.1")
         classpath("com.google.devtools.ksp:symbol-processing-gradle-plugin:1.9.23-1.0.20")
+        classpath("io.github.takahirom.roborazzi:roborazzi-gradle-plugin:1.26.0")
     }
 }

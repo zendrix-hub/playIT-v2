@@ -60,7 +60,6 @@ fun MascotBubbleComponent(
                 GummyMotionAsset(
                     assetPath = mascotState.assetPath,
                     contentDescription = "Lily the Tarsier (${mascotState.name})",
-                    isIdleFloating = true,
                     floatDistance = 2.dp,
                     modifier = Modifier
                         .fillMaxSize()

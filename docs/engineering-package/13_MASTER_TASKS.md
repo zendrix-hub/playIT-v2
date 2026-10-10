@@ -251,5 +251,43 @@ Change: Say It now asks the child to utter the letter's example WORD (m → "Mou
 - [x] **Zero-Emoji Policy Compliance**: Ensured zero emojis in UI text, buttons, titles, and speech bubbles; exclusively used Material vector graphics and transparent asset renders.
 - [x] **Compilation & APK Generation**: Verified clean compilation via `./gradlew compileDebugKotlin` and assembled `app-debug.apk` (97 MB) into workspace root `./playit-debug.apk`.
 
-
+## Hear It / Say It refactor
+Each card ticks its own item in its commit (see `docs/tasks/AGY_RUNBOOK.md`). A tick means the card is committed; CI and phone-test results are in `docs/evidence-log.md`.
+- [x] Card 00: Agent rules, precedence, housekeeping
+- [x] Card 01: Speech judge returns error types; stop accepting letter names and added vowels (NFR-ASR-01)
+- [x] Card 02: Scope the Vosk grammar to each letter's foils; carry the error type into Say It state (NFR-ASR-01, FR-03)
+- [x] Card 03: Tutor policy: prompt ladder, no hearts in Say It, corrective audio (FR-03)
+- [x] Card 04: Hear It modeling sequence (I do) (FR-02)
+- [x] Card 05: Approved key words and tutor carriers into the app (NFR-AUD-01, FR-02)
+- [x] Card 06: Say It feedback text follows the error type; debug transcript overlay (FR-03, NFR-ASR-01)
+- [x] Card 07: Idle re-prompt (10 s) and spoken next-step cues (NFR-IND-01)
+- [x] Card 07b: Avatar-only onboarding, parent rename, voiced map pop-up (NFR-IND-01)
+- [x] Card 08: Image batch 1, Find It and key-word pictures picked by the user (asset card; Claude ticks it from picks.json) (FR-05)
+- [x] Card 09: Approved held /m/ replaces the Edge-TTS clip (NFR-AUD-01, FR-02)
+- [x] Card 09b: Approved held /s/ replaces the Edge-TTS clip (NFR-AUD-01, FR-02)
+- [x] Card 10: Screenshot tests for changed screens (Roborazzi), uploaded by CI
+- [x] Card 11: Stars and hearts use real results (FR-04, FR-06, FR-13)
+- [x] Card 12: Find It distractors, gentle correction colour, no emoji in the PDF (FR-05, FR-12)
+- [x] Card 13: Approved batch-1 pictures in the app (FR-05)
+- [x] Card 03b: Say It corrections from fragments around the sound (FR-03)
+- [x] Card 14: Privacy pack: no cloud backup, delete a child's data, privacy notice (FR-14)
+- [x] Card 15: Decodable Blend It word list, 5 words per chapter, teacher-confirmed (FR-13). Word list by user decision 2026-10-09; teacher confirmation and AM/TUB/YAM/ZIP assets pending
+- [ ] Card 16: Blend It word card fits its text (screenshot finding) (FR-13). Superseded by card 20
+- [x] Card 17: Performance and calm motion: no haptics, downscaled images, no endless idle animation, portrait (NFR-PERF-01)
+- [x] Card 17b: ViewModel init blocks run after every property (crash fix from Claude's dry run)
+- [x] Card 17c: Pictures decode immediately in tests so screenshots are reliable
+- [x] Card 26: Lesson voice lines in the Kokoro voice (NFR-AUD-01)
+- [x] Card 26b: Remove the unused AudioCompletenessCheck class (fix card from the card 26 review)
+- [x] Card 18: Adaptive layout foundation, LessonScaffold, 4-size layout tests (NFR-ACC-02)
+- [x] Card 19: Hear It and Say It fit; Say It mic states (FR-03, NFR-ACC-02)
+- [x] Card 20: Find It and Blend It fit (FR-05, FR-13)
+- [x] Card 21: Complete, splash and profile screens fit; child text styles (NFR-ACC-02)
+- [x] Card 22: Map overhaul: rope trail, compact header, scales to every phone, unlock moment (FR-01)
+- [x] Card 23: Purposeful effects: transitions, correct pop, heart wobble, star drop, centre confetti (NFR-ACC-02)
+- [x] Card 24: Sound captions and mouth-shape cues (NFR-ACC-01, FR-02, FR-03)
+- [x] Card 25: Mouth-shape pictures picked by the user (asset card; Claude ticks it from picks.json) (NFR-ACC-01)
+- [ ] Card 24b: Mouth-shape pictures in the app from image release 2026-10-10-mouth; Hear It cue beside the play button (NFR-ACC-01)
+- [x] Card 27: Refactor and synchronize academic documentation: SDD v2.0, SRS v3.0, and SPMP v2.0
+- [x] Card 28: UX and pedagogy refinements: Hear It ends on the sound with no captions, Say It third miss rests the mic and unlocks Next with no debug text, Blend It in English with a full sound-out, live star totals, one-tap map start and a short greeting (FR-01, FR-02, FR-03, FR-13, NFR-ACC-01, NFR-ACC-02)
+- [ ] Card 29: Mascot poses and companion avatar art refresh (asset card)
 

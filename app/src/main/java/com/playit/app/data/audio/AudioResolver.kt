@@ -54,6 +54,35 @@ class AudioResolver @Inject constructor() {
     private val encourageCounter = AtomicInteger(0)
     private val hintCounter = AtomicInteger(0)
 
+    /** Lesson lines released in the Kokoro voice (docs/audio-release/2026-10-07); the rest stay on the old MP3s. */
+    private val kokoroLessonVo = setOf(
+        "welcome_01",
+        "encourage_01",
+        "encourage_02",
+        "encourage_03",
+        "correct_01",
+        "correct_02",
+        "hint_01",
+        "hint_02",
+        "streak_01",
+        "complete_01",
+        "unlock_01",
+        "blendit_intro_01",
+        "findit_intro_01",
+        "sayit_intro_01",
+        "sayit_word_intro_01",
+        "quiet_check_01",
+        "noise_alert_01",
+        "map_tarana",
+        "parent_gate"
+    )
+
+    private fun lessonVoPath(suffix: String): String =
+        if (suffix in kokoroLessonVo) "audio/vo/lesson/vo_$suffix.wav" else "audio/ui/vo_$suffix.mp3"
+
+    /** Letter sounds released as user-approved held sounds (docs/audio-release); the rest are still the old MP3s. */
+    private val releasedPhonemes = setOf("m", "s")
+
     /**
      * Resolves the asset path for a phoneme letter.
      */
@@ -63,6 +92,7 @@ class AudioResolver @Inject constructor() {
             "ñ", "enye" -> "enye"
             else -> clean
         }
+        if (key in releasedPhonemes) return "audio/phonemes/ph_$key.wav"
         return "audio/phonemes/phoneme_$key.mp3"
     }
 
@@ -72,6 +102,14 @@ class AudioResolver @Inject constructor() {
     fun getWordPath(word: String): String {
         val clean = word.lowercase().trim()
         return "audio/words/word_$clean.mp3"
+    }
+
+    /**
+     * Resolves the asset path for a key word.
+     */
+    fun getKeyWordPath(word: String): String {
+        val clean = word.lowercase().trim().replace("-", "")
+        return "audio/keywords/kw_$clean.wav"
     }
 
     /**
@@ -85,8 +123,18 @@ class AudioResolver @Inject constructor() {
      * Resolves the asset path for a mascot VO line.
      */
     fun getVoPath(vo: VoContext): String {
-        return "audio/ui/vo_${vo.filenameSuffix}.mp3"
+        return lessonVoPath(vo.filenameSuffix)
     }
+
+    /**
+     * Resolves the asset path for a tutor VO fragment.
+     */
+    fun getTutorPath(id: String): String = "audio/vo/tutor/$id.wav"
+
+    /**
+     * Resolves the asset path for a spoken UI cue line.
+     */
+    fun getUiPath(id: String): String = "audio/vo/ui/$id.wav"
 
     /**
      * Rotates between vo_correct_01 and vo_correct_02.
@@ -94,7 +142,7 @@ class AudioResolver @Inject constructor() {
     fun getRotatingCorrectVo(): String {
         val count = correctCounter.getAndIncrement()
         val suffix = if (count % 2 == 0) "correct_01" else "correct_02"
-        return "audio/ui/vo_$suffix.mp3"
+        return lessonVoPath(suffix)
     }
 
     /**
@@ -103,7 +151,7 @@ class AudioResolver @Inject constructor() {
     fun getRotatingEncourageVo(): String {
         val count = encourageCounter.getAndIncrement()
         val idx = (count % 3) + 1
-        return "audio/ui/vo_encourage_0$idx.mp3"
+        return lessonVoPath("encourage_0$idx")
     }
 
     /**
@@ -112,7 +160,7 @@ class AudioResolver @Inject constructor() {
     fun getRotatingHintVo(): String {
         val count = hintCounter.getAndIncrement()
         val suffix = if (count % 2 == 0) "hint_01" else "hint_02"
-        return "audio/ui/vo_$suffix.mp3"
+        return lessonVoPath(suffix)
     }
 
     /**
@@ -129,6 +177,10 @@ class AudioResolver @Inject constructor() {
         return when {
             assetPath.startsWith("audio/phonemes/") -> DevAudioCategory.PHONEME.assetPath
             assetPath.startsWith("audio/words/") -> DevAudioCategory.WORD.assetPath
+            assetPath.contains("audio/keywords/") -> DevAudioCategory.WORD.assetPath
+            assetPath.contains("audio/vo/lesson/") -> DevAudioCategory.VO.assetPath
+            assetPath.contains("audio/vo/tutor/") -> DevAudioCategory.VO.assetPath
+            assetPath.contains("audio/vo/ui/") -> DevAudioCategory.VO.assetPath
             assetPath.contains("sfx_") -> DevAudioCategory.SFX.assetPath
             assetPath.contains("vo_") -> DevAudioCategory.VO.assetPath
             else -> DevAudioCategory.SFX.assetPath

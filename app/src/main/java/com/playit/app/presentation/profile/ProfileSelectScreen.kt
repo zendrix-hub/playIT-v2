@@ -1,5 +1,8 @@
 package com.playit.app.presentation.profile
 
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.testTag
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -75,7 +78,7 @@ fun ProfileSelectScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(90.dp)
+                .heightIn(min = 72.dp)
                 .align(Alignment.BottomCenter),
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.Center
@@ -110,20 +113,20 @@ fun ProfileSelectScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                     Text(
                         text = "Who is playing?",
-                        fontFamily = LexendFontFamily,
-                        fontSize = 26.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Ink
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = Ink,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = "Choose your profile",
-                        fontFamily = LexendFontFamily,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = InkSoft
+                        style = MaterialTheme.typography.titleSmall,
+                        color = InkSoft,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
@@ -135,7 +138,7 @@ fun ProfileSelectScreen(
                     shadowColor = UbeShadow,
                     contentColor = Cloud,
                     fontSize = 14,
-                    modifier = Modifier.height(52.dp)
+                    modifier = Modifier.heightIn(min = 52.dp)
                 )
             }
 

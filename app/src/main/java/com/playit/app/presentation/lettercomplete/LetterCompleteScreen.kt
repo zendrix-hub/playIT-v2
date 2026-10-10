@@ -1,5 +1,7 @@
 package com.playit.app.presentation.lettercomplete
 
+import com.playit.app.presentation.components.LessonScaffold
+import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -10,16 +12,21 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.playit.app.presentation.components.breathingPulse
+import com.playit.app.presentation.components.resetsIdle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -51,15 +58,23 @@ fun LetterCompleteScreen(
 ) {
     val phoneme by viewModel.phoneme.collectAsStateWithLifecycle()
     val starsEarned by viewModel.starsEarned.collectAsStateWithLifecycle()
+    val nextHighlighted by viewModel.nextHighlighted.collectAsStateWithLifecycle()
     val letter = phoneme?.letter?.uppercase() ?: "M"
 
     var isPlaying by remember { mutableStateOf(true) }
 
+    DisposableEffect(Unit) {
+        viewModel.onScreenVisible()
+        onDispose {
+            viewModel.onScreenHidden()
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .resetsIdle { viewModel.onUserInteraction() }
             .background(brush = Brush.verticalGradient(colors = listOf(Ube, UbeDark)))
-            .padding(24.dp)
     ) {
         CelebrationOverlay(
             type = CelebrationType.CONFETTI,
@@ -69,38 +84,63 @@ fun LetterCompleteScreen(
             modifier = Modifier.fillMaxSize()
         )
 
-        Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-            DockedMascotWithBubble(
-                message = "You mastered Letter $letter! Amazing sound practice!",
-                mascotState = MascotState.CELEBRATING
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Text(
-                text = "LETTER $letter",
-                fontFamily = LexendFontFamily,
-                color = Cloud.copy(alpha = 0.85f),
-                fontSize = 24.sp,
-                fontWeight = FontWeight.ExtraBold,
-                letterSpacing = 1.sp
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = "Complete!",
-                fontFamily = LexendFontFamily,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Cloud
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
+        LessonScaffold(
+            topBar = {},
+            header = {
+                DockedMascotWithBubble(
+                    message = "You mastered Letter $letter! Amazing sound practice!",
+                    mascotState = MascotState.CELEBRATING,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            },
+            bottomBar = {
+                GummyContainer(
+                    onClick = onReturnToMap,
+                    faceColor = com.playit.app.presentation.theme.SunnyGold,
+                    shadowColor = com.playit.app.presentation.theme.SunnyGoldShadow,
+                    shape = com.playit.app.presentation.theme.ButtonShape,
+                    strokeWidth = 2.5.dp,
+                    strokeColor = com.playit.app.presentation.theme.ModernBorder,
+                    depthHeight = 6.dp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 64.dp)
+                        .testTag("complete_continue")
+                        .breathingPulse(enabled = nextHighlighted)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Continue to Map",
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Black),
+                            maxLines = 1,
+                            color = com.playit.app.presentation.theme.TextMidnight
+                        )
+                    }
+                }
+            }
+        ) {
+            // Title pair stays together; the scaffold spaces the groups evenly.
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "LETTER $letter",
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp),
+                    color = Cloud.copy(alpha = 0.85f),
+                    maxLines = 1
+                )
+                Text(
+                    text = "Complete!",
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = Cloud,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2
+                )
+            }
 
             StarDisplay(earnedStars = starsEarned, maxStars = 3, starSize = 56.dp)
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             Box(
                 modifier = Modifier
@@ -110,41 +150,11 @@ fun LetterCompleteScreen(
             ) {
                 Text(
                     text = "$starsEarned ${if (starsEarned == 1) "Star" else "Stars"} Earned!",
-                    fontFamily = LexendFontFamily,
-                    fontSize = 24.sp,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
                     color = Cloud,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    maxLines = 2
                 )
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Box(modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = 12.dp)) {
-                GummyContainer(
-                    onClick = onReturnToMap,
-                    faceColor = com.playit.app.presentation.theme.SunnyGold,
-                    shadowColor = com.playit.app.presentation.theme.SunnyGoldShadow,
-                    shape = com.playit.app.presentation.theme.ButtonShape,
-                    strokeWidth = 2.5.dp,
-                    strokeColor = com.playit.app.presentation.theme.ModernBorder,
-                    depthHeight = 6.dp,
-                    modifier = Modifier.fillMaxWidth().height(64.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "Continue to Map",
-                            fontFamily = LexendFontFamily,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Black,
-                            color = com.playit.app.presentation.theme.TextMidnight
-                        )
-                    }
-                }
             }
         }
     }

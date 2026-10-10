@@ -15,7 +15,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,6 +26,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.playit.app.presentation.theme.LocalReducedMotion
 import kotlinx.coroutines.launch
 
 /**
@@ -38,7 +38,7 @@ fun Modifier.idleFloating(
     floatDistance: Dp = 6.dp,
     durationMillis: Int = 2000
 ): Modifier = composed {
-    if (!enabled) return@composed this
+    if (!enabled || LocalReducedMotion.current) return@composed this
 
     val infiniteTransition = rememberInfiniteTransition(label = "IdleFloatTransition")
 
@@ -78,11 +78,16 @@ fun Modifier.celebrationWiggle(
     maxRotationDegrees: Float = 6f,
     onFinished: () -> Unit = {}
 ): Modifier = composed {
+    val isReducedMotion = LocalReducedMotion.current
     val scale = remember { Animatable(1.0f) }
     val rotation = remember { Animatable(0f) }
 
     LaunchedEffect(trigger) {
         if (trigger) {
+            if (isReducedMotion) {
+                onFinished()
+                return@LaunchedEffect
+            }
             launch {
                 scale.animateTo(
                     targetValue = 1.15f,
@@ -175,7 +180,7 @@ fun GummyMotionAsset(
     assetPath: String,
     contentDescription: String?,
     modifier: Modifier = Modifier,
-    isIdleFloating: Boolean = true,
+    isIdleFloating: Boolean = false,
     floatDistance: Dp = 6.dp,
     celebrateTrigger: Boolean = false,
     contentScale: ContentScale = ContentScale.Fit,
