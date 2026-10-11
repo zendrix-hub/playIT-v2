@@ -1020,3 +1020,15 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
 - **Picks:** the user marked all 12 takes OK on review page `2026-10-11-blendwords-card15b-eleven`, then picked take e3 for AM, TUB and YAM in chat. The spec names the e3 files directly, and `make_release.py` checked each against the review CSV, which is unchanged and kept in the batch folder.
 - **Release `docs/audio-release/2026-10-11-words/`:** 3 WAVs and the manifest, with SHA-256 for each. Teacher audit pending.
 - **Card 15b is `Status: ready`.** agy runs it per runbook section 8.2: 407 tests expected, then APK F.
+
+### agy, 2026-10-11: Card 28c Implemented & APK F Built
+
+- **Card 28c (`0573906`)**:
+  - Based on phone test of APK E and design interview on cognitive load optimization (Sweller 1988, Mayer 2009).
+  - Hear It is purely receptive auditory-orthographic mapping ("I do" modeling): removed static `ArticulationCue` and the 72 dp empty spacer from `HearItScreen.kt`.
+  - Speaker replay button is cleanly centered with zero horizontal offset.
+  - Mouth articulation cues are reserved exclusively for Say It expressive speech scaffolding (attempt 2 "Watch my lips", Boyer & Ehri 2011).
+  - `review_card.py 28c`: **ALL PASS**.
+- **APK F Assembly**:
+  - Built `Documents/playIT-apk/playit-debug-F-0573906.apk` (103 MB) and root `./playit-debug.apk`.
+
