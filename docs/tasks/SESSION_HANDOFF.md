@@ -879,3 +879,27 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   2. Run card 24b (section 7).
   3. Claude then reviews 24b.
 - **`tools/images/cutout_batch.py` (added 2026-10-11):** the grill-session entry named this script, but it did not exist; card 25 ran its two steps by hand (`cutout.py`, then `audit.py`). It now exists: `cutout_batch.py <batch>` copies the picks from `docs/assets/briefs/<batch>/` into the batch folder, runs `cutout.py` and `audit.py`, and passes `--fill` and `--app` through. Check: run on `2026-10-07-mouth-shapes`, all 9 cut-outs are byte-identical to the released files (SHA-256), audit 0 FAIL, 0 WARN. Card 29 can use it (`--fill 0.77` for Lily, `0.62` for the animals).
+
+### agy, 2026-10-11: Card 24b implemented, tested & APK D built
+
+- **Commit**: `6933e3e` `feat(assets): mouth-shape pictures from image release 2026-10-10-mouth; Hear It cue beside the play button (NFR-ACC-01)`
+- **Card 24b Status**: `Status: done`, ticked in `13_MASTER_TASKS.md`, row logged in `docs/evidence-log.md`.
+- **Review Script Check**: `python3 tools/dev/review_card.py 24b` executed:
+  - `PASS files`: 27 files, all listed or bookkeeping
+  - `PASS tests`: all 6 card tests exist
+  - `PASS status`: card done, task ticked, log row present
+  - `PASS body`: Card, Requirement, Tests run, Decisions used present
+  - `WARN hash`: evidence-log row has no hash yet (Claude fills at acceptance)
+  - `PASS emoji`: zero emoji added
+- **Key Changes**:
+  - Image release `2026-10-10-mouth` moved to `docs/image-release/2026-10-10-mouth/` and all 9 mouth PNGs copied to `app/src/main/assets/images/mouth/`.
+  - `ArticulationCue.kt`: Added internal path overload `ArticulationCue(assetPath, size, modifier)` allowing testability of missing assets.
+  - `HearItScreen.kt`: Relocated mouth cue to sit beside the play button with a balancing 72 dp spacer on the right (`CUE_SIZE = 72.dp`), ensuring that on Samsung A21s (360x740) the 5 step dots stay above the Next button (`hearit_steps` bottom <= `hearit_next` top).
+  - Tests updated: `PictureAssetsTest.everyMouthCueIsReleased`, `ArticulationCueTest.releasedPicture_renders`, `missingAsset_rendersNothing`, and `LayoutMatrixTest.hearIt_stepsAboveNext` + `sayIt_mouthCueBesideMic` using unclipped bounds.
+- **APK D Assembly**:
+  - Assembled via `./gradlew assembleDebug` (`BUILD SUCCESSFUL in 15m 43s`).
+  - Saved to `Documents/playIT-apk/playit-debug-D-6933e3e.apk` (103 MB) and `./playit-debug.apk`.
+  - Preserves prior APKs (`A`, `A2`, `B`).
+- **Next Steps**:
+  - Ready for Claude review of Card 24b (`review_card.py 24b`, diff verification, technical acceptance).
+  - User can test APK D on Samsung A21s physical hardware (verifying Hear It cue position and Say It "Watch my lips" articulation cue on miss 2).
