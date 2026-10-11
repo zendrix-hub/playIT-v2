@@ -920,3 +920,34 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
 
 - **Queued for agy (Parallel Asset Session)**:
   - **Card 29 (`card-29-mascot-avatar-art-refresh.md`)**: User will start fresh image session for Nano Banana Pro mascot poses and companion animal heads.
+
+### agy, 2026-10-11: IT411 Submission Package Finalized (Full Names & Formal Status)
+
+- **Team Legal Names Applied**:
+  1. `Riva, Zendrix` (Team Lead & Full-Stack Android Engineer)
+  2. `Palis, John James` (Frontend & Audio Engineer)
+  3. `Miel, Kaysean` (UX/UI Designer & QA Specialist)
+  4. `Durano, Ashlee Skye` (Data Architect & Backend Engineer)
+  5. `Bien, Erik Samuel` (Pedagogical Researcher & Documentation Specialist)
+  Applied across:
+  - `docs/MVP_Validation_Findings_and_Refactoring_Priorities_Filled.md`
+  - `docs/SRS_v3.0_Refactored.md`
+  - `docs/SDD_v2.0_Refactored.md`
+  - `docs/SPMP_v2.0_Refactored.md`
+  - `docs/specs/validation-report.md`
+- **Formal Academic Document Status Standardized**:
+  - Replaced internal developer backlog notes and intermediate draft revision lines in cover metadata with institutional submission headers:
+    - **SRS**: `Document Version: 3.0 (Post-MVP Validation Baseline)` | `Document Status: Submitted for Adviser Review and Evaluation`
+    - **SDD**: `Document Version: 2.0 (Post-MVP Architectural Baseline)` | `Document Status: Submitted for Adviser Review and Evaluation`
+    - **SPMP**: `Document Version: 2.0 (Post-MVP Refactored Baseline)` | `Document Status: Submitted for Adviser Review and Evaluation`
+  - Full revision details, automated test coverage tallies (386 unit tests), use-case diagrams, and traceability logs remain preserved in the internal Revision History tables.
+- **Submission Deliverables Recompiled (`[OK]` All Passed)**:
+  - `docs/submission/playIT_MVP_Validation_Findings_and_Refactoring_Priorities.docx` & `.pdf`
+  - `docs/submission/playIT_SRS_v3.0.docx` & `.pdf`
+  - `docs/submission/playIT_SDD_v2.0.docx` & `.pdf`
+  - `docs/submission/playIT_SPMP_v2.0.docx` & `.pdf`
+  - `docs/submission/SUBMISSION_OVERVIEW_AND_REVIEW_CHECKLIST.md`
+- **Request for Claude**:
+  - Review and validate the finalized academic document statuses and front-matter across the 4 submission files.
+  - Review Card 24b technical acceptance.
+  - Author and begin Card 28b (Blend It audio release manifest, mouth cue articulation audit, child wiggles/tutoring refinements).

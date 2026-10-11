@@ -6,7 +6,7 @@
 
 IT411 Capstone & Research 2 · Semester 1, AY 2026–2027
 College of Computer Studies, Cebu Institute of Technology – University
-Team: Palis, J. J. · Riva, Z. · Miel, K. · Durano, A. S. · Bien, E. S.
+Team: Palis, John James · Riva, Zendrix · Miel, Kaysean · Durano, Ashlee Skye · Bien, Erik Samuel
 
 > **Team notes (delete before submission).** Cells marked "—" in Section 4.2 are filled after Round 2. Items marked **[confirm]** need a team or adviser decision. Targets marked **[proposed]** are new and need adviser approval before Round 2.
 

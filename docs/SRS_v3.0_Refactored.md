@@ -3,10 +3,10 @@
 **Course:** IT411 — Capstone & Research 2 | Semester 1, AY 2026–2027  
 **Degree Program:** Bachelor of Science in Information Technology  
 **Department:** College of Computer Studies, Cebu Institute of Technology – University  
-**Document Version:** 3.5 (Renewed & Fully Refactored Post-MVP Validation; automated coverage recorded 2026-10-09; reviewed for submission 2026-10-10; card 28 amendments 2026-10-10; use case diagram 2026-10-11)  
-**Publication Date:** September 26, 2026  
-**Document Status:** Draft for adviser review (revised 2026-10-05, 2026-10-09 and 2026-10-10; items marked **[proposed]** await adviser approval)  
-**Prepared by:** Group 56 — PlayIT Capstone Team: Riva, Z. (Team Lead); Palis, J. J.; Miel, K.; Durano, A. S.; Bien, E. S.  
+**Document Version:** 3.0 (Post-MVP Validation Baseline)  
+**Publication Date:** September 26, 2026 (Revised October 11, 2026)  
+**Document Status:** Submitted for Adviser Review and Evaluation  
+**Prepared by:** Group 56 — PlayIT Capstone Team: Riva, Zendrix (Team Lead); Palis, John James; Miel, Kaysean; Durano, Ashlee Skye; Bien, Erik Samuel  
 **Adviser:** Mr. Joemarie C. Amparo  
 
 ---

@@ -18,10 +18,10 @@
 - **Program / Section:** Bachelor of Science in Information Technology / IT411 G1–G8
 - **Team Members:**
   1. Riva, Zendrix (Team Lead & Full-Stack Android Engineer)
-  2. Palis, J. J. (Frontend & Audio Engineer)
-  3. Miel, K. (UX/UI Designer & QA Specialist)
-  4. Durano, A. S. (Data Architect & Backend Engineer)
-  5. Bien, E. S. (Pedagogical Researcher & Documentation Specialist)
+  2. Palis, John James (Frontend & Audio Engineer)
+  3. Miel, Kaysean (UX/UI Designer & QA Specialist)
+  4. Durano, Ashlee Skye (Data Architect & Backend Engineer)
+  5. Bien, Erik Samuel (Pedagogical Researcher & Documentation Specialist)
 - **Adviser:** Mr. Joemarie C. Amparo
 - **System URL / MVP Link:** Offline Android APK (`playit-debug.apk`; package `com.playit.app`; min SDK 26 / Android 8.0, target SDK 34 / Android 14). The app runs without an internet connection, so it has no web URL.
 - **Date of MVP Validation:** September 16–23, 2026
