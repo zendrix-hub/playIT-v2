@@ -3,6 +3,7 @@
 Covers the Markdown the academic documents use: headings, paragraphs with hard
 breaks, bullet and numbered lists (nested), GFM pipe tables (inline formatting
 and <br> inside cells), fenced code blocks and ASCII diagrams, block quotes,
+figures (a line holding only ![caption](path), numbered "Figure N."),
 and $...$ / $$...$$ LaTeX, which becomes plain Unicode text (>= becomes the
 "greater than or equal" sign, \\frac{a}{b} becomes a/b, and so on).
 
@@ -14,6 +15,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from docx.enum.section import WD_ORIENT, WD_SECTION
 from docx.enum.table import WD_TABLE_ALIGNMENT
@@ -40,6 +42,8 @@ CODE_FILL = "F4F6F8"
 
 # Tables with at least this many columns go on a landscape page.
 LANDSCAPE_MIN_COLUMNS = 7
+# Figures at least this much wider than tall go on a landscape page.
+LANDSCAPE_MIN_ASPECT = 1.3
 
 
 # ---------------------------------------------------------------------------
@@ -313,16 +317,18 @@ def add_inline(paragraph, text: str, size: float | None = None, color=None,
 
 @dataclass
 class Block:
-    kind: str  # heading, para, list, code, math, table, quote, hr
+    kind: str  # heading, para, list, code, math, table, quote, hr, image
     text: str = ""
     level: int = 0
     items: list = field(default_factory=list)  # list: (level, marker, text)
     rows: list = field(default_factory=list)  # table rows (list of cell strings)
     aligns: list = field(default_factory=list)
     lines: list = field(default_factory=list)  # code lines
+    path: str = ""  # image: path relative to the Markdown file
 
 
 _HEADING = re.compile(r"^(#{1,6})\s+(.*?)\s*#*\s*$")
+_IMAGE = re.compile(r"^!\[(?P<alt>[^\]]*)\]\((?P<path>[^)\s]+)\)\s*$")
 _LIST = re.compile(r"^(\s*)([-*+]|\d+[.)])\s+(.*)$")
 _TABLE_SEP = re.compile(r"^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$")
 _HR = re.compile(r"^\s*([-*_])(\s*\1){2,}\s*$")
@@ -419,6 +425,12 @@ def parse_blocks(lines: list[str]) -> list[Block]:
         if _HR.match(stripped):
             flush_para()
             blocks.append(Block("hr"))
+            i += 1
+            continue
+        im = _IMAGE.match(stripped)
+        if im:
+            flush_para()
+            blocks.append(Block("image", text=im.group("alt"), path=im.group("path")))
             i += 1
             continue
         if stripped.startswith("|") and i + 1 < n and _TABLE_SEP.match(lines[i + 1]):
@@ -600,6 +612,7 @@ class Theme:
     table_size: float = 8.5
     code_size: float = 8
     heading_map: dict = field(default_factory=lambda: {2: 1, 3: 2, 4: 3, 5: 4, 6: 4, 1: 1})
+    base_dir: Path | None = None  # image paths are relative to this (the Markdown file's folder)
 
 
 _BULLETS = ["•", "◦", "▪", "▫"]
@@ -751,36 +764,130 @@ def render_heading(doc, block: Block, theme: Theme):
     return h
 
 
+def _image_path(theme: Theme, block: Block) -> Path:
+    path = (theme.base_dir or Path.cwd()) / block.path
+    if not path.exists():
+        raise FileNotFoundError(f"figure not found: {path}")
+    return path
+
+
+def _image_aspect(theme: Theme, block: Block) -> float:
+    from docx.image.image import Image as DocxImage
+    img = DocxImage.from_file(str(_image_path(theme, block)))
+    return img.px_width / img.px_height
+
+
+def render_image(doc, block: Block, theme: Theme, section, number: int, intro_chars: int = 0):
+    """A figure as wide as the text (or as tall as the page allows), centred, with a numbered caption below.
+    intro_chars is the length of the heading and text that share the figure's page; the figure leaves
+    room for them (about 15 characters per inch of line at the body size, 0.2 in per line)."""
+    path = _image_path(theme, block)
+    aspect = _image_aspect(theme, block)
+    max_w = text_width(section)
+    per_line = max(int(max_w / Inches(1) * 15), 40)
+    lines = -(-intro_chars // per_line) if intro_chars else 0
+    reserve = Inches(0.9) + Inches(0.2) * lines
+    max_h = section.page_height - section.top_margin - section.bottom_margin - reserve
+    width = int(min(max_w, max_h * aspect))
+    p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.paragraph_format.space_before = Pt(6)
+    p.paragraph_format.keep_with_next = True
+    p.add_run().add_picture(str(path), width=Emu(width))
+    cap = doc.add_paragraph()
+    cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    cap.paragraph_format.space_after = Pt(10)
+    add_inline(cap, f"**Figure {number}.** {block.text}", size=theme.body_size - 1, color=MUTED, italic=True)
+
+
+# CT_Settings children that must follow w:doNotAutoCompressPictures (ECMA-376 schema order).
+_AFTER_NO_COMPRESS = ("forceUpgrade", "captions", "readModeInkLockDown", "smartTagType", "schemaLibrary",
+                      "shapeDefaults", "doNotEmbedSmartTags", "decimalSymbol", "listSeparator")
+
+
+def keep_full_resolution_pictures(doc):
+    """Stop Word from downsampling pictures when it saves the .docx. (Word's PDF export still downsamples
+    to about 200 ppi; render_submission_package.py puts the full-resolution figures back into the PDF.)"""
+    settings = doc.settings.element
+    if settings.find(qn("w:doNotAutoCompressPictures")) is not None:
+        return
+    flag = OxmlElement("w:doNotAutoCompressPictures")
+    for child in settings:
+        if child.tag in {qn(f"w:{name}") for name in _AFTER_NO_COMPRESS}:
+            child.addprevious(flag)
+            return
+    settings.append(flag)
+
+
 def render_blocks(doc, blocks: list[Block], theme: Theme):
-    """Render parsed blocks. Wide tables (and the heading that introduces them) get landscape pages."""
-    landscape_starts, landscape_ends = set(), set()
+    """Render parsed blocks. Wide tables and wide figures (and the heading that introduces them) get
+    landscape pages; back-to-back landscape blocks share one landscape run, so no blank portrait page
+    falls between them."""
+    ranges = []
     for idx, b in enumerate(blocks):
-        if b.kind == "table" and max(len(r) for r in b.rows) >= LANDSCAPE_MIN_COLUMNS:
+        wide_table = b.kind == "table" and max(len(r) for r in b.rows) >= LANDSCAPE_MIN_COLUMNS
+        wide_image = b.kind == "image" and _image_aspect(theme, b) >= LANDSCAPE_MIN_ASPECT
+        if wide_table or wide_image:
             start = idx
             for back in range(idx - 1, max(idx - 4, -1), -1):
                 if blocks[back].kind == "heading":
                     start = back
                     break
-                if blocks[back].kind not in ("para", "quote"):
+                if blocks[back].kind not in ("para", "quote") + (("list",) if wide_image else ()):
                     break
-            landscape_starts.add(start)
-            landscape_ends.add(idx)
+            if ranges and start <= ranges[-1][1] + 1:
+                ranges[-1][1] = idx
+            else:
+                ranges.append([start, idx])
+    landscape_starts = {s for s, _ in ranges}
+    landscape_ends = {e for _, e in ranges}
+    if any(b.kind == "image" for b in blocks):
+        keep_full_resolution_pictures(doc)
 
+    # A heading that introduces a figure (only text between them) starts a new page, so each figure
+    # sits on one page with its heading and intro; its intro text is kept with the figure.
+    figure_heads, figure_intro, intro_chars = set(), set(), {}
+    for idx, b in enumerate(blocks):
+        if b.kind != "image":
+            continue
+        chars = 0
+        for back in range(idx - 1, max(idx - 5, -1), -1):
+            prev = blocks[back]
+            if prev.kind == "heading":
+                figure_heads.add(back)
+                chars += 80
+                break
+            if prev.kind not in ("para", "list", "quote"):
+                break
+            figure_intro.add(back)
+            texts = [it[2] for it in prev.items] if prev.kind == "list" else [prev.text]
+            chars += sum(len(plain_text(s)) + 40 for s in texts)  # +40: a part-filled last line per block
+        intro_chars[idx] = chars
+
+    figure = 0
     section = doc.sections[-1]
     for idx, b in enumerate(blocks):
         if idx in landscape_starts:
             section = start_section(doc, landscape=True)
         available = text_width(section)
         if b.kind == "heading":
-            render_heading(doc, b, theme)
+            h = render_heading(doc, b, theme)
+            if idx in figure_heads and idx not in landscape_starts:
+                h.paragraph_format.page_break_before = True
         elif b.kind == "para":
             p = doc.add_paragraph()
             add_inline(p, b.text, size=theme.body_size, color=TEXT)
             nxt = blocks[idx + 1] if idx + 1 < len(blocks) else None
             if nxt is not None and nxt.kind in ("code", "table", "math", "list") and idx + 1 not in landscape_starts:
                 p.paragraph_format.keep_with_next = True
+            if idx in figure_intro:
+                p.paragraph_format.keep_with_next = True
         elif b.kind == "list":
+            before = len(doc.paragraphs)
             render_list(doc, b, theme)
+            if idx in figure_intro:
+                for item in doc.paragraphs[before:]:
+                    item.paragraph_format.keep_with_next = True
         elif b.kind == "table":
             render_table(doc, b, theme, available)
         elif b.kind == "code":
@@ -801,6 +908,9 @@ def render_blocks(doc, blocks: list[Block], theme: Theme):
             p = doc.add_paragraph()
             p.paragraph_format.left_indent = Inches(0.35)
             add_inline(p, b.text, size=theme.body_size - 0.5, color=MUTED, italic=True)
+        elif b.kind == "image":
+            figure += 1
+            render_image(doc, b, theme, section, figure, intro_chars.get(idx, 0))
         if idx in landscape_ends and any(later.kind != "hr" for later in blocks[idx + 1:]):
             section = start_section(doc, landscape=False)
 

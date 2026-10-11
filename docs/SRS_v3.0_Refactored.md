@@ -3,7 +3,7 @@
 **Course:** IT411 — Capstone & Research 2 | Semester 1, AY 2026–2027  
 **Degree Program:** Bachelor of Science in Information Technology  
 **Department:** College of Computer Studies, Cebu Institute of Technology – University  
-**Document Version:** 3.4 (Renewed & Fully Refactored Post-MVP Validation; automated coverage recorded 2026-10-09; reviewed for submission 2026-10-10; card 28 amendments 2026-10-10)  
+**Document Version:** 3.5 (Renewed & Fully Refactored Post-MVP Validation; automated coverage recorded 2026-10-09; reviewed for submission 2026-10-10; card 28 amendments 2026-10-10; use case diagram 2026-10-11)  
 **Publication Date:** September 26, 2026  
 **Document Status:** Draft for adviser review (revised 2026-10-05, 2026-10-09 and 2026-10-10; items marked **[proposed]** await adviser approval)  
 **Prepared by:** Group 56 — PlayIT Capstone Team: Riva, Z. (Team Lead); Palis, J. J.; Miel, K.; Durano, A. S.; Bien, E. S.  
@@ -22,6 +22,7 @@
 | **3.2** | October 9, 2026 | Capstone Team (Claude, sprint synchronization) | Added §4.1, the automated test coverage of the requirements refactored in the Oct 9–10 sprint (FR-02, FR-03, FR-05, FR-13, NFR-ASR-01, NFR-ACC-01, NFR-ACC-02): each requirement is mapped to the shipped components and the passing unit-test classes (364 tests on 2026-10-09, 0 failures). Field targets in §4 (Round 2 instruments, Gate 3 teacher audit) are unchanged and still pending. |
 | **3.3** | October 10, 2026 | Capstone Team (Claude, submission review) | Checked against `docs/specs/validation-report.md` and the code: SUS grade corrected to B (§1.1); FR-03 mic states match the shipped design (Idle, Listening, Heard, Result; user decision 2026-10-06); the validation findings of FR-03, FR-14, FR-NEW-TEL and NFR-ACC-02 and RTM rows F-07, F-10 and F-16 now state only what the validation data show; RTM design components name the shipped classes, and TC-AUD-01 matches SDD §6; NFR-AUD-01 adds the short-vowel source and the dated manifest path; FR-01 names the Kokoro voice mix. |
 | **3.4** | October 10, 2026 | Capstone Team (Claude, card 28) | Amendments from the user's phone test of APK B (user decisions 2026-10-10, adviser confirmation pending): FR-02 item 4, Hear It ends on the key word and the sound, then *"Great listening! Tap the big button."* instead of *"Say it with me!"*; NFR-ACC-01 item 2, captions are not shown in the child view and the mouth-shape cue is the visual support. |
+| **3.5** | October 11, 2026 | Capstone Team (Claude, diagrams) | New §2.5 Use Case Model with the use case diagram of the six modules (Figure 1); planned use cases (FR-NEW-REC, FR-NEW-TEL) are marked. No requirement changed. |
 
 ---
 
@@ -91,6 +92,16 @@ PlayIT is an independent, self-contained mobile application executing natively o
 - The device microphone functions correctly and provides uncorrupted 16 kHz PCM audio.
 - The user grants runtime audio recording permissions (`RECORD_AUDIO`) upon initial application launch.
 - The host device maintains at least 250 MB of free internal storage for the bundled APK, Vosk acoustic model, neural audio WAV assets, and local SQLite database.
+
+### 2.5 Use Case Model
+Figure 1 shows the six functional modules of §3.2 as use cases of one offline system:
+- **Actors:** the three personas of §2.2 (child learner, parent or caregiver, teacher or facilitator), plus two system actors. The on-device Vosk recognizer serves Say It. Android OS (`PdfDocument` and the share sheet) serves the exports.
+- **Include and extend:** they follow the requirement text. For example, a spoken correction extends "Say the key word" on a miss (FR-03.4), and viewing the dashboard includes the arithmetic gate (FR-10).
+- **Planned use cases:** grey use cases marked «planned» are specified here but not yet built: the warm-up and recall checks (FR-NEW-REC) and the telemetry CSV export (FR-NEW-TEL). SDD §2.0 lists their components as planned.
+
+The diagram sources are in `docs/diagrams/src/`.
+
+![PlayIT use case diagram: the six functional modules of §3.2](diagrams/png/usecase_srs_modules.png)
 
 ---
 

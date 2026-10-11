@@ -14,8 +14,8 @@ Rebuild everything with `python3 tools/docs/render_submission_package.py` (pytho
 | # | Deliverable | Files | Source | Contents |
 |:---:|---|---|---|---|
 | 1 | **MVP Validation Findings & Refactoring Priorities** (course form) | `playIT_MVP_Validation_Findings_and_Refactoring_Priorities.pdf` / `.docx` | `MVP_Validation_Findings_and_Refactoring_Priorities_Filled.md`, filled into the course template | Sections 1–7 and the declaration: 5 findings, 6 refactoring priorities, summary matrix, non-priority screening |
-| 2 | **Software Design Description (SDD v2.0, rev. 2.3)** | `playIT_SDD_v2.0.pdf` / `.docx` | `SDD_v2.0_Refactored.md` | §2.0 implementation status checked against the code on 2026-10-09 |
-| 3 | **Software Requirements Specification (SRS v3.0, rev. 3.3)** | `playIT_SRS_v3.0.pdf` / `.docx` | `SRS_v3.0_Refactored.md` | RTM v3.0 (16 findings) and §4.1 automated test coverage |
+| 2 | **Software Design Description (SDD v2.0, rev. 2.5)** | `playIT_SDD_v2.0.pdf` / `.docx` | `SDD_v2.0_Refactored.md` | §2.0 implementation status; system ERD (§3.5.3), 6 class diagrams (§3.7) and 6 sequence diagrams (§4) |
+| 3 | **Software Requirements Specification (SRS v3.0, rev. 3.5)** | `playIT_SRS_v3.0.pdf` / `.docx` | `SRS_v3.0_Refactored.md` | Use case diagram (§2.5), RTM v3.0 (16 findings) and §4.1 automated test coverage |
 | 4 | **Software Project Management Plan (SPMP v2.0, rev. 2.3)** | `playIT_SPMP_v2.0.pdf` / `.docx` | `SPMP_v2.0_Refactored.md` | WBS, revised schedule with sprint status, risk register R1–R8 |
 
 ## 2. Technical evidence (agy batch validation, `c07206e`)
@@ -30,7 +30,7 @@ Rebuild everything with `python3 tools/docs/render_submission_package.py` (pytho
 - [ ] Confirm the adviser's name on the MVP form and the three cover pages (Mr. Joemarie C. Amparo, taken from the team's transmittal notes).
 - [ ] Confirm the group name, section ("IT411 G1–G8") and member list on the MVP form.
 - [ ] Sign the MVP form's Final Declaration (Team Lead) on the printed copy if the course requires a wet signature.
-- [ ] Open each PDF and check that the table of contents, page numbers and landscape matrices (SRS RTM, SPMP risk register) look right.
+- [ ] Open each PDF and check that the table of contents, page numbers and landscape matrices (SRS RTM, SPMP risk register) and the landscape diagram pages look right.
 - [ ] Optional: install the APK on the test phone (`adb install -r playit-debug-B-eaf8634.apk`).
 
 ## 4. Still pending after this submission (stated in the documents)

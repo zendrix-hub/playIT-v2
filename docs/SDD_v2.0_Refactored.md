@@ -3,7 +3,7 @@
 **Course:** IT411 — Capstone & Research 2 | Semester 1, AY 2026–2027  
 **Degree Program:** Bachelor of Science in Information Technology  
 **Department:** College of Computer Studies, Cebu Institute of Technology – University  
-**Document Version:** 2.4 (Renewed & Fully Refactored Post-MVP Validation; implementation status synchronized 2026-10-09; reviewed for submission 2026-10-10; card 28 2026-10-10)  
+**Document Version:** 2.5 (Renewed & Fully Refactored Post-MVP Validation; implementation status synchronized 2026-10-09; reviewed for submission 2026-10-10; card 28 2026-10-10; design diagrams 2026-10-11)  
 **Publication Date:** September 26, 2026  
 **Document Status:** Draft for adviser review (revised 2026-10-05, 2026-10-09 and 2026-10-10; items marked **[proposed]** await adviser approval). Components are marked by implementation status in §2.0  
 **Prepared by:** Group 56 — PlayIT Capstone Team: Riva, Z. (Team Lead); Palis, J. J.; Miel, K.; Durano, A. S.; Bien, E. S.  
@@ -23,6 +23,7 @@
 | **2.2** | October 9, 2026 | Capstone Team (Claude, sprint synchronization) | §2.0 re-checked against branch `refactor/hear-say-it` after the Oct 9–10 sprint (cards 18–24, 03b, 15). Newly **Implemented**: adaptive dimensions and `LessonScaffold`; 4-state Say It mic (`MicStatus`, `MicButton`, time-based ripple); spoken Say It corrections; decodable Blend It word list; purposeful effects and screen transitions; responsive map (`MapLayout`); sound captions and `ArticulationCue`. §3.4 chapter letters corrected to the seeded groups; §3.6 replaced the design sketches with the implemented components. `LessonEngine`, `AudioComposer`, Room schema v4, telemetry and CSV export remain **Planned**. |
 | **2.3** | October 10, 2026 | Capstone Team (Claude, submission review) | Review for the IT411 submission, no design change: §3.1.1 and §3.1.2 use the shipped `assets/audio/` layout and the dated release manifests; §2.2 notes that the planned `tutoring/` classes live in `domain/manager/` today; §3.1, §3.2 and §3.2.2 label the planned components; §4.2 uses the shipped Heard mic state (user decision 2026-10-06); §5 lists the short-vowel source; diagram alignment and §3.5.1 comment wrapping fixed. |
 | **2.4** | October 10, 2026 | Capstone Team (Claude, card 28) | Phone-test refinements (user decisions 2026-10-10): §2.0 adds the card 28 row (Hear It ends on the sound, Say It mic `DONE` after the third miss, Blend It sound-out that waits for each clip, live star totals from one SQL aggregate, one-tap map start) and marks captions as kept in code but not shown; §3.6.2 and §4.1 step 7 follow. |
+| **2.5** | October 11, 2026 | Capstone Team (Claude, diagrams) | Design diagrams added, traced from the code: §3.5.3 system ERD (Figure 1); §3.7 one class diagram per module (Figures 2–7); §4.1–§4.6 one sequence diagram per module (Figures 8–13); planned components are grey and marked «planned». §4.2 now marks `NEEDS_PRACTICE` as planned (Room v4). No design change. |
 
 ---
 
@@ -409,6 +410,18 @@ data class TelemetryEventEntity(
 #### 3.5.2 Local CSV Export Manager
 A local exporter reads `telemetry_events` for the active profile, formats records into RFC 4180 CSV, writes the file to `context.filesDir/exports/`, and launches the native Android `Intent.ACTION_SEND` share sheet behind the arithmetic gate.
 
+#### 3.5.3 System Entity-Relationship Diagram
+Figure 1 shows the Room database `playit_db` as built (schema version 3, `PlayItDatabase.kt`).
+- **Tables:** 11 tables in three groups:
+  - **Curriculum, seeded on every open:** `phonemes`, `letter_groups`, `letter_group_members`, `blend_it_words`.
+  - **Learners:** `profiles`, `achievements`.
+  - **Progress and attempts:** `lesson_progress`, `blend_it_progress`, `say_it_attempts`, `find_it_attempts`, `blend_it_attempts`.
+- **Foreign keys:** every one is `ON DELETE CASCADE`, so deleting a profile removes all of that child's rows (FR-14).
+- **Star totals:** the stored `profiles.totalStars` column is not what the app shows. The map and profile cards show `SUM(lesson_progress.starsEarned) + SUM(blend_it_progress.starsEarned)`, computed in `ProfileDao` (card 28).
+- **Planned tables:** the two schema v4 tables of §3.5.1 (`letter_progress`, `telemetry_events`) are grey and dashed.
+
+![System ERD: Room database playit_db, schema version 3, with the planned v4 tables in grey](diagrams/png/erd_system.png)
+
 ---
 
 ### 3.6 Pediatric Design System Tokens & Accessibility (NFR-ACC-01, NFR-ACC-02)
@@ -438,6 +451,44 @@ fun CaptionBubble(caption: String?, modifier: Modifier = Modifier)
 ```
 `ArticulationCue` draws nothing until its picture is in `assets/images/mouth/` (image release of card 25). Hear It shows a 72 dp cue under the letter card (no caption in the child view since card 28); Say It shows a 96 dp cue beside the mic from the second miss ("Watch my lips", spec Table 7).
 
+### 3.7 Module Class Diagrams
+Figures 2 to 7 give one class diagram for each functional module of SRS §3.2.
+- **Source:** traced from the code on `refactor/hear-say-it` (checked 2026-10-11).
+- **Layout:** each diagram is grouped by the layers of §2.2 (presentation, domain, data).
+- **Planned classes:** classes the earlier sections describe as planned are grey and marked «planned», with a dashed line to the class they would extend or replace (for example `AudioComposer`, `LearnerModel`, `TelemetryLogger`). Everything else exists in the app today.
+- **Sources:** the diagram sources are in `docs/diagrams/src/`.
+
+#### 3.7.1 Module 1: Letter-Sound Acquisition (Hear It)
+`HearItViewModel` builds the modeling sequence with `HearItSequenceBuilder` and plays it through `AudioPlayer`. `ArticulationCue` reads its picture from the letter's `ArticulationGroup`.
+
+![Class diagram, Module 1: Hear It](diagrams/png/class_m1_hear_it.png)
+
+#### 3.7.2 Module 2: Speech Production and Formative Tutoring (Say It)
+- **Judging and the prompt ladder:** `SpeechValidator` (in the role of `SayItJudge`) judges the transcript. The stateless `TutorPolicy` maps the attempt number and the judgement to `Praise`, `Correct` or `LeadAndMoveOn`.
+- **Mic state:** `MicStatus` drives the mic button.
+
+![Class diagram, Module 2: Say It](diagrams/png/class_m2_say_it.png)
+
+#### 3.7.3 Module 3: Phoneme Discrimination (Find It)
+`GridGenerator` builds 5 pictures (3 targets, 2 distractors). `HeartManager` deducts hearts, recovers them and restarts with 3.
+
+![Class diagram, Module 3: Find It](diagrams/png/class_m3_find_it.png)
+
+#### 3.7.4 Module 4: Word Construction Checkpoint (Blend It)
+`BlendItViewModel` checks the tiles and runs the sound-out. `BlendItCompleteViewModel` scores the group with `BlendItStarThresholds` and saves `BlendItProgress`.
+
+![Class diagram, Module 4: Blend It](diagrams/png/class_m4_blend_it.png)
+
+#### 3.7.5 Module 5: Mastery Progression, Gamification and Multi-Profile
+`SessionManager` holds the active profile. `LetterCompleteViewModel` saves stars and the streak. `MapViewModel` derives the nodes with `UnlockManager` and the live star total from `ProfileDao`.
+
+![Class diagram, Module 5: Progression, gamification and profiles](diagrams/png/class_m5_progression.png)
+
+#### 3.7.6 Module 6: Telemetry, Parent Dashboard and Diagnostics
+`ReportGenerator` aggregates the repositories into `ProfileDashboardData` and `ReportData`. `PdfExporter` writes the report. The arithmetic gate guards entry. The telemetry classes are planned.
+
+![Class diagram, Module 6: Parent dashboard and diagnostics](diagrams/png/class_m6_parent_dashboard.png)
+
 ---
 
 ## 4. Detailed Interface & Interaction Workflows
@@ -455,6 +506,9 @@ User selects Letter -> Screen Loads -> SoundPool Preloads Letter Clips
   -> Step 7: "Great listening! Tap the big button." -> Next pulses -> Say It
      (card 28: Hear It no longer ends with "Say it with me!")
 ```
+Figure 8 shows the same workflow as the code runs it. Figures 8 to 13 give one sequence diagram for each module.
+
+![Sequence diagram, Module 1: Hear It modeling sequence](diagrams/png/seq_m1_hear_it.png)
 
 ### 4.2 Say It Interaction & Correction Workflow
 ```
@@ -475,9 +529,40 @@ Screen Enters -> Mascot leads 2 Choral Turns ("Say it with me!")
          -> Lip cue enlarges -> Mic reactivates for retry
        [Branch C: Foil Match or Silence (Attempt == 3)]
          -> Mascot leads together-practice ("Let's say it together: /m/")
-         -> LetterProgressEntity marked NEEDS_PRACTICE
+         -> LetterProgressEntity marked NEEDS_PRACTICE (planned: Room v4)
          -> Advance to Find It (Zero hearts deducted)
 ```
+In the code today, the third miss saves the attempt rows and moves on; the `NEEDS_PRACTICE` mark waits for Room schema v4 (§2.0).
+
+![Sequence diagram, Module 2: Say It attempt and prompt ladder](diagrams/png/seq_m2_say_it.png)
+
+### 4.3 Find It Tap, Hearts and Restart Workflow
+- **A correct tap:** it counts towards the 3 targets. Every 3 correct taps in a row recover a heart, up to the starting pool.
+- **A wrong tap:** it removes one heart. At 0 hearts the activity restarts with a 3-heart buffer (FR-05).
+- **Letter completion:** the hearts lost in the session go to letter completion (§4.5).
+
+![Sequence diagram, Module 3: Find It](diagrams/png/seq_m3_find_it.png)
+
+### 4.4 Blend It Word and Group Completion Workflow
+- **Checking a word:** each answer is saved.
+- **A correct word:** the tiles light one by one while each letter sound plays to its end (at least 750 ms each). Then every tile lights together, and the whole word plays.
+- **Group completion:** a finished group is scored and saved to `blend_it_progress`.
+
+![Sequence diagram, Module 4: Blend It](diagrams/png/seq_m4_blend_it.png)
+
+### 4.5 Profile, Stars, Streak and Unlock Workflow
+- **Profiles:** the active profile scopes every read and write (FR-14).
+- **Letter completion:** completing a letter saves its stars (FR-06) and updates the daily streak (FR-09).
+- **Map update:** the map's Room flows re-emit, `UnlockManager` opens the next letter (FR-08), and the star total is recomputed in SQL.
+
+![Sequence diagram, Module 5: progression and profiles](diagrams/png/seq_m5_progression.png)
+
+### 4.6 Parent Zone, Dashboard and Report Workflow
+- **Entry:** an arithmetic problem guards the Parent Zone.
+- **Dashboard and report:** the dashboard and the PDF report come from `ReportGenerator`.
+- **CSV export:** the telemetry CSV export of §3.5.2 is shown in grey because it is planned.
+
+![Sequence diagram, Module 6: Parent dashboard and report](diagrams/png/seq_m6_parent_dashboard.png)
 
 ---
 

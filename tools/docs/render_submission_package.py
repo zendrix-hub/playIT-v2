@@ -18,6 +18,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 try:
@@ -224,7 +225,7 @@ def build_spec_document(spec: dict) -> Path:
     setup_page(doc.sections[0], spec["short"])
     build_cover(doc, parse_front(front), spec["title"])
     build_toc(doc)
-    render_blocks(doc, parse_blocks(body), Theme())
+    render_blocks(doc, parse_blocks(body), Theme(base_dir=spec["src"].parent))
     out = SUBMISSION_DIR / f"{spec['out']}.docx"
     doc.save(out)
     print(f"[OK] DOCX  {out.relative_to(REPO)}")
@@ -328,6 +329,57 @@ def export_pdf(docx_path: Path) -> Path:
     sys.exit(f"Error: could not convert {docx_path.name} to PDF (needs Microsoft Word or LibreOffice).")
 
 
+def _palette_copy(path: Path, tmpdir: Path) -> Path:
+    """The diagrams use flat colours, so a 256-colour copy looks the same at under half the size.
+    Without Pillow, the original is used."""
+    try:
+        from PIL import Image
+    except ImportError:
+        return path
+    out = tmpdir / path.name
+    with Image.open(path) as im:
+        im.convert("RGB").quantize(colors=256, method=Image.Quantize.MEDIANCUT,
+                                   dither=Image.Dither.NONE).save(out, optimize=True)
+    return out
+
+
+def restore_figure_resolution(pdf_path: Path, md_path: Path):
+    """Word's PDF export downsamples pictures to about 200 ppi, which blurs the small text of the wide
+    diagrams. Put each original PNG back in place (same position and size), matched in document order."""
+    lines = md_path.read_text(encoding="utf-8").splitlines()
+    figures = [md_path.parent / b.path for b in parse_blocks(lines) if b.kind == "image"]
+    if not figures:
+        return
+    try:
+        import pymupdf
+        from docx.image.image import Image as DocxImage
+    except ImportError:
+        print("[--] PDF   figures left at Word's 200 ppi (pip install pymupdf to restore full resolution)")
+        return
+    queue = [(f, DocxImage.from_file(str(f))) for f in figures]
+    doc = pymupdf.open(pdf_path)
+    replaced = 0
+    with tempfile.TemporaryDirectory() as tmpdir:
+        for page in doc:
+            for img in page.get_images(full=True):
+                if not queue:
+                    break
+                path, original = queue[0]
+                if abs(img[2] / img[3] - original.px_width / original.px_height) < 0.02:
+                    # Delete and insert at the same place (replace_image keeps a second copy of every figure).
+                    rect = page.get_image_rects(img[0])[0]
+                    page.delete_image(img[0])
+                    page.insert_image(rect, filename=str(_palette_copy(path, Path(tmpdir))))
+                    queue.pop(0)
+                    replaced += 1
+        tmp = pdf_path.with_name(pdf_path.stem + ".tmp.pdf")
+        doc.save(tmp, garbage=4, deflate=True)
+    doc.close()
+    tmp.replace(pdf_path)
+    status = "OK" if replaced == len(figures) else "!!"
+    print(f"[{status}] PDF   {replaced} of {len(figures)} figures at full resolution")
+
+
 # ---------------------------------------------------------------------------
 # Checklist
 # ---------------------------------------------------------------------------
@@ -348,8 +400,8 @@ Rebuild everything with `python3 tools/docs/render_submission_package.py` (pytho
 | # | Deliverable | Files | Source | Contents |
 |:---:|---|---|---|---|
 | 1 | **MVP Validation Findings & Refactoring Priorities** (course form) | `playIT_MVP_Validation_Findings_and_Refactoring_Priorities.pdf` / `.docx` | `MVP_Validation_Findings_and_Refactoring_Priorities_Filled.md`, filled into the course template | Sections 1–7 and the declaration: 5 findings, 6 refactoring priorities, summary matrix, non-priority screening |
-| 2 | **Software Design Description (SDD v2.0, rev. 2.3)** | `playIT_SDD_v2.0.pdf` / `.docx` | `SDD_v2.0_Refactored.md` | §2.0 implementation status checked against the code on 2026-10-09 |
-| 3 | **Software Requirements Specification (SRS v3.0, rev. 3.3)** | `playIT_SRS_v3.0.pdf` / `.docx` | `SRS_v3.0_Refactored.md` | RTM v3.0 (16 findings) and §4.1 automated test coverage |
+| 2 | **Software Design Description (SDD v2.0, rev. 2.5)** | `playIT_SDD_v2.0.pdf` / `.docx` | `SDD_v2.0_Refactored.md` | §2.0 implementation status; system ERD (§3.5.3), 6 class diagrams (§3.7) and 6 sequence diagrams (§4) |
+| 3 | **Software Requirements Specification (SRS v3.0, rev. 3.5)** | `playIT_SRS_v3.0.pdf` / `.docx` | `SRS_v3.0_Refactored.md` | Use case diagram (§2.5), RTM v3.0 (16 findings) and §4.1 automated test coverage |
 | 4 | **Software Project Management Plan (SPMP v2.0, rev. 2.3)** | `playIT_SPMP_v2.0.pdf` / `.docx` | `SPMP_v2.0_Refactored.md` | WBS, revised schedule with sprint status, risk register R1–R8 |
 
 ## 2. Technical evidence (agy batch validation, `c07206e`)
@@ -364,7 +416,7 @@ Rebuild everything with `python3 tools/docs/render_submission_package.py` (pytho
 - [ ] Confirm the adviser's name on the MVP form and the three cover pages (Mr. Joemarie C. Amparo, taken from the team's transmittal notes).
 - [ ] Confirm the group name, section ("IT411 G1–G8") and member list on the MVP form.
 - [ ] Sign the MVP form's Final Declaration (Team Lead) on the printed copy if the course requires a wet signature.
-- [ ] Open each PDF and check that the table of contents, page numbers and landscape matrices (SRS RTM, SPMP risk register) look right.
+- [ ] Open each PDF and check that the table of contents, page numbers and landscape matrices (SRS RTM, SPMP risk register) and the landscape diagram pages look right.
 - [ ] Optional: install the APK on the test phone (`adb install -r playit-debug-B-eaf8634.apk`).
 
 ## 4. Still pending after this submission (stated in the documents)
@@ -387,7 +439,7 @@ def main():
 
     for spec in SPEC_DOCUMENTS:
         print(f"\n{spec['title']}")
-        export_pdf(build_spec_document(spec))
+        restore_figure_resolution(export_pdf(build_spec_document(spec)), spec["src"])
 
     print("\nMVP Validation Findings & Refactoring Priorities")
     fill_mvp_validation_form.build_form(MVP_FORM["src"], MVP_FORM["template"], MVP_FORM["filled"])
