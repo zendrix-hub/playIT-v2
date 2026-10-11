@@ -292,5 +292,6 @@ Each card ticks its own item in its commit (see `docs/tasks/AGY_RUNBOOK.md`). A 
 - [ ] Card 15b: Approved word clips for AM, TUB and YAM from audio release 2026-10-11-words (FR-13, NFR-AUD-01)
 - [x] Card 28b: Phone-test polish: letter-to-mouth pairs, 10 s idle wiggle on the main button, unit banner title, Say It attempt dots on compact (NFR-ACC-01, NFR-ACC-02)
 - [x] Card 28c: Hear It visual focus: mouth articulation cues reserved exclusively for Say It expressive scaffolding (NFR-ACC-01, NFR-ACC-02)
+- [x] Card 28d: A lesson screen that changes letter shows the new letter's picture, not the last one (NFR-ACC-01)
 - [ ] Card 29: Mascot poses and companion avatar art refresh (asset card)
 

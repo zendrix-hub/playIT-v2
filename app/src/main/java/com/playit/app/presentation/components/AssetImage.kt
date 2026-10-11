@@ -2,8 +2,8 @@ package com.playit.app.presentation.components
 
 import android.graphics.BitmapFactory
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -72,29 +72,19 @@ fun rememberAssetPainter(assetPath: String, maxSize: Dp = 160.dp): Painter {
                 ?: decodeAsset(context, assetPath, reqPx) ?: transparent
         }
     }
-    val painter by produceState<Painter>(
-        initialValue = AssetBitmapCache.get(key)?.let { BitmapPainter(it.asImageBitmap()) } ?: transparent,
-        key1 = key
-    ) {
-        if (value !== transparent) return@produceState
+    // The state is keyed on the picture: produceState keeps its old value when its key changes, so a
+    // screen that changed letter in place kept the previous letter's picture (card 28d).
+    val painter = remember(key) {
+        mutableStateOf<Painter>(AssetBitmapCache.get(key)?.let { BitmapPainter(it.asImageBitmap()) } ?: transparent)
+    }
+    LaunchedEffect(key) {
+        if (painter.value !== transparent) return@LaunchedEffect
         AssetDecodeTracker.start()
         try {
-            value = withContext(Dispatchers.IO) {
-                runCatching {
-                    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-                    context.assets.open(assetPath).use { BitmapFactory.decodeStream(it, null, bounds) }
-                    val opts = BitmapFactory.Options().apply {
-                        inSampleSize = calculateInSampleSize(bounds.outWidth, bounds.outHeight, reqPx, reqPx)
-                    }
-                    context.assets.open(assetPath).use { BitmapFactory.decodeStream(it, null, opts) }
-                }.getOrNull()?.let { bmp ->
-                    AssetBitmapCache.put(key, bmp)
-                    BitmapPainter(bmp.asImageBitmap())
-                } ?: transparent
-            }
+            painter.value = withContext(Dispatchers.IO) { decodeAsset(context, assetPath, reqPx) } ?: transparent
         } finally {
             AssetDecodeTracker.done()   // after the value is set, so a waiting test sees the picture
         }
     }
-    return painter
+    return painter.value
 }
