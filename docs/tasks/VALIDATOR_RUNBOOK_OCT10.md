@@ -232,3 +232,40 @@ Claude ran the whole card locally before writing it. Expected:
 - **Screenshots and phone:** as in the card's "Screenshots" and "Phone checks" sections. Build APK D after the commit and copy it to `Documents/playIT-apk/playit-debug-D-<hash>.apk`; don't overwrite A, A2, B or C.
 
 Push, then report the hash. Claude reviews card 24b.
+
+## 8. Ready for agy: card 28b (`ed997b6`), then card 15b
+
+### 8.1 Validate card 28b (Claude wrote and ran it, 2026-10-11)
+```bash
+git pull origin refactor/hear-say-it
+./gradlew testDebugUnitTest
+python3 tools/dev/review_card.py 28b
+./gradlew recordRoborazziDebug --tests 'com.playit.app.screenshot.*'
+```
+Expected:
+- **Full suite:** 403 tests, 0 failed, 6 skipped (by design). Claude's run on Windows gave the same.
+- **`review_card.py 28b`:** all PASS, plus the usual WARN "no hash yet".
+- **CI:** `ed997b6` green on the Actions page.
+
+| Images | Must be true |
+|---|---|
+| `map_*` | The unit banner shows "SECTION 1, UNIT 1" and the whole title "Chocolate Hills Phonics", with the darker shelf below the card, on all 4 sizes. |
+| `sayit_cue_*` | After two misses: the mouth picture left of the mic, "Let's try again", and all three dots fully visible above the orange "Watch my lips" banner. On compact the mouse card is shorter; on the other sizes nothing moved. |
+| `hearit_*`, `sayit_*` | Unchanged from section 7. |
+
+**APK E and phone checks (A21s).** Build APK E after the validation and copy it to `Documents/playIT-apk/playit-debug-E-ed997b6.apk`; don't overwrite A to D.
+- **Mouth pictures.** Hear It O and U show an open mouth, not round lips. J and Q show round lips. R shows the tongue picture. M still shows lips together.
+- **Idle wiggle.**
+  - Hear It: after the first sequence, touch nothing for 10 s. Next wiggles once while Lily says the re-prompt.
+  - Say It: touch nothing for 10 s. The mic wiggles silently. Tap anywhere and the 10 s start again.
+  - With Android's "Remove animations" on, nothing wiggles.
+- **Map:** every unit banner shows its whole title, including "Tarsier Forest Sanctuary".
+
+Record the verdict here and in `SESSION_HANDOFF.md`.
+
+### 8.2 Card 15b: Blend It word audio (needs the WSL machine that has the audio batch)
+Card 15b is `Status: blocked` until its step 0 has run.
+- **Step 0:** one command builds release `2026-10-11-words` from the user's OK marks in batch `2026-10-06-blendwords-card15`. That batch is not on the Windows PC.
+  - The tool picks the one OK take per word itself, and refuses if a word has none or several.
+  - If it refuses, write the message to `QUESTIONS.md` and stop.
+- **Then:** run the card as a normal session: copy the 3 WAVs, then make the `AudioResolver` and seed changes. Expected: 406 tests, 0 failed, 6 skipped.

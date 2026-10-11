@@ -951,3 +951,21 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - Review and validate the finalized academic document statuses and front-matter across the 4 submission files.
   - Review Card 24b technical acceptance.
   - Author and begin Card 28b (Blend It audio release manifest, mouth cue articulation audit, child wiggles/tutoring refinements).
+
+### Claude, 2026-10-11: submission front matter, card 24b accepted, cards 15b and 28b
+- **Submission package (`074347a`):**
+  - **Versions.** The cover pages keep the baseline version and add the latest revision: SRS 3.0 rev. 3.6, SDD 2.0 rev. 2.6, SPMP 2.0 rev. 2.4. Before, the covers said 3.0 and 2.0 while the revision tables went to 3.6 and 2.5. SDD 2.6 and SPMP 2.4 record the issue for adviser review and the full names.
+  - **Wording.** "user decision" now reads "team decision" (to an adviser, "user" means the app's user), and "agy" now reads "automated batch validation".
+  - **Corrected claims.** SRS rev. 3.6 and the checklist claimed layout checks "on Samsung A21s viewports"; the matrix runs on 4 emulated sizes. They also said captions were dropped "per teacher feedback"; it was the team's phone-test decision.
+  - **Stale line.** The SDD mouth-cue row said the pictures still await release.
+  - **Figures.** The previous re-render ran without pymupdf, so all 14 diagrams were at Word's 200 ppi. They are back at full resolution: SDD 5.2 MB, SRS 0.94 MB.
+  - **Still for the team (checklist §3):** "IT411 G1–G8" on the MVP form is the course's group range, not your section. Fill in the real section before printing. The revision tables name Claude as a contributor on several rows. That is an honest AI-use record; keep it unless the course says otherwise.
+- **Card 24b accepted (`a663bc8`):** the diff matches the card, all 9 picture hashes match the manifest, the local re-run gave 386/0/6, and review_card is all PASS.
+- **Card 15b written, blocked on step 0 (`6bde488`):** the AM, TUB and YAM takes are in batch `2026-10-06-blendwords-card15`, which is on the WSL machine, not this PC. `make_release.py` now picks the take marked OK from the review CSV (`word_am_t*.wav`); the spec is `tools/audio/releases/2026-10-11-words.json`. One command on the WSL machine builds the release, then agy runs the card.
+- **Card 28b done (`ed997b6`):**
+  - **Mouth pairs.** o and u get open-mouth pictures, j and q round lips, r the tongue picture. The other 21 letters were right.
+  - **Idle wiggle.** After 10 s idle, the button to tap next wiggles once. Say It's is silent.
+  - **Map banner.** The unit banner grows with its title.
+  - **Say It dots.** They stay above the bottom bar on 360x640.
+  - **Tests.** 403 tests, 0 failed, 6 skipped; Roborazzi map and Say It cue checked on 4 sizes.
+- **Next for agy:** `VALIDATOR_RUNBOOK_OCT10.md` section 8 (validate 28b, APK E), then card 15b once its release is in.
