@@ -273,8 +273,17 @@ Record the verdict here and in `SESSION_HANDOFF.md`.
   - Check the SHA-256 of the 3 WAVs against the manifest, then copy them.
   - Make the `AudioResolver` and seed changes.
   - Add the Parent Zone credit line (`VoiceCredit.kt`). The account is on the ElevenLabs Free plan, so the clips must not ship without it.
-- **Expected:** 407 tests, 0 failed, 6 skipped. `review_card.py 15b` all PASS.
-- **APK F:** build it after the commit and copy it to `Documents/playIT-apk/playit-debug-F-<hash>.apk`. Don't overwrite A to E.
+- **Expected:** 408 tests, 0 failed, 6 skipped (404 after card 28d, plus 4). `review_card.py 15b` all PASS.
+- **APK G:** build it after the commit and copy it to `Documents/playIT-apk/playit-debug-G-<hash>.apk`. Don't overwrite A to F. It carries card 28d's picture fix as well.
 - **Phone checks (A21s):**
   - In Blend It, AM, TUB and YAM are each spoken once after the sound-out.
   - At the bottom of the Parent Zone, the credit line shows under Privacy.
+
+### 8.3 Card 28d: stale picture after "next letter" (`e7f870e`, done by Claude)
+- **Bug from the A21s test of APK E:** after "next letter" the card kept M's mouse picture. The fix is in the shared picture loader (`AssetImage.kt`).
+- **APK F (`0573906`) still has this bug.** Card 28d was first numbered 28c; agy's 28c landed first.
+- **Validate:**
+  - `./gradlew testDebugUnitTest`: 404 tests, 0 failed, 6 skipped. Claude's run on Windows, on top of `0573906`, gave the same.
+  - `python3 tools/dev/review_card.py 28d`: all PASS, plus the hash WARN.
+- **Order:** run card 15b next (8.2). APK G carries both.
+- **Phone check:** in section 1, tap through two or three letters in a row. Each card shows its own picture.

@@ -1032,3 +1032,16 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
 - **APK F Assembly**:
   - Built `Documents/playIT-apk/playit-debug-F-0573906.apk` (103 MB) and root `./playit-debug.apk`.
 
+
+### Claude, 2026-10-11 (night): card 28d, the stale picture after "next letter"; review of agy's 28c
+
+- **User's report on APK E:** after "next letter" the card kept M's mouse picture on most section 1 letters; S opened fresh from the map showed the sun.
+- **Cause:** `rememberAssetPainter` used `produceState(key1 = path)`. That keeps the old value when the key changes, and the loader then skipped the decode because the value was not blank.
+- **Fix (`e7f870e`, card 28d):** the state is now `remember(key)` with `LaunchedEffect(key)`.
+  - The new background-mode test fails on the old code and passes with the fix.
+  - Full suite on top of agy's 28c: 404 tests, 0 failures, 6 skipped. `review_card.py 28d` all PASS (hash WARN).
+  - It was first numbered 28c, but agy's 28c landed first. APK F still has the bug.
+- **Review of agy's card 28c (`0573906`):**
+  - The code is fine: the mouth picture is gone from Hear It and the play button is centred.
+  - Open item: the submission documents still describe the mouth cue as sitting beside the Hear It play button (SDD §2.0 mouth-cue row, SRS NFR-ACC-01 row, card 24b). If 28c stays, those rows need a revision before the adviser reads them.
+- **Next for agy:** validate 28d (runbook 8.3), then card 15b (8.2): 408 tests, then APK G.
