@@ -266,9 +266,14 @@ Expected:
 
 Record the verdict here and in `SESSION_HANDOFF.md`.
 
-### 8.2 Card 15b: Blend It word audio (needs the WSL machine that has the audio batch)
-Card 15b is `Status: blocked` until its step 0 has run.
-- **Step 0:** one command builds release `2026-10-11-words` from the user's OK marks in batch `2026-10-06-blendwords-card15`. That batch is not on the Windows PC.
-  - The tool picks the one OK take per word itself, and refuses if a word has none or several.
-  - If it refuses, write the message to `QUESTIONS.md` and stop.
-- **Then:** run the card as a normal session: copy the 3 WAVs, then make the `AudioResolver` and seed changes. Expected: 406 tests, 0 failed, 6 skipped.
+### 8.2 Card 15b: Blend It word audio and the ElevenLabs credit (`Status: ready`)
+- **Step 0 is done** (Claude, 2026-10-11): release `docs/audio-release/2026-10-11-words/` holds ElevenLabs takes e3 of AM, TUB and YAM, picked by the user. Start at the card's pre-step.
+- **Run the card as a normal session:**
+  - Check the SHA-256 of the 3 WAVs against the manifest, then copy them.
+  - Make the `AudioResolver` and seed changes.
+  - Add the Parent Zone credit line (`VoiceCredit.kt`). The account is on the ElevenLabs Free plan, so the clips must not ship without it.
+- **Expected:** 407 tests, 0 failed, 6 skipped. `review_card.py 15b` all PASS.
+- **APK F:** build it after the commit and copy it to `Documents/playIT-apk/playit-debug-F-<hash>.apk`. Don't overwrite A to E.
+- **Phone checks (A21s):**
+  - In Blend It, AM, TUB and YAM are each spoken once after the sound-out.
+  - At the bottom of the Parent Zone, the credit line shows under Privacy.

@@ -1,6 +1,6 @@
 # Card 15b: Approved word clips for AM, TUB and YAM, with the ElevenLabs credit; Blend It stops being silent on them (FR-13, NFR-AUD-01)
 
-Status: blocked (needs release 2026-10-11-words: the user's OK marks; see step 0)
+Status: ready
 
 It touches `AudioResolver`, the Blend It word seeds and their tests, and the Parent Zone dashboard (one credit line), and adds three assets. Card 28b does not touch any of these files, so the two cards can run in either order.
 
@@ -13,7 +13,9 @@ It touches `AudioResolver`, the Blend It word seeds and their tests, and the Par
   - Batch `2026-10-11-blendwords-card15b-eleven` has four ElevenLabs takes per word (e1 to e4): Text to Speech, model `eleven_v4`, library voice "Lily Wolff", because the account has no "PlayIT Lily" clone. The takes are cleaned like every other clip (24 kHz WAV, RMS -20 dBFS).
 - **Not in this card:** pictures for AM, TUB, YAM and ZIP. They need an image round and an image release. Until then, these words show no picture.
 
-## Step 0: build the release (Claude, on the Windows PC)
+## Step 0: build the release (Claude, on the Windows PC): done
+Done on 2026-10-11: release `docs/audio-release/2026-10-11-words/` (manifest and 3 WAVs) is committed. The user marked all four takes of each word OK, then picked take e3 of each word in chat, so the spec names `word_<w>_e3.wav` directly and `make_release.py` checked each against the review CSV. agy starts at the pre-step.
+
 The batch lives outside the repo, in `Documents/playIT-audio-batches/2026-10-11-blendwords-card15b-eleven/` on the Windows PC.
 - **The plan is Free** (user, 2026-10-11), and the spec's `license` says so. Free means non-commercial use only, and anything published must credit "elevenlabs.io". Change 4 adds that credit, so the clips never ship without it. Free-plan audio cannot become commercial later, even after an upgrade.
 - **Still missing: the user's verdicts.** One take per word must be marked OK on the batch's review page and exported as `2026-10-11-blendwords-card15b-eleven_review.csv` into the batch folder. Until then the spec's `approvedBy` is `TODO`, and `make_release.py` refuses.

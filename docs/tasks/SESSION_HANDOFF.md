@@ -1013,3 +1013,10 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - `tools/audio/releases/2026-10-11-words.json` points at that batch. `approvedBy` and `license` are `TODO`, and `make_release.py` now refuses any spec with a `TODO` field.
 - **Waiting on the user:** the OK/FIX marks on that batch's review page (CSV export), and the account's ElevenLabs plan (Free means non-commercial use and a credit line in the app). Then Claude builds the release, commits it and sets card 15b to `Status: ready` for agy.
 - **agy:** nothing to do for card 15b until then. Its card was updated: Step 0 is now Claude's, on the Windows PC.
+
+### Claude, 2026-10-11 (night): release 2026-10-11-words built; card 15b ready
+
+- **Plan:** the ElevenLabs account is on the Free plan (user). The clips are non-commercial only, and card 15b adds the "elevenlabs.io" credit at the bottom of the Parent Zone, under Privacy.
+- **Picks:** the user marked all 12 takes OK on review page `2026-10-11-blendwords-card15b-eleven`, then picked take e3 for AM, TUB and YAM in chat. The spec names the e3 files directly, and `make_release.py` checked each against the review CSV, which is unchanged and kept in the batch folder.
+- **Release `docs/audio-release/2026-10-11-words/`:** 3 WAVs and the manifest, with SHA-256 for each. Teacher audit pending.
+- **Card 15b is `Status: ready`.** agy runs it per runbook section 8.2: 407 tests expected, then APK F.
