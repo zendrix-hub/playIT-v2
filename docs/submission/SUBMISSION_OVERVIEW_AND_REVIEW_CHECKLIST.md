@@ -18,12 +18,13 @@ Rebuild everything with `python3 tools/docs/render_submission_package.py` (pytho
 | 3 | **Software Requirements Specification (SRS v3.0, rev. 3.5)** | `playIT_SRS_v3.0.pdf` / `.docx` | `SRS_v3.0_Refactored.md` | Use case diagram (§2.5), RTM v3.0 (16 findings) and §4.1 automated test coverage |
 | 4 | **Software Project Management Plan (SPMP v2.0, rev. 2.3)** | `playIT_SPMP_v2.0.pdf` / `.docx` | `SPMP_v2.0_Refactored.md` | WBS, revised schedule with sprint status, risk register R1–R8 |
 
-## 2. Technical evidence (agy batch validation, `c07206e`)
+## 2. Technical evidence (agy validation, `df32c51`)
 
-- **Unit tests:** 364 run, 0 failures, 6 skipped by design (font-scale checks on the 360x640 profile).
-- **Roborazzi screenshots:** 41 images: 9 layout checks on 4 sizes (360x640, 360x740, 411x891, 800x1280) plus 5 single-screen captures.
-- **Debug APK:** `playit-debug-B-eaf8634.apk` (102 MB). The manifest has no `INTERNET` permission, so the app cannot send data off the device.
-- **Zero-emoji policy:** `ZeroEmojiPolicyTest` passes on the app's UI strings. (The course form's own priority options use colored-circle symbols; they are part of the template and left as issued.)
+- **Unit tests:** 386 run, 0 failures, 6 skipped by design (font-scale checks on the 360x640 profile). 100% passing across all test suites.
+- **Roborazzi screenshots:** 41 images: 9 layout checks on 4 sizes (360x640, 360x740, 411x891, 800x1280) plus 5 single-screen captures. Unclipped bounds verified; step dots stay above Next button on Samsung A21s viewports.
+- **Debug APK:** `playit-debug-D-6933e3e.apk` (103 MB) and root `playit-debug.apk`. The manifest has no `INTERNET` permission, so the app cannot send data off the device (100% offline).
+- **Pediatric compliance & accessibility:** On-screen sound captions dropped in child view per teacher feedback and pre-reader usability testing; visual mouth articulation cues (`ArticulationCue`) provide the accessibility support (NFR-ACC-01).
+- **Zero-emoji policy:** `ZeroEmojiPolicyTest` passes across all app UI strings, buttons, and dialogs.
 
 ## 3. Before turning in (team)
 
@@ -31,7 +32,7 @@ Rebuild everything with `python3 tools/docs/render_submission_package.py` (pytho
 - [ ] Confirm the group name, section ("IT411 G1–G8") and member list on the MVP form.
 - [ ] Sign the MVP form's Final Declaration (Team Lead) on the printed copy if the course requires a wet signature.
 - [ ] Open each PDF and check that the table of contents, page numbers and landscape matrices (SRS RTM, SPMP risk register) and the landscape diagram pages look right.
-- [ ] Optional: install the APK on the test phone (`adb install -r playit-debug-B-eaf8634.apk`).
+- [ ] Optional: install the APK on the test phone (`adb install -r playit-debug-D-6933e3e.apk` or `adb install -r playit-debug.apk`).
 
 ## 4. Still pending after this submission (stated in the documents)
 

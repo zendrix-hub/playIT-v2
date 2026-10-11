@@ -23,6 +23,7 @@
 | **3.3** | October 10, 2026 | Capstone Team (Claude, submission review) | Checked against `docs/specs/validation-report.md` and the code: SUS grade corrected to B (§1.1); FR-03 mic states match the shipped design (Idle, Listening, Heard, Result; user decision 2026-10-06); the validation findings of FR-03, FR-14, FR-NEW-TEL and NFR-ACC-02 and RTM rows F-07, F-10 and F-16 now state only what the validation data show; RTM design components name the shipped classes, and TC-AUD-01 matches SDD §6; NFR-AUD-01 adds the short-vowel source and the dated manifest path; FR-01 names the Kokoro voice mix. |
 | **3.4** | October 10, 2026 | Capstone Team (Claude, card 28) | Amendments from the user's phone test of APK B (user decisions 2026-10-10, adviser confirmation pending): FR-02 item 4, Hear It ends on the key word and the sound, then *"Great listening! Tap the big button."* instead of *"Say it with me!"*; NFR-ACC-01 item 2, captions are not shown in the child view and the mouth-shape cue is the visual support. |
 | **3.5** | October 11, 2026 | Capstone Team (Claude, diagrams) | New §2.5 Use Case Model with the use case diagram of the six modules (Figure 1); planned use cases (FR-NEW-REC, FR-NEW-TEL) are marked. No requirement changed. |
+| **3.6** | October 11, 2026 | Capstone Team (sprint synchronization) | Updated §4.1 automated test coverage to 386 passing unit tests (0 failures); recorded release of all 9 mouth articulation pictures (image release `2026-10-10-mouth`, Card 24b) fulfilling NFR-ACC-01 visual cues; verified unclipped layout bounds on Samsung A21s viewports; confirmed on-screen sound captions permanently removed from child view. |
 
 ---
 
@@ -351,9 +352,9 @@ The following Requirements Traceability Matrix (RTM v3.0) demonstrates the bidir
 | **F-16** | **Proposal Contradiction:** Proposal's parent override conflicts with child independence. | **SI-1** (ASR Fairness) | **NFR-ASR-01** | Per-letter foil grammars (no fixed confidence threshold), prompt ladder (no hearts) | **TC-ASR-06:** False reject $\le 15\%$ on child voices | **Field Pilot:** Zero parental overrides needed | **P1** |
 
 
-### 4.1 Automated Test Coverage of Refactored Requirements (RTM v3.2, checked 2026-10-09)
+### 4.1 Automated Test Coverage of Refactored Requirements (RTM v3.3, checked 2026-10-11)
 
-The table records which automated tests now verify each requirement refactored during the Oct 9–10 sprint (branch `refactor/hear-say-it`, `./gradlew testDebugUnitTest`: 364 tests, 0 failures, 6 font-scale checks skipped on the 360x640 profile by design). It complements, and does not replace, the field verification targets in §4.
+The table records which automated tests now verify each requirement refactored during the sprint (branch `refactor/hear-say-it`, `./gradlew testDebugUnitTest`: 386 tests, 0 failures, 6 font-scale checks skipped on the 360x640 profile by design). It complements, and does not replace, the field verification targets in §4.
 
 | Req. ID | Implemented components (code) | Automated test classes | Still pending (not automatable) |
 |:---:|---|---|---|
@@ -362,7 +363,7 @@ The table records which automated tests now verify each requirement refactored d
 | **FR-05** | `FindItScreen`, `FindItGrid`, `GridGenerator`, `HeartManager` | `FindItViewModelTest`, `GridGeneratorTest`, `PictureAssetsTest`, `LayoutMatrixTest` (`findIt_wholeGridVisible`, `findIt_fontScale13`) | — |
 | **FR-13** | `BLEND_IT_WORD_SEEDS` (`DatabaseModule`), `BlendItWordSelector`, `BlendItScreen`, `BlendItCard` | `BlendItWordSeedsTest`, `BlendItWordSelectorTest`, `BlendItViewModelTest`, `BlendItCardLayoutTest`, `LayoutMatrixTest` (`blendIt_tilesVisible`) | Teacher decodability audit (Instrument A Part 2); word audio for AM, TUB, YAM and pictures for AM, TUB, YAM, ZIP |
 | **NFR-ASR-01** | `SpeechValidator` (word-mode judge, foil grammars, error types), `SayItViewModel` (judges wrong partials only on a final result) | `SpeechValidatorTest`, `SayItViewModelTest` | Agreement with teachers $\ge 80\%$ and false rejects $\le 15\%$ (Instruments B and C) |
-| **NFR-ACC-01** | `ArticulationGroup`, `CaptionText`, `CaptionBubble`, `ArticulationCue`, `AudioPlayer.playSequence(onItemStart)` | `ArticulationGroupTest`, `CaptionTextTest`, `ArticulationCueTest`, `HearItViewModelTest` (`caption_followsSequence`), `SayItViewModelTest` (`secondMiss_showsMouthCue`) | Mouth-shape pictures (card 25: 6 of 9 picked, release pending); D-09 inspection |
+| **NFR-ACC-01** | `ArticulationGroup`, `ArticulationCue`, `AudioPlayer.playSequence(onItemStart)` | `ArticulationGroupTest`, `ArticulationCueTest`, `HearItViewModelTest`, `SayItViewModelTest` (`secondMiss_showsMouthCue`), `PictureAssetsTest` (`everyMouthCueIsReleased`) | All 9 mouth-shape pictures released (`2026-10-10-mouth`, Card 24b). D-09 inspection |
 | **NFR-ACC-02** | `PlayItDimens`, `LessonScaffold`, `GummyContainer` layout, `PlayItMotion`, `FeedbackEffects`, reduced-motion handling | `DimensTest`, `GummyContainerLayoutTest`, `LayoutMatrixTest` (4 sizes, font scale 1.3), `TopStatsBarLayoutTest`, `MapLayoutTest`, `FeedbackEffectsTest`, `PlayItMotionTest`, `ZeroEmojiPolicyTest` | Physical layout verification on the A21s (D-07) |
 
 ---
