@@ -13,6 +13,8 @@ SPEC.json:
       "sourceFile": "ui_hearit_next.wav", "text": "...", "voice": "...", "speed": 0.95,
       "license": "Apache-2.0 (Kokoro-82M)"}, ...]}
 Optional per clip: "tool" (generator and method, for clips not made by plain Kokoro), "note".
+A "sourceFile" with a * (e.g. "word_am_t*.wav") picks the one take the user marked OK among the
+matching files; no OK take, or more than one, refuses the release.
 
 Stdlib only, so it runs on Windows and in WSL.
 """
@@ -56,6 +58,17 @@ def verdict_of(row):
     return "unscored", False
 
 
+def pick_take(batches, batch, pattern):
+    """(file, None) for the one take matching pattern that the user approved, else (None, reason)."""
+    takes = sorted(p.name for p in (Path(batches) / batch).glob(pattern))
+    if not takes:
+        return None, f"no file matches {pattern} in {batch}"
+    approved = [t for t in takes if (row := review_row(batches, batch, t)[1]) is not None and verdict_of(row)[1]]
+    if len(approved) != 1:
+        return None, f"{len(approved)} approved takes among {', '.join(takes)} (need exactly 1)"
+    return approved[0], None
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("spec")
@@ -67,6 +80,12 @@ def main(argv=None):
     out = Path(args.out)
     entries, problems = [], []
     for c in spec["clips"]:
+        if "*" in c["sourceFile"]:
+            picked, why = pick_take(args.batches, c["sourceBatch"], c["sourceFile"])
+            if picked is None:
+                problems.append(f"{c['clipId']}: {why}")
+                continue
+            c = {**c, "sourceFile": picked}
         src = Path(args.batches) / c["sourceBatch"] / c["sourceFile"]
         csv_name, row = review_row(args.batches, c["sourceBatch"], c["sourceFile"])
         if not src.exists():

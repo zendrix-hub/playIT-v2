@@ -1,0 +1,21 @@
+{
+  "release": "2026-10-11-words",
+  "approvedBy": "user (OK/FIX review page 2026-10-06-blendwords-card15, one take per word marked OK; release built 2026-10-11 after the A21s test of APK D found AM, TUB and YAM silent)",
+  "clips": [
+    {"clipId": "word_am", "dest": "words", "sourceBatch": "2026-10-06-blendwords-card15", "sourceFile": "word_am_t*.wav",
+     "text": "am", "voice": "kokoro-82M mix af_heart*0.7+af_bella*0.3", "speed": null,
+     "license": "Apache-2.0 (Kokoro-82M)",
+     "tool": "tools/audio/audio_lab.py blendwords (9315da8): take t1 = text at speed 0.95, t2 = text at 0.85, t3 = phonemes ˈæm at 0.95",
+     "note": "Blend It word (card 15, FR-13). Judged by ear; Vosk mishears close short vowels on clean audio."},
+    {"clipId": "word_tub", "dest": "words", "sourceBatch": "2026-10-06-blendwords-card15", "sourceFile": "word_tub_t*.wav",
+     "text": "tub", "voice": "kokoro-82M mix af_heart*0.7+af_bella*0.3", "speed": null,
+     "license": "Apache-2.0 (Kokoro-82M)",
+     "tool": "tools/audio/audio_lab.py blendwords (9315da8): take t1 = text at speed 0.95, t2 = text at 0.85, t3 = phonemes tˈʌb at 0.95",
+     "note": "Blend It word (card 15, FR-13). Judged by ear; Vosk mishears close short vowels on clean audio."},
+    {"clipId": "word_yam", "dest": "words", "sourceBatch": "2026-10-06-blendwords-card15", "sourceFile": "word_yam_t*.wav",
+     "text": "yam", "voice": "kokoro-82M mix af_heart*0.7+af_bella*0.3", "speed": null,
+     "license": "Apache-2.0 (Kokoro-82M)",
+     "tool": "tools/audio/audio_lab.py blendwords (9315da8): take t1 = text at speed 0.95, t2 = text at 0.85, t3 = phonemes jˈæm at 0.95",
+     "note": "Blend It word (card 15, FR-13). Judged by ear; Vosk mishears close short vowels on clean audio."}
+  ]
+}
