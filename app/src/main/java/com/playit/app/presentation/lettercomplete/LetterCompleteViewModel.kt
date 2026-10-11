@@ -51,10 +51,17 @@ class LetterCompleteViewModel @Inject constructor(
     private val _nextHighlighted = MutableStateFlow(false)
     val nextHighlighted: StateFlow<Boolean> = _nextHighlighted.asStateFlow()
 
+    /** Goes up on each 10 s idle prompt; the screen wiggles the button to tap next (card 28b). */
+    private val _idleNudge = MutableStateFlow(0)
+    val idleNudge: StateFlow<Int> = _idleNudge.asStateFlow()
+
     private val idleTimer = IdleTimer(
         scope = viewModelScope,
         isBusy = { _isPlaying.value },
-        onIdle = { audioPlayer.playAssetAudio(audioResolver.getUiPath("ui_complete_next")) }
+        onIdle = {
+            _idleNudge.value++
+            audioPlayer.playAssetAudio(audioResolver.getUiPath("ui_complete_next"))
+        }
     )
 
     fun onScreenVisible() {

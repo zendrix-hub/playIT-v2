@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -102,18 +104,18 @@ fun MarungkoGroupBanner(
             .padding(horizontal = 16.dp, vertical = 6.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 3D Duolingo Unit Card
+        // 3D Duolingo Unit Card. The face grows with its text (a fixed 72 dp clipped the title on
+        // every size, and a long title wraps on 360 dp phones); the shelf follows it (card 28b).
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(78.dp)
+                .testTag("unit_banner_$groupNumber")
         ) {
-            // 3D Shelf Extrusion
+            // 3D Shelf Extrusion: the card's full height, 6 dp lower than the face
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(72.dp)
-                    .align(Alignment.BottomCenter)
+                    .matchParentSize()
+                    .padding(top = 6.dp)
                     .clip(RoundedCornerShape(18.dp))
                     .background(bannerShelf)
             )
@@ -121,12 +123,13 @@ fun MarungkoGroupBanner(
             // Top Card Face
             Box(
                 modifier = Modifier
+                    .padding(bottom = 6.dp)
                     .fillMaxWidth()
-                    .height(72.dp)
-                    .align(Alignment.TopCenter)
+                    .heightIn(min = 72.dp)
                     .clip(RoundedCornerShape(18.dp))
                     .background(bannerBg)
-                    .padding(horizontal = 18.dp, vertical = 10.dp)
+                    .padding(horizontal = 18.dp, vertical = 10.dp),
+                contentAlignment = Alignment.CenterStart
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -150,8 +153,11 @@ fun MarungkoGroupBanner(
                             text = theme.title,
                             fontFamily = LexendFontFamily,
                             fontSize = 17.sp,
+                            lineHeight = 21.sp,
                             fontWeight = FontWeight.Black,
-                            color = titleColor
+                            color = titleColor,
+                            maxLines = 2,
+                            modifier = Modifier.testTag("unit_banner_title_$groupNumber")
                         )
                     }
 

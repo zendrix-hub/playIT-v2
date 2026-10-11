@@ -212,7 +212,9 @@ abstract class LayoutMatrixTest(private val deviceName: String) {
         val cue = compose.onNodeWithContentDescription("Mouth shape for this sound").getUnclippedBoundsInRoot()
         val mic = compose.onNodeWithTag("sayit_mic", useUnmergedTree = true).getUnclippedBoundsInRoot()
         assertTrue("cue right ${cue.right} > mic left ${mic.left} on $deviceName", cue.right <= mic.left)
-        assertOnScreen("sayit_mic"); capture("sayit_cue")
+        assertOnScreen("sayit_mic")
+        // The "Watch my lips" banner makes the pinned bar taller; the dots stay above it (card 28b).
+        assertAbove("sayit_attempts", "sayit_bottom"); capture("sayit_cue")
     }
     /** Built as FindItScreenshotTest builds it. */
     @Composable private fun findIt() {
@@ -307,6 +309,16 @@ abstract class LayoutMatrixTest(private val deviceName: String) {
         compose.setContent { PlayItTheme { map() } }
         compose.waitForIdle()
         assertOnScreen("map_current_node"); capture("map")
+    }
+
+    /** The unit banner's title sits inside the card face, above the 6 dp shelf (card 28b). */
+    @Test fun map_unitBannerTitleFits() {
+        compose.setContent { PlayItTheme { map() } }
+        compose.waitForIdle()
+        val banner = compose.onNodeWithTag("unit_banner_1", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        val title = compose.onNodeWithTag("unit_banner_title_1", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        assertTrue("title bottom ${title.bottom} > face bottom ${banner.bottom - 6.dp} on $deviceName",
+            title.bottom <= banner.bottom - 6.dp)
     }
     /** Built as LetterCompleteScreenshotTest builds it (1 star after 3 hearts lost). */
     @Composable private fun complete() {

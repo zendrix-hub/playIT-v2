@@ -37,6 +37,7 @@ import com.playit.app.presentation.components.LessonTopBar
 import com.playit.app.presentation.components.MascotSpeechHeader
 import com.playit.app.presentation.components.MascotState
 import com.playit.app.presentation.components.breathingPulse
+import com.playit.app.presentation.components.idleWiggle
 import com.playit.app.presentation.components.resetsIdle
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.ui.semantics.contentDescription
@@ -60,6 +61,7 @@ fun FindItScreen(
     val isPlaying by viewModel.isPlaying.collectAsStateWithLifecycle()
     val isPlayingPrompt by viewModel.isPlayingPrompt.collectAsStateWithLifecycle()
     val nextHighlighted by viewModel.nextHighlighted.collectAsStateWithLifecycle()
+    val idleNudge by viewModel.idleNudge.collectAsStateWithLifecycle()
 
     DisposableEffect(Unit) {
         viewModel.onScreenVisible()
@@ -121,6 +123,7 @@ fun FindItScreen(
                             .fillMaxWidth()
                             .heightIn(min = 64.dp)
                             .breathingPulse(enabled = nextHighlighted)
+                            .idleWiggle(idleNudge, enabled = nextHighlighted)
                     )
                 }
             }

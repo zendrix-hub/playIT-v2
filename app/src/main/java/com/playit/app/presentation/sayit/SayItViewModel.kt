@@ -18,6 +18,7 @@ import com.playit.app.domain.model.SpeechErrorType
 import com.playit.app.domain.model.SpeechJudgement
 import com.playit.app.domain.repository.SayItAttemptRepository
 import com.playit.app.navigation.SessionManager
+import com.playit.app.presentation.components.IdleTimer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -172,6 +173,28 @@ class SayItViewModel @Inject constructor(
 
     private val _isPlayingPrompt = MutableStateFlow(false)
     val isPlayingPrompt: StateFlow<Boolean> = _isPlayingPrompt.asStateFlow()
+
+    /** Goes up after 10 s with no touch; the screen wiggles the mic, or Next once it is open (card 28b). */
+    private val _idleNudge = MutableStateFlow(0)
+    val idleNudge: StateFlow<Int> = _idleNudge.asStateFlow()
+
+    // Visual only: Say It already speaks its prompt ladder, and a tap on Lily replays the model.
+    private val idleTimer = IdleTimer(
+        scope = viewModelScope,
+        isBusy = {
+            _state.value is SayItState.Listening || _isPlayingPrompt.value ||
+                _isPlayingPhoneme.value || _isModelInitializing.value
+        },
+        onIdle = { _idleNudge.value++ }
+    )
+
+    fun onScreenVisible() {
+        idleTimer.start()
+    }
+
+    fun onUserInteraction() {
+        idleTimer.touch()
+    }
 
     fun playSayItIntroAudio() {
         playIntroThenPromptAudio()
@@ -449,6 +472,7 @@ class SayItViewModel @Inject constructor(
      * A listening attempt is dropped unjudged, so the mic is never stuck in Listening.
      */
     fun onScreenHidden() {
+        idleTimer.stop()
         autoStopJob?.cancel()
         if (_state.value is SayItState.Listening) {
             voskRecognizer.stopListening()
@@ -464,6 +488,7 @@ class SayItViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
+        idleTimer.stop()
         autoStopJob?.cancel()
         voskRecognizer.stopListening()
         audioPlayer.stop()

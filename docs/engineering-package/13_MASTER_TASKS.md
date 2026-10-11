@@ -290,6 +290,6 @@ Each card ticks its own item in its commit (see `docs/tasks/AGY_RUNBOOK.md`). A 
 - [x] Card 27: Refactor and synchronize academic documentation: SDD v2.0, SRS v3.0, and SPMP v2.0
 - [x] Card 28: UX and pedagogy refinements: Hear It ends on the sound with no captions, Say It third miss rests the mic and unlocks Next with no debug text, Blend It in English with a full sound-out, live star totals, one-tap map start and a short greeting (FR-01, FR-02, FR-03, FR-13, NFR-ACC-01, NFR-ACC-02)
 - [ ] Card 15b: Approved word clips for AM, TUB and YAM from audio release 2026-10-11-words (FR-13, NFR-AUD-01)
-- [ ] Card 28b: Phone-test polish: letter-to-mouth pairs, 10 s idle wiggle on the main button, unit banner title, Say It attempt dots on compact (NFR-ACC-01, NFR-ACC-02)
+- [x] Card 28b: Phone-test polish: letter-to-mouth pairs, 10 s idle wiggle on the main button, unit banner title, Say It attempt dots on compact (NFR-ACC-01, NFR-ACC-02)
 - [ ] Card 29: Mascot poses and companion avatar art refresh (asset card)
 

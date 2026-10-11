@@ -246,4 +246,24 @@ class HearItViewModelTest {
         onItem.captured(6, "audio/keywords/kw_mouse.wav")
         assertEquals("mouse", viewModel.caption.value)
     }
+
+
+    /** Card 28b: each 10 s idle prompt also nudges the screen, which wiggles the button to tap next. */
+    @Test
+    fun idle_nudgesTheScreen() = runTest {
+        val fakePhoneme = Phoneme(id = 1, letter = "m", audioPath = "path", imagePath = "path", exampleWord = "mouse")
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme
+
+        viewModel = HearItViewModel(phonemeRepository, audioPlayer, audioResolver, savedStateHandle)
+        advanceUntilIdle()
+        assertEquals(0, viewModel.idleNudge.value)
+
+        viewModel.onScreenVisible()
+        advanceTimeBy(10_001)
+        assertEquals(1, viewModel.idleNudge.value)
+
+        viewModel.onScreenHidden()
+        advanceTimeBy(60_000)
+        assertEquals(1, viewModel.idleNudge.value)
+    }
 }

@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.playit.app.presentation.components.breathingPulse
+import com.playit.app.presentation.components.idleWiggle
 import com.playit.app.presentation.components.resetsIdle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,6 +60,7 @@ fun LetterCompleteScreen(
     val phoneme by viewModel.phoneme.collectAsStateWithLifecycle()
     val starsEarned by viewModel.starsEarned.collectAsStateWithLifecycle()
     val nextHighlighted by viewModel.nextHighlighted.collectAsStateWithLifecycle()
+    val idleNudge by viewModel.idleNudge.collectAsStateWithLifecycle()
     val letter = phoneme?.letter?.uppercase() ?: "M"
 
     var isPlaying by remember { mutableStateOf(true) }
@@ -107,6 +109,7 @@ fun LetterCompleteScreen(
                         .heightIn(min = 64.dp)
                         .testTag("complete_continue")
                         .breathingPulse(enabled = nextHighlighted)
+                        .idleWiggle(idleNudge)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxSize(),

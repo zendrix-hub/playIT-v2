@@ -78,10 +78,15 @@ class FindItViewModel @Inject constructor(
     private val _nextHighlighted = MutableStateFlow(false)
     val nextHighlighted: StateFlow<Boolean> = _nextHighlighted.asStateFlow()
 
+    /** Goes up on each 10 s idle prompt; the screen wiggles the button to tap next (card 28b). */
+    private val _idleNudge = MutableStateFlow(0)
+    val idleNudge: StateFlow<Int> = _idleNudge.asStateFlow()
+
     private val idleTimer = IdleTimer(
         scope = viewModelScope,
         isBusy = { _isPlaying.value || _isPlayingPrompt.value }
     ) {
+        _idleNudge.value++
         if (_nextHighlighted.value) {
             audioPlayer.playAssetAudio(audioResolver.getUiPath("ui_findit_next"))
         } else {

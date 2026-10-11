@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.presentation.components.GummyContainer
+import com.playit.app.presentation.components.idleWiggle
 import com.playit.app.presentation.sayit.MicStatus
 import com.playit.app.presentation.theme.EmeraldLeaf
 import com.playit.app.presentation.theme.EmeraldLeafDark
@@ -83,6 +84,7 @@ fun MicButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     labelOverride: String? = null,
+    idleNudge: Int = 0,
 ) {
     val d = LocalPlayItDimens.current
     val reduced = LocalReducedMotion.current
@@ -127,6 +129,7 @@ fun MicButton(
                 modifier = Modifier
                     .size(d.micSize)
                     .testTag("sayit_mic")
+                    .idleWiggle(idleNudge, enabled = tappable)
                     .semantics { contentDescription = label }
                     .graphicsLayer {
                         scaleX = pop.value; scaleY = pop.value

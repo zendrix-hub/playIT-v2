@@ -763,5 +763,46 @@ class SayItViewModelTest {
         advanceUntilIdle()
         assertEquals(SayItState.Idle, viewModel.state.value)
     }
-}
 
+
+    /** Card 28b: 10 s with no touch nudges the screen to wiggle the mic (visual only); a touch restarts the wait. */
+    @Test
+    fun idle_tenSecondsWithoutTouch_nudgesOnce() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        every { audioPlayer.playAssetAudio(any(), any()) } answers { secondArg<(() -> Unit)?>()?.invoke() }
+        createViewModel()
+        advanceUntilIdle()
+
+        viewModel.onScreenVisible()
+        advanceTimeBy(9_000)
+        viewModel.onUserInteraction()
+        advanceTimeBy(9_000)
+        assertEquals(0, viewModel.idleNudge.value)
+        advanceTimeBy(1_001)
+        assertEquals(1, viewModel.idleNudge.value)
+    }
+
+    @Test
+    fun idle_noNudgeOnceHidden() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        every { audioPlayer.playAssetAudio(any(), any()) } answers { secondArg<(() -> Unit)?>()?.invoke() }
+        createViewModel()
+        advanceUntilIdle()
+
+        viewModel.onScreenVisible()
+        viewModel.onScreenHidden()
+        advanceTimeBy(60_000)
+        assertEquals(0, viewModel.idleNudge.value)
+    }
+
+    @Test
+    fun idle_waitsWhileTheModelPlays() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        createViewModel()   // relaxed audio never finishes, so the intro prompt keeps playing
+        advanceUntilIdle()
+
+        viewModel.onScreenVisible()
+        advanceTimeBy(30_000)
+        assertEquals(0, viewModel.idleNudge.value)
+    }
+}

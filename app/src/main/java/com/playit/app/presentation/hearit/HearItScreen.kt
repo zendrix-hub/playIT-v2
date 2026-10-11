@@ -35,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.playit.app.presentation.components.breathingPulse
+import com.playit.app.presentation.components.idleWiggle
 import com.playit.app.presentation.components.resetsIdle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -80,6 +81,7 @@ fun HearItScreen(
     val isPlayingPrompt by viewModel.isPlayingPrompt.collectAsStateWithLifecycle()
     val playCount by viewModel.playCount.collectAsStateWithLifecycle()
     val nextHighlighted by viewModel.nextHighlighted.collectAsStateWithLifecycle()
+    val idleNudge by viewModel.idleNudge.collectAsStateWithLifecycle()
     val loadError by viewModel.loadError.collectAsStateWithLifecycle()
     val targetLetter = phoneme?.letter?.uppercase() ?: "M"
     val d = LocalPlayItDimens.current
@@ -201,6 +203,7 @@ fun HearItScreen(
                         .heightIn(min = 64.dp)
                         .testTag("hearit_next")
                         .breathingPulse(enabled = nextHighlighted)
+                        .idleWiggle(idleNudge, enabled = nextHighlighted)
                         .graphicsLayer {
                             scaleX = unlockScale.value
                             scaleY = unlockScale.value
@@ -253,6 +256,7 @@ fun HearItScreen(
                             strokeColor = com.playit.app.presentation.theme.ModernBorder,
                             depthHeight = 6.dp,
                             modifier = Modifier.size(d.primaryCta).testTag("hearit_play")
+                                .idleWiggle(idleNudge, enabled = !nextHighlighted && !isPlaying)
                         ) {
                             Icon(
                                 imageVector = if (isPlaying) Icons.AutoMirrored.Rounded.VolumeUp else Icons.Rounded.PlayArrow,

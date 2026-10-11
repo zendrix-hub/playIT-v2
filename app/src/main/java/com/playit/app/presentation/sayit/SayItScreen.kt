@@ -38,11 +38,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.ui.graphics.graphicsLayer
 import com.playit.app.domain.manager.TutorAction
 import com.playit.app.presentation.components.breathingPulse
+import com.playit.app.presentation.components.idleWiggle
+import com.playit.app.presentation.components.resetsIdle
+import com.playit.app.presentation.theme.WindowProfile
+import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.playit.app.BuildConfig
 import com.playit.app.domain.manager.SayItFeedbackCopy
@@ -87,6 +92,7 @@ fun SayItScreen(
     val isModelInitializing by viewModel.isModelInitializing.collectAsStateWithLifecycle()
     val canContinue by viewModel.canContinue.collectAsStateWithLifecycle()
     val attempts by viewModel.attempts.collectAsStateWithLifecycle()
+    val idleNudge by viewModel.idleNudge.collectAsStateWithLifecycle()
     val audioAmplitude by viewModel.audioAmplitude.collectAsStateWithLifecycle()
     val isNoisyEnvironment by viewModel.isNoisyEnvironment.collectAsStateWithLifecycle()
     val isPlayingPhoneme by viewModel.isPlayingPhoneme.collectAsStateWithLifecycle()
@@ -170,6 +176,7 @@ fun SayItScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_START) viewModel.onScreenVisible()
             if (event == Lifecycle.Event.ON_STOP) viewModel.onScreenHidden()
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -179,9 +186,18 @@ fun SayItScreen(
         }
     }
 
+    // On a compact phone the feedback banner makes the pinned bar taller; the card gives up that
+    // height so the attempt dots stay above the bar (card 28b).
+    val cardMaxHeight by animateDpAsState(
+        targetValue = if (showFeedback && d.profile == WindowProfile.COMPACT) d.letterCardHeight * 0.62f
+        else d.letterCardHeight * 0.8f,
+        label = "sayItCardMaxHeight"
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .resetsIdle { viewModel.onUserInteraction() }
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
@@ -223,7 +239,7 @@ fun SayItScreen(
                 )
             },
             bottomBar = {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(Modifier.testTag("sayit_bottom"), horizontalAlignment = Alignment.CenterHorizontally) {
                     AnimatedVisibility(
                         visible = showFeedback,
                         enter = fadeIn() + slideInVertically(initialOffsetY = { 20 }),
@@ -298,6 +314,7 @@ fun SayItScreen(
                             .fillMaxWidth()
                             .heightIn(min = 64.dp)
                             .breathingPulse(enabled = canContinue)
+                            .idleWiggle(idleNudge, enabled = canContinue)
                             .graphicsLayer {
                                 scaleX = nextPop.value
                                 scaleY = nextPop.value
@@ -317,7 +334,7 @@ fun SayItScreen(
                     showSpeakerIcon = true,
                     isPlaying = isPlayingPhoneme,
                     // Shorter than in Hear It: the mic, its label and the attempt dots sit below it.
-                    modifier = Modifier.heightIn(max = d.letterCardHeight * 0.8f).shake(trigger = state is SayItState.Incorrect),
+                    modifier = Modifier.heightIn(max = cardMaxHeight).shake(trigger = state is SayItState.Incorrect),
                     onTapReplay = { viewModel.playWordAudio() }
                 )
             } else {
@@ -332,7 +349,7 @@ fun SayItScreen(
                     depthHeight = 6.dp,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(max = d.letterCardHeight * 0.8f)
+                        .heightIn(max = cardMaxHeight)
                         .shake(trigger = state is SayItState.Incorrect)
                 ) {
                     Column(
@@ -383,14 +400,19 @@ fun SayItScreen(
                         status = micStatus,
                         onTap = startAttempt,
                         enabled = !isPlayingPhoneme && !isModelInitializing,
-                        labelOverride = if (isModelInitializing) "Lily is getting ready..." else null
+                        labelOverride = if (isModelInitializing) "Lily is getting ready..." else null,
+                        idleNudge = idleNudge
                     )
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 // Attempt dots: a check for a correct try, a plain orange dot for a miss.
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier.testTag("sayit_attempts"),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     val maxAttempts = 3
                     for (i in 0 until maxAttempts) {
                         if (i < attempts.size) {
