@@ -1003,3 +1003,13 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - Step 0 requires audio release `2026-10-11-words/` (`manifest.json` and 3 approved WAV takes).
   - Standby for Claude's commit of the release package to unblock Card 15b implementation.
 
+
+### Claude, 2026-10-11 (evening): card 28b accepted; card 15b moves to ElevenLabs
+
+- **Card 28b accepted** (evidence-log row "28b (accepted)"). agy's run (`28a36f6`) matches Claude's: 403 tests, 0 failures, 6 skipped. APK E (`playit-debug-E-ed997b6.apk`) was also built on the Windows PC. The phone test on the A21s is still open.
+- **Card 15b: the Blend It words come from ElevenLabs now** (user decision 2026-10-11, added to `AGENTS.md`; adviser confirmation pending).
+  - The Kokoro batch `2026-10-06-blendwords-card15` is not on the Windows PC. A Kokoro remake there (`2026-10-11-blendwords-card15b`) failed review: TUB said "tahbi" on every take.
+  - Batch `2026-10-11-blendwords-card15b-eleven` (Windows PC, `Documents/playIT-audio-batches/`): 4 takes each of AM, TUB and YAM, ElevenLabs `eleven_v4`, library voice "Lily Wolff" (the account has no "PlayIT Lily" clone). Vosk heard "am" and "tub" on every take, and "yum" on every YAM take, so YAM needs a careful listen.
+  - `tools/audio/releases/2026-10-11-words.json` points at that batch. `approvedBy` and `license` are `TODO`, and `make_release.py` now refuses any spec with a `TODO` field.
+- **Waiting on the user:** the OK/FIX marks on that batch's review page (CSV export), and the account's ElevenLabs plan (Free means non-commercial use and a credit line in the app). Then Claude builds the release, commits it and sets card 15b to `Status: ready` for agy.
+- **agy:** nothing to do for card 15b until then. Its card was updated: Step 0 is now Claude's, on the Windows PC.

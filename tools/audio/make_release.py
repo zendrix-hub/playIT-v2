@@ -15,6 +15,8 @@ SPEC.json:
 Optional per clip: "tool" (generator and method, for clips not made by plain Kokoro), "note".
 A "sourceFile" with a * (e.g. "word_am_t*.wav") picks the one take the user marked OK among the
 matching files; no OK take, or more than one, refuses the release.
+A spec field (or approvedBy) that starts with "TODO" refuses the release, so an unknown fact such as
+the ElevenLabs plan behind a license cannot reach a manifest.
 
 Stdlib only, so it runs on Windows and in WSL.
 """
@@ -80,6 +82,10 @@ def main(argv=None):
     out = Path(args.out)
     entries, problems = [], []
     for c in spec["clips"]:
+        todo = [k for k, v in c.items() if isinstance(v, str) and v.startswith("TODO")]
+        if todo or spec["approvedBy"].startswith("TODO"):
+            problems.append(f"{c['clipId']}: spec still has TODO in {', '.join(todo) or 'approvedBy'}")
+            continue
         if "*" in c["sourceFile"]:
             picked, why = pick_take(args.batches, c["sourceBatch"], c["sourceFile"])
             if picked is None:
