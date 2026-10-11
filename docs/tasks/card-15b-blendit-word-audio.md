@@ -1,8 +1,8 @@
-# Card 15b: Approved word clips for AM, TUB and YAM; Blend It stops being silent on them (FR-13, NFR-AUD-01)
+# Card 15b: Approved word clips for AM, TUB and YAM, with the ElevenLabs credit; Blend It stops being silent on them (FR-13, NFR-AUD-01)
 
-Status: blocked (needs release 2026-10-11-words: the user's OK marks and the ElevenLabs plan; see step 0)
+Status: blocked (needs release 2026-10-11-words: the user's OK marks; see step 0)
 
-It touches `AudioResolver`, the Blend It word seeds and their tests, and adds three assets. Card 28b does not touch any of these files, so the two cards can run in either order.
+It touches `AudioResolver`, the Blend It word seeds and their tests, and the Parent Zone dashboard (one credit line), and adds three assets. Card 28b does not touch any of these files, so the two cards can run in either order.
 
 ## Why
 - **Phone test of APK D (A21s, 2026-10-11):** Blend It is silent for AM, TUB and YAM. Card 15 replaced AIM, TOY and BOY with these decodable words, but their audio never shipped.
@@ -14,13 +14,11 @@ It touches `AudioResolver`, the Blend It word seeds and their tests, and adds th
 - **Not in this card:** pictures for AM, TUB, YAM and ZIP. They need an image round and an image release. Until then, these words show no picture.
 
 ## Step 0: build the release (Claude, on the Windows PC)
-The batch lives outside the repo, in `Documents/playIT-audio-batches/2026-10-11-blendwords-card15b-eleven/` on the Windows PC. Two facts are missing. The spec marks both `TODO`, so `make_release.py` refuses until they are filled in:
-- **The user's verdicts:** one take per word marked OK on the batch's review page, exported as `2026-10-11-blendwords-card15b-eleven_review.csv` into the batch folder.
-- **The ElevenLabs plan** of the account, for each clip's `license`.
-  - Free: non-commercial only, and the app must credit "elevenlabs.io". A follow-up card then adds the credit line; this card does not.
-  - Starter or higher: commercial use is allowed and no credit is needed.
+The batch lives outside the repo, in `Documents/playIT-audio-batches/2026-10-11-blendwords-card15b-eleven/` on the Windows PC.
+- **The plan is Free** (user, 2026-10-11), and the spec's `license` says so. Free means non-commercial use only, and anything published must credit "elevenlabs.io". Change 4 adds that credit, so the clips never ship without it. Free-plan audio cannot become commercial later, even after an upgrade.
+- **Still missing: the user's verdicts.** One take per word must be marked OK on the batch's review page and exported as `2026-10-11-blendwords-card15b-eleven_review.csv` into the batch folder. Until then the spec's `approvedBy` is `TODO`, and `make_release.py` refuses.
 
-Claude fills in `approvedBy` and `license` in `tools/audio/releases/2026-10-11-words.json`, then runs:
+Claude fills in `approvedBy` in `tools/audio/releases/2026-10-11-words.json`, then runs:
 
 ```bash
 python tools/audio/make_release.py tools/audio/releases/2026-10-11-words.json \
@@ -43,7 +41,10 @@ Code paths are under `app/src/main/java/com/playit/app/`; test paths are under `
 - Modify: `data/audio/AudioResolver.kt` (`getWordPath` and a new `releasedWords` set)
 - Modify: `di/DatabaseModule.kt` (the three seed lines for AM, TUB, YAM: audio path only)
 - Modify: `presentation/blendit/BlendItViewModel.kt` (the AM line of the fallback list: audio path only)
+- Add: `presentation/dashboard/components/VoiceCredit.kt` (`VOICE_CREDIT`, `VoiceCreditLine`)
+- Modify: `presentation/dashboard/ParentDashboardScreen.kt` (one `item` after the Privacy button)
 - Modify: `data/audio/AudioResolverTest.kt`, `di/BlendItWordSeedsTest.kt`
+- Add: `presentation/dashboard/VoiceCreditTest.kt`
 
 ## Changes
 1. In `AudioResolver`, above `getWordPath`, add the set, then make `getWordPath` use it:
@@ -87,7 +88,34 @@ Code paths are under `app/src/main/java/com/playit/app/`; test paths are under `
         }
     }
 ```
-4. Change nothing else.
+4. **The ElevenLabs credit** (Free plan). Add `presentation/dashboard/components/VoiceCredit.kt`:
+```kotlin
+package com.playit.app.presentation.dashboard.components
+
+/** The ElevenLabs Free plan requires this credit wherever its audio is published (release 2026-10-11-words). */
+const val VOICE_CREDIT = "Some word voices made with ElevenLabs (elevenlabs.io)"
+
+@Composable
+fun VoiceCreditLine(modifier: Modifier = Modifier) {
+    Text(
+        text = VOICE_CREDIT,
+        fontFamily = LexendFontFamily,
+        fontSize = 12.sp,
+        color = TextMuted,
+        textAlign = TextAlign.Center,
+        modifier = modifier.fillMaxWidth().padding(bottom = 16.dp).testTag("parent_voice_credit")
+    )
+}
+```
+   In `ParentDashboardScreen`'s `LazyColumn`, after the item that holds the Privacy button, add `item { VoiceCreditLine() }`. It is adult-facing text in the Parent Zone; children never see it.
+   - **VoiceCreditTest**, add:
+```kotlin
+    @Test fun creditNamesElevenLabsAndItsDomain() {
+        assertTrue(VOICE_CREDIT.contains("ElevenLabs"))
+        assertTrue(VOICE_CREDIT.contains("elevenlabs.io"))
+    }
+```
+5. Change nothing else.
 
 ## Tests
 | Test file | Test | Assertion |
@@ -96,13 +124,14 @@ Code paths are under `app/src/main/java/com/playit/app/`; test paths are under `
 | AudioResolverTest | `releasedWords_filesExist` | the three WAVs are in assets and not empty |
 | BlendItWordSeedsTest | `releasedWordsPointAtTheirWav` | the three seeds use the `.wav` path |
 | BlendItWordSeedsTest | `replacementsKeepTheirSlots` | unchanged; ZIP still `.mp3` |
+| VoiceCreditTest | `creditNamesElevenLabsAndItsDomain` | the Parent Zone credit names ElevenLabs and "elevenlabs.io" |
 
 `review_card.py 15b` checks the added assets against the release SHA-256. Run `./gradlew testDebugUnitTest`.
 
 ## Phone test
-In Blend It group 1 build AM, and in group 3 build TUB and YAM. Each word is spoken once after the sound-out, in a voice close to Lily's, with the right vowel: not "a.m.", "tube", "tab" or "yum".
+In Blend It group 1 build AM, and in group 3 build TUB and YAM. Each word is spoken once after the sound-out, in a voice close to Lily's, with the right vowel: not "a.m.", "tube", "tab" or "yum". In the Parent Zone, scroll to the bottom: "Some word voices made with ElevenLabs (elevenlabs.io)" shows under Privacy.
 
 ## Commit
-`feat(audio): approved word clips for AM, TUB and YAM from release 2026-10-11-words (FR-13, NFR-AUD-01)`
+`feat(audio): approved word clips for AM, TUB and YAM from release 2026-10-11-words, with the ElevenLabs credit (FR-13, NFR-AUD-01)`
 
-Decisions used: ElevenLabs for the AM, TUB and YAM word clips (user decision 2026-10-11, amends the Kokoro-only source; adviser confirmation pending); the user's OK on review page 2026-10-11-blendwords-card15b-eleven. Teacher audit pending before merge to main.
+Decisions used: ElevenLabs for the AM, TUB and YAM word clips (user decision 2026-10-11, amends the Kokoro-only source; adviser confirmation pending); the user's OK on review page 2026-10-11-blendwords-card15b-eleven; ElevenLabs Free plan, so the app credits elevenlabs.io (user, 2026-10-11). Teacher audit pending before merge to main.
