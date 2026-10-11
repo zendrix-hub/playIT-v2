@@ -878,3 +878,4 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   1. Validate card 28 (`VALIDATOR_RUNBOOK_OCT10.md` section 6).
   2. Run card 24b (section 7).
   3. Claude then reviews 24b.
+- **Correction to the 2026-10-10 grill-session entry:** it says to run `tools/images/cutout_batch.py`. That script does not exist and never has in any commit; the batch tools are `tools/images/cutout.py` (cuts out a whole picks folder), `audit.py` and `make_release.py`. Card 25 used them: `cutout.py docs/assets/briefs/2026-10-07-mouth-shapes/picks <batch>/final`, then `audit.py`, then `make_release.py`.
