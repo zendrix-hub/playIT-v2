@@ -902,4 +902,21 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - Preserves prior APKs (`A`, `A2`, `B`).
 - **Next Steps**:
   - Ready for Claude review of Card 24b (`review_card.py 24b`, diff verification, technical acceptance).
-  - User can test APK D on Samsung A21s physical hardware (verifying Hear It cue position and Say It "Watch my lips" articulation cue on miss 2).
+  - User tested APK D on Samsung A21s physical hardware. Findings logged below.
+
+### agy & User, 2026-10-11: APK D Hardware Test Findings & Card 28b Directives for Claude
+
+- **APK D Hardware Test Findings**:
+  1. **Mouth Image Assignments**: User observed that mouth images are not assigned well across letters/phonemes. Action for Claude: Audit `ArticulationGroup.kt` (`articulationFor` letter mapping) to verify phoneme-to-mouth shape phonetic correspondence against speech therapy guides.
+  2. **Blend It Missing Audio**: User reported empty/silent audios on Blend It. Diagnosis confirmed: `word_am.mp3`, `word_tub.mp3`, and `word_yam.mp3` are missing from `app/src/main/assets/audio/words/`. (Card 15 replaced non-decodable words AIM, TOY, BOY with AM, TUB, YAM; user approved Kokoro takes in review batch `2026-10-06-blendwords-card15`, but an audio release was never created/shipped). Action for Claude: build audio release in WSL and draft copy card for agy.
+  3. **On-Screen Sound Captions**: User confirmed in chat on 2026-10-11: *"remove the on screen sound captions"*. Dropping captions from child view is officially finalized (answered in `QUESTIONS.md`). Visual articulation mouth cues fulfill the visual accessibility mandate (NFR-ACC-01).
+
+- **Queued for Claude (Card 28b)**:
+  - Remap / audit `ArticulationGroup.kt` phoneme mappings.
+  - Release missing Blend It word audio clips (`word_am.mp3`, `word_tub.mp3`, `word_yam.mp3`).
+  - Implement 10-second idle visual wiggles on main action targets for autonomous child interaction.
+  - Fix `MarungkoGroupBanner` title clipping on small phone viewports.
+  - Fix Say It attempt dots overlap on compact (360×640) screens.
+
+- **Queued for agy (Parallel Asset Session)**:
+  - **Card 29 (`card-29-mascot-avatar-art-refresh.md`)**: User will start fresh image session for Nano Banana Pro mascot poses and companion animal heads.

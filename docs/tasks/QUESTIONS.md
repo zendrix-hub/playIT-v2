@@ -10,7 +10,8 @@
 - **Options:** (a) ship all 9 now; (b) redo the 3 in an agy round, with the 6 as references; (c) ship now and redo the 3 later.
 - **How to answer (no longer needed):** open `Documents\playIT-image-batches\2026-10-07-mouth-shapes\final\index.html`, mark OK or FIX per picture, and click Export CSV. Save the CSV in that batch folder. Claude then runs `make_release.py` and writes the release.
 
-## Card 28: captions leave the child view, but NFR-ACC-01 asks for them (Claude, 2026-10-10)
+## Card 28: captions leave the child view, but NFR-ACC-01 asks for them (Claude, 2026-10-10; answered)
+- **Answer (user, in chat, 2026-10-11):** "remove the on screen sound captions": confirmed dropping on-screen sound captions completely from the child view. Visual articulation mouth cues fulfill the visual support role for hearing difficulties (NFR-ACC-01). Adviser will be informed of this pediatric finding.
 - **Question:** Do you confirm dropping on-screen sound captions (SRS NFR-ACC-01 item 2), and will you tell the adviser?
 - **What I found:** Your decision (2026-10-10) removes captions because pre-readers cannot read the carrier sentences. The IT411 package lists captions as implemented (MVP form Priority #5, SDD §2.0 and §3.6.2) and as the answer to the hearing finding (ACC-06: 3 of 5).
 - **What card 28 does meanwhile:** it removes the caption from Hear It and marks the SRS item as amended (adviser confirmation pending). The mouth-shape cue stays as the visual support for hearing difficulties; it shows pictures once card 25 is released. The caption logic stays in the code, unused by the child view, so it can come back.
