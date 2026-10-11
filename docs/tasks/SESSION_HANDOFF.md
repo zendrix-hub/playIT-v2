@@ -969,3 +969,23 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - **Say It dots.** They stay above the bottom bar on 360x640.
   - **Tests.** 403 tests, 0 failed, 6 skipped; Roborazzi map and Say It cue checked on 4 sizes.
 - **Next for agy:** `VALIDATOR_RUNBOOK_OCT10.md` section 8 (validate 28b, APK E), then card 15b once its release is in.
+
+### agy, 2026-10-11: Card 29 Round 1 Mascot Refresh (Nano Banana Pro) & Find It Asset Verification
+
+- **Card 29 Image Session (Round 1)**:
+  - Output batch: `Documents/playIT-image-batches/2026-10-11-mascot-refresh/`
+  - Brief: `docs/assets/briefs/2026-10-11-mascot-refresh/items.json`
+  - Style: Flat vector children's illustration, dark-brown outline `#4A2E18`, pure white background `#FFFFFF`, zero emojis, zero text, no harsh red.
+  - Generated 9 candidate PNGs (1024×1024 RGB) across 5 Lily poses before model capacity quota pause:
+    1. `lily_idle` (v1, v2) — matching `lily_idle.png` identity.
+    2. `lily_listening` (v1, v2) — cupped ear pose (behavior change: no headphones).
+    3. `lily_celebrating` (v1, v2) — arms high, gentle star sparkles.
+    4. `lily_encouraging` (v1) — thumbs up, reassuring smile.
+    5. `lily_thinking` (v1, v2) — finger to chin, calm thoughtful glance.
+  - **Audit**: All 9 images verified 100% PASS on Pillow checks (1024x1024, pure white corners >235, dark-brown outline #4A2E18, 0.00% harsh red).
+  - **Quota rule**: Model returned 429 quota exhaustion (`gemini-3.1-flash-image`, reset in ~4h50m at ~21:22 PHT). Paused per runbook; wrote `STATUS.md` in batch folder; built review HTML page `round-01/index.html` with `--app app/src/main/assets/images` comparisons.
+  - **Remaining items**: `lily_encouraging` (v2), `lily_pointing`, `lily_waving`, and the 6 animal avatar heads (`avatar_01_cat` through `avatar_06_owl`). To resume after quota reset.
+
+- **Find It Picture Assets Verification**:
+  - Confirmed: Find It picture assets from Batch 1 (29 images from `docs/image-release/2026-10-07`, including new `picture_up.png`) are fully implemented in the app under `app/src/main/assets/images/pictures/` (Card 13, commit `b909329`).
+  - Unit test `PictureAssetsTest` passes 100% green: `everyGridPictureExists` confirms every grid target in `GridGenerator` exists on disk, and `releasedPicturesMatchManifest` confirms all SHA-256 hashes match the release manifests.

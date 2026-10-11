@@ -15,7 +15,7 @@
 
 - **Team/Group Name:** Group 56 — PlayIT Capstone Team
 - **Project/System Title:** PlayIT: An Offline-First Gamified Early Literacy Mobile Application Using the DepEd Marungko Approach
-- **Program / Section:** Bachelor of Science in Information Technology / IT411 G1–G8
+- **Program / Section:** Bachelor of Science in Information Technology / IT411 G7
 - **Team Members:**
   1. Riva, Zendrix (Team Lead & Full-Stack Android Engineer)
   2. Palis, John James (Frontend & Audio Engineer)

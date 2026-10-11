@@ -1,6 +1,6 @@
 # Software Requirements Specification (SRS)
 ## Project: PlayIT — An Offline-First Gamified Early Literacy Mobile Application
-**Course:** IT411 — Capstone & Research 2 | Semester 1, AY 2026–2027  
+**Course:** IT411 (Section G7) — Capstone & Research 2 | Semester 1, AY 2026–2027  
 **Degree Program:** Bachelor of Science in Information Technology  
 **Department:** College of Computer Studies, Cebu Institute of Technology – University  
 **Document Version:** 3.0 (Post-MVP Validation Baseline), revision 3.6  
