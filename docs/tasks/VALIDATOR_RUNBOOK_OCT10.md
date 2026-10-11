@@ -50,10 +50,13 @@ Whenever Claude announces a new commit for validation:
 | Card 21 | `9bac8ca` | 364 (0 failed, 6 skipped) | `complete_*`, `splash_*`, `nameprompt_*` green | Included in APK B-eaf8634 | ✅ VALIDATED |
 | Card 23 | `dd42582` | 364 (0 failed, 6 skipped) | Reduced-motion & effects verified | Included in APK B-eaf8634 | ✅ VALIDATED |
 | Card 15 | `299cea2` | 364 (0 failed, 6 skipped) | Decodable Blend It seeds verified | Included in APK B-eaf8634 | ✅ VALIDATED |
-| Card 24 | `20efb22` | 364 (0 failed, 6 skipped) | `hearit_*`, `sayit_*` captions verified | Included in APK B-eaf8634 | ✅ VALIDATED |
-| Card 27 | `eaf8634` | Docs verified | SDD v2.2, SRS v3.2, SPMP v2.2 verified | Included in APK B-eaf8634 | ✅ VALIDATED |
+| Card 24 | `20efb22` | 364 (0 failed, 6 skipped) | `hearit_*`, `sayit_*` captions verified | Included in APK B-eaf8634 | VALIDATED |
+| Card 27 | `eaf8634` | Docs verified | SDD v2.2, SRS v3.2, SPMP v2.2 verified | Included in APK B-eaf8634 | VALIDATED |
+| Card 24b | `6933e3e` | 386 (0 failed, 6 skipped) | 9 mouth-shape pictures in assets; cue beside play button | Included in APK D-6933e3e | VALIDATED |
+| Card 28b | `ed997b6` | 403 (0 failed, 6 skipped) | `review_card.py 28b` ALL PASS; truer mouth pairs, idle wiggle, banner fit | Included in APK E-ed997b6 | VALIDATED |
 
 > **SPRINT BATCH VALIDATION COMPLETE (2026-10-10):** All 8 cards in the sprint batch (03b, 20, 22, 21, 23, 15, 24, 27) have been fully verified by agy: 364/364 unit tests passed (100% pass rate, 6 skipped by design), Roborazzi 4-device screenshot matrix clean across compact, a21s, phone, and tablet, and release debug APK assembled (`playit-debug-B-eaf8634.apk`, 102 MB).
+> **FOLLOW-UP POLISH VALIDATION (2026-10-11):** Card 24b (`6933e3e`, 386 tests, APK D) and Card 28b (`ed997b6`, 403 tests, APK E) fully verified. APK E assembled as `playit-debug-E-ed997b6.apk` (103 MB).
 
 
 ---

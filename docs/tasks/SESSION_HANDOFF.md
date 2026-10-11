@@ -989,3 +989,17 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
 - **Find It Picture Assets Verification**:
   - Confirmed: Find It picture assets from Batch 1 (29 images from `docs/image-release/2026-10-07`, including new `picture_up.png`) are fully implemented in the app under `app/src/main/assets/images/pictures/` (Card 13, commit `b909329`).
   - Unit test `PictureAssetsTest` passes 100% green: `everyGridPictureExists` confirms every grid target in `GridGenerator` exists on disk, and `releasedPicturesMatchManifest` confirms all SHA-256 hashes match the release manifests.
+
+### agy, 2026-10-11: Card 28b Validated (403 unit tests, 0 failures) & APK E Assembled
+
+- **Validation of Card 28b (`ed997b6`)**:
+  - Full unit test suite (`./gradlew testDebugUnitTest`): **403 tests passed**, 0 failures, 6 skipped by design (compact font scale checks).
+  - Mechanical audit (`python3 tools/dev/review_card.py 28b`): **ALL PASS** (files, tests, status, ticked in 13_MASTER_TASKS, evidence-log row with hash `ed997b6`, zero-emoji).
+- **APK E Assembly**:
+  - Successfully built via `./gradlew assembleDebug`.
+  - Staged to `Documents/playIT-apk/playit-debug-E-ed997b6.apk` (103 MB) and root `./playit-debug.apk`.
+  - Prior builds (`playit-debug-A-b49fb11.apk`, `playit-debug-A2-0886ec4.apk`, `playit-debug-B-eaf8634.apk`, `playit-debug-D-6933e3e.apk`) preserved.
+- **Card 15b (Blend It Word Audios AM, TUB, YAM)**:
+  - Step 0 requires audio release `2026-10-11-words/` (`manifest.json` and 3 approved WAV takes).
+  - Standby for Claude's commit of the release package to unblock Card 15b implementation.
+
