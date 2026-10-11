@@ -186,7 +186,7 @@ abstract class LayoutMatrixTest(private val deviceName: String) {
         assertOnScreen("sayit_mic")
     }
 
-    /** Hear It with the mouth picture beside the play button: the step dots stay above Next (card 24b). */
+    /** Hear It with centered play button: the step dots stay above Next (card 28c). */
     @Test fun hearIt_stepsAboveNext() {
         compose.setContent { PlayItTheme { hearIt() } }
         compose.waitForIdle()
