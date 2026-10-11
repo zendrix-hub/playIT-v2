@@ -9,7 +9,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.getBoundsInRoot
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.dp
@@ -24,6 +26,8 @@ import com.playit.app.data.audio.AudioResolver
 import com.playit.app.data.speech.VoskRecognizer
 import com.playit.app.domain.manager.SpeechValidator
 import com.playit.app.domain.model.Phoneme
+import com.playit.app.domain.model.SpeechErrorType
+import com.playit.app.domain.model.SpeechJudgement
 import com.playit.app.domain.repository.PhonemeRepository
 import com.playit.app.domain.repository.SayItAttemptRepository
 import com.playit.app.navigation.SessionManager
@@ -85,9 +89,19 @@ abstract class LayoutMatrixTest(private val deviceName: String) {
 
     /** Fails if the node's bottom is below the window (the child would have to scroll to reach it). */
     protected fun assertOnScreen(tag: String) {
-        val node = compose.onNodeWithTag(tag, useUnmergedTree = true).getBoundsInRoot()
+        val node = compose.onNodeWithTag(tag, useUnmergedTree = true).getUnclippedBoundsInRoot()
         val root = compose.onRoot().getBoundsInRoot()
         assertTrue("$tag bottom ${node.bottom} > window ${root.bottom} on $deviceName", node.bottom <= root.bottom)
+    }
+
+    /**
+     * Fails if [upper] reaches below the top of [lower]. Unclipped bounds, so a node pushed out of the
+     * lesson body's scroll area still counts (clipped bounds stop at the body's edge and always pass).
+     */
+    protected fun assertAbove(upper: String, lower: String) {
+        val u = compose.onNodeWithTag(upper, useUnmergedTree = true).getUnclippedBoundsInRoot()
+        val l = compose.onNodeWithTag(lower, useUnmergedTree = true).getBoundsInRoot()
+        assertTrue("$upper bottom ${u.bottom} > $lower top ${l.top} on $deviceName", u.bottom <= l.top)
     }
 
     protected fun capture(name: String) {
@@ -170,6 +184,35 @@ abstract class LayoutMatrixTest(private val deviceName: String) {
         compose.setContent { PlayItTheme { WithFontScale(1.3f) { sayIt() } } }
         compose.waitForIdle()
         assertOnScreen("sayit_mic")
+    }
+
+    /** Hear It with the mouth picture beside the play button: the step dots stay above Next (card 24b). */
+    @Test fun hearIt_stepsAboveNext() {
+        compose.setContent { PlayItTheme { hearIt() } }
+        compose.waitForIdle()
+        assertAbove("hearit_steps", "hearit_next")
+    }
+
+    /** Say It after two misses: the mouth picture shows left of the mic, and the mic stays on screen (card 24b). */
+    @Test fun sayIt_mouthCueBesideMic() {
+        val validator = mockk<SpeechValidator>(relaxed = true)
+        every { validator.judgeWord(any(), any(), any()) } returns
+            SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.OTHER_WORD, heard = "cat")
+        // The miss is recorded for the active profile, so the relaxed mock needs a real Long here.
+        val session = mockk<SessionManager>(relaxed = true) { every { activeProfileId } returns MutableStateFlow<Long?>(1L) }
+        val vm = SayItViewModel(
+            phonemes, mockk<SayItAttemptRepository>(relaxed = true), validator,
+            mockk<VoskRecognizer>(relaxed = true), mockk<AudioPlayer>(relaxed = true),
+            mockk<AudioResolver>(relaxed = true), session, handle()
+        )
+        compose.setContent { PlayItTheme { SayItScreen(vm, onNext = {}, onBack = {}) } }
+        compose.waitForIdle()
+        compose.runOnIdle { repeat(2) { vm.evaluateSpeech("cat") } }
+        compose.waitForIdle()
+        val cue = compose.onNodeWithContentDescription("Mouth shape for this sound").getUnclippedBoundsInRoot()
+        val mic = compose.onNodeWithTag("sayit_mic", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        assertTrue("cue right ${cue.right} > mic left ${mic.left} on $deviceName", cue.right <= mic.left)
+        assertOnScreen("sayit_mic"); capture("sayit_cue")
     }
     /** Built as FindItScreenshotTest builds it. */
     @Composable private fun findIt() {

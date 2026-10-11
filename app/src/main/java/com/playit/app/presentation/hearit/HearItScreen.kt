@@ -66,6 +66,9 @@ import com.playit.app.presentation.theme.Ube
 import com.playit.app.presentation.theme.UbeLight
 import com.playit.app.presentation.theme.UbeShadow
 
+/** Mouth-shape cue beside the play button, and the empty slot that balances it (card 24b). */
+private val CUE_SIZE = 72.dp
+
 @Composable
 fun HearItScreen(
     viewModel: HearItViewModel,
@@ -196,6 +199,7 @@ fun HearItScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = 64.dp)
+                        .testTag("hearit_next")
                         .breathingPulse(enabled = nextHighlighted)
                         .graphicsLayer {
                             scaleX = unlockScale.value
@@ -215,54 +219,57 @@ fun HearItScreen(
                 height = if (d.profile == WindowProfile.COMPACT) d.letterCardHeight else d.letterCardHeight * 1.2f
             )
 
-            // Mouth-shape cue (NFR-ACC-01). No caption in the child view: pre-readers cannot read the
-            // carrier sentences (user decision 2026-10-10, card 28). The row keeps its height, so the
-            // play button doesn't jump when the cue's picture loads.
-            Row(
-                modifier = Modifier.heightIn(min = 48.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                ArticulationCue(group = viewModel.articulation, size = 72.dp)
-            }
-
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                // Pulsating PrimaryJoy Speaker Replay Button; the ring draws outside its bounds
-                Box(contentAlignment = Alignment.Center) {
-                    if (isPlaying) {
-                        Box(
-                            modifier = Modifier
-                                .size(d.primaryCta)
-                                .scale(pulseScale)
-                                .clip(CircleShape)
-                                .background(com.playit.app.presentation.theme.PrimaryJoyLight.copy(alpha = pulseAlpha))
-                        )
+                // Mouth-shape cue (NFR-ACC-01) left of the play button, as Say It shows it left of the mic;
+                // beside the button it adds no height (card 24b). Fixed slots on both sides keep the button
+                // centred. No caption in the child view: pre-readers cannot read the carrier sentences
+                // (user decision 2026-10-10, card 28).
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(Modifier.size(CUE_SIZE), contentAlignment = Alignment.Center) {
+                        ArticulationCue(group = viewModel.articulation, size = CUE_SIZE)
                     }
+                    // Pulsating PrimaryJoy Speaker Replay Button; the ring draws outside its bounds
+                    Box(contentAlignment = Alignment.Center) {
+                        if (isPlaying) {
+                            Box(
+                                modifier = Modifier
+                                    .size(d.primaryCta)
+                                    .scale(pulseScale)
+                                    .clip(CircleShape)
+                                    .background(com.playit.app.presentation.theme.PrimaryJoyLight.copy(alpha = pulseAlpha))
+                            )
+                        }
 
-                    GummyContainer(
-                        onClick = if (isPlaying) null else ({ viewModel.playPhonemeSound() }),
-                        enabled = !isPlaying,
-                        faceColor = com.playit.app.presentation.theme.PrimaryJoy,
-                        shadowColor = com.playit.app.presentation.theme.PrimaryJoyDark,
-                        shape = CircleShape,
-                        strokeWidth = 2.5.dp,
-                        strokeColor = com.playit.app.presentation.theme.ModernBorder,
-                        depthHeight = 6.dp,
-                        modifier = Modifier.size(d.primaryCta).testTag("hearit_play")
-                    ) {
-                        Icon(
-                            imageVector = if (isPlaying) Icons.AutoMirrored.Rounded.VolumeUp else Icons.Rounded.PlayArrow,
-                            contentDescription = if (isPlaying) "Playing" else "Play Sound",
-                            tint = androidx.compose.ui.graphics.Color.White,
-                            modifier = Modifier.size(d.primaryCta * 0.5f)
-                        )
+                        GummyContainer(
+                            onClick = if (isPlaying) null else ({ viewModel.playPhonemeSound() }),
+                            enabled = !isPlaying,
+                            faceColor = com.playit.app.presentation.theme.PrimaryJoy,
+                            shadowColor = com.playit.app.presentation.theme.PrimaryJoyDark,
+                            shape = CircleShape,
+                            strokeWidth = 2.5.dp,
+                            strokeColor = com.playit.app.presentation.theme.ModernBorder,
+                            depthHeight = 6.dp,
+                            modifier = Modifier.size(d.primaryCta).testTag("hearit_play")
+                        ) {
+                            Icon(
+                                imageVector = if (isPlaying) Icons.AutoMirrored.Rounded.VolumeUp else Icons.Rounded.PlayArrow,
+                                contentDescription = if (isPlaying) "Playing" else "Play Sound",
+                                tint = androidx.compose.ui.graphics.Color.White,
+                                modifier = Modifier.size(d.primaryCta * 0.5f)
+                            )
+                        }
                     }
+                    Spacer(Modifier.size(CUE_SIZE))
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // Gummy Radial Gradient Replay Dots
                 Row(
+                    modifier = Modifier.testTag("hearit_steps"),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {

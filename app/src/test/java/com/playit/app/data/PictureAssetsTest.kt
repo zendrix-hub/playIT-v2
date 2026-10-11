@@ -51,8 +51,7 @@ class PictureAssetsTest {
         }
     }
 
-    @Test
-    fun releasedPicturesMatchManifest() {
+    private fun releasedPictures(): Map<String, String> {
         val imageReleaseDir = File(docsDir, "image-release")
         assertTrue("image-release directory should exist", imageReleaseDir.exists())
 
@@ -78,7 +77,12 @@ class PictureAssetsTest {
                 }
             }
         }
+        return latestEntries
+    }
 
+    @Test
+    fun releasedPicturesMatchManifest() {
+        val latestEntries = releasedPictures()
         assertTrue("Must have released images in manifest", latestEntries.isNotEmpty())
 
         for ((appPath, expectedSha256) in latestEntries) {
@@ -86,6 +90,16 @@ class PictureAssetsTest {
             assertTrue("Asset file does not exist: $appPath", file.exists())
             val actualSha256 = sha256(file.readBytes())
             assertEquals("SHA-256 mismatch for $appPath", expectedSha256, actualSha256)
+        }
+    }
+
+    /** Every mouth-shape group shows a released picture (card 24b); none falls back to drawing nothing. */
+    @Test
+    fun everyMouthCueIsReleased() {
+        val released = releasedPictures()
+        for (group in com.playit.app.domain.model.ArticulationGroup.values()) {
+            assertTrue("${group.assetPath} is in no image release", group.assetPath in released)
+            assertTrue("${group.assetPath} is not in assets", File(assetsDir, group.assetPath).exists())
         }
     }
 }

@@ -22,17 +22,22 @@ import com.playit.app.presentation.theme.SurfaceCard
  * empty box (Review Focus 4).
  */
 @Composable
-fun ArticulationCue(group: ArticulationGroup, size: Dp, modifier: Modifier = Modifier) {
+fun ArticulationCue(group: ArticulationGroup, size: Dp, modifier: Modifier = Modifier) =
+    ArticulationCue(assetPath = group.assetPath, size = size, modifier = modifier)
+
+/** By path, so a test can name a picture that is not in assets (card 24b). */
+@Composable
+internal fun ArticulationCue(assetPath: String, size: Dp, modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    val present = remember(group) {
-        val dir = group.assetPath.substringBeforeLast('/')
-        val file = group.assetPath.substringAfterLast('/')
+    val present = remember(assetPath) {
+        val dir = assetPath.substringBeforeLast('/')
+        val file = assetPath.substringAfterLast('/')
         runCatching { context.assets.list(dir)?.contains(file) == true }.getOrDefault(false)
     }
     if (!present) return
 
     Image(
-        painter = rememberAssetPainter(group.assetPath, maxSize = size),
+        painter = rememberAssetPainter(assetPath, maxSize = size),
         contentDescription = "Mouth shape for this sound",
         modifier = modifier
             .size(size)
@@ -41,3 +46,4 @@ fun ArticulationCue(group: ArticulationGroup, size: Dp, modifier: Modifier = Mod
             .padding(6.dp)
     )
 }
+

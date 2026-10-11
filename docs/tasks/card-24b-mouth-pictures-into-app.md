@@ -1,6 +1,6 @@
 # Card 24b: Mouth pictures into the app; the Hear It cue moves beside the play button (NFR-ACC-01)
 
-Status: ready
+Status: done
 
 Runs after agy validates card 28 (`VALIDATOR_RUNBOOK_OCT10.md` section 6). It edits `HearItScreen.kt`, which card 28 also edited, so find code by name, not by line number.
 
