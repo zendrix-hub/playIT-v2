@@ -1,0 +1,70 @@
+' Shared look for the PlayIT diagrams (docs/diagrams). Planned parts (SDD §2.0 "Planned") are grey and
+' carry the <<planned>> stereotype, so no diagram reads as if the planned design were already built.
+set separator none
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam dpi 150
+skinparam nodesep 40
+skinparam ranksep 60
+skinparam roundCorner 8
+skinparam ArrowColor #3D3D5C
+skinparam ArrowFontSize 11
+skinparam TitleFontSize 16
+skinparam TitleFontStyle bold
+skinparam NoteBackgroundColor #FFF8E1
+skinparam NoteBorderColor #C9A227
+skinparam NoteFontSize 11
+skinparam PackageBorderColor #6C5CE7
+skinparam PackageFontColor #3D2C9E
+skinparam PackageBackgroundColor #FBFAFF
+
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #3D3D5C
+  HeaderBackgroundColor #EEEAFE
+  AttributeFontSize 11
+  BackgroundColor<<planned>> #F2F2F2
+  BorderColor<<planned>> #9E9E9E
+  FontColor<<planned>> #757575
+  AttributeFontColor<<planned>> #757575
+  StereotypeFontColor<<planned>> #757575
+  HeaderBackgroundColor<<planned>> #E6E6E6
+}
+
+skinparam usecase {
+  BackgroundColor #EEEAFE
+  BorderColor #6C5CE7
+  BackgroundColor<<planned>> #F2F2F2
+  BorderColor<<planned>> #9E9E9E
+  FontColor<<planned>> #757575
+  StereotypeFontColor<<planned>> #757575
+}
+
+skinparam actor {
+  BorderColor #3D3D5C
+  BackgroundColor #FFFFFF
+}
+
+skinparam sequence {
+  ParticipantBackgroundColor #EEEAFE
+  ParticipantBorderColor #6C5CE7
+  ActorBorderColor #3D3D5C
+  ActorBackgroundColor #FFFFFF
+  LifeLineBorderColor #9E9EB8
+  LifeLineBackgroundColor #EEEAFE
+  BoxBackgroundColor #FBFAFF
+  BoxBorderColor #C8C2F0
+  GroupBorderColor #6C5CE7
+  GroupHeaderFontColor #3D2C9E
+  DividerBackgroundColor #EEEAFE
+  MessageAlign left
+}
+
+skinparam entity {
+  BackgroundColor #FFFFFF
+  BorderColor #3D3D5C
+  BackgroundColor<<planned>> #F2F2F2
+  BorderColor<<planned>> #9E9E9E
+  FontColor<<planned>> #757575
+}

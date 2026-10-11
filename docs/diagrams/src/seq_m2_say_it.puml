@@ -1,0 +1,68 @@
+@startuml seq_m2_say_it
+!include _style.iuml
+autonumber "<b>0."
+hide footbox
+
+title Sequence Diagram, Module 2: Say It attempt and prompt ladder (SDD §4.2, FR-03)
+
+actor "Child" as Child
+participant "SayItScreen\n(MicButton)" as Screen
+participant "SayItViewModel" as VM
+participant "SpeechValidator" as Judge
+participant "VoskRecognizer" as Vosk
+participant "TutorPolicy" as Policy
+participant "SayItAttemptRepository" as Repo
+participant "AudioPlayer" as Player
+database "Room\n(say_it_attempts)" as DB
+
+Child -> Screen : taps the green mic ("Tap and say it")
+Screen -> VM : startListening()
+activate VM
+VM -> Player : stop()  (no voice bleeds into the mic)
+VM -> Judge : grammarFor(letter "m", targetWord "mouse")
+Judge --> VM : grammar: the key word plus the letter-name\nand added-vowel foils
+VM -> Vosk : setGrammar(tokens)
+VM -> Vosk : startListening(onResult)
+VM --> Screen : micStatus = LISTENING (gold, ripple)
+activate Vosk
+note right of VM : auto-stop after 3.8 s
+Child -> Vosk : says "mouse"
+Vosk --> VM : onResult(transcript, isFinal)
+VM --> Screen : micStatus = HEARD (lavender dots)
+deactivate Vosk
+
+VM -> VM : evaluateSpeech(transcript); attemptNumber++
+VM -> Judge : judgeWord(transcript, "mouse", "m")
+Judge --> VM : SpeechJudgement(isCorrect, errorType, heard)
+VM -> Policy : next(attemptNumber, judgement)
+Policy --> VM : TutorAction
+VM ->> Repo : saveAttempt(profileId, phonemeId, isCorrect)
+Repo -> DB : INSERT INTO say_it_attempts
+
+alt TutorAction.Praise (correct)
+  VM -> Player : playSequence([sfx_correct_chime, rotating "correct" line])
+  VM --> Screen : RESULT_CORRECT (green check), canContinue = true
+else TutorAction.Correct(errorType, supportLevel 1) (miss 1)
+  VM -> Player : playSequence([sfx_incorrect_pop, correction by error type,\n sound /m/, kw_mouse, car_your_turn])
+  note right of VM
+    LETTER_NAME: "That's the letter's name. Its sound is /m/."
+    ADDED_VOWEL: "Almost! Just /m/, no 'ah'."
+  end note
+  VM --> Screen : RESULT_TRY_AGAIN (soft orange); hearts unchanged
+else TutorAction.Correct(errorType, supportLevel 2) (miss 2)
+  VM -> VM : showMouthCue = true
+  VM -> Player : playSequence([sfx_incorrect_pop, car_watch_my_lips,\n kw_mouse, car_your_turn])
+  VM --> Screen : mouth picture beside the mic
+else TutorAction.LeadAndMoveOn (miss 3)
+  VM -> VM : showMouthCue = true
+  VM -> Player : playSequence([car_lets_say_together, kw_mouse,\n fb_try_later, sfx_node_unlock_chime])
+  VM --> Screen : micStatus = DONE ("Nice try!", no taps),\n canContinue = true, Next pulses
+  note right of VM
+    NEEDS_PRACTICE is not stored yet:
+    it needs Room v4 (LearnerModel, planned)
+  end note
+end
+deactivate VM
+
+Child -> Screen : taps "Next: Find It" (when canContinue)
+@enduml

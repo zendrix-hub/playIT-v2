@@ -1,0 +1,62 @@
+@startuml seq_m3_find_it
+!include _style.iuml
+autonumber "<b>0."
+hide footbox
+
+title Sequence Diagram, Module 3: Find It picture tap, hearts and restart (FR-04, FR-05, FR-07)
+
+actor "Child" as Child
+participant "FindItScreen" as Screen
+participant "FindItViewModel" as VM
+participant "GridGenerator" as Grid
+participant "HeartManager" as Hearts
+participant "FindItAttemptRepository" as Repo
+participant "AudioPlayer" as Player
+database "Room\n(find_it_attempts)" as DB
+
+== Load ==
+Screen -> VM : create (phonemeId)
+activate VM
+VM -> Grid : generate5ItemGrid("m", phonemes)
+Grid --> VM : 5 FindItPictureItems (3 start with /m/,\n2 distractors from letters already met)
+VM -> Player : playAssetAudio(vo_findit_intro_01),\nthen playTargetSound(): sound /m/
+VM --> Screen : pictureGrid, hearts = 5
+
+== Tap ==
+Child -> Screen : taps a picture
+Screen -> VM : selectPictureItem(item)
+VM -> Player : stop()
+VM ->> Repo : saveAttempt(profileId, phonemeId, selectedPhonemeId, isCorrect)
+Repo -> DB : INSERT INTO find_it_attempts
+
+alt item.isCorrect
+  VM -> VM : consecutiveCorrect++
+  VM -> Hearts : checkRecovery(consecutiveCorrect)
+  note right of Hearts : +1 heart every 3 correct in a row,\ncapped at the starting pool (FR-07)
+  alt 3 targets found
+    VM --> Screen : state = Completed, Next pulses
+    VM -> Player : playSequence([sfx_correct_chime, rotating "correct", ui_findit_next])
+  else fewer than 3
+    VM --> Screen : state = FoundOne(item, foundCount)
+    VM -> Player : playAssetAudio(sfx_correct_chime)
+  end
+else wrong picture
+  VM -> VM : consecutiveCorrect = 0
+  VM -> Hearts : deductHeart()
+  Hearts --> VM : isGameOver
+  VM -> Player : playSequence([sfx_incorrect_pop, sfx_heart_loss_whoosh, encouragement])
+  alt hearts reach 0
+    VM --> Screen : state = GameOver (restart dialog)
+    Child -> Screen : taps Try again
+    Screen -> VM : restartSession()
+    VM -> Hearts : resetForRestart(3)  (3-heart buffer, FR-05)
+    VM -> Grid : generate5ItemGrid(...) (new grid)
+  else hearts left
+    VM --> Screen : state = Incorrect(item), heart wobble
+  end
+end
+
+Child -> Screen : taps Next
+Screen -> Screen : navigate to Letter Complete\n(phonemeId, heartsLost = HeartManager.sessionHeartsLost)
+deactivate VM
+@enduml

@@ -1,0 +1,125 @@
+@startuml class_m4_blend_it
+!include _style.iuml
+hide empty members
+
+title Class Diagram, Module 4: Word Construction Checkpoint (Blend It)\nSDD §3.4 Decodable Blend It Word Bank
+
+package "presentation" {
+  class BlendItScreen <<Composable>>
+  class BlendItCard <<Composable>>
+  class BlendItViewModel <<HiltViewModel>> {
+    +words : StateFlow<List<BlendItWord>>
+    +currentWord : StateFlow<BlendItWord?>
+    +placedTiles : StateFlow<List<Char>>
+    +tileBank : StateFlow<List<Char>>
+    +hearts : StateFlow<Int>
+    +highlightedSlotIndex : StateFlow<Int?>
+    +uiState : StateFlow<BlendItUiState>
+    -heartManager : HeartManager
+    +placeTile(letter)
+    +removeTile(index)
+    +submitWord()
+    +applyHint()
+    +restartSession()
+    +result() : BlendItResult
+    -playAndAwait(path, minMs, maxMs)
+    {static} ALL_SLOTS = -1
+    {static} LETTER_MIN_MS = 750
+    {static} BLEND_PAUSE_MS = 500
+  }
+  abstract class BlendItUiState <<sealed>>
+  class "Idle" as BIdle <<object>>
+  class WordCorrect <<object>>
+  class WordIncorrect {
+    +heartsLeft : Int
+  }
+  class HeartDepleted <<object>>
+  class SessionComplete <<object>>
+  class BlendItCompleteViewModel <<HiltViewModel>> {
+    +starsEarned : StateFlow<Int>
+    -completeSession()
+  }
+}
+
+package "domain" {
+  class BlendItWordSelector <<Singleton>> {
+    +selectWordsForSession(groupId, words) : List<BlendItWord>
+  }
+  class BlendItStarThresholds <<object>> {
+    +calculateStars(groupId, totalHeartsLost, wordsCorrect, totalWords) : Int
+  }
+  class HeartManager
+  class BlendItWord <<data>> {
+    +wordId : Int
+    +groupId : Int
+    +word : String
+    +wordPattern : String
+    +audioPath : String
+    +imagePath : String
+  }
+  class BlendItProgress <<data>> {
+    +profileId : Long
+    +groupId : Int
+    +starsEarned : Int
+    +heartsLost : Int
+    +isCompleted : Boolean
+  }
+  interface BlendItWordRepository {
+    +getWordsForGroup(groupId) : Flow<List<BlendItWord>>
+  }
+  interface BlendItAttemptRepository {
+    +saveAttempt(attempt)
+  }
+  interface BlendItProgressRepository {
+    +saveProgress(progress)
+    +getProgressForProfile(profileId) : Flow<List<BlendItProgress>>
+  }
+  class StreakTracker
+}
+
+package "data" {
+  class "DatabaseModule\n(BLEND_IT_WORD_SEEDS)" as Seeds <<Hilt module>> {
+    5 decodable words per chapter
+    written on every open (FR-13)
+  }
+  class BlendItWordDao <<Room DAO>>
+  class BlendItAttemptDao <<Room DAO>>
+  class BlendItProgressDao <<Room DAO>>
+  class AudioPlayer <<Singleton>>
+  class AudioResolver <<Singleton>>
+}
+
+BlendItScreen --> BlendItViewModel
+BlendItScreen *-- BlendItCard
+BlendItViewModel --> BlendItWordRepository
+BlendItViewModel --> BlendItAttemptRepository
+BlendItViewModel --> BlendItWordSelector
+BlendItViewModel *-- HeartManager
+BlendItViewModel --> AudioPlayer
+BlendItViewModel --> AudioResolver
+BlendItViewModel *-- BlendItUiState
+BlendItUiState <|-- BIdle
+BlendItUiState <|-- WordCorrect
+BlendItUiState <|-- WordIncorrect
+BlendItUiState <|-- HeartDepleted
+BlendItUiState <|-- SessionComplete
+BlendItCompleteViewModel --> BlendItProgressRepository
+BlendItCompleteViewModel --> StreakTracker
+BlendItCompleteViewModel ..> BlendItStarThresholds
+BlendItWordRepository ..> BlendItWord
+BlendItProgressRepository ..> BlendItProgress
+BlendItWordRepository ..> BlendItWordDao : implemented by Impl
+BlendItAttemptRepository ..> BlendItAttemptDao : implemented by Impl
+BlendItProgressRepository ..> BlendItProgressDao : implemented by Impl
+Seeds ..> BlendItWordDao : seeds
+
+
+' Layout only: stack classes in columns so the diagram is not one long row.
+BIdle -[hidden]down- WordCorrect
+HeartDepleted -[hidden]down- SessionComplete
+AudioPlayer -[hidden]down- AudioResolver
+BlendItAttemptDao -[hidden]down- BlendItProgressDao
+BlendItWordSelector -[hidden]down- BlendItStarThresholds
+BlendItAttemptRepository -[hidden]down- BlendItProgressRepository
+HeartManager -[hidden]down- StreakTracker
+@enduml
