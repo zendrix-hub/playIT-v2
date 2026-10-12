@@ -1,6 +1,6 @@
 # Card 09c: The approved short i replaces the old placeholder clip (NFR-AUD-01, FR-02)
 
-Status: ready (run after card 15b)
+Status: done
 
 **Run after card 15b.** This clip is ElevenLabs Free-plan audio, so it may only ship with the "elevenlabs.io" credit line that card 15b adds to the Parent Zone.
 
