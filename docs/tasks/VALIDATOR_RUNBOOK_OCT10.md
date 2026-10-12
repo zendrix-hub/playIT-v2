@@ -274,7 +274,7 @@ Record the verdict here and in `SESSION_HANDOFF.md`.
   - Make the `AudioResolver` and seed changes.
   - Add the Parent Zone credit line (`VoiceCredit.kt`). The account is on the ElevenLabs Free plan, so the clips must not ship without it.
 - **Expected:** 408 tests, 0 failed, 6 skipped (404 after card 28d, plus 4). `review_card.py 15b` all PASS.
-- **APK G:** build it after the commit and copy it to `Documents/playIT-apk/playit-debug-G-<hash>.apk`. Don't overwrite A to F. It carries card 28d's picture fix as well.
+- **APK G:** not yet. Run card 09c next (8.4), then build APK G. Don't overwrite A to F.
 - **Phone checks (A21s):**
   - In Blend It, AM, TUB and YAM are each spoken once after the sound-out.
   - At the bottom of the Parent Zone, the credit line shows under Privacy.
@@ -285,5 +285,13 @@ Record the verdict here and in `SESSION_HANDOFF.md`.
 - **Validate:**
   - `./gradlew testDebugUnitTest`: 404 tests, 0 failed, 6 skipped. Claude's run on Windows, on top of `0573906`, gave the same.
   - `python3 tools/dev/review_card.py 28d`: all PASS, plus the hash WARN.
-- **Order:** run card 15b next (8.2). APK G carries both.
+- **Order:** run card 15b next (8.2), then card 09c (8.4). APK G carries all three.
 - **Phone check:** in section 1, tap through two or three letters in a row. Each card shows its own picture.
+
+### 8.4 Card 09c: the short i (`Status: ready`, run after card 15b)
+- **Bug from the A21s test of APK 28d (2026-10-12):** the I sound in section 1 was wrong. It was the old placeholder `phoneme_i.mp3`.
+- **Release `docs/audio-release/2026-10-12-i/`** (Claude, 2026-10-12): one ElevenLabs clip, `ph_i.wav`, picked by the user. It is Free-plan audio, so it needs card 15b's credit line first.
+- **Run the card as a normal session:** check the SHA-256, copy the WAV, add `"i"` to `releasedPhonemes`, and add one test.
+- **Expected:** 409 tests, 0 failed, 6 skipped. `review_card.py 09c` all PASS.
+- **APK G:** build it after 09c, so it carries 28d, 15b and 09c. Copy it to `Documents/playIT-apk/playit-debug-G-<hash>.apk`.
+- **Phone check:** Hear It for I says the short i of "insect", not "eye" or "ee".

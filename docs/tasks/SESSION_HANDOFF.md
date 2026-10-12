@@ -1045,3 +1045,15 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - The code is fine: the mouth picture is gone from Hear It and the play button is centred.
   - Open item: the submission documents still describe the mouth cue as sitting beside the Hear It play button (SDD §2.0 mouth-cue row, SRS NFR-ACC-01 row, card 24b). If 28c stays, those rows need a revision before the adviser reads them.
 - **Next for agy:** validate 28d (runbook 8.3), then card 15b (8.2): 408 tests, then APK G.
+
+### Claude, 2026-10-12: the short i (release 2026-10-12-i, card 09c)
+
+- **User's report on APK 28d** (`Documents/playIT-apk/playit-debug-28d-9c1b6b5.apk`, built by Claude from `9c1b6b5`): the I sound in section 1 is wrong.
+  - **Cause:** only M and S have released sounds. I still plays `phoneme_i.mp3`, the old placeholder.
+- **User's choice:** ElevenLabs Text to Speech now, instead of waiting for the team member's Voice Changer takes.
+  - Texts: `/ɪ/.`, `/ɪ/, /ɪ/, insect.` and `Ih.`, 4 takes each, same voice ("Lily Wolff") and flow as AM, TUB and YAM.
+  - **ElevenLabs disabled the account's Free Tier partway** ("Unusual activity has been detected on your account ... Please upgrade to a paid subscription"). Only 5 of 12 takes came back. Claude did not retry.
+- **Review page `2026-10-12-vowel-i-eleven`** (outside the repo): the user marked the three phrase takes and the first sound cut from each OK, and the IPA-only and "Ih" takes FIX. In chat they picked `i_phrase_e1_cut` (0.28 s).
+- **Release `docs/audio-release/2026-10-12-i/`:** `ph_i.wav`, SHA-256 `f88b5b0b...`, made by `make_release.py` from `tools/audio/releases/2026-10-12-i.json`. Teacher audit pending.
+- **Card 09c is `Status: ready`.** It runs after 15b (credit line), per runbook 8.4: 409 tests, then APK G.
+- **Open:** A is still the old placeholder. It needs the team member's takes, a paid ElevenLabs plan, or the account's Free Tier restored.
