@@ -45,4 +45,11 @@ class BlendItWordSeedsTest {
         assertEquals("A-M", byId.getValue(3).wordPattern)
         assertEquals("audio/words/word_zip.mp3", byId.getValue(32).audioPath)
     }
+
+    @Test fun releasedWordsPointAtTheirWav() {
+        val byWord = BLEND_IT_WORD_SEEDS.associateBy { it.word }
+        listOf("AM", "TUB", "YAM").forEach {
+            assertEquals("audio/words/word_${it.lowercase()}.wav", byWord.getValue(it).audioPath)
+        }
+    }
 }

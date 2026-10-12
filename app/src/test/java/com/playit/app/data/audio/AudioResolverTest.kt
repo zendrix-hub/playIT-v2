@@ -91,6 +91,23 @@ class AudioResolverTest {
     }
 
     @Test
+    fun releasedWords_useWav() {
+        assertEquals("audio/words/word_am.wav", audioResolver.getWordPath("AM"))
+        assertEquals("audio/words/word_tub.wav", audioResolver.getWordPath("tub "))
+        assertEquals("audio/words/word_yam.wav", audioResolver.getWordPath("Yam"))
+        assertEquals("audio/words/word_sam.mp3", audioResolver.getWordPath("SAM"))
+    }
+
+    @Test
+    fun releasedWords_filesExist() {
+        val assetsDir = listOf(File("src/main/assets"), File("app/src/main/assets")).first { it.exists() }
+        listOf("am", "tub", "yam").forEach {
+            val f = File(assetsDir, "audio/words/word_$it.wav")
+            assertTrue("missing ${f.path}", f.exists() && f.length() > 0L)
+        }
+    }
+
+    @Test
     fun getTutorPath_returnsWavInTutorFolder() {
         assertEquals("audio/vo/tutor/car_your_turn.wav", audioResolver.getTutorPath("car_your_turn"))
     }

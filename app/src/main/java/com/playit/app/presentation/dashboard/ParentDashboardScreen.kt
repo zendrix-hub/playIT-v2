@@ -46,6 +46,7 @@ import com.playit.app.presentation.dashboard.components.MasteredSoundsShelf
 import com.playit.app.presentation.dashboard.components.PracticeFocusSection
 import com.playit.app.presentation.dashboard.components.PrivacyNoticeDialog
 import com.playit.app.presentation.dashboard.components.ProfileSwitcherDropdown
+import com.playit.app.presentation.dashboard.components.VoiceCreditLine
 import com.playit.app.presentation.dashboard.components.WordBlendingShelf
 import androidx.compose.ui.graphics.Color
 import com.playit.app.presentation.theme.*
@@ -232,6 +233,7 @@ fun ParentDashboardScreen(
                                 }
                             }
                         }
+                        item { VoiceCreditLine() }
                     }
                 } else {
                     Box(

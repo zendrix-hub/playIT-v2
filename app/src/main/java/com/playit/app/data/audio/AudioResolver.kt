@@ -96,11 +96,15 @@ class AudioResolver @Inject constructor() {
         return "audio/phonemes/phoneme_$key.mp3"
     }
 
+    /** Blend It words released as user-approved ElevenLabs takes (docs/audio-release/2026-10-11-words); the rest stay on the old MP3s. */
+    private val releasedWords = setOf("am", "tub", "yam")
+
     /**
      * Resolves the asset path for a Blend It word.
      */
     fun getWordPath(word: String): String {
         val clean = word.lowercase().trim()
+        if (clean in releasedWords) return "audio/words/word_$clean.wav"
         return "audio/words/word_$clean.mp3"
     }
 

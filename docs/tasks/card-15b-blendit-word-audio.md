@@ -1,6 +1,6 @@
 # Card 15b: Approved word clips for AM, TUB and YAM, with the ElevenLabs credit; Blend It stops being silent on them (FR-13, NFR-AUD-01)
 
-Status: ready
+Status: done
 
 It touches `AudioResolver`, the Blend It word seeds and their tests, and the Parent Zone dashboard (one credit line), and adds three assets. Card 28b does not touch any of these files, so the two cards can run in either order.
 

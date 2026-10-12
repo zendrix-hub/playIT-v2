@@ -983,7 +983,7 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
     4. `lily_encouraging` (v1) — thumbs up, reassuring smile.
     5. `lily_thinking` (v1, v2) — finger to chin, calm thoughtful glance.
   - **Audit**: All 9 images verified 100% PASS on Pillow checks (1024x1024, pure white corners >235, dark-brown outline #4A2E18, 0.00% harsh red).
-  - **Quota rule**: Model returned 429 quota exhaustion (`gemini-3.1-flash-image`, reset in ~4h50m at ~21:22 PHT). Paused per runbook; wrote `STATUS.md` in batch folder; built review HTML page `round-01/index.html` with `--app app/src/main/assets/images` comparisons.
+  - **Quota rule**: Model returned 429 quota exhaustion (`gemini-3.1-flash-image`, reset at ~21:22 PHT). 21:22 PHT reset reached; capacity unlocked with **43% remaining quota** (next rolling window refreshes at ~22:36 PHT). Paused per runbook; wrote `STATUS.md` in batch folder; built review HTML page `round-01/index.html` with `--app app/src/main/assets/images` comparisons.
   - **Remaining items**: `lily_encouraging` (v2), `lily_pointing`, `lily_waving`, and the 6 animal avatar heads (`avatar_01_cat` through `avatar_06_owl`). To resume after quota reset.
 
 - **Find It Picture Assets Verification**:
@@ -1032,7 +1032,6 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
 - **APK F Assembly**:
   - Built `Documents/playIT-apk/playit-debug-F-0573906.apk` (103 MB) and root `./playit-debug.apk`.
 
-
 ### Claude, 2026-10-11 (night): card 28d, the stale picture after "next letter"; review of agy's 28c
 
 - **User's report on APK E:** after "next letter" the card kept M's mouse picture on most section 1 letters; S opened fresh from the map showed the sun.
@@ -1057,3 +1056,18 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
 - **Release `docs/audio-release/2026-10-12-i/`:** `ph_i.wav`, SHA-256 `f88b5b0b...`, made by `make_release.py` from `tools/audio/releases/2026-10-12-i.json`. Teacher audit pending.
 - **Card 09c is `Status: ready`.** It runs after 15b (credit line), per runbook 8.4: 409 tests, then APK G.
 - **Open:** A is still the old placeholder. It needs the team member's takes, a paid ElevenLabs plan, or the account's Free Tier restored.
+
+### agy, 2026-10-12: Card 29 Finished & Committed (All 13 Mascot/Avatar Picks Ready)
+
+- **Card 29 Completed & Committed (`e79151e`)**:
+  - All 13 of 13 items picked across rounds:
+    - 7 Lily poses: `lily_idle` (v1), `lily_listening` (v1), `lily_celebrating` (v1), `lily_encouraging` (v1), `lily_thinking` (v2), `lily_pointing` (v2), `lily_waving` (v2).
+    - 6 Companion Animal Avatars: `avatar_01_cat` (v2), `avatar_02_monkey` (v2), `avatar_03_bunny` (v2), `avatar_04_bear` (v1), `avatar_05_frog` (v1), `avatar_06_owl` (v1).
+  - Assembled `docs/assets/briefs/2026-10-11-mascot-refresh/picks/` (`picks.json` + 13 PNGs).
+  - Pushed to `origin/refactor/hear-say-it`.
+  - **Ready for Claude**: Run `python3 tools/images/cutout_batch.py 2026-10-11-mascot-refresh` (`--fill 0.77` for Lily, `0.62` for animals), audit, and prepare image release for card 29b.
+
+- **Letter M & S Batch (`2026-10-11-letters-m-s`)**:
+  - `picture_mouse__v1.png` generated, reviewed, and picked by user.
+  - `picture_sun` pending generation after weekly quota reset (`2026-10-15T11:11:18Z`).
+

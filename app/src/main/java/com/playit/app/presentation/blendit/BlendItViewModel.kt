@@ -131,7 +131,7 @@ class BlendItViewModel @Inject constructor(
                 listOf(
                     BlendItWord(1, 1, "SAM", "S-A-M", "audio/words/word_sam.mp3", "images/pictures/blendword_sam.png"),
                     BlendItWord(2, 1, "SIS", "S-I-S", "audio/words/word_sis.mp3", "images/pictures/blendword_sis.png"),
-                    BlendItWord(3, 1, "AM", "A-M", "audio/words/word_am.mp3", "images/pictures/blendword_am.png")
+                    BlendItWord(3, 1, "AM", "A-M", "audio/words/word_am.wav", "images/pictures/blendword_am.png")
                 )
             }
             setupWordAtIndex(0)
