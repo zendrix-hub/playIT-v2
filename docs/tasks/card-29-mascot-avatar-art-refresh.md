@@ -1,7 +1,7 @@
 # Card 29: Lily poses and avatar animals, redrawn in one consistent style (asset card)
 
 Type: asset
-Status: ready (runs in its own agy image session, like card 25)
+Status: done
 
 ## Why
 On the phone (APK B) the user found Lily and the six avatar animals out of step with the newer pictures: thinner outlines and different shading than the anchor style sheet (`app/src/main/assets/images/_style-reference-sheet/anchor_letter-card.png`, `16_ILLUSTRATION_STYLE_GUIDE.md`). The animals also have uneven sizes on their canvas (51-67% fill, Lily 77%), so they look mismatched side by side in the profile picker.
