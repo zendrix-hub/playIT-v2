@@ -44,15 +44,25 @@ Submitting without synchronizing would present stale design claims to the panel 
 The user has requested an explicit, rigorous challenge of the app's visual design and user experience before tomorrow's submission:
 - **Design Target**: "Duolingo ABC, but a minimal version" — chunky, tactile 3D gummy elements (`Squircle`, `GummyButton`), joyful saturated accents, but stripped of sensory overload, clutter, or visual noise.
 - **Audit Checklist for Claude**:
-  1. **Map Screen (`MapScreen.kt`)**: Does the winding rope trail and chapter progression feel tactile and intuitive like Duolingo ABC without visual crowding on compact screens (360x740dp)?
-  2. **Hear It Screen (`HearItScreen.kt`)**: Is the auditory modeling uncluttered? With mouth cues moved out (Card 28c), does the centered play button feel prominent, calm, and purposeful?
-  3. **Say It Screen (`SayItScreen.kt`)**: Does the 4-state mic visualizer and gentle feedback banner feel supportive and game-like rather than testing-oriented?
-  4. **Find It Screen (`FindItScreen.kt`)**: Is the 2x2 grid spacing balanced, with clear tactile card feedback on selection?
-  5. **Blend It Screen (`BlendItScreen.kt`)**: Does the sequential 1 -> 2 -> 3 letter sound-out card provide clear visual focus as each phoneme is spoken?
-  6. **Pediatric Compliance**: Verify 64dp touch target floor, 16sp/18sp text floor, zero emojis across all screens, and zero harsh red `#FF0000`.
+  1. **Intro / Splash Screen (`SplashScreen.kt`)**: The opening moment upon launching the app. Currently draws an older Headspace canvas arch (`HeadspaceTarsierCanvas`); must be modernized to feature Lily the tarsier mascot in her welcoming pose (`lily_waving.png`), clean Duolingo ABC typography, and an inviting 64dp `GummyButton` with tactile tap feedback.
+  2. **Map Screen (`MapScreen.kt`)**: Does the winding rope trail and chapter progression feel tactile and intuitive like Duolingo ABC without visual crowding on compact screens (360x740dp)?
+  3. **Hear It Screen (`HearItScreen.kt`)**: Is the auditory modeling uncluttered? With mouth cues moved out (Card 28c), does the centered play button feel prominent, calm, and purposeful?
+  4. **Say It Screen (`SayItScreen.kt`)**: Does the 4-state mic visualizer and gentle feedback banner feel supportive and game-like rather than testing-oriented?
+  5. **Find It Screen (`FindItScreen.kt`)**: Is the 2x2 grid spacing balanced, with clear tactile card feedback on selection?
+  6. **Blend It Screen (`BlendItScreen.kt`)**: Does the sequential 1 -> 2 -> 3 letter sound-out card provide clear visual focus as each phoneme is spoken?
+  7. **Pediatric Compliance**: Verify 64dp touch target floor, 16sp/18sp text floor, zero emojis across all screens, and zero harsh red `#FF0000`.
 - **Submission Go / No-Go Verdict**:
   - Claude must explicitly state whether APK G meets the threshold for tomorrow's midterm submission.
   - If any non-blocking visual polish remains, Claude will catalog them into a prioritized post-midterm polish card rather than risking regressions tonight.
+
+### 6. Tactile Sound Effects (SFX) Strategy: The Duolingo ABC Acoustic Kit
+- **Core Directive**: Eliminate harsh or jarring sounds and establish joyful, effective audio feedback.
+- **Immediate Replacements**:
+  - Purge `sfx_blendit_buzz.mp3`: Replace with a gentle bubble/wooden "nudge" so children never experience game-show alarm buzzer feedback.
+  - Upgrade core feedback tones: Adopt a cohesive, high-polish acoustic foley set (soft wooden tile pop for taps, joyful marimba/xylophone chords for correct answers, gentle sparkle chimes for unlocks, and celebratory fanfare).
+- **Audio Gate & Provenance**:
+  - Source replacement SFX from verified CC0 / Public Domain acoustic game UI packs (e.g., Kenney Interface Sounds).
+  - Package through `docs/audio-release/` with standard SHA-256 manifest to guarantee academic licensing compliance.
 
 ## Agreed Submission Metadata (User Decision 2026-10-13)
 - **Capstone Adviser:** Mr. Joemarie C. Amparo
