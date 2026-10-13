@@ -40,6 +40,20 @@ Submitting without synchronizing would present stale design claims to the panel 
 ### 4. Course Form (`docs/MVP_Validation_Findings_and_Refactoring_Priorities_Filled.md`)
 - Verify Team Lead signature, date (October 14, 2026), and adviser confirmation details.
 
+### 5. Pedagogical UI & Architecture Audit: "Minimalist Duolingo ABC" Benchmark
+The user has requested an explicit, rigorous challenge of the app's visual design and user experience before tomorrow's submission:
+- **Design Target**: "Duolingo ABC, but a minimal version" — chunky, tactile 3D gummy elements (`Squircle`, `GummyButton`), joyful saturated accents, but stripped of sensory overload, clutter, or visual noise.
+- **Audit Checklist for Claude**:
+  1. **Map Screen (`MapScreen.kt`)**: Does the winding rope trail and chapter progression feel tactile and intuitive like Duolingo ABC without visual crowding on compact screens (360x740dp)?
+  2. **Hear It Screen (`HearItScreen.kt`)**: Is the auditory modeling uncluttered? With mouth cues moved out (Card 28c), does the centered play button feel prominent, calm, and purposeful?
+  3. **Say It Screen (`SayItScreen.kt`)**: Does the 4-state mic visualizer and gentle feedback banner feel supportive and game-like rather than testing-oriented?
+  4. **Find It Screen (`FindItScreen.kt`)**: Is the 2x2 grid spacing balanced, with clear tactile card feedback on selection?
+  5. **Blend It Screen (`BlendItScreen.kt`)**: Does the sequential 1 -> 2 -> 3 letter sound-out card provide clear visual focus as each phoneme is spoken?
+  6. **Pediatric Compliance**: Verify 64dp touch target floor, 16sp/18sp text floor, zero emojis across all screens, and zero harsh red `#FF0000`.
+- **Submission Go / No-Go Verdict**:
+  - Claude must explicitly state whether APK G meets the threshold for tomorrow's midterm submission.
+  - If any non-blocking visual polish remains, Claude will catalog them into a prioritized post-midterm polish card rather than risking regressions tonight.
+
 ## Agreed Submission Metadata (User Decision 2026-10-13)
 - **Capstone Adviser:** Mr. Joemarie C. Amparo
 - **Submission Date Header:** October 14, 2026
