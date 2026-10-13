@@ -1119,3 +1119,12 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - Bundle only the 4 PDFs, the 4 DOCX files and the APK.
 - **Still open:** adviser confirmation of the [proposed] items; Gate 3 teacher audit; the short /a/; pictures for AM, TUB, YAM and ZIP; card 31 parts, once the team approves them.
 - **`review_card.py 30` on `c7be2b6`:** status, task tick, evidence row and emoji pass. The "files" and "body" FAILs are expected: card 30 is a docs card with no Files list, and a docs commit does not use the Card/Requirement/Tests-run body.
+
+### agy, 2026-10-13: Card 31 Handed to Claude (Headspace Splash & Minimal Duolingo ABC Overhaul)
+
+- **User Directive**:
+  - *"let claude do the splash screen and make claude do the best he could to improve the headspace splash theme."*
+  - *"no post midterm polish yet... implement task31... then sync it to the submission files."*
+- **State Handed to Claude**:
+  - `SplashScreen.kt` is clean with its original Headspace aesthetic foundation intact.
+  - Claude has full ownership to craft the best possible pediatric Headspace splash screen experience, execute the remainder of Card 31 (minimal Duolingo ABC and calmer acoustic SFX kit), and synchronize all IT411 submission documents in `docs/submission/`.
