@@ -297,5 +297,6 @@ Each card ticks its own item in its commit (see `docs/tasks/AGY_RUNBOOK.md`). A 
 - [x] Card 29: Mascot poses and companion avatar art refresh (asset card)
 - [x] Card 29b: Mascot poses and companion avatars in the app from release 2026-10-12-mascot (NFR-ACC-02)
 - [x] Card 30: IT411 submission package synchronized with APK G (`89604d7`): SDD rev. 2.7, SRS rev. 3.7, SPMP rev. 2.5, the course form and 4 diagrams; audit of every screen and the sound effects (docs)
-- [ ] Card 31: Post-midterm polish: splash with Lily waving, one calm sound-effect set, short bubble lines, one message at a time, map text at 16 sp, Blend It tiles never dealt solved (NFR-ACC-01, NFR-ACC-02, NFR-IND-01)
+- [x] Card 31a: Splash screen overhaul with waving Lily and Start button below Lily (NFR-ACC-02)
+- [ ] Card 31: Calmer, simpler minimal Duolingo ABC UI and SFX polish (NFR-ACC-01, NFR-ACC-02, NFR-IND-01)
 
