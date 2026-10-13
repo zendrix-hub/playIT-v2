@@ -25,7 +25,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -150,15 +152,22 @@ fun MicButton(
                 }
             }
         }
+        // One line under the mic. Say It's feedback ("Watch my lips") shows here too (card 31d), so a long
+        // line shrinks to fit instead of being cut, never below the 16 sp floor.
+        var labelSize by remember(label) { mutableStateOf(20.sp) }
         Text(
             text = label,
             fontFamily = LexendFontFamily,
-            fontSize = 20.sp,
+            fontSize = labelSize,
             fontWeight = FontWeight.Bold,
             color = TextMidnight,
             textAlign = TextAlign.Center,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            softWrap = false,
+            overflow = TextOverflow.Ellipsis,
+            onTextLayout = { layout ->
+                if (layout.hasVisualOverflow && labelSize.value > 16f) labelSize = (labelSize.value - 2f).sp
+            }
         )
     }
 }

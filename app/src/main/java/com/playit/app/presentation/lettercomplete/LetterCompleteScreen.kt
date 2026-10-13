@@ -52,6 +52,11 @@ import com.playit.app.presentation.theme.Mango
 import com.playit.app.presentation.theme.Ube
 import com.playit.app.presentation.theme.UbeDark
 
+/** Lily's line on the letter's end screen: one star means the child finished the letter, not mastered it (card 31d). */
+internal fun letterCompleteMessage(letter: String, stars: Int): String =
+    if (stars == 1) "You finished Letter $letter! Amazing sound practice!"
+    else "You mastered Letter $letter! Amazing sound practice!"
+
 @Composable
 fun LetterCompleteScreen(
     viewModel: LetterCompleteViewModel,
@@ -90,7 +95,7 @@ fun LetterCompleteScreen(
             topBar = {},
             header = {
                 DockedMascotWithBubble(
-                    message = "You mastered Letter $letter! Amazing sound practice!",
+                    message = letterCompleteMessage(letter, starsEarned),
                     mascotState = MascotState.CELEBRATING,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )

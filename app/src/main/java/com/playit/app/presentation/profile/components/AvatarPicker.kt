@@ -34,23 +34,8 @@ fun AvatarPicker(
     modifier: Modifier = Modifier
 ) {
 
+    // No headings of its own: Lily's bubble above it says "Pick your animal friend!" (card 31d).
     Column(modifier = modifier.fillMaxWidth()) {
-        Text(
-            text = "Choose Your Avatar",
-            fontFamily = LexendFontFamily,
-            fontSize = 26.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = Ink
-        )
-        Text(
-            text = "Pick your animal companion",
-            fontFamily = LexendFontFamily,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Medium,
-            color = InkSoft,
-            modifier = Modifier.padding(bottom = 12.dp)
-        )
-
         // 3x2 Bento Grid
         Column(
             modifier = Modifier.fillMaxWidth(),

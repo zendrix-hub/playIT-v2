@@ -9,8 +9,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.getBoundsInRoot
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
@@ -214,8 +217,17 @@ abstract class LayoutMatrixTest(private val deviceName: String) {
         val mic = compose.onNodeWithTag("sayit_mic", useUnmergedTree = true).getUnclippedBoundsInRoot()
         assertTrue("cue right ${cue.right} > mic left ${mic.left} on $deviceName", cue.right <= mic.left)
         assertOnScreen("sayit_mic")
-        // The "Watch my lips" banner makes the pinned bar taller; the dots stay above it (card 28b).
+        // "Watch my lips" is the line under the mic now, not a banner in the pinned bar (card 31d);
+        // the dots still stay above the bar (card 28b).
         assertAbove("sayit_attempts", "sayit_bottom"); capture("sayit_cue")
+        // The feedback shows once, as plain text under the mic, and nothing in the pinned bar repeats it.
+        // Unmerged: the mic merges its label into one node, and only the label's own bounds sit under the mic.
+        compose.onAllNodesWithText("Watch my lips", useUnmergedTree = true).assertCountEquals(1)
+        val line = compose.onNodeWithText("Watch my lips", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        val micBox = compose.onNodeWithTag("sayit_mic", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        val bar = compose.onNodeWithTag("sayit_bottom", useUnmergedTree = true).getBoundsInRoot()
+        assertTrue("feedback not under the mic on $deviceName", line.top >= micBox.bottom)
+        assertTrue("feedback inside the pinned bar on $deviceName", line.bottom <= bar.top)
     }
     /** Built as FindItScreenshotTest builds it. */
     @Composable private fun findIt() {

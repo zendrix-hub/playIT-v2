@@ -299,4 +299,5 @@ Each card ticks its own item in its commit (see `docs/tasks/AGY_RUNBOOK.md`). A 
 - [x] Card 30: IT411 submission package synchronized with APK G (`89604d7`): SDD rev. 2.7, SRS rev. 3.7, SPMP rev. 2.5, the course form and 4 diagrams; audit of every screen and the sound effects (docs)
 - [ ] Card 31: Minimal Duolingo ABC polish, run before the submission (team directive 2026-10-13), split into cards 31a to 31f (NFR-ACC-01, NFR-ACC-02, NFR-IND-01)
 - [x] Card 31a: The Headspace splash matches Lily, and Start sits in a panel below her face (NFR-ACC-02, NFR-IND-01)
+- [x] Card 31d: One message at a time on Hear It, Say It, the new profile and the letter's end screen (NFR-IND-01, NFR-ACC-02)
 

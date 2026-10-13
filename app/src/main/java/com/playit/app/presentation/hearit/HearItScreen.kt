@@ -171,12 +171,9 @@ fun HearItScreen(
             topBar = { LessonTopBar(currentStep = LessonStep.HEAR_IT, onBack = onBack) },
             header = {
                 // Mascot speech bubble prompt (Tapping Lily replays the lesson intro voiceover)
+                // While the sound plays the card already shows "Sound: /m/", so the bubble only says "Listen!" (card 31d).
                 MascotSpeechHeader(
-                    message = if (isPlaying) {
-                        "Sound: /${phoneme?.letter ?: "m"}/"
-                    } else {
-                        "Listen closely to the sound of the letter, then tap play."
-                    },
+                    message = if (isPlaying) "Listen!" else "Listen closely to the sound of the letter, then tap play.",
                     mascotState = if (isPlaying) MascotState.LISTENING else if (playCount > 0) MascotState.POINTING else MascotState.IDLE,
                     isPlayingAudio = isPlayingPrompt,
                     onMascotTap = { viewModel.playHearItIntroAudio() }
@@ -231,9 +228,10 @@ fun HearItScreen(
                         )
                     }
 
+                    // It keeps its colour while the sound plays and ignores taps until it ends: a grey
+                    // button looked switched off to a child (card 31d). The pulse ring shows it is playing.
                     GummyContainer(
-                        onClick = if (isPlaying) null else ({ viewModel.playPhonemeSound() }),
-                        enabled = !isPlaying,
+                        onClick = { if (!isPlaying) viewModel.playPhonemeSound() },
                         faceColor = com.playit.app.presentation.theme.PrimaryJoy,
                         shadowColor = com.playit.app.presentation.theme.PrimaryJoyDark,
                         shape = CircleShape,

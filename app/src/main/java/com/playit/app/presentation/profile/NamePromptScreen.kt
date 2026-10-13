@@ -110,22 +110,14 @@ fun NamePromptScreen(
             ) {
                 GummyBackButton(onClick = onBack)
                 Spacer(modifier = Modifier.width(12.dp))
-                Column {
-                    Text(
-                        text = "New Player Profile",
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = TextMidnight,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Text(
-                        text = "Create your player profile",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = TextMuted,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
+                // One title; Lily's bubble says what to do (card 31d dropped two headings that repeated it).
+                Text(
+                    text = "New Player Profile",
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = TextMidnight,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
 
             Spacer(modifier = Modifier.height(10.dp))

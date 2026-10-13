@@ -6,13 +6,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,7 +32,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.ui.graphics.graphicsLayer
@@ -46,7 +39,6 @@ import com.playit.app.domain.manager.TutorAction
 import com.playit.app.presentation.components.breathingPulse
 import com.playit.app.presentation.components.idleWiggle
 import com.playit.app.presentation.components.resetsIdle
-import com.playit.app.presentation.theme.WindowProfile
 import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.playit.app.BuildConfig
@@ -73,7 +65,6 @@ import com.playit.app.presentation.components.MascotState
 import com.playit.app.presentation.components.shake
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.playit.app.presentation.components.LessonScaffold
@@ -186,13 +177,8 @@ fun SayItScreen(
         }
     }
 
-    // On a compact phone the feedback banner makes the pinned bar taller; the card gives up that
-    // height so the attempt dots stay above the bar (card 28b).
-    val cardMaxHeight by animateDpAsState(
-        targetValue = if (showFeedback && d.profile == WindowProfile.COMPACT) d.letterCardHeight * 0.62f
-        else d.letterCardHeight * 0.8f,
-        label = "sayItCardMaxHeight"
-    )
+    // The pinned bar holds only Next now (card 31d), so the card keeps one height whatever the feedback.
+    val cardMaxHeight = d.letterCardHeight * 0.8f
 
     Box(
         modifier = Modifier
@@ -239,60 +225,9 @@ fun SayItScreen(
                 )
             },
             bottomBar = {
+                // Only Next here: the feedback line is plain text under the mic (card 31d). What Vosk heard
+                // goes to Logcat only (see the LaunchedEffect above), never on screen.
                 Column(Modifier.testTag("sayit_bottom"), horizontalAlignment = Alignment.CenterHorizontally) {
-                    AnimatedVisibility(
-                        visible = showFeedback,
-                        enter = fadeIn() + slideInVertically(initialOffsetY = { 20 }),
-                        exit = fadeOut() + slideOutVertically(targetOffsetY = { 20 })
-                    ) {
-                        val isCorrect = state is SayItState.Correct
-                        // Third miss: a calm cream banner, not the orange "try again" (card 28).
-                        val movedOn = tutorAction is TutorAction.LeadAndMoveOn
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 8.dp)
-                                    .background(
-                                        color = when {
-                                            isCorrect -> EmeraldLeaf
-                                            movedOn -> SunnyGoldLight
-                                            else -> ApricotGlow
-                                        },
-                                        shape = Squircle16
-                                    )
-                                    .border(2.5.dp, ModernBorder, Squircle16)
-                                    .padding(vertical = 8.dp, horizontal = 16.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                // One line: a second line makes the pinned bar taller and pushes the mic
-                                // label off small phones, so a long banner shrinks (never below 16 sp).
-                                val bannerText = currentFeedbackCopy?.banner
-                                    ?: if (isCorrect) "Great listening!" else "Listen again"
-                                var bannerSize by remember(bannerText) { mutableStateOf(24.sp) }
-                                Text(
-                                    text = bannerText,
-                                    color = if (isCorrect) Color.White else TextMidnight,
-                                    fontWeight = FontWeight.Black,
-                                    fontFamily = LexendFontFamily,
-                                    fontSize = bannerSize,
-                                    maxLines = 1,
-                                    softWrap = false,
-                                    textAlign = TextAlign.Center,
-                                    onTextLayout = { layout ->
-                                        if (layout.hasVisualOverflow && bannerSize.value > 16f) {
-                                            bannerSize = (bannerSize.value - 2f).sp
-                                        }
-                                    }
-                                )
-                            }
-                            // What Vosk heard goes to Logcat only (see the LaunchedEffect above), never on screen.
-                        }
-                    }
-
                     // Next pulses once it unlocks (praise or the third miss) and pops on the change.
                     val nextPop = remember { Animatable(1f) }
                     var wasUnlocked by remember { mutableStateOf(canContinue) }
@@ -396,11 +331,18 @@ fun SayItScreen(
                     if (showMouthCue) {
                         ArticulationCue(group = articulationFor(phoneme?.letter ?: "m"), size = 96.dp)
                     }
+                    // After an attempt the line under the mic is the short feedback ("Watch my lips"), as
+                    // plain text: it used to be a separate banner that looked like a second button (card 31d).
                     MicButton(
                         status = micStatus,
                         onTap = startAttempt,
                         enabled = !isPlayingPhoneme && !isModelInitializing,
-                        labelOverride = if (isModelInitializing) "Lily is getting ready..." else null,
+                        labelOverride = when {
+                            isModelInitializing -> "Lily is getting ready..."
+                            showFeedback -> currentFeedbackCopy?.banner
+                                ?: if (state is SayItState.Correct) "Great listening!" else "Listen again"
+                            else -> null
+                        },
                         idleNudge = idleNudge
                     )
                 }
