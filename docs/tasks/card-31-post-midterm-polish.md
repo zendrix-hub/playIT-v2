@@ -1,6 +1,6 @@
 # Card 31: Post-midterm polish: a calmer, simpler "minimal Duolingo ABC" (NFR-ACC-01, NFR-ACC-02, NFR-IND-01)
 
-Status: proposed (after the October 14 submission; the team picks which parts run before Round 2 on October 19)
+Status: in progress: the team directive of 2026-10-13 runs card 31 now, before the submission, split into cards 31a to 31f. Two changes from this blueprint: the splash keeps the Headspace drawing and matches it to Lily (31a), and the map part also raises its buttons to 64 dp (31e).
 
 Written by Claude on 2026-10-13 from the card 30 audit of APK G (`89604d7`). Nothing here blocks the submission: APK G is the submitted build, and every change below needs a new APK and a new phone test.
 

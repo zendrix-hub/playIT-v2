@@ -63,6 +63,7 @@ import com.playit.app.presentation.lettercomplete.LetterCompleteScreen
 import com.playit.app.presentation.lettercomplete.LetterCompleteViewModel
 import com.playit.app.presentation.profile.NamePromptScreen
 import com.playit.app.presentation.profile.ProfileViewModel
+import com.playit.app.presentation.splash.LILY_FACE_BOTTOM
 import com.playit.app.presentation.splash.SplashScreen
 import io.mockk.coEvery
 import io.mockk.every
@@ -311,6 +312,7 @@ abstract class LayoutMatrixTest(private val deviceName: String) {
         assertOnScreen("map_current_node"); capture("map")
     }
 
+
     /** The unit banner's title sits inside the card face, above the 6 dp shelf (card 28b). */
     @Test fun map_unitBannerTitleFits() {
         compose.setContent { PlayItTheme { map() } }
@@ -375,6 +377,23 @@ abstract class LayoutMatrixTest(private val deviceName: String) {
         compose.setContent { PlayItTheme { WithFontScale(1.3f) { SplashScreen(onStartClick = {}) } } }
         compose.waitForIdle()
         assertOnScreen("splash_start")
+        assertLilyFaceClear()
+    }
+
+    /** Lily peeks over the start panel: the panel, her paws (14 dp above it) and Start stay below her face (card 31a). */
+    @Test fun splash_lilyFaceClearOfStart() {
+        compose.setContent { PlayItTheme { SplashScreen(onStartClick = {}) } }
+        compose.waitForIdle()
+        assertLilyFaceClear()
+    }
+
+    private fun assertLilyFaceClear() {
+        val lily = compose.onNodeWithTag("splash_lily").getUnclippedBoundsInRoot()
+        val face = lily.top + (lily.bottom - lily.top) * LILY_FACE_BOTTOM
+        val panel = compose.onNodeWithTag("splash_panel", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        val start = compose.onNodeWithTag("splash_start", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        assertTrue("paws top ${panel.top - 14.dp} above face bottom $face on $deviceName", panel.top - 14.dp >= face)
+        assertTrue("Start top ${start.top} above face bottom $face on $deviceName", start.top >= face)
     }
 
     @Test fun nameprompt_letsPlayVisible() {
