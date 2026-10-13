@@ -1,8 +1,20 @@
 # Card 30: IT411 Midterm Submission Package Synchronization (SDD v2.4, SRS v3.4, SPMP v2.4)
 
-Status: ready
+Status: done
 Type: docs
-Auditor: Claude (WSL)
+Auditor: Claude (Windows PC)
+
+## Outcome (Claude, 2026-10-13)
+- **Baseline checked:** Claude's own run at `89604d7` gives 409 tests, 0 failures, 6 skipped by design, the same as agy's. Every shipped file of releases `2026-10-11-words`, `2026-10-12-i` and `2026-10-12-mascot` matches its manifest SHA-256.
+- **Revision numbers:** the card's "v2.4 / v3.4 / v2.4" are already used: SDD rev. 2.4 and SRS rev. 3.4 were card 28, and SPMP rev. 2.4 was the October 11 issue. This revision is therefore SDD rev. 2.7, SRS rev. 3.7 and SPMP rev. 2.5. The file names keep the document versions (v2.0, v3.0, v2.0).
+- **Synchronized:** sections 1 to 4 below, plus the four diagrams that showed the Hear It mouth cue:
+  - Figure 2 and Figure 8 (Hear It class and sequence diagrams) lose it.
+  - Figure 3 (Say It class diagram) gains `ArticulationCue`.
+  - SRS Figure 1 moves the mouth-cue use case to Say It.
+- **Course form:** the declaration prints a blank signature line under the Team Lead's name (`fill_mvp_validation_form.py`). The date is October 14, 2026.
+- **Adviser:** Mr. Joemarie C. Amparo on all four documents.
+- **Package:** re-rendered with `tools/docs/render_submission_package.py`: 4 DOCX and 4 PDF, all 14 figures at full resolution, plus the checklist.
+- **Audit (section 5) and SFX (section 6):** the findings and the plan are in `card-31-post-midterm-polish.md`. Verdict: **GO** for the October 14 submission with APK G; no finding blocks it.
 
 ## Why
 The academic submission package in `docs/submission/` was compiled on October 11 at commit `6933e3e` (Card 24b / APK D, 386 tests). Since then, the codebase advanced through Cards 28, 28b, 28c, 28d, 15b, 09c, and 29b to commit `89604d7` (APK G, 409 passing tests).

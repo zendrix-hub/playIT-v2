@@ -3,8 +3,8 @@
 **Course:** IT411 (Section G7) — Capstone & Research 2 | Semester 1, AY 2026–2027  
 **Degree Program:** Bachelor of Science in Information Technology  
 **Department:** College of Computer Studies, Cebu Institute of Technology – University  
-**Document Version:** 2.0 (Post-MVP Architectural Baseline), revision 2.6  
-**Publication Date:** September 26, 2026 (Revised October 11, 2026)  
+**Document Version:** 2.0 (Post-MVP Architectural Baseline), revision 2.7  
+**Publication Date:** September 26, 2026 (Revised October 14, 2026)  
 **Document Status:** Submitted for Adviser Review and Evaluation  
 **Prepared by:** Group 56 — PlayIT Capstone Team: Riva, Zendrix (Team Lead); Palis, John James; Miel, Kaysean; Durano, Ashlee Skye; Bien, Erik Samuel  
 **Adviser:** Mr. Joemarie C. Amparo  
@@ -25,6 +25,7 @@
 | **2.4** | October 10, 2026 | Capstone Team (Claude, card 28) | Phone-test refinements (team decisions 2026-10-10): §2.0 adds the card 28 row (Hear It ends on the sound, Say It mic `DONE` after the third miss, Blend It sound-out that waits for each clip, live star totals from one SQL aggregate, one-tap map start) and marks captions as kept in code but not shown; §3.6.2 and §4.1 step 7 follow. |
 | **2.5** | October 11, 2026 | Capstone Team (Claude, diagrams) | Design diagrams added, traced from the code: §3.5.3 system ERD (Figure 1); §3.7 one class diagram per module (Figures 2–7); §4.1–§4.6 one sequence diagram per module (Figures 8–13); planned components are grey and marked «planned». §4.2 now marks `NEEDS_PRACTICE` as planned (Room v4). No design change. |
 | **2.6** | October 11, 2026 | Capstone Team | Issued for adviser review and evaluation: the front matter states the submission status and the members' full names. §2.0 records the 9 mouth-shape pictures now in the app (image release `2026-10-10-mouth`, card 24b) and the Hear It mouth cue beside the play button. No design change. |
+| **2.7** | October 14, 2026 | Capstone Team (Claude, card 30) | Synchronized with debug APK G (`89604d7`, 409 unit tests passing) for the October 14 submission. §2.0: the mouth cue is shown in Say It only (card 28c, team decision 2026-10-11); new rows for the phone-test fixes (cards 28b, 28d), the ElevenLabs clips for AM, TUB, YAM and the short /i/ with the Parent Zone credit (cards 15b, 09c), and the redrawn mascot and avatars (card 29b); the map labels below the 16 sp floor are listed. §3.1.1, §3.4, §3.6.2, the new §3.6.3, §3.7.1, §3.7.2, §4.1, §4.2 and §5 follow; Figures 2, 3 and 8 are redrawn for card 28c. |
 
 ---
 
@@ -63,7 +64,7 @@ This design document governs the entire PlayIT Android mobile application:
 
 ## 2. Architectural Design
 
-### 2.0 Implementation Status (checked against the code on 2026-10-09, branch `refactor/hear-say-it`)
+### 2.0 Implementation Status (checked against the code on 2026-10-13, branch `refactor/hear-say-it` at `89604d7`)
 This document describes the target design for Weeks 4–9. The table separates what the app does today from what is planned, so the design is not read as a description of the current build.
 
 | Component | Status | Where / note |
@@ -76,15 +77,18 @@ This document describes the target design for Weeks 4–9. The table separates w
 | `HeartManager`, `StarCalculator`, `GridGenerator`, `ArithmeticGateManager` | Implemented | `domain/manager/` |
 | `ProfileEntity`, `SessionManager` (up to 6 profiles) | Implemented | Room schema version 3 (`PlayItDatabase.kt`) |
 | Parent PDF report | Implemented | `data/pdf/PdfExporter.kt` |
-| Adaptive dimensions and lesson layout (`WindowProfile`, `PlayItDimens`, `LessonScaffold`) | Implemented | `presentation/theme/Dimens.kt`, `presentation/components/LessonScaffold.kt`; 64 dp touch and 16 sp text floors; tested in `DimensTest`, `GummyContainerLayoutTest`, `LayoutMatrixTest` (4 device sizes, font scale 1.3) |
+| Adaptive dimensions and lesson layout (`WindowProfile`, `PlayItDimens`, `LessonScaffold`) | Implemented | `presentation/theme/Dimens.kt`, `presentation/components/LessonScaffold.kt`; 64 dp touch and 16 sp text floors; tested in `DimensTest`, `GummyContainerLayoutTest`, `LayoutMatrixTest` (4 device sizes, font scale 1.3). Known gap: some map labels are smaller than 16 sp (the unit banner's section line 11 sp, the Blend It node badge 9.5 sp, the letter and star counters 12 to 13 sp); they are listed for the post-midterm polish card 31 |
 | Say It mic states (Idle, Listening, Heard, Result, and Done after the third miss) | Implemented | `presentation/sayit/MicStatus.kt`, `presentation/sayit/components/MicButton.kt`; time-based ripple, no red; returns to Idle when the app is backgrounded; Done takes no taps (card 28); tested in `MicStatusTest`, `SayItViewModelTest` |
 | Spoken Say It corrections (letter name, added vowel, remodel) | Implemented | `presentation/sayit/SayItViewModel.kt`; tutor fragments `fb_letter_name`, `fb_its_sound_is`, `fb_almost_just`, `fb_no_ah`, `fb_listen` (Kokoro, audio release 2026-10-01; teacher audit pending); tested in `SayItViewModelTest`, `AudioResolverTest` |
-| Decodable Blend It word list (§3.4) | Implemented | `di/DatabaseModule.kt` `BLEND_IT_WORD_SEEDS`, written on every open; tested in `BlendItWordSeedsTest`. Teacher confirmation and the AM, TUB, YAM, ZIP word audio and pictures are pending |
+| Decodable Blend It word list (§3.4) | Implemented | `di/DatabaseModule.kt` `BLEND_IT_WORD_SEEDS`, written on every open; tested in `BlendItWordSeedsTest`. The AM, TUB and YAM word clips ship from audio release `2026-10-11-words` (card 15b; row below). Teacher confirmation and the pictures for AM, TUB, YAM and ZIP are pending |
 | Purposeful effects and screen transitions | Implemented | `presentation/components/FeedbackEffects.kt`, `navigation/NavGraph.kt`, `CelebrationOverlay.kt`; reduced motion gives fades only; no haptics; tested in `FeedbackEffectsTest`, `PlayItMotionTest` |
 | Responsive map trail, compact header, unlock moment | Implemented | `presentation/map/MapLayout.kt`, `MapScreen.kt`, `MapViewModel.newlyUnlockedNodeId`; tested in `MapLayoutTest`, `TopStatsBarLayoutTest`, `MapViewModelTest` |
-| Mouth-shape cue `ArticulationCue` (§3.6.2); sound captions kept in code, not shown in the child view since card 28 (team decision 2026-10-10, confirmed 2026-10-11) | Implemented | `domain/model/ArticulationGroup.kt`, `domain/manager/CaptionText.kt`, `presentation/components/CaptionBubble.kt`, `ArticulationCue.kt`; the 9 mouth-shape pictures ship from image release `2026-10-10-mouth` (card 24b) and Hear It shows the cue beside the play button; tested in `ArticulationGroupTest`, `CaptionTextTest`, `ArticulationCueTest`, `PictureAssetsTest`, `LayoutMatrixTest` |
+| Mouth-shape cue `ArticulationCue` (§3.6.2), shown in Say It from the second miss; sound captions kept in code, not shown in the child view since card 28 (team decision 2026-10-10, confirmed 2026-10-11) | Implemented | `domain/model/ArticulationGroup.kt`, `domain/manager/CaptionText.kt`, `presentation/components/CaptionBubble.kt`, `ArticulationCue.kt`; the 9 mouth-shape pictures ship from image release `2026-10-10-mouth` (card 24b). Since card 28c (team decision 2026-10-11) Hear It shows no mouth cue: the child watches the letter card while the sound plays. Say It shows a 96 dp cue beside the mic from the second miss ("Watch my lips"); tested in `ArticulationGroupTest`, `CaptionTextTest`, `ArticulationCueTest`, `SayItViewModelTest`, `PictureAssetsTest`, `LayoutMatrixTest` |
 | Phone-test refinements (card 28): Hear It ends on the key word and the sound; the third Say It miss rests the mic and unlocks Next; Blend It sounds out each letter to the end (at least 750 ms) before the whole word; one-tap start of the active map node | Implemented | `domain/manager/HearItSequenceBuilder.kt`, `presentation/sayit/MicStatus.kt`, `presentation/blendit/BlendItViewModel.kt`, `presentation/map/MapTapRules.kt`; tested in `HearItSequenceBuilderTest`, `SayItViewModelTest`, `BlendItViewModelTest`, `MapTapRulesTest` |
 | Live star totals on the map, the profile cards and the parent report | Implemented | `data/local/dao/ProfileDao.kt` sums `lesson_progress` and `blend_it_progress` in SQL, the same sum as `ReportGenerator`; no schema change (card 28); tested in `ProfileDaoStarsTest` on an in-memory Room database |
+| Phone-test fixes (cards 28b, 28d): truer letter-to-mouth pairs; after 10 s without a tap the main button wiggles; the unit banner title and the Say It attempt dots fit on compact screens; a lesson screen that moves to the next letter shows that letter's picture | Implemented | `domain/model/ArticulationGroup.kt`, `presentation/components/PulseModifier.kt`, `presentation/map/components/MarungkoGroupBanner.kt`, `presentation/components/AssetImage.kt` (the picture state is keyed on the picture, card 28d); tested in `ArticulationGroupTest`, `IdleWiggleTest`, `SayItViewModelTest`, `LayoutMatrixTest`, `AssetImageLoadTest` |
+| ElevenLabs clips (cards 15b, 09c): the Blend It words AM, TUB and YAM, and the short /i/ (team decisions 2026-10-11 and 2026-10-12; adviser confirmation pending) | Implemented | `assets/audio/words/word_am.wav`, `word_tub.wav`, `word_yam.wav` and `assets/audio/phonemes/ph_i.wav` from audio releases `2026-10-11-words` and `2026-10-12-i`; `data/audio/AudioResolver.kt` resolves them. Free-plan clips, so the Parent Zone shows the credit "Some word voices made with ElevenLabs (elevenlabs.io)" (`presentation/dashboard/components/VoiceCredit.kt`); tested in `AudioResolverTest`, `BlendItWordSeedsTest`, `VoiceCreditTest`. Teacher audit pending |
+| Redrawn mascot and companion avatars (card 29b, §3.6.3) | Implemented | 7 Lily poses in `assets/images/mascot/` and 6 animal avatars in `assets/images/characters/` from image release `2026-10-12-mascot`; `AvatarCircle` and the map companions read `CompanionAnimal.assetPath`; tested in `PictureAssetsTest` (`releasedPicturesMatchManifest`) |
 | `LessonEngine`, `LearnerModel` (review scheduler) | Planned | — |
 | `AudioComposer`, `AudioPlaybackManager` | Planned | Playback today goes through `data/audio/AudioPlayer.kt`, which already uses a `SoundPool` for short clips |
 | RMS-driven mic ripple (`MicStateVisualizer` with the `AudioRecord` loop of §3.2) | Planned | The 4 mic states are implemented (row above); the voice-driven ripple follows the planned `AudioRecord` loop (post-Round-2, team decision 2026-10-06) |
@@ -154,9 +158,11 @@ To ensure pure phoneme delivery with zero trailing vowel intrusion and instantan
 - **Underlying Driver:** Android native `SoundPool` API with `AudioAttributes.USAGE_GAME`.
 - **Preloading Lifecycle:** When the learner navigates to a chapter node on the Map Screen, all phoneme bursts for that letter (`ph_<letter>.wav`) are loaded into uncompressed memory.
 - **Physical Asset Segregation:**
-  - `assets/audio/phonemes/ph_<letter>.wav`: Pure phoneme burst ($800\,\text{ms}$ continuous; $\le 250\,\text{ms}$ stops). Zero schwa trailing (released so far: `ph_m.wav`, `ph_s.wav`).
+  - `assets/audio/phonemes/ph_<letter>.wav`: Pure phoneme burst ($800\,\text{ms}$ continuous; $\le 250\,\text{ms}$ stops). Zero schwa trailing. Released so far: the held `ph_m.wav` and `ph_s.wav`, and the short `ph_i.wav` (0.28 s; the teacher audit judges its length). The other letters still play the MVP's `phoneme_<letter>.mp3` until their clips are released.
   - `assets/audio/keywords/kw_<word>.wav`: Key word pronunciation (e.g., `kw_mouse.wav`).
+  - `assets/audio/words/word_<word>.wav`: released Blend It word clips (AM, TUB, YAM); the other words still play the MVP's `word_<word>.mp3`.
   - `assets/audio/vo/tutor/car_<phrase>.wav`: Spoken carrier phrases (e.g., `car_listen.wav`, `car_this_letter_says.wav`, `car_say_it_with_me.wav`, `car_your_turn.wav`).
+- **Provenance and license:** each released clip is listed with its source, license and SHA-256 in its release manifest (`docs/audio-release/<date>/manifest.json`). The ElevenLabs clips (AM, TUB, YAM and the short /i/) are Free-plan audio: non-commercial use only, credited as "elevenlabs.io" at the bottom of the Parent Zone (`VoiceCreditLine`).
 
 #### 3.1.2 AudioComposer Component (planned)
 `AudioComposer` will manage runtime assembly of the modeling sequence using duration metadata from the audio release manifests (`docs/audio-release/<date>/manifest.json`); today `HearItSequenceBuilder` builds the sequence (§2.0):
@@ -321,7 +327,7 @@ Vosk is instantiated with a constrained per-letter runtime grammar rather than o
 ---
 
 ### 3.4 Decodable Blend It Word Bank Refactoring (FR-13)
-The seeded `BlendItWord` list (`BLEND_IT_WORD_SEEDS` in `di/DatabaseModule.kt`) carries the replacements below and is written on every app start, so existing installs receive them; each replacement keeps the word id it replaces, so learner progress is unaffected (card 15, implemented 2026-10-09; teacher confirmation of the list pending). The 5 invalid words identified during MVP validation are replaced:
+The seeded `BlendItWord` list (`BLEND_IT_WORD_SEEDS` in `di/DatabaseModule.kt`) carries the replacements below and is written on every app start, so existing installs receive them; each replacement keeps the word id it replaces, so learner progress is unaffected (card 15, implemented 2026-10-09; teacher confirmation of the list pending). The AM, TUB and YAM word clips were made with ElevenLabs Text to Speech after the Kokoro TUB takes added a vowel ("tahbi") (card 15b). The pictures for AM, TUB, YAM and ZIP are still pending, so these four words show no picture yet. The 5 invalid words identified during MVP validation are replaced:
 
 | Chapter | Unlocked Letters | Purged Word | Violation Reason | Replacement Word | Valid Letters Used |
 |:---:|---|:---:|---|:---:|:---:|
@@ -441,8 +447,8 @@ fun LessonScaffold(
 ```
 `LayoutMatrixTest` renders Hear It, Say It, Find It, Blend It, the map, the complete screens, splash and the name prompt at 360x640, 360x740, 411x891 and 800x1280 dp (and at font scale 1.3), and fails if the main action is below the window.
 
-#### 3.6.2 Articulation Cue and Sound Captions (implemented; pictures pending)
-Each letter maps to one of 9 mouth-shape groups (`ArticulationGroup`, pure Kotlin), an approximation for a child that a teacher checks during Gate 3. Captions come from `CaptionText.forClip(path, letter, word)`: a phoneme clip shows `/m/`, a key word shows the word, a carrier shows its line, and a pause shows nothing. `AudioPlayer.playSequence(paths, onItemStart, onComplete)` reports each clip as it starts, so Hear It captions the modeling sequence live.
+#### 3.6.2 Articulation Cue and Sound Captions (implemented)
+Each letter maps to one of 9 mouth-shape groups (`ArticulationGroup`, pure Kotlin), an approximation for a child that a teacher checks during Gate 3. Captions come from `CaptionText.forClip(path, letter, word)`: a phoneme clip shows `/m/`, a key word shows the word, a carrier shows its line, and a pause shows nothing. `AudioPlayer.playSequence(paths, onItemStart, onComplete)` reports each clip as it starts, so the Hear It view model computes the caption live; the screen does not show it (card 28).
 ```kotlin
 @Composable
 fun ArticulationCue(group: ArticulationGroup, size: Dp, modifier: Modifier = Modifier)
@@ -450,23 +456,33 @@ fun ArticulationCue(group: ArticulationGroup, size: Dp, modifier: Modifier = Mod
 @Composable
 fun CaptionBubble(caption: String?, modifier: Modifier = Modifier)
 ```
-`ArticulationCue` draws nothing until its picture is in `assets/images/mouth/` (image release of card 25). Hear It shows a 72 dp cue under the letter card (no caption in the child view since card 28); Say It shows a 96 dp cue beside the mic from the second miss ("Watch my lips", spec Table 7).
+The 9 pictures ship in `assets/images/mouth/` (image release `2026-10-10-mouth`, card 24b); `ArticulationCue` draws nothing if a picture is missing.
+- **Say It:** a 96 dp cue beside the mic from the second miss ("Watch my lips", spec Table 7).
+- **Hear It:** no cue since card 28c (team decision 2026-10-11, adviser confirmation pending). During the modeling sequence the child looks at one thing, the letter card, and listens; a second picture would split a pre-reader's attention.
+- **Captions:** kept in the code but not shown in the child view (card 28).
+
+#### 3.6.3 Mascot and Companion Art (card 29b)
+- **Lily:** the orange tarsier has 7 poses in `assets/images/mascot/` (idle, listening, pointing, thinking, encouraging, celebrating, waving). They were redrawn for one consistent style, not redesigned. `MascotState` picks the pose for each screen state; for example the profile screen waves when profiles exist.
+- **Companions:** 6 animal avatars (cat, monkey, bunny, bear, frog, owl) are in `assets/images/characters/`. The profile `AvatarCircle` and the map companions both read `CompanionAnimal.assetPath`, so one picture serves both places.
+- **Release:** all 13 pictures ship from image release `2026-10-12-mascot` with their SHA-256 (§2.0).
+- **Not yet:** the splash screen still draws an older vector tarsier in `SplashScreen.kt`. Replacing it with the waving pose is listed for card 31.
 
 ### 3.7 Module Class Diagrams
 Figures 2 to 7 give one class diagram for each functional module of SRS §3.2.
-- **Source:** traced from the code on `refactor/hear-say-it` (checked 2026-10-11).
+- **Source:** traced from the code on `refactor/hear-say-it` (checked 2026-10-11; Figures 2, 3 and 8 rechecked on 2026-10-13 for card 28c).
 - **Layout:** each diagram is grouped by the layers of §2.2 (presentation, domain, data).
 - **Planned classes:** classes the earlier sections describe as planned are grey and marked «planned», with a dashed line to the class they would extend or replace (for example `AudioComposer`, `LearnerModel`, `TelemetryLogger`). Everything else exists in the app today.
 - **Sources:** the diagram sources are in `docs/diagrams/src/`.
 
 #### 3.7.1 Module 1: Letter-Sound Acquisition (Hear It)
-`HearItViewModel` builds the modeling sequence with `HearItSequenceBuilder` and plays it through `AudioPlayer`. `ArticulationCue` reads its picture from the letter's `ArticulationGroup`.
+`HearItViewModel` builds the modeling sequence with `HearItSequenceBuilder` and plays it through `AudioPlayer`. Since card 28c the screen shows only the letter card, the play button and the step dots. The view model still computes the caption and the letter's `ArticulationGroup`, but the screen does not show them.
 
 ![Class diagram, Module 1: Hear It](diagrams/png/class_m1_hear_it.png)
 
 #### 3.7.2 Module 2: Speech Production and Formative Tutoring (Say It)
 - **Judging and the prompt ladder:** `SpeechValidator` (in the role of `SayItJudge`) judges the transcript. The stateless `TutorPolicy` maps the attempt number and the judgement to `Praise`, `Correct` or `LeadAndMoveOn`.
 - **Mic state:** `MicStatus` drives the mic button.
+- **Mouth cue:** from the second miss, `showMouthCue` puts `ArticulationCue` beside the mic, with the picture of the letter's `ArticulationGroup`.
 
 ![Class diagram, Module 2: Say It](diagrams/png/class_m2_say_it.png)
 
@@ -501,7 +517,7 @@ User selects Letter -> Screen Loads -> SoundPool Preloads Letter Clips
   -> Step 2: Letter card flips, displaying embedded Picture Mnemonic
   -> Step 3: Mascot plays "This letter says..." carrier
   -> Step 4: Pure phoneme plays 3 times (800ms hold or <=250ms stop)
-             accompanied by ArticulationCue highlight and caption
+             (card 28c: no mouth cue or caption; the child watches the letter card)
   -> Step 5: Mascot plays Keyword audio ("mouse") + Keyword image
   -> Step 6: Pure phoneme plays 1 time
   -> Step 7: "Great listening! Tap the big button." -> Next pulses -> Say It
@@ -527,7 +543,8 @@ Screen Enters -> Mascot leads 2 Choral Turns ("Say it with me!")
        [Branch B: Foil Match or Silence (Attempt < 3)]
          -> MicState changes to RESULT (Amber)
          -> Formative prompt plays (e.g. "Almost! Just /m/, no 'ah'")
-         -> Lip cue enlarges -> Mic reactivates for retry
+         -> From the second miss the mouth cue shows beside the mic
+         -> Mic reactivates for retry
        [Branch C: Foil Match or Silence (Attempt == 3)]
          -> Mascot leads together-practice ("Let's say it together: /m/")
          -> LetterProgressEntity marked NEEDS_PRACTICE (planned: Room v4)
@@ -577,7 +594,7 @@ In the code today, the third miss saves the attempt rows and moves on; the `NEED
 | **Audio I/O** | Android AudioRecord / SoundPool | Native | Non-blocking 16kHz PCM recording and zero-latency SoundPool playback. |
 | **Local Database** | Android Jetpack Room | 2.6.1 | SQLite ORM managing profiles, spaced retrieval states, and telemetry. |
 | **Document Export** | Android PdfDocument | Native | Zero-dependency local PDF progress report generation. |
-| **Audio Synthesis** | Kokoro-82M / Chatterbox-Turbo | Apache-2.0 / MIT | Offline neural TTS for carrier phrases and cloned held phonemes (build-time tools, not shipped in the app). Short vowels: a team member's recordings voice-converted with ElevenLabs (**[proposed]**, adviser confirmation pending). |
+| **Audio Synthesis** | Kokoro-82M / Chatterbox-Turbo / ElevenLabs Text to Speech | Apache-2.0 / MIT / ElevenLabs Free plan | Build-time tools, not shipped in the app. Kokoro voices the carrier phrases and key words; Chatterbox clones the Kokoro voice for held phonemes. ElevenLabs (model `eleven_v4`, library voice "Lily Wolff") made the Blend It words AM, TUB, YAM and the short /i/, where the local tools' takes failed review (**[proposed]**, adviser confirmation pending); Free-plan audio is non-commercial and is credited in the Parent Zone. |
 
 ---
 

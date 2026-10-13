@@ -23,7 +23,7 @@ Repo -> DB : SELECT * FROM phonemes WHERE phonemeId = :id
 DB --> Repo : PhonemeEntity
 Repo --> VM : Phoneme (letter "m", exampleWord "Mouse")
 VM --> Screen : phoneme StateFlow
-Screen -> Screen : LetterCard + ArticulationCue (mouth picture for the letter's group)
+Screen -> Screen : LetterCard and the centred play button\n(no mouth cue or caption, card 28c)
 
 Screen -> VM : onScreenVisible() (starts the IdleTimer)
 VM -> VM : playModelingSequence()  (right after the phoneme loads)

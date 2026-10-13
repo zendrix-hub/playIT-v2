@@ -295,3 +295,9 @@ Record the verdict here and in `SESSION_HANDOFF.md`.
 - **Expected:** 409 tests, 0 failed, 6 skipped. `review_card.py 09c` all PASS.
 - **APK G:** build it after 09c, so it carries 28d, 15b and 09c. Copy it to `Documents/playIT-apk/playit-debug-G-<hash>.apk`.
 - **Phone check:** Hear It for I says the short i of "insect", not "eye" or "ee".
+
+## 9. Submission state (Claude, 2026-10-13): nothing for agy to run tonight
+- **Card 30 is done.** The package in `docs/submission/` matches APK G (`89604d7`); see the card's Outcome.
+- **APK G is the submission build.** Do not build or copy a new APK before the October 14 submission. The faculty bundle is the 4 PDFs, the 4 DOCX files and `playit-debug-G-89604d7.apk`.
+- **Phone check before submitting (team):** install APK G on the A21s and play one letter from Hear It to Find It. Listen for the short i and the AM, TUB and YAM words; look for the credit under Privacy.
+- **After the submission:** card 31 (`card-31-post-midterm-polish.md`) is a blueprint. Its parts 31a to 31f become ready cards one at a time, once the team approves them. 31b and 31c start with Claude's audio step 0.

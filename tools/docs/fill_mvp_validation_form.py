@@ -631,11 +631,17 @@ def _fill_section7(doc, form):
 
 
 def _fill_declaration(doc, form):
+    """Team Lead and Date come from the source. A **Signature:** line in the source prints a blank line
+    to sign by hand on the submitted copy; its text is a note for the team and is not printed."""
     paras = _body_paragraphs(doc)
     p = paras[_find(paras, "Team Lead:")]
     _clear_runs(p)
     set_run_font(p.add_run("Team Lead: "), bold=True)
     add_inline(p, form["declaration"]["Team Lead"], size=ANSWER_SIZE + 1)
+    if "Signature" in form["declaration"]:
+        p.add_run().add_break()
+        set_run_font(p.add_run("Signature: "), bold=True)
+        set_run_font(p.add_run("_" * 28))
     p.add_run().add_break()
     set_run_font(p.add_run("Date: "), bold=True)
     add_inline(p, form["declaration"]["Date"], size=ANSWER_SIZE + 1)

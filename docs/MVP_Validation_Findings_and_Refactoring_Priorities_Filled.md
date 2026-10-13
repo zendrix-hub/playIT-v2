@@ -4,8 +4,8 @@
 **Degree Program:** Bachelor of Science in Information Technology  
 **Department:** College of Computer Studies, Cebu Institute of Technology – University  
 **Target Milestone:** Weeks 1–2 MVP Validation Deliverable & Week 3 Refactoring Bridge  
-**Document Version:** 2.1 (checked on 2026-10-10 against `docs/specs/validation-report.md` and the code)  
-**Date of Submission:** October 10, 2026  
+**Document Version:** 2.2 (checked on 2026-10-13 against `docs/specs/validation-report.md` and the code at `89604d7`)  
+**Date of Submission:** October 14, 2026  
 
 > This file is the source of the course form. `tools/docs/render_submission_package.py` fills the official template (`docs/MVP Validation Findings & Refactoring Priorities.docx`) from it, so keep the section headings, the numbered questions and the `- [x]` lines in this layout. Only the checked options are listed here; the form shows every option with its box ticked or empty. Figures come from `docs/specs/validation-report.md`.
 
@@ -169,7 +169,7 @@ The Weeks 1–2 MVP validation was formative and diagnostic, not summative. The 
 4. **Current MVP approach**  
    Letter sounds were generated with Edge-TTS from single-letter text, which produced letter names or added vowels ("ma", "es").
 5. **Proposed refactored approach**  
-   A local, offline audio pipeline. Kokoro-82M (Apache-2.0) voices the carrier lines and key words; held sounds are chosen by ear between Kokoro phoneme input and Chatterbox-Turbo (MIT) voice cloning; short sounds come from a human model (the short vowels are recorded by a team member and voice-converted with ElevenLabs, pending adviser confirmation). A clip enters the app only after the team approves it on a review page and it is listed, with its SHA-256 hash, in a release manifest; a teacher audit (Gate 3) follows before release. The Hear It sequence keeps pure sounds separate from key words and carrier lines.
+   A local, offline audio pipeline. Kokoro-82M (Apache-2.0) voices the carrier lines and key words; held sounds are chosen by ear between Kokoro phoneme input and Chatterbox-Turbo (MIT) voice cloning; stop sounds come from a human model. Where these tools could not make a clean clip, ElevenLabs Text to Speech is used: so far the Blend It words AM, TUB and YAM and the short /i/ (pending adviser confirmation). These are Free-plan clips, so the app credits elevenlabs.io in the Parent Zone. A clip enters the app only after the team approves it on a review page and it is listed, with its SHA-256 hash, in a release manifest; a teacher audit (Gate 3) follows before release. The Hear It sequence keeps pure sounds separate from key words and carrier lines.
 6. **Why is this change necessary?**  
    Pure sounds are what children blend. Removing the added vowel removes the "sa-a-ma" error at its source and answers the teachers' request directly.
 7. **Expected improvement**  
@@ -263,7 +263,7 @@ The Weeks 1–2 MVP validation was formative and diagnostic, not summative. The 
 4. **Current MVP approach**  
    Audio played with only the letter, the picture and a mascot speech bubble; nothing on screen showed the sound or how to make it.
 5. **Proposed refactored approach**  
-   A `CaptionBubble` shows each clip as it starts (/m/ for the sound, the key word, the carrier line), and an `ArticulationCue` shows the mouth shape for the letter (lips together for /m/, teeth close together for /s/) in Hear It and from the second Say It miss.
+   An `ArticulationCue` shows the mouth shape for the letter (lips together for /m/, teeth close together for /s/) beside the Say It microphone from the second miss, when the child needs help making the sound. Captions (`CaptionBubble`: /m/ for the sound, the key word, the carrier line) were built, but after the phone tests they stay out of the child view: pre-readers cannot read the lines, and the text pulls their eyes from the letter (team decision 2026-10-10). For the same reason Hear It shows no mouth cue, so the child watches the letter while the sound plays (team decision 2026-10-11). Both changes await the adviser's confirmation.
 6. **Why is this change necessary?**  
    Children who cannot hear the model clearly can still see the sound and how to make it, which also helps every child in a noisy classroom.
 7. **Expected improvement**  
@@ -309,7 +309,7 @@ The Weeks 1–2 MVP validation was formative and diagnostic, not summative. The 
 | 2 | Children hesitate at the Say It mic (Finding #2) | Facilitator notes; 7 of 16 children did not choose the top face for ease | O2c: at least 85% of mic turns without hesitation (proposed); O2a: at least 80% agreement | Four-state mic and non-punitive prompt ladder (FR-03) | At least 85% of mic turns without hesitation; P90 feedback within 0.5 s | High (P1) |
 | 3 | 6 of 33 Blend It words not decodable (Finding #4) | Post-pilot design review of the seeded word list | O4: 100% decodable words | Replace AIM, BEE, TOY, BOY, ZOO with AM, SUM, TUB, YAM, ZIP; QUIZ documented (FR-13) | 100% of words rated decodable by teachers | High (P1) |
 | 4 | Agreement, latency, accuracy and completion not measurable (Finding #5) | No Round 1 result for O2a, O2b, O3, O5; teachers asked for progress tracking | O2a, O2b, O3, O5 | On-device telemetry log and PIN-gated CSV export (FR-NEW-TEL) | Every interaction event logged with millisecond timestamps | High (P1) |
-| 5 | No visual support for hearing difficulties (Finding #3) | ACC-06: 3 of 5 Yes | O6: accessibility criteria met | Sound captions and mouth-shape cues (NFR-ACC-01) | D-09 passes; hearing rating 5 of 5 | Medium (P2) |
+| 5 | No visual support for hearing difficulties (Finding #3) | ACC-06: 3 of 5 Yes | O6: accessibility criteria met | Mouth-shape cues in Say It; captions built but kept out of the child view (NFR-ACC-01) | D-09 passes; hearing rating 5 of 5 | Medium (P2) |
 | 6 | Tight corner controls; main buttons cut off on small screens (Finding #3) | ACC-07: 4 of 5 Yes; team layout tests at 360x640 dp | O6: touch targets of at least 64 dp | Adaptive layout tokens, `LessonScaffold`, 64 dp floor (NFR-ACC-02) | No cut-off buttons on 4 sizes; all targets at least 64 dp | Medium (P2) |
 
 ---
@@ -345,9 +345,9 @@ Rebuild the audio pipeline: replace the generic text-to-speech clips with verifi
 Children who use Hear It and Say It will learn correct, isolated sounds, so in Blend It they can blend /s/ + /a/ + /m/ into SAM without extra syllables. This serves Objective O1 (100% pure phonemes) directly, supports Objective O4 (building the chapter word), and gives teachers a reason to trust PlayIT as a supplementary classroom tool.
 
 ### 4. What requirements and/or design documents will need to be updated as a result?
-- [x] **SRS:** v3.0 (rev. 3.3): FR-02 (pure phonemes), FR-03 (mic states and prompt ladder), FR-13 (decodable words), FR-14 (multi-profile), FR-NEW-REC (spaced recall), FR-NEW-TEL (telemetry), NFR-AUD-01, NFR-ACC-01 and NFR-ACC-02.
-- [x] **SDD:** v2.0 (rev. 2.3): audio subsystem, tutoring layer (`TutorPolicy`, `SpeechValidator`), the Room schema v3 to v4 plan, the adaptive `LessonScaffold`, and a §2.0 table of what is implemented and what is planned.
-- [x] **SPMP:** v2.0 (rev. 2.3): 9 work packages, the revised Weeks 3–9 schedule, audio tooling and test devices, and the risk register R1–R8.
+- [x] **SRS:** v3.0 (rev. 3.7): FR-02 (pure phonemes), FR-03 (mic states and prompt ladder), FR-13 (decodable words), FR-14 (multi-profile), FR-NEW-REC (spaced recall), FR-NEW-TEL (telemetry), NFR-AUD-01, NFR-ACC-01 and NFR-ACC-02.
+- [x] **SDD:** v2.0 (rev. 2.7): audio subsystem, tutoring layer (`TutorPolicy`, `SpeechValidator`), the Room schema v3 to v4 plan, the adaptive `LessonScaffold`, and a §2.0 table of what is implemented and what is planned.
+- [x] **SPMP:** v2.0 (rev. 2.5): 9 work packages, the revised Weeks 3–9 schedule, audio tooling and test devices, and the risk register R1–R8.
 - [x] **Other:** RTM v3.0 (in the SRS): 16 rows linking findings F-01 to F-16 to objectives, requirements, design components and test cases.
 
 ---
@@ -357,4 +357,5 @@ Children who use Hear It and Say It will learn correct, isolated sounds, so in B
 We certify that the findings and proposed refactoring priorities submitted in this form are based on actual MVP validation feedback gathered from our identified stakeholders/users. We understand that the proposed refactoring must be justified in relation to our project's SMART objectives and measurable outcomes.
 
 **Team Lead:** Zendrix Riva  
-**Date:** October 10, 2026
+**Signature:** signed by hand on the submitted copy (the form prints a blank line)  
+**Date:** October 14, 2026

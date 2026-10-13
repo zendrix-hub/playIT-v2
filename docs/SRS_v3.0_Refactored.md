@@ -3,8 +3,8 @@
 **Course:** IT411 (Section G7) — Capstone & Research 2 | Semester 1, AY 2026–2027  
 **Degree Program:** Bachelor of Science in Information Technology  
 **Department:** College of Computer Studies, Cebu Institute of Technology – University  
-**Document Version:** 3.0 (Post-MVP Validation Baseline), revision 3.6  
-**Publication Date:** September 26, 2026 (Revised October 11, 2026)  
+**Document Version:** 3.0 (Post-MVP Validation Baseline), revision 3.7  
+**Publication Date:** September 26, 2026 (Revised October 14, 2026)  
 **Document Status:** Submitted for Adviser Review and Evaluation  
 **Prepared by:** Group 56 — PlayIT Capstone Team: Riva, Zendrix (Team Lead); Palis, John James; Miel, Kaysean; Durano, Ashlee Skye; Bien, Erik Samuel  
 **Adviser:** Mr. Joemarie C. Amparo  
@@ -24,6 +24,7 @@
 | **3.4** | October 10, 2026 | Capstone Team (Claude, card 28) | Amendments from the team's phone test of APK B (team decisions 2026-10-10, adviser confirmation pending): FR-02 item 4, Hear It ends on the key word and the sound, then *"Great listening! Tap the big button."* instead of *"Say it with me!"*; NFR-ACC-01 item 2, captions are not shown in the child view and the mouth-shape cue is the visual support. |
 | **3.5** | October 11, 2026 | Capstone Team (Claude, diagrams) | New §2.5 Use Case Model with the use case diagram of the six modules (Figure 1); planned use cases (FR-NEW-REC, FR-NEW-TEL) are marked. No requirement changed. |
 | **3.6** | October 11, 2026 | Capstone Team (sprint synchronization) | Issued for adviser review and evaluation: the front matter states the submission status and the members' full names. §4.1 updated to 386 passing unit tests (0 failures); the NFR-ACC-01 row records the 9 mouth-shape pictures now in the app (image release `2026-10-10-mouth`, card 24b) and the layout checks with unclipped bounds on 4 screen sizes (`LayoutMatrixTest`); the team confirmed that sound captions stay out of the child view (rev. 3.4). |
+| **3.7** | October 14, 2026 | Capstone Team (Claude, card 30) | Synchronized with debug APK G (`89604d7`) for the October 14 submission. Amendments from the phone tests of APK E (team decisions 2026-10-11 and 2026-10-12; adviser confirmation pending): FR-02 item 4 and NFR-ACC-01 item 1, the mouth-shape cue is shown in Say It from the second miss and not during the Hear It sequence (card 28c); NFR-AUD-01 item 1, ElevenLabs Text to Speech for the Blend It words AM, TUB, YAM and the short /i/, with the credit the Free plan requires (cards 15b, 09c). Figure 1 moves the mouth-cue use case to Say It; RTM rows F-09 and F-13 and §4.1 follow (409 unit tests, 0 failures). |
 
 ---
 
@@ -148,7 +149,7 @@ The diagram sources are in `docs/diagrams/src/`.
      - Carrier (*"Listen!"*)
      - Visual Letter Reveal with Picture Mnemonic
      - Carrier (*"This letter says..."*)
-     - Pure Phoneme (3 iterations with $500\,\text{ms}$ pauses accompanied by visual lip articulation cues)
+     - Pure Phoneme (3 iterations with $500\,\text{ms}$ pauses). **Amended (team decision 2026-10-11, card 28c; adviser confirmation pending):** no mouth-shape cue is shown during the sequence, so the child watches the letter and listens; the cue supports Say It (FR-03.4, NFR-ACC-01).
      - Key Word Audio (e.g., *"mouse"*)
      - Pure Phoneme (1 iteration)
      - Carrier (*"Great listening! Tap the big button."*), which points to the Next button. Hear It is listen-only, so it no longer ends with *"Say it with me!"* (team decision 2026-10-10, card 28; **[proposed]**, adviser confirmation pending).
@@ -275,7 +276,7 @@ The diagram sources are in `docs/diagrams/src/`.
 
 ##### [NFR-AUD-01] Phoneme Audio Production & Three-Stage Release Gate (New · P0)
 - **Requirement:**
-  1. Audio assets shall be generated using the Kokoro-82M neural model (Apache-2.0). Held (continuous) sounds may instead use Chatterbox-Turbo (MIT), voice-cloned from a Kokoro reference clip, chosen per clip by ear (team decision 2026-10-01; **[proposed]**, adviser confirmation pending). Short vowels may instead be a team member's recordings voice-converted with ElevenLabs (team decision 2026-10-08; **[proposed]**, adviser confirmation pending).
+  1. Audio assets shall be generated using the Kokoro-82M neural model (Apache-2.0). Held (continuous) sounds may instead use Chatterbox-Turbo (MIT), voice-cloned from a Kokoro reference clip, chosen per clip by ear (team decision 2026-10-01; **[proposed]**, adviser confirmation pending). Short vowels may instead be a team member's recordings voice-converted with ElevenLabs (team decision 2026-10-08; **[proposed]**, adviser confirmation pending). The Blend It words AM, TUB and YAM and the short /i/ were made with ElevenLabs Text to Speech after the Kokoro and earlier synthetic takes failed review (team decisions 2026-10-11 and 2026-10-12; **[proposed]**, adviser confirmation pending). These are Free-plan clips: non-commercial use only, and the app credits "elevenlabs.io" in the Parent Zone.
   2. No phoneme model shall be synthesized by feeding single letters into raw text-to-speech. Continuous sounds shall utilize phoneme IPA tokens or phonetic interjections (e.g., *"Mmm!"*); short sounds shall utilize human phoneme recordings.
   3. Every shipped audio clip shall pass three strict verification gates:
      - **Gate 1 (Internal Acoustic Audit):** Zero audible trailing schwa, clipped at $\le 800\,\text{ms}$ (continuous) or $\le 250\,\text{ms}$ (stops), SNR $\ge 25\,\text{dB}$.
@@ -308,7 +309,7 @@ The diagram sources are in `docs/diagrams/src/`.
 ##### [NFR-ACC-01] Visual Articulation Guides & Sound Captions (New · P2)
 - **Validation Finding:** Accessibility checklist revealed a 60% score on hearing accommodations (`ACC-06`) due to absence of visual phonetic cues.
 - **Requirement:**
-  1. Hear It and Say It shall display a synchronized `ArticulationCue` component illustrating proper mouth, lip, and teeth placement for each phoneme.
+  1. Hear It and Say It shall display a synchronized `ArticulationCue` component illustrating proper mouth, lip, and teeth placement for each phoneme. **Amended (team decision 2026-10-11, card 28c; adviser confirmation pending):** the cue is shown in Say It, beside the microphone from the second miss (FR-03.4); Hear It shows none, because a second picture during the modeling sequence splits a pre-reader's attention between the mouth and the letter.
   2. On-screen text captions representing the pure phonetic sound (e.g., *"mmm"*, *"sss"*, *"aaa"*) shall accompany audio playback to assist hearing-impaired learners. **Amended (team decision 2026-10-10, card 28; adviser confirmation pending):** captions are not shown in the child view, because pre-readers cannot read the carrier sentences and the text pulls their eyes from the letter; the mouth-shape cue (item 1) is the visual support. The caption logic stays in the code for a possible accessibility option.
 
 ##### [NFR-ACC-02] Pediatric Touch Target Ergonomics (Refactored · P2)
@@ -342,28 +343,28 @@ The following Requirements Traceability Matrix (RTM v3.0) demonstrates the bidir
 | **F-06** | **Teacher Feedback:** Teachers requested batch data export for classroom tracking; missing telemetry. | **Gen Obj 5 / O5** (Progress Tracking) | **FR-NEW-TEL** | `TelemetryLogger`, `CsvExportManager` | **TC-TEL-01:** Telemetry schema validation<br>**TC-EXP-01:** PIN gate enforcement<br>**TC-EXP-02:** Zero network calls | **Instrument C:** Successful CSV export on test tablet | **P1** |
 | **F-07** | **PED-12 (4 of 4):** Teachers judged the app ready as a supplementary classroom tool; classroom stations share devices. | **Gen Obj 5 / O5** (Classroom Stations) | **FR-14** | `ProfileEntity`, `ProfileRepository`, Avatar Switcher | **TC-DB-03:** Multi-profile data isolation test | **Instrument D:** 6 profiles operate concurrently without data bleed | **P1** |
 | **F-08** | **Field Observation:** Need formal proof that app survives unexpected OS kill without progress loss. | **Gen Obj 5 / O6** (Data Reliability) | **NFR-REL-01** | Room Transaction DAOs, Schema v4 Migration (planned) | **TC-DB-01:** 20 force-close crash tests<br>**TC-DB-02:** Migration preservation test | **Instrument D (D-05, D-06):** 100% progress retained after process kill | **P1** |
-| **F-09** | **ACC-06 (60% Yes):** Accessibility gap for hearing-impaired learners; missing visual cues. | **Gen Obj 1 / O6** (Pediatric Inclusion) | **NFR-ACC-01** | `ArticulationCue` Composable, Sound Captions | **TC-ACC-01:** Visual cue and caption present for 26/26 letters | **Instrument D (D-09):** Inspection of articulation cues | **P2** |
+| **F-09** | **ACC-06 (60% Yes):** Accessibility gap for hearing-impaired learners; missing visual cues. | **Gen Obj 1 / O6** (Pediatric Inclusion) | **NFR-ACC-01** | `ArticulationCue` Composable (Say It); sound captions kept in code, not shown (rev. 3.4) | **TC-ACC-01:** Mouth-shape cue present for 26/26 letters | **Instrument D (D-09):** Inspection of articulation cues | **P2** |
 | **F-10** | **ACC-07 (4 of 5 Yes):** One caregiver reported difficulty for learners with motor challenges (tight corner toggles). | **Gen Obj 5 / O6** (Ergonomics) | **NFR-ACC-02** | `PlayItDimens` 64 dp tokens, `LessonScaffold` | **TC-ACC-02:** Automated layout audit confirming all targets $\ge 64\,\text{dp}$ | **Instrument D (D-07):** Physical layout verification | **P2** |
 | **F-11** | **Teacher Feedback:** Teacher T-2 requested advanced reading expansion track. | **Long-term Roadmap** | **Future Scope (P3)** | Data-driven Chapter Model (`Chapter 8+`) | N/A (Deferred to Post-Capstone) | N/A | **P3** |
 | **F-12** | **Adviser Review:** Modeling sequence lacked formal composition spec and replay mechanism. | **HI-2** (Sequence Spec) | **FR-02** | `AudioComposer`, `LessonScript` | **TC-SCR-01:** Runtime sequence execution $\le 15\,\text{s}$ | **Instrument D (D-11):** Sequence timing verification | **P0** |
-| **F-13** | **Adviser Review:** Synthetic TTS creates schwa when prompt is a lone letter. | **HI-1** (Audio Pipeline) | **NFR-AUD-01** | Kokoro-82M / Chatterbox Pipeline, Asset Manifest | **TC-AUD-03:** Manifest gate verification check | **Gate 3 Audit:** Expert phoneme verification | **P0** |
+| **F-13** | **Adviser Review:** Synthetic TTS creates schwa when prompt is a lone letter. | **HI-1** (Audio Pipeline) | **NFR-AUD-01** | Kokoro-82M / Chatterbox Pipeline, ElevenLabs clips (AM, TUB, YAM, /i/), Asset Manifest | **TC-AUD-03:** Manifest gate verification check | **Gate 3 Audit:** Expert phoneme verification | **P0** |
 | **F-14** | **Adviser Review:** Learning model must guarantee child can succeed without an adult co-present. | **HI-3, SI-3** (Autonomy) | **NFR-IND-01, FR-03** | `TutorPolicy`, Spoken Carriers, 10s Idle Re-prompt | **TC-IND-01 to 03:** Spoken instruction & idle prompts | **Silent Observer Protocol:** $\ge 85\%$ unprompted completion | **P1** |
 | **F-15** | **Adviser Review:** Echoing an immediate model shows imitation, not true phonemic mastery. | **SI-4** (Spaced Recall) | **FR-NEW-REC** | `LearnerModel`, Review Scheduler | **TC-REV-01 to 03:** Warm-up & end-of-session checks | **Instrument B:** $\ge 70\%$ recall retention rate | **P1** |
 | **F-16** | **Proposal Contradiction:** Proposal's parent override conflicts with child independence. | **SI-1** (ASR Fairness) | **NFR-ASR-01** | Per-letter foil grammars (no fixed confidence threshold), prompt ladder (no hearts) | **TC-ASR-06:** False reject $\le 15\%$ on child voices | **Field Pilot:** Zero parental overrides needed | **P1** |
 
 
-### 4.1 Automated Test Coverage of Refactored Requirements (RTM v3.3, checked 2026-10-11)
+### 4.1 Automated Test Coverage of Refactored Requirements (RTM v3.3, checked 2026-10-13)
 
-The table records which automated tests now verify each requirement refactored during the sprint (branch `refactor/hear-say-it`, `./gradlew testDebugUnitTest`: 386 tests, 0 failures, 6 font-scale checks skipped on the 360x640 profile by design). It complements, and does not replace, the field verification targets in §4.
+The table records which automated tests now verify each requirement refactored during the sprint (branch `refactor/hear-say-it` at `89604d7`, the code of debug APK G; `./gradlew testDebugUnitTest`: 409 tests, 0 failures, 6 font-scale checks skipped on the 360x640 profile by design). It complements, and does not replace, the field verification targets in §4.
 
 | Req. ID | Implemented components (code) | Automated test classes | Still pending (not automatable) |
 |:---:|---|---|---|
-| **FR-02** | `HearItSequenceBuilder`, `HearItViewModel`, `AudioResolver` (released held /m/ and /s/) | `HearItSequenceBuilderTest`, `HearItViewModelTest`, `AudioResolverTest` | Gate 3 teacher audit of every phoneme clip; short vowels (ElevenLabs, due Oct 11) |
+| **FR-02** | `HearItSequenceBuilder`, `HearItViewModel`, `AudioResolver` (released held /m/ and /s/, and the short /i/) | `HearItSequenceBuilderTest`, `HearItViewModelTest`, `AudioResolverTest` | Gate 3 teacher audit of every phoneme clip; Chapter 1's short /a/ and the letters of Chapters 2–7 still play the MVP clips |
 | **FR-03** | `MicStatus`, `MicButton`, `SayItViewModel` (spoken corrections, `onScreenHidden`), `TutorPolicy`, `SayItFeedbackCopy` | `MicStatusTest`, `SayItViewModelTest`, `TutorPolicyTest`, `SayItFeedbackCopyTest` | Round 2 hesitation measure (Instrument B / D-10); RMS-driven ripple (planned) |
 | **FR-05** | `FindItScreen`, `FindItGrid`, `GridGenerator`, `HeartManager` | `FindItViewModelTest`, `GridGeneratorTest`, `PictureAssetsTest`, `LayoutMatrixTest` (`findIt_wholeGridVisible`, `findIt_fontScale13`) | — |
-| **FR-13** | `BLEND_IT_WORD_SEEDS` (`DatabaseModule`), `BlendItWordSelector`, `BlendItScreen`, `BlendItCard` | `BlendItWordSeedsTest`, `BlendItWordSelectorTest`, `BlendItViewModelTest`, `BlendItCardLayoutTest`, `LayoutMatrixTest` (`blendIt_tilesVisible`) | Teacher decodability audit (Instrument A Part 2); word audio for AM, TUB, YAM and pictures for AM, TUB, YAM, ZIP |
+| **FR-13** | `BLEND_IT_WORD_SEEDS` (`DatabaseModule`), `BlendItWordSelector`, `BlendItScreen`, `BlendItCard`; `AudioResolver` (released AM, TUB, YAM clips, audio release `2026-10-11-words`) and `VoiceCreditLine` (the Parent Zone credit for the ElevenLabs clips) | `BlendItWordSeedsTest`, `BlendItWordSelectorTest`, `BlendItViewModelTest`, `BlendItCardLayoutTest`, `LayoutMatrixTest` (`blendIt_tilesVisible`), `AudioResolverTest`, `VoiceCreditTest` | Teacher decodability audit (Instrument A Part 2); teacher audit of the AM, TUB, YAM clips; pictures for AM, TUB, YAM, ZIP |
 | **NFR-ASR-01** | `SpeechValidator` (word-mode judge, foil grammars, error types), `SayItViewModel` (judges wrong partials only on a final result) | `SpeechValidatorTest`, `SayItViewModelTest` | Agreement with teachers $\ge 80\%$ and false rejects $\le 15\%$ (Instruments B and C) |
-| **NFR-ACC-01** | `ArticulationGroup`, `ArticulationCue` (9 mouth-shape pictures, image release `2026-10-10-mouth`), `AudioPlayer.playSequence(onItemStart)` | `ArticulationGroupTest`, `ArticulationCueTest`, `HearItViewModelTest`, `SayItViewModelTest` (`secondMiss_showsMouthCue`), `PictureAssetsTest` (`everyMouthCueIsReleased`), `LayoutMatrixTest` (`hearIt_stepsAboveNext`, `sayIt_mouthCueBesideMic`) | Teacher check of the letter-to-mouth-shape pairs; D-09 inspection |
+| **NFR-ACC-01** | `ArticulationGroup`, `ArticulationCue` in Say It from the second miss (9 mouth-shape pictures, image release `2026-10-10-mouth`; none in Hear It since card 28c), `AudioPlayer.playSequence(onItemStart)` | `ArticulationGroupTest`, `ArticulationCueTest`, `HearItViewModelTest`, `SayItViewModelTest` (`secondMiss_showsMouthCue`), `PictureAssetsTest` (`everyMouthCueIsReleased`), `LayoutMatrixTest` (`hearIt_stepsAboveNext`, `sayIt_mouthCueBesideMic`) | Teacher check of the letter-to-mouth-shape pairs; D-09 inspection |
 | **NFR-ACC-02** | `PlayItDimens`, `LessonScaffold`, `GummyContainer` layout, `PlayItMotion`, `FeedbackEffects`, reduced-motion handling | `DimensTest`, `GummyContainerLayoutTest`, `LayoutMatrixTest` (4 sizes, font scale 1.3), `TopStatsBarLayoutTest`, `MapLayoutTest`, `FeedbackEffectsTest`, `PlayItMotionTest`, `ZeroEmojiPolicyTest` | Physical layout verification on the A21s (D-07) |
 
 ---

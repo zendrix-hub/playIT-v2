@@ -2,19 +2,21 @@
 !include _style.iuml
 hide empty members
 
-title Class Diagram, Module 1: Letter-Sound Acquisition (Hear It)\nSDD §3.1 Audio Subsystem, §3.6.2 Articulation Cue, §4.1 Hear It Workflow
+title Class Diagram, Module 1: Letter-Sound Acquisition (Hear It)\nSDD §3.1 Audio Subsystem, §4.1 Hear It Workflow
 
 package "presentation" {
   class HearItScreen <<Composable>> {
     +HearItScreen(viewModel, onNext, onBack)
+    <i>letter card, play button, step dots;</i>
+    <i>no mouth cue or caption, card 28c</i>
   }
   class HearItViewModel <<HiltViewModel>> {
     +phoneme : StateFlow<Phoneme?>
     +isPlaying : StateFlow<Boolean>
     +playCount : StateFlow<Int>
     +nextHighlighted : StateFlow<Boolean>
-    +caption : StateFlow<String?>
-    +articulation : ArticulationGroup
+    +caption : StateFlow<String?>  <i>not shown</i>
+    +articulation : ArticulationGroup  <i>not shown</i>
     +playModelingSequence()
     +playPhonemeSound()
     +onUserInteraction()
@@ -22,9 +24,6 @@ package "presentation" {
     -buildSequence(template) : List<String>
   }
   class LetterCard <<Composable>>
-  class ArticulationCue <<Composable>> {
-    +ArticulationCue(group, size)
-  }
   class IdleTimer {
     +start()
     +touch()
@@ -100,7 +99,6 @@ package "planned (SDD §3.1)" {
 
 HearItScreen --> HearItViewModel : observes StateFlows
 HearItScreen *-- LetterCard
-HearItScreen *-- ArticulationCue
 HearItViewModel *-- IdleTimer
 HearItViewModel --> PhonemeRepository
 HearItViewModel --> AudioPlayer
@@ -108,7 +106,6 @@ HearItViewModel --> AudioResolver
 HearItViewModel ..> HearItSequenceBuilder : builds the sequence
 HearItViewModel ..> CaptionText
 HearItViewModel ..> ArticulationGroup
-ArticulationCue ..> ArticulationGroup : reads assetPath
 PhonemeRepository ..> Phoneme
 PhonemeRepositoryImpl ..|> PhonemeRepository
 PhonemeRepositoryImpl --> PhonemeDao

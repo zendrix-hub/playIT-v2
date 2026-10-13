@@ -2,12 +2,16 @@
 !include _style.iuml
 hide empty members
 
-title Class Diagram, Module 2: Speech Production and Formative Tutoring (Say It)\nSDD §3.2 Speech Recognition, §3.3 Tutoring Layer, §4.2 Say It Workflow
+title Class Diagram, Module 2: Speech Production and Formative Tutoring (Say It)\nSDD §3.2 Speech Recognition, §3.3 Tutoring Layer, §3.6.2 Articulation Cue, §4.2 Say It Workflow
 
 package "presentation" {
   class SayItScreen <<Composable>>
   class MicButton <<Composable>> {
     +MicButton(status, onTap, enabled)
+  }
+  class ArticulationCue <<Composable>> {
+    +ArticulationCue(group, size)
+    <i>96 dp beside the mic, from miss 2</i>
   }
   enum MicStatus {
     IDLE
@@ -79,6 +83,10 @@ package "domain (tutoring layer)" {
     NO_SPEECH
     UNCONFIRMED
   }
+  class ArticulationGroup <<enum>> {
+    +assetPath : String
+    <i>9 mouth-shape groups</i>
+  }
   class SayItFeedbackCopy <<object>> {
     +forResult(...) : FeedbackCopy
   }
@@ -121,6 +129,8 @@ package "planned (SDD 3.2, 3.3)" {
 
 SayItScreen --> SayItViewModel
 SayItScreen *-- MicButton
+SayItScreen *-- ArticulationCue : when showMouthCue
+ArticulationCue ..> ArticulationGroup : reads assetPath
 MicButton ..> MicStatus
 SayItViewModel --> SpeechValidator
 SayItViewModel *-- TutorPolicy

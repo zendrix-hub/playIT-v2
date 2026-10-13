@@ -5,9 +5,10 @@ skinparam packageStyle rectangle
 
 title PlayIT Use Case Diagram: the six functional modules of SRS v3.0 (§3.2)
 
-actor "Child Learner\n(ages 5-7)" as Child
+' Declaration order steers the Graphviz layout: adults top left, the child beside the lesson modules.
 actor "Parent / Caregiver" as Parent
 actor "Teacher / Facilitator" as Teacher
+actor "Child Learner\n(ages 5-7)" as Child
 
 actor "Vosk ASR\n(on-device)" as Vosk <<system>>
 actor "Android OS\n(PdfDocument,\nShare Sheet)" as Android <<system>>
@@ -17,12 +18,12 @@ rectangle "PlayIT (offline Android app)" {
   package "Module 1: Letter-Sound Acquisition (Hear It)" {
     usecase "Listen to the modeling\nsequence (FR-01, FR-02)" as UC_Hear
     usecase "Replay the sound\nwith the Ear button (FR-02.6)" as UC_Replay
-    usecase "See the mouth-shape cue\n(NFR-ACC-01)" as UC_Mouth
   }
 
   package "Module 2: Speech Production and Tutoring (Say It)" {
     usecase "Say the key word\n(FR-03)" as UC_Say
-    usecase "Get a spoken correction;\nmouth cue from miss 2 (FR-03.4)" as UC_Correct
+    usecase "Get a spoken correction\n(FR-03.4)" as UC_Correct
+    usecase "See the mouth-shape cue\n(NFR-ACC-01)" as UC_Mouth
     usecase "Say it together\nand move on (FR-03.4)" as UC_Together
     usecase "Warm-up and recall\nchecks (FR-NEW-REC)" as UC_Recall <<planned>>
   }
@@ -75,9 +76,9 @@ Teacher --> UC_Pdf
 Teacher --> UC_Csv
 
 ' ---------- Include and extend, inside each module ----------
-UC_Hear ..> UC_Mouth : <<include>>
 UC_Correct ..> UC_Say : <<extend>>\n(miss 1 or 2)
 UC_Together ..> UC_Say : <<extend>>\n(miss 3)
+UC_Mouth ..> UC_Correct : <<extend>>\n(from miss 2)
 UC_Heart ..> UC_Find : <<extend>>\n(wrong tap)
 UC_Restart ..> UC_Heart : <<extend>>\n(0 hearts)
 UC_Hint ..> UC_Blend : <<extend>>

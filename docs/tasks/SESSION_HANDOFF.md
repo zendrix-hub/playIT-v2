@@ -1096,3 +1096,25 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - `picture_mouse` picked from Round 1.
   - `picture_sun` open for Round 2. Quota pause until `2026-10-15T11:11:18Z`. Standing background cron scheduled to check every 6 hours and generate as soon as capacity allows.
 
+### Claude, 2026-10-13: card 30 (submission sync), the review of cards 15b, 09c and 29b, and the GO verdict
+
+- **Baseline:** Claude's own run at `89604d7` gives 409 tests, 0 failures, 6 skipped by design, the same as agy's. Every shipped file of releases `2026-10-11-words`, `2026-10-12-i` and `2026-10-12-mascot` matches its SHA-256.
+- **Cards 15b, 09c and 29b accepted** (evidence log). Two process notes on 29b:
+  - agy cut out and released the pictures itself (AGENTS.md gives that step to Claude).
+  - The user's review CSV is not on the Windows PC, so the picks rest on `picks.json` and agy's handoff.
+- **Card 30 done:**
+  - The card's "v2.4 / v3.4 / v2.4" numbers were already used, so this is SDD rev. 2.7, SRS rev. 3.7 and SPMP rev. 2.5, dated October 14, 2026.
+  - Adviser: Mr. Joemarie C. Amparo. The course form prints a blank signature line under "Team Lead: Zendrix Riva".
+  - The documents no longer put the mouth cue in Hear It: SDD Figures 2 and 8 and SRS Figure 1 were redrawn, and SDD Figure 3 shows the cue in Say It.
+  - New in the documents: the ElevenLabs clips and their Free-plan credit, the redrawn mascot (SDD §3.6.3), the Oct 10-13 sprint in the SPMP, and risks R1, R5 and R7.
+  - Package re-rendered: 4 DOCX, 4 PDF, 14 of 14 figures at full resolution.
+- **Audit of every screen and the sound effects** (fresh screenshots on the 4 sizes):
+  - The lesson screens already meet the "minimal Duolingo ABC" core: big gummy controls, one main action, the 64 dp floor, no emoji.
+  - Polish for later, in card 31: the splash still draws the old vector tarsier; bubble text is cut off on compact; some messages repeat; map labels are under 16 sp; one harsh-red church dome; Blend It tiles can be dealt in the answer's order.
+  - Sounds: the error sounds are louder than Lily's voice, and taking a tile back plays the "wrong" pop. The Blend It buzzer is never played, so children never hear it.
+- **Verdict: GO** for the October 14 submission with APK G and the re-rendered package. No finding blocks it.
+- **Before submitting (team):**
+  - Install APK G on the A21s and play one letter end to end.
+  - Sign the course form by hand.
+  - Bundle only the 4 PDFs, the 4 DOCX files and the APK.
+- **Still open:** adviser confirmation of the [proposed] items; Gate 3 teacher audit; the short /a/; pictures for AM, TUB, YAM and ZIP; card 31 parts, once the team approves them.
