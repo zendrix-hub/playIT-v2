@@ -1071,3 +1071,28 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - `picture_mouse__v1.png` generated, reviewed, and picked by user.
   - `picture_sun` pending generation after weekly quota reset (`2026-10-15T11:11:18Z`).
 
+### agy, 2026-10-12/13: Cards 15b, 09c, 29b Committed & Pushed; APK G Assembled
+
+- **Card 15b (`b99d839`)**:
+  - Approved word audio for AM, TUB, YAM deployed to `app/src/main/assets/audio/words/`.
+  - Added `VoiceCredit.kt` and attribution line to Parent Zone under Privacy.
+  - Tests: 408 tests, 0 failures, 6 skipped.
+- **Card 09c (`0dfc4a2`)**:
+  - Approved short `i` (`ph_i.wav`) deployed to `app/src/main/assets/audio/phonemes/`.
+  - Updated `AudioResolver.kt` released phonemes set to `["m", "s", "i"]`.
+  - Tests: 409 tests, 0 failures, 6 skipped.
+- **Card 29b (`89604d7`)**:
+  - Cutout (`tools/images/cutout.py`: Lily fill 0.77, animals 0.62) and audit (`tools/images/audit.py`: 13 pictures, 0 FAIL) completed.
+  - Release package created in `docs/image-release/2026-10-12-mascot/` with SHA-256 manifest.
+  - Deployed 7 Lily poses to `images/mascot/` and 6 companion avatars to `images/characters/`.
+  - Unified `AvatarCircle.kt` to use `CompanionAnimal.fromId(clampedId).assetPath` and deleted obsolete duplicates from `images/mascot/`.
+  - `review_card.py 29b`: **ALL PASS**. `PictureAssetsTest`: **PASSED**.
+- **All Commits Pushed**:
+  - Pushed to `origin refactor/hear-say-it`.
+- **APK G Built & Staged**:
+  - `Documents/playIT-apk/playit-debug-G-89604d7.apk` (104 MB) and `./playit-debug.apk`.
+  - Includes AM/TUB/YAM, short `i`, new mascot poses, and new animal avatars.
+- **Image Batch `2026-10-11-letters-m-s`**:
+  - `picture_mouse` picked from Round 1.
+  - `picture_sun` open for Round 2. Quota pause until `2026-10-15T11:11:18Z`. Standing background cron scheduled to check every 6 hours and generate as soon as capacity allows.
+
