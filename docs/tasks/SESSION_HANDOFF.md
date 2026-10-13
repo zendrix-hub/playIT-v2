@@ -1128,3 +1128,25 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
 - **State Handed to Claude**:
   - `SplashScreen.kt` is clean with its original Headspace aesthetic foundation intact.
   - Claude has full ownership to craft the best possible pediatric Headspace splash screen experience, execute the remainder of Card 31 (minimal Duolingo ABC and calmer acoustic SFX kit), and synchronize all IT411 submission documents in `docs/submission/`.
+
+### Claude, 2026-10-14: card 31 before the submission; APK H; 31b and 31c with Zendrix
+
+- **Team directive (2026-10-13):** run card 31 now. Claude owns the splash and keeps the Headspace drawing; agy's Lily-picture splash was reverted (`26446fd`).
+- **Done and pushed:**
+
+  | Card | Commit | Change |
+  |---|---|---|
+  | 31a | `8f49279` | Lily's sampled colours and dark-brown outline on the squircle dome. She peeks over a white start panel, and the 64 dp Start stays below her face on 4 sizes. Nothing moves by itself with reduced motion. |
+  | 31d | `cdbbef9` | Hear It says "Listen!" and keeps the play button's colour. Say It's feedback is the line under the mic. One profile title. "You finished" with 1 star. |
+  | 31e | `1420c84` | One map header card with the greeting; 16 sp text everywhere on the map; 64 dp map buttons; terracotta church dome. |
+  | 31f | `0320385` | `dealTiles` never deals the answer. |
+
+  - **Correction to card 30's audit:** it called the 64 dp floor met. The map's back (46 dp), guidebook (44 dp), dialog close (32 and 36 dp) and dialog buttons (52 to 56 dp) were below it; 31e fixed them, and the tests now check them.
+  - **Tests:** full suite at `0320385`: 433 tests, 0 failed, 6 skipped. Screenshots on 4 sizes checked by eye.
+- **Cards 31b and 31c (calmer Kenney CC0 sounds; Lily's lines cut to 8 words or fewer):**
+  - Review page `2026-10-13-card31-audio` is built (outside the repo; zip in `Documents/playIT-audio-batches/`).
+  - The user handed the listening review to Zendrix, the team lead (2026-10-14).
+  - Code is ready as patches and the release specs have `approvedBy: TODO`, so nothing ships without the marks. Steps are in the cards and runbook section 10.
+- **APK H:** `Documents/playIT-apk/playit-debug-H-0320385.apk`, SHA-256 `D301007F…937D`, built by Claude.
+- **Package:** re-rendered for APK H: SDD rev. 2.8, SRS rev. 3.8, SPMP rev. 2.6, course form 2.3.
+- **Verdict: GO** with APK H. Before submitting, install it on the A21s and check the splash, one letter and the map.

@@ -4,7 +4,7 @@
 **Degree Program:** Bachelor of Science in Information Technology  
 **Department:** College of Computer Studies, Cebu Institute of Technology – University  
 **Target Milestone:** Weeks 1–2 MVP Validation Deliverable & Week 3 Refactoring Bridge  
-**Document Version:** 2.2 (checked on 2026-10-13 against `docs/specs/validation-report.md` and the code at `89604d7`)  
+**Document Version:** 2.3 (checked on 2026-10-14 against `docs/specs/validation-report.md` and the code at `0320385`)  
 **Date of Submission:** October 14, 2026  
 
 > This file is the source of the course form. `tools/docs/render_submission_package.py` fills the official template (`docs/MVP Validation Findings & Refactoring Priorities.docx`) from it, so keep the section headings, the numbered questions and the `- [x]` lines in this layout. Only the checked options are listed here; the form shows every option with its box ticked or empty. Figures come from `docs/specs/validation-report.md`.
@@ -345,9 +345,9 @@ Rebuild the audio pipeline: replace the generic text-to-speech clips with verifi
 Children who use Hear It and Say It will learn correct, isolated sounds, so in Blend It they can blend /s/ + /a/ + /m/ into SAM without extra syllables. This serves Objective O1 (100% pure phonemes) directly, supports Objective O4 (building the chapter word), and gives teachers a reason to trust PlayIT as a supplementary classroom tool.
 
 ### 4. What requirements and/or design documents will need to be updated as a result?
-- [x] **SRS:** v3.0 (rev. 3.7): FR-02 (pure phonemes), FR-03 (mic states and prompt ladder), FR-13 (decodable words), FR-14 (multi-profile), FR-NEW-REC (spaced recall), FR-NEW-TEL (telemetry), NFR-AUD-01, NFR-ACC-01 and NFR-ACC-02.
-- [x] **SDD:** v2.0 (rev. 2.7): audio subsystem, tutoring layer (`TutorPolicy`, `SpeechValidator`), the Room schema v3 to v4 plan, the adaptive `LessonScaffold`, and a §2.0 table of what is implemented and what is planned.
-- [x] **SPMP:** v2.0 (rev. 2.5): 9 work packages, the revised Weeks 3–9 schedule, audio tooling and test devices, and the risk register R1–R8.
+- [x] **SRS:** v3.0 (rev. 3.8): FR-02 (pure phonemes), FR-03 (mic states and prompt ladder), FR-13 (decodable words), FR-14 (multi-profile), FR-NEW-REC (spaced recall), FR-NEW-TEL (telemetry), NFR-AUD-01, NFR-ACC-01 and NFR-ACC-02.
+- [x] **SDD:** v2.0 (rev. 2.8): audio subsystem, tutoring layer (`TutorPolicy`, `SpeechValidator`), the Room schema v3 to v4 plan, the adaptive `LessonScaffold`, and a §2.0 table of what is implemented and what is planned.
+- [x] **SPMP:** v2.0 (rev. 2.6): 9 work packages, the revised Weeks 3–9 schedule, audio tooling and test devices, and the risk register R1–R8.
 - [x] **Other:** RTM v3.0 (in the SRS): 16 rows linking findings F-01 to F-16 to objectives, requirements, design components and test cases.
 
 ---

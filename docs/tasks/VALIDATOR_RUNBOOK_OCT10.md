@@ -301,3 +301,25 @@ Record the verdict here and in `SESSION_HANDOFF.md`.
 - **APK G is the submission build.** Do not build or copy a new APK before the October 14 submission. The faculty bundle is the 4 PDFs, the 4 DOCX files and `playit-debug-G-89604d7.apk`.
 - **Phone check before submitting (team):** install APK G on the A21s and play one letter from Hear It to Find It. Listen for the short i and the AM, TUB and YAM words; look for the credit under Privacy.
 - **After the submission:** card 31 (`card-31-post-midterm-polish.md`) is a blueprint. Its parts 31a to 31f become ready cards one at a time, once the team approves them. 31b and 31c start with Claude's audio step 0.
+
+## 10. Card 31 (Claude, 2026-10-14): APK H is the submission build
+- **Done (Claude, pushed):**
+
+  | Card | Commit | Change |
+  |---|---|---|
+  | 31a | `8f49279` | The Headspace splash matches Lily |
+  | 31d | `cdbbef9` | One message at a time |
+  | 31e | `1420c84` | The map's header card, 16 sp text and 64 dp buttons |
+  | 31f | `0320385` | Tiles never dealt solved |
+
+  - Full suite at `0320385`: 433 tests, 0 failed, 6 skipped.
+  - Claude built `Documents/playIT-apk/playit-debug-H-0320385.apk`. The submission package in `docs/submission/` matches it: SDD rev. 2.8, SRS rev. 3.8, SPMP rev. 2.6.
+- **Validate:** `review_card.py 31a`, `31d`, `31e` and `31f`. Phone check on the A21s:
+  - the splash looks like Lily, Start is easy to reach, and a tap on her winks;
+  - the map's header is one card, and the greeting is not cut;
+  - a Say It miss shows "Watch my lips" once, under the mic.
+- **Cards 31b and 31c wait for Zendrix's listening review** (user decision 2026-10-14):
+  - Erik sends `Documents/playIT-audio-batches/2026-10-13-card31-audio.zip`.
+  - The steps from review to commit are in each card; the code is ready as `docs/tasks/card-31b-code.patch` and `card-31c-code.patch`.
+  - Expected: 436 tests after 31b, 438 after 31c.
+- **If 31b and 31c ship before the submission:** build APK I, then ask Claude to re-render the package. Card 31b also changes two sequence diagrams: the whoosh goes.

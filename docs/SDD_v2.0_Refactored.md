@@ -3,7 +3,7 @@
 **Course:** IT411 (Section G7) — Capstone & Research 2 | Semester 1, AY 2026–2027  
 **Degree Program:** Bachelor of Science in Information Technology  
 **Department:** College of Computer Studies, Cebu Institute of Technology – University  
-**Document Version:** 2.0 (Post-MVP Architectural Baseline), revision 2.7  
+**Document Version:** 2.0 (Post-MVP Architectural Baseline), revision 2.8  
 **Publication Date:** September 26, 2026 (Revised October 14, 2026)  
 **Document Status:** Submitted for Adviser Review and Evaluation  
 **Prepared by:** Group 56 — PlayIT Capstone Team: Riva, Zendrix (Team Lead); Palis, John James; Miel, Kaysean; Durano, Ashlee Skye; Bien, Erik Samuel  
@@ -26,6 +26,7 @@
 | **2.5** | October 11, 2026 | Capstone Team (Claude, diagrams) | Design diagrams added, traced from the code: §3.5.3 system ERD (Figure 1); §3.7 one class diagram per module (Figures 2–7); §4.1–§4.6 one sequence diagram per module (Figures 8–13); planned components are grey and marked «planned». §4.2 now marks `NEEDS_PRACTICE` as planned (Room v4). No design change. |
 | **2.6** | October 11, 2026 | Capstone Team | Issued for adviser review and evaluation: the front matter states the submission status and the members' full names. §2.0 records the 9 mouth-shape pictures now in the app (image release `2026-10-10-mouth`, card 24b) and the Hear It mouth cue beside the play button. No design change. |
 | **2.7** | October 14, 2026 | Capstone Team (Claude, card 30) | Synchronized with debug APK G (`89604d7`, 409 unit tests passing) for the October 14 submission. §2.0: the mouth cue is shown in Say It only (card 28c, team decision 2026-10-11); new rows for the phone-test fixes (cards 28b, 28d), the ElevenLabs clips for AM, TUB, YAM and the short /i/ with the Parent Zone credit (cards 15b, 09c), and the redrawn mascot and avatars (card 29b); the map labels below the 16 sp floor are listed. §3.1.1, §3.4, §3.6.2, the new §3.6.3, §3.7.1, §3.7.2, §4.1, §4.2 and §5 follow; Figures 2, 3 and 8 are redrawn for card 28c. |
+| **2.8** | October 14, 2026 | Capstone Team (Claude, card 31) | Synchronized with debug APK H (`0320385`, 433 unit tests passing) after card 31 ran before the submission (team directive 2026-10-13). §2.0 adds the Headspace splash matched to Lily (31a), one message at a time on the lesson screens (31d), the map's single header card with its 16 sp text and 64 dp buttons (31e), and Blend It tiles that are never dealt solved (31f). It also corrects rev. 2.7: the map's buttons were below 64 dp, not only its labels below 16 sp. The calmer sound set and Lily's shorter lines (31b, 31c) are listed as planned: they wait for the team lead's listening review and are not in APK H. §3.1.1, §3.6.1, §3.6.3 and §4.4 follow. No diagram changes: APK H still plays the old sounds. |
 
 ---
 
@@ -64,7 +65,7 @@ This design document governs the entire PlayIT Android mobile application:
 
 ## 2. Architectural Design
 
-### 2.0 Implementation Status (checked against the code on 2026-10-13, branch `refactor/hear-say-it` at `89604d7`)
+### 2.0 Implementation Status (checked against the code on 2026-10-14, branch `refactor/hear-say-it` at `0320385`)
 This document describes the target design for Weeks 4–9. The table separates what the app does today from what is planned, so the design is not read as a description of the current build.
 
 | Component | Status | Where / note |
@@ -77,7 +78,7 @@ This document describes the target design for Weeks 4–9. The table separates w
 | `HeartManager`, `StarCalculator`, `GridGenerator`, `ArithmeticGateManager` | Implemented | `domain/manager/` |
 | `ProfileEntity`, `SessionManager` (up to 6 profiles) | Implemented | Room schema version 3 (`PlayItDatabase.kt`) |
 | Parent PDF report | Implemented | `data/pdf/PdfExporter.kt` |
-| Adaptive dimensions and lesson layout (`WindowProfile`, `PlayItDimens`, `LessonScaffold`) | Implemented | `presentation/theme/Dimens.kt`, `presentation/components/LessonScaffold.kt`; 64 dp touch and 16 sp text floors; tested in `DimensTest`, `GummyContainerLayoutTest`, `LayoutMatrixTest` (4 device sizes, font scale 1.3). Known gap: some map labels are smaller than 16 sp (the unit banner's section line 11 sp, the Blend It node badge 9.5 sp, the letter and star counters 12 to 13 sp); they are listed for the post-midterm polish card 31 |
+| Adaptive dimensions and lesson layout (`WindowProfile`, `PlayItDimens`, `LessonScaffold`) | Implemented | `presentation/theme/Dimens.kt`, `presentation/components/LessonScaffold.kt`; 64 dp touch and 16 sp text floors; tested in `DimensTest`, `GummyContainerLayoutTest`, `LayoutMatrixTest` (4 device sizes, font scale 1.3). The map met both floors only with card 31e. Its labels were 9.5 to 15 sp, and its back, guidebook and dialog buttons 32 to 56 dp. Every map text is now at least 16 sp (`MapTextFloorTest`), and every map control is 64 dp (`map_buttonsAre64dp`, `TopStatsBarLayoutTest`) |
 | Say It mic states (Idle, Listening, Heard, Result, and Done after the third miss) | Implemented | `presentation/sayit/MicStatus.kt`, `presentation/sayit/components/MicButton.kt`; time-based ripple, no red; returns to Idle when the app is backgrounded; Done takes no taps (card 28); tested in `MicStatusTest`, `SayItViewModelTest` |
 | Spoken Say It corrections (letter name, added vowel, remodel) | Implemented | `presentation/sayit/SayItViewModel.kt`; tutor fragments `fb_letter_name`, `fb_its_sound_is`, `fb_almost_just`, `fb_no_ah`, `fb_listen` (Kokoro, audio release 2026-10-01; teacher audit pending); tested in `SayItViewModelTest`, `AudioResolverTest` |
 | Decodable Blend It word list (§3.4) | Implemented | `di/DatabaseModule.kt` `BLEND_IT_WORD_SEEDS`, written on every open; tested in `BlendItWordSeedsTest`. The AM, TUB and YAM word clips ship from audio release `2026-10-11-words` (card 15b; row below). Teacher confirmation and the pictures for AM, TUB, YAM and ZIP are pending |
@@ -89,11 +90,16 @@ This document describes the target design for Weeks 4–9. The table separates w
 | Phone-test fixes (cards 28b, 28d): truer letter-to-mouth pairs; after 10 s without a tap the main button wiggles; the unit banner title and the Say It attempt dots fit on compact screens; a lesson screen that moves to the next letter shows that letter's picture | Implemented | `domain/model/ArticulationGroup.kt`, `presentation/components/PulseModifier.kt`, `presentation/map/components/MarungkoGroupBanner.kt`, `presentation/components/AssetImage.kt` (the picture state is keyed on the picture, card 28d); tested in `ArticulationGroupTest`, `IdleWiggleTest`, `SayItViewModelTest`, `LayoutMatrixTest`, `AssetImageLoadTest` |
 | ElevenLabs clips (cards 15b, 09c): the Blend It words AM, TUB and YAM, and the short /i/ (team decisions 2026-10-11 and 2026-10-12; adviser confirmation pending) | Implemented | `assets/audio/words/word_am.wav`, `word_tub.wav`, `word_yam.wav` and `assets/audio/phonemes/ph_i.wav` from audio releases `2026-10-11-words` and `2026-10-12-i`; `data/audio/AudioResolver.kt` resolves them. Free-plan clips, so the Parent Zone shows the credit "Some word voices made with ElevenLabs (elevenlabs.io)" (`presentation/dashboard/components/VoiceCredit.kt`); tested in `AudioResolverTest`, `BlendItWordSeedsTest`, `VoiceCreditTest`. Teacher audit pending |
 | Redrawn mascot and companion avatars (card 29b, §3.6.3) | Implemented | 7 Lily poses in `assets/images/mascot/` and 6 animal avatars in `assets/images/characters/` from image release `2026-10-12-mascot`; `AvatarCircle` and the map companions read `CompanionAnimal.assetPath`; tested in `PictureAssetsTest` (`releasedPicturesMatchManifest`) |
+| Headspace splash matched to Lily (card 31a, §3.6.3) | Implemented | `presentation/splash/SplashScreen.kt`. Lily is one squircle dome in her own colours (`LilyOrange` and the rest in `theme/Color.kt`) with her pictures' dark-brown outline. She rises from behind the white start panel, whose 64 dp Start stays below her face on 4 sizes. She breathes, blinks and winks when tapped; with reduced motion nothing moves by itself (`splashMotion`, `LilyEyes`). Tested in `SplashScreenTest`, `LayoutMatrixTest` (`splash_lilyFaceClearOfStart`) |
+| One message at a time (card 31d) | Implemented | Hear It: Lily says "Listen!" while the sound plays, the card keeps "Sound: /m/", and the play button keeps its colour. Say It: the feedback is the plain line under the mic (`MicButton` label), not a banner that looked like a button. The new-profile screen has one title. One star says "You finished Letter M!". Tested in `HearItScreenFocusTest`, `LayoutMatrixTest` (`sayIt_mouthCueBesideMic`), `LetterCompleteMessageTest` |
+| Map header and floors (card 31e) | Implemented | `presentation/map/components/TopStatsBar.kt` holds Lily's greeting (the card is her 64 dp tap target), the letters learned, the streak and star pills and the progress bar, so the trail gets more of the screen. The map and its dialogs use 16 sp text and 64 dp buttons. The background church dome is terracotta, not red. Tested in `MapTextFloorTest`, `TopStatsBarLayoutTest`, `LayoutMatrixTest` (`map_buttonsAre64dp`) |
+| Blend It tile deal (card 31f) | Implemented | `dealTiles` in `presentation/blendit/BlendItViewModel.kt` reshuffles until the deal is not the answer; tested in `BlendItTileDealTest` |
 | `LessonEngine`, `LearnerModel` (review scheduler) | Planned | — |
 | `AudioComposer`, `AudioPlaybackManager` | Planned | Playback today goes through `data/audio/AudioPlayer.kt`, which already uses a `SoundPool` for short clips |
 | RMS-driven mic ripple (`MicStateVisualizer` with the `AudioRecord` loop of §3.2) | Planned | The 4 mic states are implemented (row above); the voice-driven ripple follows the planned `AudioRecord` loop (post-Round-2, team decision 2026-10-06) |
 | `LetterProgressEntity`, `TelemetryEventEntity`, `TelemetryLogger`, `CsvExportManager` | Planned | Needs Room schema v4 and a migration |
 | `Modifier.pediatricTouchTarget()` as a single global modifier | Planned | The 64 dp floor is enforced today through `PlayItDimens` tokens and `heightIn(min = 64.dp)` on every child-facing control |
+| Calm sound set and shorter Lily lines (cards 31b, 31c) | Planned (ready; waits for the team lead's listening review) | Kenney CC0 sound effects 6 dB under Lily's voice, one soft sound on a wrong answer, and a neutral tap for taking a Blend It tile back. The Say It and Find It lines are cut to 8 words or fewer. The code and release specs are ready (`docs/tasks/card-31b-code.patch`, `card-31c-code.patch`); not in APK H |
 
 
 ### 2.1 System Architecture Paradigm
@@ -161,6 +167,7 @@ To ensure pure phoneme delivery with zero trailing vowel intrusion and instantan
   - `assets/audio/phonemes/ph_<letter>.wav`: Pure phoneme burst ($800\,\text{ms}$ continuous; $\le 250\,\text{ms}$ stops). Zero schwa trailing. Released so far: the held `ph_m.wav` and `ph_s.wav`, and the short `ph_i.wav` (0.28 s; the teacher audit judges its length). The other letters still play the MVP's `phoneme_<letter>.mp3` until their clips are released.
   - `assets/audio/keywords/kw_<word>.wav`: Key word pronunciation (e.g., `kw_mouse.wav`).
   - `assets/audio/words/word_<word>.wav`: released Blend It word clips (AM, TUB, YAM); the other words still play the MVP's `word_<word>.mp3`.
+  - `assets/audio/ui/sfx_<event>.mp3`: the MVP's sound effects. A calmer set from Kenney's CC0 packs, levelled 6 dB under the voice, is ready and waits for the team lead's listening review (card 31b, §2.0).
   - `assets/audio/vo/tutor/car_<phrase>.wav`: Spoken carrier phrases (e.g., `car_listen.wav`, `car_this_letter_says.wav`, `car_say_it_with_me.wav`, `car_your_turn.wav`).
 - **Provenance and license:** each released clip is listed with its source, license and SHA-256 in its release manifest (`docs/audio-release/<date>/manifest.json`). The ElevenLabs clips (AM, TUB, YAM and the short /i/) are Free-plan audio: non-commercial use only, credited as "elevenlabs.io" at the bottom of the Parent Zone (`VoiceCreditLine`).
 
@@ -434,7 +441,7 @@ Figure 1 shows the Room database `playit_db` as built (schema version 3, `PlayIt
 ### 3.6 Pediatric Design System Tokens & Accessibility (NFR-ACC-01, NFR-ACC-02)
 
 #### 3.6.1 Touch Targets and Adaptive Dimensions (implemented)
-The 64 dp touch floor and the 16 sp text floor are carried by design tokens rather than one global modifier. `windowProfileFor(widthDp, heightDp)` picks `COMPACT` (under 700 dp tall), `REGULAR` or `WIDE` (600 dp and wider), and `LocalPlayItDimens` provides the matching `PlayItDimens` (letter card height, primary button, mic size, Find It card size, tile size, map node size). Every child-facing control uses `heightIn(min = 64.dp)` or a token at least that large. `LessonScaffold` pins the top bar, header and bottom bar, and lets the body fit or scroll, capped at 560 dp wide on tablets:
+The 64 dp touch floor and the 16 sp text floor are carried by design tokens rather than one global modifier. `windowProfileFor(widthDp, heightDp)` picks `COMPACT` (under 700 dp tall), `REGULAR` or `WIDE` (600 dp and wider), and `LocalPlayItDimens` provides the matching `PlayItDimens` (letter card height, primary button, mic size, Find It card size, tile size, map node size). Every child-facing control uses `heightIn(min = 64.dp)` or a token at least that large (the map's back, guidebook and dialog buttons since card 31e). `LessonScaffold` pins the top bar, header and bottom bar, and lets the body fit or scroll, capped at 560 dp wide on tablets:
 ```kotlin
 @Composable
 fun LessonScaffold(
@@ -465,7 +472,7 @@ The 9 pictures ship in `assets/images/mouth/` (image release `2026-10-10-mouth`,
 - **Lily:** the orange tarsier has 7 poses in `assets/images/mascot/` (idle, listening, pointing, thinking, encouraging, celebrating, waving). They were redrawn for one consistent style, not redesigned. `MascotState` picks the pose for each screen state; for example the profile screen waves when profiles exist.
 - **Companions:** 6 animal avatars (cat, monkey, bunny, bear, frog, owl) are in `assets/images/characters/`. The profile `AvatarCircle` and the map companions both read `CompanionAnimal.assetPath`, so one picture serves both places.
 - **Release:** all 13 pictures ship from image release `2026-10-12-mascot` with their SHA-256 (§2.0).
-- **Not yet:** the splash screen still draws an older vector tarsier in `SplashScreen.kt`. Replacing it with the waving pose is listed for card 31.
+- **Splash (card 31a):** the first screen draws Lily in the Headspace style: one soft squircle dome with ears, eye patches, cheeks and her belly. It uses colours sampled from her pictures and their dark-brown outline, so she looks the same as on every other screen. She rises from behind the white start panel and rests her paws on its edge. Start sits in the panel, in the thumb's reach and below her face (`LILY_FACE_BOTTOM`).
 
 ### 3.7 Module Class Diagrams
 Figures 2 to 7 give one class diagram for each functional module of SRS §3.2.
@@ -562,6 +569,7 @@ In the code today, the third miss saves the attempt rows and moves on; the `NEED
 ![Sequence diagram, Module 3: Find It](diagrams/png/seq_m3_find_it.png)
 
 ### 4.4 Blend It Word and Group Completion Workflow
+- **Dealing the tiles:** the letters come in a random order that is never the answer itself (card 31f).
 - **Checking a word:** each answer is saved.
 - **A correct word:** the tiles light one by one while each letter sound plays to its end (at least 750 ms each). Then every tile lights together, and the whole word plays.
 - **Group completion:** a finished group is scored and saved to `blend_it_progress`.
