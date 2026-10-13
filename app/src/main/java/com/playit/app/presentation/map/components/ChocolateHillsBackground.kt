@@ -451,7 +451,7 @@ private fun DrawScope.drawBaclayonHeritageZone(canvasWidth: Float, startY: Float
         )
         close()
     }
-    drawPath(path = domePath, color = Color(0xFFDC2626).copy(alpha = 0.70f))
+    drawPath(path = domePath, color = Color(0xFFC7764F).copy(alpha = 0.70f)) // muted terracotta, not harsh red (card 31e)
 
     // Arched Church Portals & Windows
     drawRoundRect(

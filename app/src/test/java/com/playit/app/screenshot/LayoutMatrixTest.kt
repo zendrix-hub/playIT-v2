@@ -324,6 +324,17 @@ abstract class LayoutMatrixTest(private val deviceName: String) {
         assertOnScreen("map_current_node"); capture("map")
     }
 
+    /** The map's back and guidebook buttons are 64 dp, like every child-facing control (card 31e). */
+    @Test fun map_buttonsAre64dp() {
+        compose.setContent { PlayItTheme { map() } }
+        compose.waitForIdle()
+        for (tag in listOf("map_back", "unit_guidebook_1")) {
+            val b = compose.onNodeWithTag(tag, useUnmergedTree = true).getUnclippedBoundsInRoot()
+            // 63.5: pixels round to 63.999996 dp at 2.625x
+            assertTrue("$tag is ${b.right - b.left} x ${b.bottom - b.top} on $deviceName",
+                b.right - b.left >= 63.5.dp && b.bottom - b.top >= 63.5.dp)
+        }
+    }
 
     /** The unit banner's title sits inside the card face, above the 6 dp shelf (card 28b). */
     @Test fun map_unitBannerTitleFits() {

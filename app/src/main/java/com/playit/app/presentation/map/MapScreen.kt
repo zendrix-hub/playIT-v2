@@ -262,11 +262,14 @@ fun MapScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                // 64 dp like every child-facing control (it was 46 dp).
                 GummyBackButton(
                     onClick = onBack,
-                    size = 46.dp
+                    modifier = Modifier.testTag("map_back")
                 )
 
+                // One header card: the greeting is folded in, so the trail gets the screen (card 31e).
+                // Tapping it, Lily says "Let's go! Tap a letter to begin our adventure!" (card 28).
                 TopStatsBar(
                     totalStars = userStats.totalStars,
                     currentStreak = userStats.currentStreak,
@@ -274,19 +277,10 @@ fun MapScreen(
                     lettersCompleted = mapNodes.count { it is MapNode.LetterNode && it.starsEarned > 0 },
                     profileName = userStats.profileName,
                     biomeTheme = activeBiomeTheme,
+                    onLilyTap = { viewModel.playMascotTapReaction() },
                     modifier = Modifier.weight(1f)
                 )
             }
-
-            // ── Mascot Prompt Header (Personalized Instant Greeting) ─
-            // One short line, so the trail gets the screen and a 16-character name is never cut off;
-            // tapping Lily says "Let's go! Tap a letter to begin our adventure!" (card 28).
-            LilyGreetingChip(
-                message = greetingFor(userStats.profileName),
-                backgroundColor = activeBiomeTheme.backgroundTint.copy(alpha = 0.95f),
-                onTap = { viewModel.playMascotTapReaction() },
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-            )
 
             // ── Winding Adventure Map ──────────────────────────────────────
             BoxWithConstraints(
@@ -921,15 +915,17 @@ fun BlendItChallengeNodeCard(
                     imageVector = Icons.Rounded.Extension,
                     contentDescription = null,
                     tint = Color.White,
-                    modifier = Modifier.size(11.dp)
+                    modifier = Modifier.size(16.dp)
                 )
+                // 16 sp like all map text (it was 9.5 sp, card 31e).
                 Text(
                     text = "BLEND ${node.groupId}",
                     fontFamily = LexendFontFamily,
-                    fontSize = 9.5.sp,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Black,
                     color = Color.White,
-                    letterSpacing = 0.5.sp
+                    letterSpacing = 0.5.sp,
+                    maxLines = 1
                 )
             }
         }
@@ -937,49 +933,8 @@ fun BlendItChallengeNodeCard(
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// One-line Lily greeting chip and the unlock chip
+// The unlock chip (Lily's greeting now lives in TopStatsBar, card 31e)
 // ═══════════════════════════════════════════════════════════════════════════
-
-@Composable
-private fun LilyGreetingChip(
-    message: String,
-    backgroundColor: Color,
-    onTap: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = 64.dp)
-            .background(backgroundColor, RoundedCornerShape(999.dp))
-            .border(1.5.dp, ModernBorderSoft, RoundedCornerShape(999.dp))
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = onTap
-            )
-            .padding(horizontal = 10.dp, vertical = 6.dp)
-            .semantics(mergeDescendants = true) { contentDescription = "Lily says: $message. Tap to hear it." },
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Image(
-            painter = rememberAssetPainter(MascotState.ENCOURAGING.assetPath),
-            contentDescription = null,
-            modifier = Modifier.size(44.dp)
-        )
-        Text(
-            text = message,
-            fontFamily = LexendFontFamily,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            color = TextMidnight,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f)
-        )
-    }
-}
 
 @Composable
 private fun UnlockChip(modifier: Modifier = Modifier) {

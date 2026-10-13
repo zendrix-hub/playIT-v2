@@ -140,13 +140,15 @@ fun MarungkoGroupBanner(
                         verticalArrangement = Arrangement.Center,
                         modifier = Modifier.weight(1f)
                     ) {
+                        // 16 sp floor for all map text (it was 11 sp, card 31e).
                         Text(
                             text = "SECTION 1, UNIT $groupNumber".uppercase(),
                             fontFamily = LexendFontFamily,
-                            fontSize = 11.sp,
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = headerColor,
-                            letterSpacing = 0.5.sp
+                            letterSpacing = 0.5.sp,
+                            maxLines = 1
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
@@ -161,20 +163,22 @@ fun MarungkoGroupBanner(
                         )
                     }
 
-                    // Interactive Guidebook notebook icon button on the right
+                    // Interactive Guidebook notebook icon button on the right: 64 dp like every
+                    // child-facing control (it was 44 dp, card 31e).
                     Box(
                         modifier = Modifier
-                            .size(44.dp)
-                            .clip(RoundedCornerShape(12.dp))
+                            .size(64.dp)
+                            .clip(RoundedCornerShape(16.dp))
                             .background(if (status == GroupBannerStatus.LOCKED) Color(0xFFCBD5E1) else theme.shelfColor)
-                            .clickable { onGuidebookClick() },
+                            .clickable { onGuidebookClick() }
+                            .testTag("unit_guidebook_$groupNumber"),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Rounded.AutoStories,
                             contentDescription = "Guidebook for Unit $groupNumber",
                             tint = Color.White,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(32.dp)
                         )
                     }
                 }
@@ -199,9 +203,10 @@ fun MarungkoGroupBanner(
             Text(
                 text = "  ${theme.lettersSummary}  ",
                 fontFamily = LexendFontFamily,
-                fontSize = 12.sp,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF64748B)
+                color = Color(0xFF64748B),
+                maxLines = 1
             )
             HorizontalDivider(
                 modifier = Modifier.weight(1f),
