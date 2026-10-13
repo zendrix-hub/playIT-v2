@@ -1118,3 +1118,4 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - Sign the course form by hand.
   - Bundle only the 4 PDFs, the 4 DOCX files and the APK.
 - **Still open:** adviser confirmation of the [proposed] items; Gate 3 teacher audit; the short /a/; pictures for AM, TUB, YAM and ZIP; card 31 parts, once the team approves them.
+- **`review_card.py 30` on `c7be2b6`:** status, task tick, evidence row and emoji pass. The "files" and "body" FAILs are expected: card 30 is a docs card with no Files list, and a docs commit does not use the Card/Requirement/Tests-run body.
