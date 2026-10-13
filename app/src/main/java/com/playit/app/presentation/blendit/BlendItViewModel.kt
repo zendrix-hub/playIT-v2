@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import com.playit.app.presentation.components.IdleTimer
 import javax.inject.Inject
+import kotlin.random.Random
 
 sealed class BlendItUiState {
     object Idle : BlendItUiState()
@@ -43,6 +44,21 @@ data class BlendItResult(
     val wordsCorrect: Int,
     val totalWords: Int
 )
+
+/**
+ * The word's letters in a random order that is never the answer itself, so no word starts solved
+ * (card 31f; a plain shuffle gave the answer 1 time in 6, and 1 in 3 for SIS). A word whose letters are
+ * all the same has only one order.
+ */
+internal fun dealTiles(word: String, random: Random = Random.Default): List<Char> {
+    val letters = word.toList()
+    if (letters.distinct().size < 2) return letters
+    var deal: List<Char>
+    do {
+        deal = letters.shuffled(random)
+    } while (deal == letters)
+    return deal
+}
 
 @HiltViewModel
 class BlendItViewModel @Inject constructor(
@@ -177,8 +193,7 @@ class BlendItViewModel @Inject constructor(
         _highlightedSlotIndex.value = null
         _uiState.value = BlendItUiState.Idle
 
-        val letters = wordObj.word.toCharArray().toList().shuffled()
-        _tileBank.value = letters
+        _tileBank.value = dealTiles(wordObj.word)
 
         // Play prompt first on session start, or word audio directly on subsequent words
         if (index == 0) {

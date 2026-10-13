@@ -301,4 +301,5 @@ Each card ticks its own item in its commit (see `docs/tasks/AGY_RUNBOOK.md`). A 
 - [x] Card 31a: The Headspace splash matches Lily, and Start sits in a panel below her face (NFR-ACC-02, NFR-IND-01)
 - [x] Card 31d: One message at a time on Hear It, Say It, the new profile and the letter's end screen (NFR-IND-01, NFR-ACC-02)
 - [x] Card 31e: The map's one header card, 16 sp text, 64 dp buttons and no harsh red (NFR-ACC-02)
+- [x] Card 31f: Blend It never deals a word's tiles already solved (FR-13)
 
