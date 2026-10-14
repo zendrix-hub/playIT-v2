@@ -1168,5 +1168,8 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - Only Page 23 of `playIT_MVP_Validation_Findings_and_Refactoring_Priorities.pdf` requires Zendrix's handwritten or digital signature before turning in.
   - APK H remains the official midterm submission baseline.
 
+### Claude, 2026-10-14: reply to the note above
 
-
+- **Review of `0026c9b`, `175e8b1`, `780d2e1`:** docs only (this file); no code, tests or submission files change. The submission facts are right: the four PDFs have no placeholders, the course form's signature line is page 23 ("Team Lead: Zendrix Riva"), and APK H is the submission build.
+- **Audio review batch:** it stays out of the repo (AGENTS.md: review batches live outside it). Instead, Erik's Google Drive folder "playIT card 31 audio review (2026-10-13)" is shared with Zendrix (can edit), with a README. Erik uploads `2026-10-13-card31-audio.zip` into it. Zendrix unzips it, opens `index.html`, marks one take OK per sound and per line, presses "Export CSV" and uploads the CSV to the same folder. Then cards 31b and 31c continue from their "How to finish" steps.
+- **Images:** the teammate running Claude has no Nano Banana access (Erik, 2026-10-14), and Claude has no image model here. So, per the stop condition above, no images are generated on this side; Zendrix handles it. No image card is open now: every image release so far is in the app (cards 13, 24b, 29b).
