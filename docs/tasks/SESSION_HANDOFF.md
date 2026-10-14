@@ -1168,6 +1168,12 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - Only Page 23 of `playIT_MVP_Validation_Findings_and_Refactoring_Priorities.pdf` requires Zendrix's handwritten or digital signature before turning in.
   - APK H remains the official midterm submission baseline.
 
+### Claude, 2026-10-14: reply to the note above
+
+- **Review of `0026c9b`, `175e8b1`, `780d2e1`:** docs only (this file); no code, tests or submission files change. The submission facts are right: the four PDFs have no placeholders, the course form's signature line is page 23 ("Team Lead: Zendrix Riva"), and APK H is the submission build.
+- **Audio review batch:** it stays out of the repo (AGENTS.md: review batches live outside it). Instead, Erik's Google Drive folder "playIT card 31 audio review (2026-10-13)" is shared with Zendrix (can edit), with a README. Erik uploads `2026-10-13-card31-audio.zip` into it. Zendrix unzips it, opens `index.html`, marks one take OK per sound and per line, presses "Export CSV" and uploads the CSV to the same folder. Then cards 31b and 31c continue from their "How to finish" steps.
+- **Images:** the teammate running Claude has no Nano Banana access (Erik, 2026-10-14), and Claude has no image model here. So, per the stop condition above, no images are generated on this side; Zendrix handles it. No image card is open now: every image release so far is in the app (cards 13, 24b, 29b).
+
 ### agy, 2026-10-14: Standalone SRS Deliverables Generated for CIT-U Portal Upload
 
 - **Context & Portal Requirements**:
@@ -1198,3 +1204,54 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - Upload the 3 PDFs to Google Drive (e.g. in a shared IT411 folder).
   - Verify sharing permission on all 3 files is set to: **"Anyone with the link can view"** (do NOT leave as "Restricted" or CIT-U domain-only if personal accounts are used).
   - Copy and paste each Google Drive URL into the corresponding portal input field.
+
+### Verification & Execution Brief for Claude: SPMP, SDD, MVP Validation, and Software Test Document (STD)
+
+> **Directive from Team Lead (Zendrix):** Course submission rubrics and portal validation guidelines require rigorous verification of the refactored deliverables (SPMP, SDD, MVP Validation Form) and systematic execution documentation for the **Software Test Document (STD)**.
+
+#### 1. Pre-Submission Rubric Alignment Check (All Verified Green)
+- **Refactored SPMP (`docs/submission/playIT_SPMP_v2.0.pdf` / `docs/SPMP_v2.0_Refactored.md`)**:
+  - **Project Scope:** §1.3 baselines 26 letters across 7 chapters, isolating Chapter 1 (*m, s, a, i*) as the validated vertical slice.
+  - **Activities & Schedule:** §3 re-baselines the 14-week timeline, detailing completed sprints and the Oct 10–13 audio/mascot iterations.
+  - **Work Breakdown (WBS):** §2 defines 9 structured work packages (WP-01 to WP-09) with explicit deliverable mappings.
+  - **Resources:** §4 specifies hardware test fleets, Kokoro/ElevenLabs pipelines, and offline-first Android tooling.
+  - **Roles & Responsibilities:** §5 matrix covers Group 56 (Riva, Palis, Miel, Durano, Bien) and Adviser Mr. Joemarie C. Amparo.
+  - **Risks & Mitigations:** §6 details 8 proactive risk items (R1–R8) covering synthetic speech naturalness, Vosk child acoustic models, and teacher validation gates.
+  - **Other Considerations:** §7 outlines configuration management and three-tier quality assurance gates.
+- **Refactored SDD (`docs/submission/playIT_SDD_v2.0.pdf` / `docs/SDD_v2.0_Refactored.md`)**:
+  - **SRS Traceability:** §2.0 audits implementation status against requirements FR-01–FR-14 and NFRs at commit `0320385`.
+  - **System Architecture:** §2.1–§2.2 defines the reactive MVI/Clean Architecture paradigm and layer boundaries.
+  - **Subsystem Designs:** §3.1 (Audio Subsystem & `AudioComposer`), §3.2 (Vosk 16 kHz async recognition & `MicStateVisualizer`), §3.3 (`LessonEngine`, `TutorPolicy` FSM, `SayItJudge`), §3.4 (Decodable CVC banks), §3.5 (Room DB Schema v4 & `TelemetryEventEntity`), §3.6 (Pediatric UI tokens & `ArticulationCue`).
+  - **Diagrammatic Evidence:** §3.7 features 6 complete class diagrams; §4 details 6 end-to-end sequence diagrams.
+- **MVP Validation Findings & Refactoring Priorities (`playIT_MVP_Validation_Findings_and_Refactoring_Priorities.pdf`)**:
+  - **Validation Evidence:** Sections 1–2 detail empirical validation ($N=25$: 16 early learners, 5 parents, 4 certified DepEd teachers; mean SUS $75.50$ / Grade B+).
+  - **Empirical Findings:** Sections 2.1–2.5 document verbatim stakeholder feedback (Teacher T-1: *"M should be /m/ (mmm) rather than 'ma'"*, hesitation at mic, non-decodable CVC words).
+  - **SMART Objectives & Refactoring:** Section 3 connects findings directly to SMART goals (Gen Obj 1 / HI-1 Pure Phoneme Model, Gen Obj 2 / SI-3 Child Independence) and outlines Priorities 1 to 6.
+  - **Summary Matrix & Sign-off:** Section 5 summary matrix establishes bidirectional traceability from finding to code component; Section 7 includes team reflections and Team Lead signature line (Page 23).
+
+#### 2. Software Test Document (STD) Implementation & Verification Guide
+The course requires an STD establishing the relationship: **Updated SRS → System Features → Test Cases → Test Execution → Test Results**.
+
+1. **Requirements Coverage**:
+   - Every requirement in SRS Section 3 and RTM Section 4 is verified by automated test suites in `app/src/test/` (433 tests, 0 failures, 6 skipped on 360x640 by design).
+   - Mapping:
+     - `FR-02` (Pure Phonemes): `HearItSequenceBuilderTest`, `HearItViewModelTest`, `AudioResolverTest`.
+     - `FR-03` (Say It Mic & Correction): `MicStatusTest`, `SayItViewModelTest`, `TutorPolicyTest`, `SayItFeedbackCopyTest`.
+     - `FR-05` (Find It Distractors & Hearts): `FindItViewModelTest`, `GridGeneratorTest`, `PictureAssetsTest`.
+     - `FR-13` (Decodable Words): `BlendItWordSeedsTest`, `BlendItWordSelectorTest`, `BlendItViewModelTest`, `BlendItTileDealTest`.
+     - `NFR-ASR-01` (Offline Vosk): `SpeechValidatorTest`, `SayItViewModelTest`.
+     - `NFR-ACC-01 / ACC-02` (Accessibility & 64 dp Touch Targets): `ArticulationGroupTest`, `ArticulationCueTest`, `DimensTest`, `GummyContainerLayoutTest`, `TopStatsBarLayoutTest`, `MapTextFloorTest`, `LayoutMatrixTest`.
+     - `NFR-SEC-01` & Zero-Emoji Policy: `ZeroEmojiPolicyTest`, manifest inspection (zero `android.permission.INTERNET`).
+2. **Beyond the "Happy Path" (Tested Edge Cases & Failure Modes)**:
+   - **Invalid / Foil Inputs:** `SpeechValidatorTest` validates rejection of letter names (e.g. saying "em" for /m/) and intrusive trailing schwa (saying "muh").
+   - **Boundary Conditions:** `HeartManagerTest` verifies heart depletion to 0, recovery capped at initial starting pool (5 hearts), and restart replenishment to 3. `GridGeneratorTest` verifies distractor pool fallback when 0 letters are mastered (Letter 1 `m`).
+   - **Missing Inputs / Timeouts:** `SayItViewModelTest` tests silence handling, idle re-prompting after 10 s, and partial speech timeout.
+   - **Incorrect User Actions:** `BlendItTileDealTest` guarantees tiles are never dealt pre-solved; `BlendItViewModelTest` verifies wrong tile submissions trigger gentle orange shake and soft pop sound rather than harsh buzzes or app crashes.
+   - **Unauthorized / Offline Bounds:** Sandbox security verifies zero network requests, local Room database encapsulation, and graceful behavior under Airplane mode.
+3. **Documenting Actual Results vs Expected Outputs**:
+   - The test runner records distinct status per assertion (`PASSED`, `SKIPPED`).
+   - Any historical discrepancy (e.g., card 30 finding map buttons below 64 dp) is explicitly logged with its resolution in card 31e (`map_buttonsAre64dp` passing at `0320385`).
+4. **Documented Evidence Base**:
+   - **Unit & Instrumented Test Logs:** 433 tests executed via `./gradlew testDebugUnitTest`.
+   - **Roborazzi Screenshot Matrix:** 21 visual layout regression checks across 4 device profiles (360x640, 360x740, 411x891, 800x1280) asserting unclipped bounds for mouth cues, buttons, and splash typography.
+   - **Binary Build Artifact:** `playit-debug-H-0320385.apk` (SHA-256 `D301007F…937D`) stored securely in `Documents/playIT-apk/`.
