@@ -1,0 +1,24 @@
+# TC-SEC-01 / TC-SEC-03: inspection of the submitted debug APK
+# Run on 2026-10-14 22:21 +0800 with 37.0.0/aapt dump; file: playit-debug-H-0320385.apk
+
+## sha256sum
+d301007fc865120023008f41adbbeaf0f22ac7ed9f5f36ad4299404ba988937d *playit-debug-H-0320385.apk
+
+## size (bytes)
+108489471
+
+## aapt dump permissions
+package: com.playit.app
+uses-permission: name='android.permission.RECORD_AUDIO'
+uses-permission: name='android.permission.READ_EXTERNAL_STORAGE' maxSdkVersion='32'
+uses-permission: name='android.permission.WRITE_EXTERNAL_STORAGE' maxSdkVersion='28'
+permission: com.playit.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+uses-permission: name='com.playit.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION'
+
+## aapt dump badging (package and SDK lines)
+package: name='com.playit.app' versionCode='1' versionName='1.0.0' platformBuildVersionName='14' platformBuildVersionCode='34' compileSdkVersion='34' compileSdkVersionCodename='14'
+sdkVersion:'26'
+targetSdkVersion:'34'
+
+## INTERNET permission present?
+NO (expected: NO)

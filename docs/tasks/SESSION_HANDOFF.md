@@ -1255,3 +1255,35 @@ The course requires an STD establishing the relationship: **Updated SRS → Syst
    - **Unit & Instrumented Test Logs:** 433 tests executed via `./gradlew testDebugUnitTest`.
    - **Roborazzi Screenshot Matrix:** 21 visual layout regression checks across 4 device profiles (360x640, 360x740, 411x891, 800x1280) asserting unclipped bounds for mouth cues, buttons, and splash typography.
    - **Binary Build Artifact:** `playit-debug-H-0320385.apk` (SHA-256 `D301007F…937D`) stored securely in `Documents/playIT-apk/`.
+
+### Claude, 2026-10-14: review of the SRS extracts and the rubric brief; Software Test Document v1.0
+
+- **Standalone SRS PDFs (`a80a98a`): correct.**
+  - The Requirements Inventory is exactly SRS §3 (pages 9–15), and the Traceability Matrix is §4 to §5 (pages 16–20). No placeholders, and the cover facts match.
+  - One fix: `extract_srs_standalone_deliverables.py` hard-coded those page numbers, so a re-rendered SRS whose pages moved would have been cut in the wrong place. It now finds the two section headings in the SRS PDF. The output for the current SRS is unchanged: same pages, same text.
+- **Checklist:** `render_submission_package.py` writes the checklist from its `CHECKLIST` constant, so the next render would have erased the portal section added in `a80a98a`. That section is now in the constant. Two other changes:
+  - The stale heading "code at `89604d7`" is fixed.
+  - `--only SDD SRS SPMP STD FORM` rebuilds only the named documents, so the PDFs already uploaded to Drive need not change.
+- **Rubric brief (§1): the documents hold up; some claims in the brief do not.**
+  - The SUS grade is **B**, not B+ (SRS §1.1).
+  - The SPMP names its work packages "WBS 1 to 9", not WP-01 to WP-09.
+  - SDD §3.5 (Room schema v4 and `TelemetryEventEntity`) is *planned*, not shipped.
+  - FR-05 is hearts; FR-04 is the grid and its distractors.
+- **STD brief (§2): checked against the test code. Corrections:**
+  - No test runs on a device ("instrumented"): all 433 are JVM or Robolectric tests.
+  - Nothing checks Airplane mode or "zero network requests". The missing INTERNET permission is now verified by `aapt` on the APK itself (STD TC-SEC-01). `ManifestPrivacyTest` only checks that backup is off.
+  - The "letter 1 fallback" test exercises `generateGrid`, which Find It no longer calls.
+  - No test covers a fully silent Say It attempt from end to end.
+  - The Blend It "orange shake" is not tested; the soft pop is.
+- **New: `docs/STD_v1.0.md` → `docs/submission/playIT_STD_v1.0.pdf` / `.docx`** (50 pages).
+  - **Generation:** `tools/docs/build_std.py` builds it from `docs/std/STD_template.md` and the raw logs in `docs/std/evidence/2026-10-14-0320385/`, and refuses to build if a cited test is missing or did not pass.
+  - **Fresh run at the APK H code:** 433 tests, 427 passed, 6 skipped by design, 0 failed. The layout matrix ran 84 times: 78 passed, 6 skipped by design.
+  - **Test cases:** 83 in all, with expected and actual results: 57 pass, 1 partial, 2 fail, 23 not run (each with its reason).
+  - **Inspections:** the APK's permissions, and the audio releases (`tools/docs/check_audio_release.py`: 69 of 69 shipped clips byte-identical).
+  - **Layout evidence:** 4 figures of each screen on 4 sizes.
+  - **Incidents:** INC-01 to 07 closed, with their commits.
+- **Two open defects found while writing it (in the STD, §7.2):**
+  - **DEF-01 (FR-04, Medium):** `generate5ItemGrid` ignores the mastered letters, so Find It for M shows Elephant, Orange, Jug, Yoyo and Pig. A fix card is needed.
+  - **DEF-02 (FR-06, Low):** stars use hearts lost only. With 3 targets, the SRS's 80% accuracy rule could never give 2 stars, so the SRS or the code must change: a team and adviser decision.
+  - **Also:** the SPMP placed telemetry, CSV export and the Gate 3 audit in Milestone 4 (Week 6), and none is in APK H, so the schedule needs re-baselining.
+- **Team to do:** sign STD §8.4 (Team Lead, adviser); submit `playIT_STD_v1.0.pdf` where the course asks for it.

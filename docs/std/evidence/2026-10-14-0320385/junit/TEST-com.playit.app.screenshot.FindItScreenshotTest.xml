@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.screenshot.FindItScreenshotTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-14T14:14:25" hostname="LAPTOP-REHI7A0K" time="0.384">
+  <properties/>
+  <testcase name="findIt_letterM_fiveHearts" classname="com.playit.app.screenshot.FindItScreenshotTest" time="0.384"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.ZeroEmojiPolicyTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-14T14:13:37" hostname="LAPTOP-REHI7A0K" time="0.503">
+  <properties/>
+  <testcase name="noEmojiInAppSources" classname="com.playit.app.ZeroEmojiPolicyTest" time="0.503"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

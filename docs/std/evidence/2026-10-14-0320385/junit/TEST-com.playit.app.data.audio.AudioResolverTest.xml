@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.data.audio.AudioResolverTest" tests="23" skipped="0" failures="0" errors="0" timestamp="2026-10-14T14:13:38" hostname="LAPTOP-REHI7A0K" time="0.059">
+  <properties/>
+  <testcase name="devPlaceholder_mapsUiLines" classname="com.playit.app.data.audio.AudioResolverTest" time="0.002"/>
+  <testcase name="phonemeM_usesReleasedHeldSound" classname="com.playit.app.data.audio.AudioResolverTest" time="0.001"/>
+  <testcase name="getUiPath_returnsWavInUiFolder" classname="com.playit.app.data.audio.AudioResolverTest" time="0.0"/>
+  <testcase name="getTutorPath_returnsWavInTutorFolder" classname="com.playit.app.data.audio.AudioResolverTest" time="0.001"/>
+  <testcase name="getDevPlaceholderForAsset_mapsProductionPathsToDevPlaceholders" classname="com.playit.app.data.audio.AudioResolverTest" time="0.0"/>
+  <testcase name="correctionFragments_fileExists" classname="com.playit.app.data.audio.AudioResolverTest" time="0.002"/>
+  <testcase name="getDevPlaceholderPath_returnsCorrectCategoryPaths" classname="com.playit.app.data.audio.AudioResolverTest" time="0.0"/>
+  <testcase name="releasedPhoneme_fileExists" classname="com.playit.app.data.audio.AudioResolverTest" time="0.0"/>
+  <testcase name="getPhonemePath_returnsCorrectPathForStandardLetters" classname="com.playit.app.data.audio.AudioResolverTest" time="0.0"/>
+  <testcase name="getVoPath_returnsCorrectPaths" classname="com.playit.app.data.audio.AudioResolverTest" time="0.001"/>
+  <testcase name="releasedWords_useWav" classname="com.playit.app.data.audio.AudioResolverTest" time="0.001"/>
+  <testcase name="releasedWords_filesExist" classname="com.playit.app.data.audio.AudioResolverTest" time="0.001"/>
+  <testcase name="otherPhonemes_keepOldPath" classname="com.playit.app.data.audio.AudioResolverTest" time="0.0"/>
+  <testcase name="getPhonemePath_returnsCorrectPathForSpecialLetters" classname="com.playit.app.data.audio.AudioResolverTest" time="0.0"/>
+  <testcase name="rotationalHelpers_alternateCorrectly" classname="com.playit.app.data.audio.AudioResolverTest" time="0.004"/>
+  <testcase name="phonemeI_usesReleasedClip" classname="com.playit.app.data.audio.AudioResolverTest" time="0.001"/>
+  <testcase name="lessonVo_allReleasedLinesUseWav" classname="com.playit.app.data.audio.AudioResolverTest" time="0.026"/>
+  <testcase name="getPhonemePath_returnsDraftPathForX" classname="com.playit.app.data.audio.AudioResolverTest" time="0.002"/>
+  <testcase name="phonemeS_usesReleasedHeldSound" classname="com.playit.app.data.audio.AudioResolverTest" time="0.001"/>
+  <testcase name="getKeyWordPath_returnsWavInKeywordsFolder" classname="com.playit.app.data.audio.AudioResolverTest" time="0.008"/>
+  <testcase name="getWordPath_returnsCorrectPath" classname="com.playit.app.data.audio.AudioResolverTest" time="0.0"/>
+  <testcase name="devPlaceholder_mapsKeywordsAndTutor" classname="com.playit.app.data.audio.AudioResolverTest" time="0.001"/>
+  <testcase name="getSfxPath_returnsCorrectPaths" classname="com.playit.app.data.audio.AudioResolverTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

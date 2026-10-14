@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.domain.manager.UnlockManagerTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-14T14:13:46" hostname="LAPTOP-REHI7A0K" time="0.001">
+  <properties/>
+  <testcase name="phonemeN_lockedWhenPreviousNotCompleted" classname="com.playit.app.domain.manager.UnlockManagerTest" time="0.001"/>
+  <testcase name="phonemeN_unlockedWhenPreviousCompleted" classname="com.playit.app.domain.manager.UnlockManagerTest" time="0.0"/>
+  <testcase name="phonemeOne_unlockedByDefault" classname="com.playit.app.domain.manager.UnlockManagerTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

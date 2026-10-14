@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.presentation.hearit.HearItScreenFocusTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-14T14:14:12" hostname="LAPTOP-REHI7A0K" time="2.993">
+  <properties/>
+  <testcase name="whilePlaying_playButtonKeepsItsColour" classname="com.playit.app.presentation.hearit.HearItScreenFocusTest" time="2.587"/>
+  <testcase name="whilePlaying_soundTextShowsOnce_andLilySaysListen" classname="com.playit.app.presentation.hearit.HearItScreenFocusTest" time="0.406"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -4,15 +4,19 @@
 Deliverables:
 1. docs/submission/playIT_Requirements_Inventory.pdf
    - CIT-U Cover page + Section 3 (Specific Requirements FR-01 to FR-14, NFR-AUD to NFR-SEC)
-   - Extracted from docs/submission/playIT_SRS_v3.0.pdf (pages 9-15)
+   - Extracted from docs/submission/playIT_SRS_v3.0.pdf (the pages of Section 3, found by its heading)
 2. docs/submission/playIT_Traceability_Matrix.pdf
    - CIT-U Cover page + Section 4 (Requirements Traceability Matrix v3.0, §4.1 Test Coverage Table, §5 Sign-Off & Verification)
-   - Extracted from docs/submission/playIT_SRS_v3.0.pdf (pages 16-20)
+   - Extracted from docs/submission/playIT_SRS_v3.0.pdf (Section 4 to the end, found by its heading)
+
+The page ranges are read from the SRS PDF each run, so a re-rendered SRS whose pages moved still splits
+at the right place.
 """
 
 from __future__ import annotations
 
 import io
+import re
 from pathlib import Path
 from pypdf import PdfReader, PdfWriter
 from reportlab.lib.pagesizes import letter
@@ -24,6 +28,7 @@ from reportlab.lib.enums import TA_CENTER, TA_LEFT
 REPO_DIR = Path(__file__).resolve().parents[2]
 SUBMISSION_DIR = REPO_DIR / "docs" / "submission"
 SRS_PDF_PATH = SUBMISSION_DIR / "playIT_SRS_v3.0.pdf"
+SECTION_3 = SECTION_4_ON = range(0)  # set in main() from the SRS PDF
 
 TEAL = colors.HexColor("#1F3A3D")
 PLUM = colors.HexColor("#6B4E71")
@@ -205,6 +210,29 @@ def generate_cover_pdf(
     return buffer
 
 
+def section_start(reader: PdfReader, number: int, title: str) -> int:
+    """0-based index of the page whose line is the heading '<number>. <title>' (not the dotted TOC line)."""
+    heading = re.compile(rf"^\s*{number}\. {re.escape(title)}\s*$")
+    for idx, page in enumerate(reader.pages):
+        if any(heading.match(line) for line in (page.extract_text() or "").splitlines()):
+            return idx
+    raise ValueError(f"Section {number} ('{title}') not found in {SRS_PDF_PATH.name}")
+
+
+def srs_ranges() -> tuple[range, range]:
+    """Pages of Section 3, and of Section 4 to the end of the SRS."""
+    reader = PdfReader(str(SRS_PDF_PATH))
+    s3 = section_start(reader, 3, "Specific Requirements")
+    s4 = section_start(reader, 4, "Requirements Traceability Matrix (RTM v3.0)")
+    if not s3 < s4:
+        raise ValueError(f"Section 3 (page {s3 + 1}) must come before Section 4 (page {s4 + 1})")
+    return range(s3, s4), range(s4, len(reader.pages))
+
+
+def pages_label(pages: range) -> str:
+    return f"Pages {pages.start + 1}–{pages.stop} of SRS v3.0"
+
+
 def build_requirements_inventory():
     """Extract Section 3 (Specific Requirements) from SRS v3.0 and prepend cover page."""
     out_path = SUBMISSION_DIR / "playIT_Requirements_Inventory.pdf"
@@ -214,7 +242,7 @@ def build_requirements_inventory():
         title="PlayIT — Software Requirements Inventory",
         subtitle="Complete Inventory of Specific Requirements (FR-01 to FR-14 & NFR-AUD-01 to NFR-SEC-01)",
         document_role="Standalone Deliverable: Requirements Inventory",
-        extracted_sections="Section 3: Specific Requirements (Pages 9–15 of SRS v3.0)",
+        extracted_sections=f"Section 3: Specific Requirements ({pages_label(SECTION_3)})",
     )
 
     cover_reader = PdfReader(cover_buf)
@@ -224,14 +252,14 @@ def build_requirements_inventory():
     # Add cover page
     writer.add_page(cover_reader.pages[0])
 
-    # Add Pages 9 to 15 (0-indexed 8 to 14 inclusive)
-    for p_idx in range(8, 15):
+    for p_idx in SECTION_3:
         writer.add_page(srs_reader.pages[p_idx])
 
     with open(out_path, "wb") as f:
         writer.write(f)
 
-    print(f"  [OK] Saved {out_path.name} ({len(writer.pages)} pages: 1 cover + 7 content)")
+    print(f"  [OK] Saved {out_path.name} ({len(writer.pages)} pages: 1 cover + {len(SECTION_3)} content, "
+          f"{pages_label(SECTION_3)})")
 
 
 def build_traceability_matrix():
@@ -243,7 +271,7 @@ def build_traceability_matrix():
         title="PlayIT — Requirements Traceability Matrix (RTM v3.0)",
         subtitle="Bidirectional Traceability Matrix (Findings F-01 to F-16), Test Coverage Table (§4.1), and Verification Protocol (§5)",
         document_role="Standalone Deliverable: Traceability Matrix",
-        extracted_sections="Section 4: Requirements Traceability Matrix & Section 5: Verification Protocol (Pages 16–20 of SRS v3.0)",
+        extracted_sections=f"Section 4: Requirements Traceability Matrix & Section 5: Verification Protocol ({pages_label(SECTION_4_ON)})",
     )
 
     cover_reader = PdfReader(cover_buf)
@@ -253,19 +281,21 @@ def build_traceability_matrix():
     # Add cover page
     writer.add_page(cover_reader.pages[0])
 
-    # Add Pages 16 to 20 (0-indexed 15 to 19 inclusive)
-    for p_idx in range(15, 20):
+    for p_idx in SECTION_4_ON:
         writer.add_page(srs_reader.pages[p_idx])
 
     with open(out_path, "wb") as f:
         writer.write(f)
 
-    print(f"  [OK] Saved {out_path.name} ({len(writer.pages)} pages: 1 cover + 5 content)")
+    print(f"  [OK] Saved {out_path.name} ({len(writer.pages)} pages: 1 cover + {len(SECTION_4_ON)} content, "
+          f"{pages_label(SECTION_4_ON)})")
 
 
 def main():
     if not SRS_PDF_PATH.exists():
         raise FileNotFoundError(f"SRS master PDF not found: {SRS_PDF_PATH}")
+    global SECTION_3, SECTION_4_ON
+    SECTION_3, SECTION_4_ON = srs_ranges()
 
     build_requirements_inventory()
     build_traceability_matrix()
