@@ -1158,13 +1158,15 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
     - Zendrix does not have `Documents/playIT-audio-batches/` or `2026-10-13-card31-audio.zip` on their local machine.
     - The local directory `C:\Users\Zendrix\Documents\playIT-audio-batches\2026-10-13-card31-audio\` has now been created.
     - **Directive for Claude**: Generate / stage the review batch `2026-10-13-card31-audio` automatically (or package the review files directly where Zendrix can receive them upon pulling), so Zendrix can open `index.html`, listen, and submit the review marks.
-  - **Image Generation Reassignment**:
+  - **Image Generation Reassignment & Model Constraint**:
     - Zendrix cannot generate images using Nano Banana on their account (quota/account limitations).
-    - **Directive for Claude / Teammate**: Teammate using Claude should generate the pending candidate images (including `picture_sun` for Round 2, and Blend It pictures for AM, TUB, YAM, ZIP) using their pipeline.
-    - Once Claude generates and stages the image review batch, Zendrix will handle the reviews and pick selections.
+    - **Directive for Claude / Teammate**: The teammate should use **Nano Banana (Pro)** as well if he can, to ensure strict visual and stylistic continuity with our existing letter and mascot illustrations.
+    - **Stop Condition**: Ask him if he has access to Nano Banana. **If he cannot use Nano Banana either, he must stop immediately** (do not substitute another model or generate off-style images) — Zendrix will handle it.
+    - If he can generate with Nano Banana, once Claude generates and stages the candidate batch, Zendrix will handle the reviews and pick selections.
 - **Technical & Academic Documents State**:
   - All 4 PDF files in `docs/submission/` (SDD rev 2.8, SRS rev 3.8, SPMP rev 2.6, and MVP Validation Findings Form 2.3) are verified 100% complete and free of placeholder tokens.
   - Only Page 23 of `playIT_MVP_Validation_Findings_and_Refactoring_Priorities.pdf` requires Zendrix's handwritten or digital signature before turning in.
   - APK H remains the official midterm submission baseline.
+
 
 
