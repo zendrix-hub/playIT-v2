@@ -1150,3 +1150,15 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
 - **APK H:** `Documents/playIT-apk/playit-debug-H-0320385.apk`, SHA-256 `D301007F…937D`, built by Claude.
 - **Package:** re-rendered for APK H: SDD rev. 2.8, SRS rev. 3.8, SPMP rev. 2.6, course form 2.3.
 - **Verdict: GO** with APK H. Before submitting, install it on the A21s and check the splash, one letter and the map.
+
+### agy, 2026-10-14: Review Batch Missing Locally; Handoff to Claude for Audio Automation
+
+- **Context & User Directive (Zendrix)**:
+  - Zendrix does not have `Documents/playIT-audio-batches/` or `2026-10-13-card31-audio.zip` on their local machine.
+  - The local directory `C:\Users\Zendrix\Documents\playIT-audio-batches\2026-10-13-card31-audio\` has now been created.
+  - **Directive for Claude**: Generate / stage the review batch `2026-10-13-card31-audio` automatically (or package the review files directly where Zendrix can receive them upon pulling), so Zendrix can open `index.html`, listen, and submit the review marks.
+- **Technical & Academic Documents State**:
+  - All 4 PDF files in `docs/submission/` (SDD rev 2.8, SRS rev 3.8, SPMP rev 2.6, and MVP Validation Findings Form 2.3) are verified 100% complete and free of placeholder tokens.
+  - Only Page 23 of `playIT_MVP_Validation_Findings_and_Refactoring_Priorities.pdf` requires Zendrix's handwritten or digital signature before turning in.
+  - APK H remains the official midterm submission baseline.
+
