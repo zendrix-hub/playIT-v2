@@ -1168,5 +1168,33 @@ Result with 17 + 17b + 18 applied: **260 tests, 0 failed** (1 skipped by design)
   - Only Page 23 of `playIT_MVP_Validation_Findings_and_Refactoring_Priorities.pdf` requires Zendrix's handwritten or digital signature before turning in.
   - APK H remains the official midterm submission baseline.
 
+### agy, 2026-10-14: Standalone SRS Deliverables Generated for CIT-U Portal Upload
 
-
+- **Context & Portal Requirements**:
+  - The CIT-U IT411 midterm portal requires individual Google Drive links for three specific SRS items:
+    1. `(PDF) Refactored SRS`
+    2. `(PDF) Traceability Matrix`
+    3. `(PDF) Requirements Inventory`
+- **Actions Executed**:
+  - Created standalone PDF extraction pipeline: `tools/docs/extract_srs_standalone_deliverables.py`.
+  - Generated branded institutional CIT-U CCS cover pages with exact academic typography (Teal `#1F3A3D`, Plum `#6B4E71`, Text `#2D3748`), institutional headers, course metadata (IT411 Section G7, Semester 1, AY 2026–2027), group member roster (Riva, Palis, Miel, Durano, Bien), adviser (Mr. Joemarie C. Amparo), and submission date (October 14, 2026).
+  - Merged cover pages with exact page slices extracted from `docs/submission/playIT_SRS_v3.0.pdf`:
+    1. **`docs/submission/playIT_SRS_v3.0.pdf`** (Master Full SRS, 20 pages):
+       - Covers the entire Software Requirements Specification (Revision 3.8, all sections 1 to 5).
+       - Maps to portal field: **`(PDF) Refactored SRS`**.
+    2. **`docs/submission/playIT_Traceability_Matrix.pdf`** (Standalone, 6 pages: 1 cover + 5 content):
+       - Cover page + Section 4 (Requirements Traceability Matrix v3.0, Findings F-01 to F-16), Section 4.1 (Automated Test Coverage Table), and Section 5 (Requirements Sign-Off & Verification Protocol).
+       - Extracted from pages 16–20 of SRS v3.0.
+       - Maps to portal field: **`(PDF) Traceability Matrix`**.
+    3. **`docs/submission/playIT_Requirements_Inventory.pdf`** (Standalone, 8 pages: 1 cover + 7 content):
+       - Cover page + Section 3 (Specific Requirements: 3.1 External Interfaces, 3.2 Functional Requirements FR-01 to FR-14, 3.3 Non-Functional Requirements NFR-AUD-01 to NFR-SEC-01).
+       - Extracted from pages 9–15 of SRS v3.0.
+       - Maps to portal field: **`(PDF) Requirements Inventory`**.
+- **Quality & Content Verification**:
+  - Both standalone documents were audited: 0 `TODO`, 0 `TBD`, 0 `FIXME` placeholder tokens.
+  - Page orientation preserved: Landscape retained for wide RTM matrix tables (pages 2–4 of Traceability Matrix), Portrait for all other sections.
+  - Test coverage table in Section 4.1 seamlessly connects through to the Section 5 verification protocol without truncation.
+- **Action for Team / Zendrix / Claude**:
+  - Upload the 3 PDFs to Google Drive (e.g. in a shared IT411 folder).
+  - Verify sharing permission on all 3 files is set to: **"Anyone with the link can view"** (do NOT leave as "Restricted" or CIT-U domain-only if personal accounts are used).
+  - Copy and paste each Google Drive URL into the corresponding portal input field.

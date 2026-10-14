@@ -11,12 +11,22 @@ Rebuild everything with `python3 tools/docs/render_submission_package.py` (pytho
 
 ## 1. Deliverables
 
+### Core Faculty Submission Package
 | # | Deliverable | Files | Source | Contents |
 |:---:|---|---|---|---|
 | 1 | **MVP Validation Findings & Refactoring Priorities** (course form) | `playIT_MVP_Validation_Findings_and_Refactoring_Priorities.pdf` / `.docx` | `MVP_Validation_Findings_and_Refactoring_Priorities_Filled.md`, filled into the course template | Sections 1–7 and the declaration (with a blank line for the Team Lead's signature): 5 findings, 6 refactoring priorities, summary matrix, non-priority screening |
 | 2 | **Software Design Description (SDD v2.0, rev. 2.8)** | `playIT_SDD_v2.0.pdf` / `.docx` | `SDD_v2.0_Refactored.md` | §2.0 implementation status; system ERD (§3.5.3), 6 class diagrams (§3.7) and 6 sequence diagrams (§4) |
-| 3 | **Software Requirements Specification (SRS v3.0, rev. 3.8)** | `playIT_SRS_v3.0.pdf` / `.docx` | `SRS_v3.0_Refactored.md` | Use case diagram (§2.5), RTM v3.0 (16 findings) and §4.1 automated test coverage |
+| 3 | **Software Requirements Specification (SRS v3.0, rev. 3.8)** | `playIT_SRS_v3.0.pdf` / `.docx` | `SRS_v3.0_Refactored.md` | Complete SRS master: Use case diagram (§2.5), Section 3 Requirements Inventory, Section 4 RTM v3.0 (16 findings), §4.1 automated test coverage, and §5 Sign-off |
 | 4 | **Software Project Management Plan (SPMP v2.0, rev. 2.6)** | `playIT_SPMP_v2.0.pdf` / `.docx` | `SPMP_v2.0_Refactored.md` | WBS, revised schedule with sprint status, risk register R1–R8 |
+
+### Standalone SRS Deliverables (for CIT-U IT411 Submission Portal Links)
+| Portal Field Label | File Location | Page Count | Included Sections & Content |
+|---|---|:---:|---|
+| **(PDF) Refactored SRS** | `docs/submission/playIT_SRS_v3.0.pdf` | 20 pages | Master full SRS v3.0 (Revision 3.8, all sections 1 to 5). |
+| **(PDF) Traceability Matrix** | `docs/submission/playIT_Traceability_Matrix.pdf` | 6 pages | CIT-U Cover Page + Section 4 (Requirements Traceability Matrix v3.0, Findings F-01 to F-16), Section 4.1 (Automated Test Coverage Table), and Section 5 (Requirements Sign-Off & Verification Protocol). |
+| **(PDF) Requirements Inventory** | `docs/submission/playIT_Requirements_Inventory.pdf` | 8 pages | CIT-U Cover Page + Section 3 (Specific Requirements: 3.1 External Interfaces, 3.2 Functional Requirements FR-01 to FR-14, 3.3 Non-Functional Requirements NFR-AUD-01 to NFR-SEC-01). |
+
+*Note: Standalone PDFs are generated from the master SRS using `python3 tools/docs/extract_srs_standalone_deliverables.py`.*
 
 ## 2. Technical evidence (code at `89604d7`)
 
@@ -29,11 +39,15 @@ Rebuild everything with `python3 tools/docs/render_submission_package.py` (pytho
 
 ## 3. Before turning in (team)
 
-- [ ] Sign the MVP form's Final Declaration by hand (Team Lead): the form prints a blank signature line under the name.
+- [ ] Sign the MVP form's Final Declaration by hand (Team Lead): the form prints a blank signature line under the name (Page 23).
 - [ ] Confirm the group name, section ("IT411 G7") and member list on the MVP form. The adviser's name (Mr. Joemarie C. Amparo) and the date (October 14, 2026) were confirmed by the team on October 13.
 - [ ] Open each PDF and check that the table of contents, page numbers and landscape matrices (SRS RTM, SPMP risk register) and the landscape diagram pages look right.
 - [ ] Install APK H on the test phone (`adb install -r playit-debug-H-0320385.apk`): open the splash, then play one letter from Hear It to Find It and look at the map's header.
-- [ ] The faculty bundle holds only the 4 PDFs and 4 DOCX files from `docs/submission/` and `playit-debug-H-0320385.apk` (team decision, 2026-10-13); no task cards or relay files.
+- [ ] **Google Drive Portal Submissions (3 Required Links):**
+  1. Upload `docs/submission/playIT_SRS_v3.0.pdf` to your Google Drive folder, set sharing permission to **"Anyone with the link can view"**, and paste into **(PDF) Refactored SRS**.
+  2. Upload `docs/submission/playIT_Traceability_Matrix.pdf` to your Google Drive folder, set sharing permission to **"Anyone with the link can view"**, and paste into **(PDF) Traceability Matrix**.
+  3. Upload `docs/submission/playIT_Requirements_Inventory.pdf` to your Google Drive folder, set sharing permission to **"Anyone with the link can view"**, and paste into **(PDF) Requirements Inventory**.
+- [ ] The faculty bundle holds only the PDFs/DOCX files from `docs/submission/` and `playit-debug-H-0320385.apk` (team decision, 2026-10-13); no task cards or relay files.
 
 ## 4. Still pending after this submission (stated in the documents)
 
