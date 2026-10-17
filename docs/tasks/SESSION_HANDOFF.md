@@ -1287,3 +1287,85 @@ The course requires an STD establishing the relationship: **Updated SRS → Syst
   - **DEF-02 (FR-06, Low):** stars use hearts lost only. With 3 targets, the SRS's 80% accuracy rule could never give 2 stars, so the SRS or the code must change: a team and adviser decision.
   - **Also:** the SPMP placed telemetry, CSV export and the Gate 3 audit in Milestone 4 (Week 6), and none is in APK H, so the schedule needs re-baselining.
 - **Team to do:** sign STD §8.4 (Team Lead, adviser); submit `playIT_STD_v1.0.pdf` where the course asks for it.
+
+### Claude, 2026-10-17: review of the 2D refresh, card 32 and the midterm package (`7c4bdbe`, `fbcf9ce`, `01e6be8`, `722d3d3`)
+
+**Verdict: not ready to submit.** Items 1 to 3 must be fixed first. Card 32 needs a rewrite before anyone implements it (item 4). The four core documents still match APK H (item 5).
+
+**1. Ten keyword pictures show the wrong thing (release `2026-10-16`, `fbcf9ce`). Blocker.**
+- Every picture in that release shows another item's art:
+
+  | File | Shows |
+  |---|---|
+  | `picture_ball.png` | a duck |
+  | `picture_cat.png` | a ladybug |
+  | `picture_dog.png` | a box |
+  | `picture_duck.png` | a key |
+  | `picture_fish.png` | a mouse |
+  | `picture_kite.png` | a fish |
+  | `picture_mouse.png` | a sun |
+  | `picture_rabbit.png` | a cat |
+  | `picture_tree.png` | a dog |
+  | `picture_umbrella.png` | a rabbit |
+
+- Eight are letter keyword pictures (B, C, D, F, K, M, R, U: `DatabaseModule.kt:85-105`, `LetterCard`), and all ten are Find It pictures (`GridGenerator.kt:19-40`). M is the first letter of Chapter 1: its keyword "mouse" now shows a sun, and S (sun) is the next letter.
+- Ball, kite, tree and umbrella have no correct new picture at all. The other six exist, under the wrong names.
+- How it got through: the release was approved in chat ("no need to do the index.html"), so nobody looked at the pictures by name. `PictureAssetsTest` only checks that each file's bytes match the manifest, so "0 FAIL" says nothing about what a picture shows. The other 80 new pictures are right (checked on a contact sheet).
+- Fix for the submission: restore the ten files from `0ba18d2` (APK H's pictures, which are correct) and withdraw release `2026-10-16` (its manifest), so `PictureAssetsTest` passes again. Redo the ten through a review page later. Do not build an APK from the current HEAD before this.
+
+**2. The public repo `zendrix-hub/playIt` (`20f4c8d`) does not build. Blocker.**
+- Cloned it and ran `gradlew :app:testDebugUnitTest`: it fails at `checkDebugAarMetadata` because `android.useAndroidX` is not set. `assemble_midterm_submission.py` leaves `gradle.properties` out.
+- With `gradle.properties` added it builds, but 3 of 433 tests fail (6 skipped): `PictureAssetsTest` (2) and `AudioResolverTest.lessonVo_allReleasedLinesUseWav`, because `docs/image-release/` and `docs/audio-release/` are not copied. So the README's "433 passing, 0 failed" is not true for that repo. Copy `gradle.properties` and both release folders (the manifests are also the provenance record for the pictures and voices).
+- The README's 8 screenshots are missing. The copied `.gitignore` ignores `/screenshots/`, and this repo has no `screenshots/` folder either, so the "Visual Showcase" shows 8 broken images.
+- `docs/engineering-package/99_AGENT_BOOTSTRAP.md` is in it, though the script says agent files are left out.
+
+**3. The QA PDFs from `assemble_midterm_submission.py` state results nobody measured, and contradict the STD. Blocker.**
+
+The text is typed into the script, not taken from evidence, and the faculty get these PDFs next to the STD:
+- **Performance report:** cold start 720 ms, Vosk 380 ms median, 78.4 MB heap, 59.4 to 60 fps with 0 jank. Nothing in the repo measured any of these. The STD's §3 table says NFR-PERF-01 is "Not run: needs telemetry on the device".
+- **Usability report:** "100% of tested learners completed the loop without adult prompting" and "zero mis-taps across 120 interaction cycles" have no source. The STD says independent completion (TC-IND-03) waits for Round 2. Its F-01 to F-05 are not the SRS RTM's F-01 to F-05, and "F-05 Visual stage noise" is not an MVP finding.
+- **Acceptance sign-off:** "every FR and NFR has been systematically tested ... satisfies all verification criteria", and FR-03 is "VERIFIED". The STD has 2 failed test cases (DEF-01, DEF-02), 1 partial and 23 not run; teacher agreement is a Round 2 measure.
+- **Defect log:** INC-01 to INC-07 reuse the STD's IDs for different incidents (STD INC-01 is the silent AM, TUB and YAM; here INC-01 is a ViewModel crash). Use the STD's list.
+- **Card 32 described as done:** the refactoring evidence, the usability report and the README describe "calibrated step pastel tints, grounded horizon baselines". Card 32 is `Status: ready`, and the code still has the 3-stop gradient.
+- **Wrong facts:**
+  - Permissions: no VIBRATE (no haptics since card 17). The manifest has RECORD_AUDIO, plus READ and WRITE_EXTERNAL_STORAGE capped at SDK 32 and 28.
+  - The Vosk model is in `assets/vosk-model`, not `assets/models/vosk-model-small-en-us-0.15`.
+  - No profile is pre-seeded, so "select profile 'Zendrix'" fails on a fresh install.
+  - Parent Zone is the "Parent Zone" button at the top right of Profile Select, not a top-left padlock.
+  - The app has 26 letters in 7 chapters, chapter 1 is m, s, a, i, and Ñ and NG are excluded (SRS §1.2). It does not have 28 phonemes, and the README's chapter table (M, S, A, I, O; NG; Ñ) matches neither.
+  - `MapScreenTest`, `ArithmeticGateTest` and `PdfExporterTest` do not exist.
+  - There are 11 repositories, not 9.
+  - APK H is 108 MB and a debug build, not "production-grade, signed".
+  - 433 tests means 427 passed and 6 skipped, not "433/433 green".
+  - "21 Roborazzi captures" disagrees with the STD's 84 layout runs.
+- **Fix:** build these reports from the STD's tables and evidence (as `build_std.py` does), and mark what was not measured "Not measured; Round 2". Invented numbers in a signed submission are an integrity risk, and the clashes with the STD are easy for a grader to spot.
+
+**4. Card 32: the direction is right; the card cannot be implemented as written.**
+
+What holds up: one calm tint per step, pictures on white cards, a ground line, map props as landmarks, and no #D63031 in the PDF.
+- **Colours disagree with `Color.kt`:** `Sky` is #EEF5FF (card: #CBE7FF), `Sand` #FFFBF0 (#FDE4BE), `SoftSky` is `Sky` (#E6F4FE), `CanvasLight` #F7FAFC and `CanvasSoft` #EEF5FF (#F8FAFC, #F1F5F9), `DestructiveRed` #E53935 (#FF4757 is `CoralBerry`), and there is no `DeepNavy` (#1E293B is `ModernBorder`).
+- **The PDF palette makes the report harder to read.** `PdfExporter.kt:143-149` draws the status as 9.5 pt text. Against white, EmeraldLeaf is 2.2:1, SunnyGold 1.7:1 and ApricotGlow 2.0:1, worse than today's 2.5:1 and 2.9:1. The design system (§2, §5.1, §6) asks for 4.5:1 text (7:1 preferred on the Parent Dashboard), never colour alone, and red only in destructive dialogs. "At-risk in DestructiveRed" is still red. Suggestion: dark text (TextMidnight, 16:1) on a light chip (EmeraldLeafLight, SunnyGoldLight, ApricotGlowLight), keeping the words Mastered, Developing and At-Risk. For the banner pick one: PrimaryJoy under white text (4.9:1) or ModernBorder (14.6:1).
+- **Card edges:** a white card on the tints is 1.08:1 to 1.15:1, so the outline does the figure-ground work. AAA is a text criterion; write the target as WCAG 1.4.11 (3:1 at the card's edge). `ModernBorder` gives about 13:1; `ModernBorderSoft` only 1.3:1.
+- **Map props:** `map/components/MapTerrainProps.kt` already places 14 of the 16 props (not eraser_shrub or ruler_ramp), but nothing calls it. The card should wire it in and list the file. Two changes are needed there: drop the endless sway (card 17's calm-motion rule), and set `contentDescription = null`, or TalkBack reads "Map Prop PALM_TREE" for every prop.
+- **One stage in one place:** `LessonScaffold` has no background; each screen paints its own (`HearItScreen.kt:161`, `SayItScreen.kt:188`, `FindItScreen.kt:80`, `BlendItScreen.kt:104`). A `stage` parameter on `LessonScaffold` (tint and ground) means one line per screen and one test.
+- **Viewports:** the card's four sizes are not the ones `LayoutMatrixTest` uses (`Devices`: 360x640, 360x740, 411x891, 800x1280). Use those.
+- **Tests:** `PdfExporterTest` does not exist, and drawing a `PdfDocument` under Robolectric is unreliable. Put the PDF colours in a small palette object and test that, or add a source scan like `ZeroEmojiPolicyTest` that bans #D63031 and #4C68D7. "Strict print parity" needs a concrete check or should go.
+- **Splash (§2.C)** was done by card 31a and has no target file: mark it "no change".
+- **Card format (runbook):** there is no Commit section, no test per change and no implementer. Twelve files across every screen plus the PDF is too much for one card. Suggested split: 32a PDF palette (small; fixes a real violation), 32b lesson stages through `LessonScaffold`, 32c map props, 32d profile and name screens.
+- **Design tokens:** the four tints are new tokens. Add them to `03_DESIGN_SYSTEM_SUMMARY.md` §2 in the same card (AGENTS.md non-negotiable).
+- **Timing:** none of this is in APK H, so for the midterm the documents must call it planned.
+
+**5. Documentation sync: the core documents are fine.**
+- The SDD, SRS, SPMP and STD sources have not changed since APK H. `7c4bdbe` changed only the covers (the logo, and the STD cover's author line); the rest of the text is identical.
+- No "WSL" in any of the 7 PDFs or their sources.
+- The image release manifests have 141 entries, as stated. The assets also hold 50 older pictures from before the image gate.
+- Unit tests at `722d3d3`: 433 run, 0 failed, 6 skipped.
+- One regression: the `7c4bdbe` render shrank every figure (SDD p. 21 from 4729 to 1799 px wide; the SRS use case diagram from 2026x3412 to 700x1179 px). It was rendered without pymupdf. Render again with pymupdf installed to restore full resolution.
+- Decide which APK goes to Drive. The core documents and the deployment guide's checksum describe APK H, which has none of the 90 new pictures. A build from the current HEAD has the wrong pictures (item 1).
+
+**6. Smaller items**
+- **AI disclosure (README):** it names Claude as reviewer, test generator and documentation assistant, and Gemini and Argon 4 for images. It leaves out that agy wrote most of the app code from the cards, and that the voices are synthetic (Kokoro, Chatterbox, ElevenLabs). `7c4bdbe` also took "with Claude (AI assistant)" off the STD cover. The wording is the team's call, but under CIT-U's integrity rules the disclosure should name each tool and what it produced.
+- **ElevenLabs credit:** the public repo holds the Free-plan clips, so its README needs the "elevenlabs.io" credit and the non-commercial note.
+- **README statistic:** "over 80% of Filipino Grade 1 learners struggle ..." needs a source or should go.
+
+**Suggested order:** (1) a fix card for the ten pictures; (2) fix the script and push the clean repo again; (3) rebuild the QA PDFs from the STD, and render the four documents again with full-resolution figures; then submit with APK H, or with a new APK built after (1). Card 32 waits until after the midterm, split as above.
