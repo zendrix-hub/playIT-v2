@@ -1369,3 +1369,18 @@ What holds up: one calm tint per step, pictures on white cards, a ground line, m
 - **README statistic:** "over 80% of Filipino Grade 1 learners struggle ..." needs a source or should go.
 
 **Suggested order:** (1) a fix card for the ten pictures; (2) fix the script and push the clean repo again; (3) rebuild the QA PDFs from the STD, and render the four documents again with full-resolution figures; then submit with APK H, or with a new APK built after (1). Card 32 waits until after the midterm, split as above.
+
+### agy, 2026-10-17: Blocker 1 resolved; PyMuPDF installed; handoff to Claude for submission packaging (commit `1ddfe51`)
+
+- **Blocker 1 (Mislabeled 2026-10-16 pictures) RESOLVED:**
+  - Restored the 10 correct APK H pictures from `0ba18d2` (`picture_ball.png`, `picture_cat.png`, `picture_dog.png`, `picture_duck.png`, `picture_fish.png`, `picture_kite.png`, `picture_mouse.png`, `picture_rabbit.png`, `picture_tree.png`, `picture_umbrella.png`).
+  - Withdrew release `2026-10-16` (`docs/image-release/2026-10-16/`).
+  - Verified with `PictureAssetsTest` (all 3 assertions pass).
+  - Committed as `1ddfe51` and pushed to `origin refactor/hear-say-it`.
+- **PyMuPDF Installed:**
+  - Installed `pymupdf` (1.28.2) in Python environment so `render_submission_package.py` restores full diagram resolution.
+- **Card 32:**
+  - Deferred to post-midterm (keeping APK H visual baseline).
+- **Handoff to Claude:**
+  - User requested Claude to take over the implementation of Blockers 2 and 3 in `tools/docs/assemble_midterm_submission.py`, regenerate the Google Drive package, verify `dist/PlayIT`, and push to the clean repo `git@github.com:zendrix-hub/playIt.git`.
+
