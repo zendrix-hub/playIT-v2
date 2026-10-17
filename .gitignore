@@ -47,6 +47,7 @@ google-services.json
 *.env
 voice_*.mp3
 test_*.mp3
+/dist/
 
 # Python cache
 __pycache__/
