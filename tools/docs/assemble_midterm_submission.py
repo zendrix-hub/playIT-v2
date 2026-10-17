@@ -2,736 +2,1093 @@
 """
 assemble_midterm_submission.py
 
-Automates the complete packaging of the IT411 Capstone Midterm Submission:
-1. Creates the Google Drive Master Directory structure:
-   - 01_Software_and_Deployment/
-   - 02_Updated_Documentation/
-   - 03_Testing_and_QA/
-2. Generates standalone academic PDF reports for all required submission items:
-   - DEPLOYED_SYSTEM_AND_ACCESS_INSTRUCTIONS.pdf
-   - CODE_REFACTORING_EVIDENCE.pdf
-   - FEATURE_COMPLETION_MATRIX.pdf
-   - PERFORMANCE_TESTING_REPORT.pdf
-   - USABILITY_TESTING_AND_IMPROVEMENTS_REPORT.pdf
-   - DEFECT_LOG_AND_RETEST_RECORD.pdf
-   - ACCEPTANCE_TESTING_AND_SIGNOFF_REPORT.pdf
-3. Stages the clean, publication-grade academic repository: `dist/PlayIT/`
-   - Excludes internal relay tasks, scratchpads, and agent configurations.
-   - Purges any historical mentions of "WSL".
-   - Creates a faculty-ready visual README.md with embedded screenshots.
-   - Prepares Git initialization for the new 'PlayIT' repository.
+Builds the IT411 midterm package from the project's own records, so the reports say what the STD says.
+
+1. dist/PlayIT_IT411_Midterm_Submission/ (the Google Drive folder)
+   01_Software_and_Deployment/  APK H, deployment guide, refactoring evidence, feature matrix, APK inspection
+   02_Updated_Documentation/    the rendered SRS, SDD, SPMP, STD and MVP form from docs/submission/
+   03_Testing_and_QA/           performance, usability, defect and acceptance reports, raw JUnit logs
+2. dist/PlayIT/ (the public academic repository, github.com/zendrix-hub/playIt)
+   The tracked files that the build and the tests need, the image and audio release manifests,
+   README.md and its screenshots. An existing dist/PlayIT/.git is kept, so the result can be
+   committed on top of the published history.
+
+Sources: docs/STD_v1.0.md (sections 3, 4, 5.1, 5.5, 7 and 8), its evidence in docs/std/evidence/,
+the MVP Validation Findings form, the seeded curriculum in DatabaseModule.kt, the release manifests
+and git. The script stops if the APK's checksum or the JUnit totals disagree with the STD. Anything
+the STD lists as not run is reported as not measured, never as a result.
+
+Usage (from the repo root; Python 3 with reportlab):
+    gradlew :app:recordRoborazziDebug --tests "com.playit.app.screenshot.*"   # README screenshots
+    python tools/docs/assemble_midterm_submission.py
 """
 
-import os
+import hashlib
+import html
+import json
+import re
 import shutil
 import subprocess
-import hashlib
+import sys
+import urllib.parse
+import xml.etree.ElementTree as ET
+from datetime import date
 from pathlib import Path
-from reportlab.lib.pagesizes import letter
-from reportlab.lib.units import inch
+
 from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image as RLImage, PageBreak, KeepTogether
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_JUSTIFY, TA_RIGHT
+from reportlab.lib.enums import TA_LEFT
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.platypus import Image as RLImage
+from reportlab.platypus import KeepTogether, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 DIST_DIR = REPO_ROOT / "dist"
 SUBMISSION_DIR = DIST_DIR / "PlayIT_IT411_Midterm_Submission"
 CLEAN_REPO_DIR = DIST_DIR / "PlayIT"
 LOGO_PATH = REPO_ROOT / "docs" / "submission" / "logocit-1.png"
+STD_PATH = REPO_ROOT / "docs" / "STD_v1.0.md"
+MVP_FORM_PATH = REPO_ROOT / "docs" / "MVP_Validation_Findings_and_Refactoring_Priorities_Filled.md"
+EVIDENCE_DIR = REPO_ROOT / "docs" / "std" / "evidence" / "2026-10-14-0320385"
+APK_SRC = REPO_ROOT / "playit-debug.apk"
+APK_H_COMMIT = "0320385"
+SEEDS_PATH = REPO_ROOT / "app" / "src" / "main" / "java" / "com" / "playit" / "app" / "di" / "DatabaseModule.kt"
+VERSIONS_PATH = REPO_ROOT / "gradle" / "libs.versions.toml"
+ROBORAZZI_DIR = REPO_ROOT / "app" / "build" / "outputs" / "roborazzi"
+PUBLIC_REPO_URL = "https://github.com/zendrix-hub/playIt"
 
-PRIMARY = colors.HexColor("#1E293B")      # Slate 800
+PROJECT = "PlayIT: An Offline-First Gamified Early Literacy Mobile Application"
+COURSE = "IT411 Capstone & Research 2, Section G7"
+TEAM = "Group 56: Riva, Zendrix (Team Lead); Palis, John James; Miel, Kaysean; Durano, Ashlee Skye; Bien, Erik Samuel"
+ADVISER = "Mr. Joemarie C. Amparo"
+TODAY = date.today()
+PREPARED_ON = f"{TODAY:%B} {TODAY.day}, {TODAY.year}"
+
+PRIMARY = colors.HexColor("#1E293B")      # ModernBorder (slate)
 ACCENT = colors.HexColor("#6C5CE7")       # PrimaryJoy
-TEXT_COLOR = colors.HexColor("#2D3748")   # Deep Charcoal
-MUTED_COLOR = colors.HexColor("#64748B")  # Slate 500
-BORDER_COLOR = colors.HexColor("#CBD5E1") # Slate 300
-ROW_ALT = colors.HexColor("#F8FAFC")      # Slate 50
+TEXT_COLOR = colors.HexColor("#2D3748")
+MUTED_COLOR = colors.HexColor("#475569")
+BORDER_COLOR = colors.HexColor("#CBD5E1")
+ROW_ALT = colors.HexColor("#F8FAFC")
+
+PAGE_W = 7.5  # usable width of a portrait letter page with 0.5 in margins, in inches
+
+# ==============================================================================
+# FONTS AND TEXT
+# ==============================================================================
+
+# The STD uses arrows and comparison signs that Helvetica cannot draw, so a TrueType font is used
+# when one is installed. Characters the font lacks fall back to ASCII.
+FONT_CANDIDATES = [
+    ("C:/Windows/Fonts/arial.ttf", "C:/Windows/Fonts/arialbd.ttf",
+     "C:/Windows/Fonts/ariali.ttf", "C:/Windows/Fonts/arialbi.ttf"),
+    ("/System/Library/Fonts/Supplemental/Arial.ttf", "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
+     "/System/Library/Fonts/Supplemental/Arial Italic.ttf", "/System/Library/Fonts/Supplemental/Arial Bold Italic.ttf"),
+    ("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+     "/usr/share/fonts/truetype/dejavu/DejaVuSans-Oblique.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSans-BoldOblique.ttf"),
+]
+FALLBACK = {0x2192: "->", 0x2265: ">=", 0x2264: "<=", 0x2212: "-", 0x2013: "-", 0x2014: "-", 0x2026: "...",
+            0x2018: "'", 0x2019: "'", 0x201C: '"', 0x201D: '"', 0x00A7: "S", 0x2248: "~"}
+ZERO_WIDTH = chr(0x200B)
+BODY_FONT, BOLD_FONT = "Helvetica", "Helvetica-Bold"
+_font_glyphs = None  # code points the body font can draw; None means Helvetica (WinAnsi)
+
+
+def register_fonts():
+    global BODY_FONT, BOLD_FONT, _font_glyphs
+    for paths in FONT_CANDIDATES:
+        if all(Path(p).exists() for p in paths):
+            names = ["Body", "Body-Bold", "Body-Italic", "Body-BoldItalic"]
+            for name, path in zip(names, paths):
+                pdfmetrics.registerFont(TTFont(name, path))
+            pdfmetrics.registerFontFamily("Body", normal="Body", bold="Body-Bold",
+                                          italic="Body-Italic", boldItalic="Body-BoldItalic")
+            BODY_FONT, BOLD_FONT = "Body", "Body-Bold"
+            _font_glyphs = set(pdfmetrics.getFont("Body").face.charToGlyph)
+            return paths[0]
+    return "Helvetica (built in)"
+
+
+def _can_draw(ch):
+    if ord(ch) < 128:
+        return True
+    if _font_glyphs is not None:
+        return ord(ch) in _font_glyphs
+    try:
+        ch.encode("cp1252")
+        return True
+    except UnicodeEncodeError:
+        return False
+
+
+def drawable(s):
+    s = s.replace(ZERO_WIDTH, "")
+    return "".join(ch if _can_draw(ch) else FALLBACK.get(ord(ch), "?") for ch in s)
+
+
+def plain(s):
+    """Plain text to Paragraph markup."""
+    return drawable(html.escape(s, quote=False))
+
+
+def md(s):
+    """One line of the STD's Markdown (bold, italics, code, <br>, links) to Paragraph markup."""
+    br, code_mark = chr(0), chr(1)
+    s = s.replace(ZERO_WIDTH, "").replace("<br>", br)
+    codes = []
+
+    def stash(m):
+        codes.append(m.group(1))
+        return f"{code_mark}{len(codes) - 1}{code_mark}"
+
+    s = re.sub(r"`([^`]+)`", stash, s)
+    s = html.escape(s, quote=False)
+    s = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", s)
+    s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
+    s = re.sub(r"(?<![\w*])\*([^*\s][^*]*?)\*(?![\w*])", r"<i>\1</i>", s)
+    s = re.sub(code_mark + r"(\d+)" + code_mark,
+               lambda m: '<font name="Courier">' + html.escape(codes[int(m.group(1))], quote=False) + "</font>", s)
+    return drawable(s.replace(br, "<br/>"))
+
+
+# ==============================================================================
+# SOURCES: STD, EVIDENCE, MVP FORM, CURRICULUM, MANIFESTS, GIT
+# ==============================================================================
+
+def heading_level(line):
+    return len(line) - len(line.lstrip("#")) if line.startswith("#") else 0
+
+
+def section_lines(text, heading_prefix):
+    """The lines under the first heading that starts with heading_prefix, up to the next heading of the same or a higher level."""
+    lines = text.splitlines()
+    starts = [i for i, line in enumerate(lines) if line.startswith(heading_prefix)]
+    if not starts:
+        sys.exit(f"Error: heading '{heading_prefix}' not found in {STD_PATH.name}")
+    start = starts[0]
+    level = heading_level(lines[start])
+    end = next((j for j in range(start + 1, len(lines)) if 0 < heading_level(lines[j]) <= level), len(lines))
+    return lines[start + 1:end]
+
+
+def md_tables(lines):
+    """Every Markdown table in lines, as lists of rows (header row first, separator rows dropped)."""
+    tables, rows = [], []
+    for line in lines + [""]:
+        if line.startswith("|"):
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            if not all(re.fullmatch(r":?-+:?", c) for c in cells):
+                rows.append(cells)
+        elif rows:
+            tables.append(rows)
+            rows = []
+    return tables
+
+
+def md_paragraphs(lines):
+    """Prose lines of a section: no tables, headings, figures or code."""
+    out, in_code = [], False
+    for line in lines:
+        if line.startswith("```"):
+            in_code = not in_code
+            continue
+        if in_code or not line.strip() or line.startswith(("|", "#", "![", "---")):
+            continue
+        out.append(line.rstrip())
+    return out
+
+
+def leading_int(cell):
+    m = re.search(r"\d[\d,]*", cell)
+    return int(m.group(0).replace(",", "")) if m else None
+
+
+class Std:
+    def __init__(self):
+        self.text = STD_PATH.read_text(encoding="utf-8")
+        self.traceability = md_tables(section_lines(self.text, "## 3."))[0]
+        self.not_run = md_tables(section_lines(self.text, "### 4.8"))[0]
+        self.execution = {md(r[0]).replace("<b>", "").replace("</b>", ""): r[1]
+                          for r in md_tables(section_lines(self.text, "### 5.1"))[0][1:]}
+        self.device_tests = md_tables(section_lines(self.text, "### 5.5"))[0]
+        self.severity = md_paragraphs(section_lines(self.text, "## 7."))[0]
+        self.incidents = md_tables(section_lines(self.text, "### 7.1"))[0]
+        self.defects = md_tables(section_lines(self.text, "### 7.2"))[0]
+        self.summary_bullets = [l for l in section_lines(self.text, "### 8.1") if l.lstrip().startswith("- ")]
+        self.assessment = md_paragraphs(section_lines(self.text, "### 8.2"))
+        self.tc_status = {}
+        sec4 = section_lines(self.text, "## 4.")
+        cut = next(i for i, line in enumerate(sec4) if line.startswith("### 4.8"))
+        for table in md_tables(sec4[:cut]):
+            for row in table[1:]:
+                self.tc_status[row[0].strip("*")] = row[-1]
+        self.not_run_by_id = {row[0].strip("*"): row for row in self.not_run[1:]}
+
+    def status(self, tc_id):
+        if tc_id not in self.tc_status:
+            sys.exit(f"Error: {tc_id} is not in STD section 4")
+        return self.tc_status[tc_id]
+
+
+def junit_results():
+    """Totals and per-class results of the STD run, read from its raw JUnit XML."""
+    per_class, totals = {}, {"tests": 0, "failed": 0, "skipped": 0, "classes": 0}
+    for xml_path in sorted((EVIDENCE_DIR / "junit").glob("TEST-*.xml")):
+        root = ET.parse(xml_path).getroot()
+        tests, skipped = int(root.get("tests")), int(root.get("skipped"))
+        failed = int(root.get("failures")) + int(root.get("errors"))
+        per_class[root.get("name").rsplit(".", 1)[-1]] = (tests, failed, skipped)
+        totals["tests"] += tests
+        totals["failed"] += failed
+        totals["skipped"] += skipped
+        totals["classes"] += 1
+    totals["passed"] = totals["tests"] - totals["failed"] - totals["skipped"]
+    layout = [v for k, v in per_class.items() if k.startswith("LayoutMatrix")]
+    totals["layout_runs"] = sum(t for t, _, _ in layout)
+    totals["layout_skipped"] = sum(s for _, _, s in layout)
+    totals["layout_passed"] = sum(t - f - s for t, f, s in layout)
+    return totals, per_class
+
+
+def check_junit_against_std(totals, std):
+    expected = {
+        "tests": leading_int(std.execution["Test cases run"]),
+        "passed": leading_int(std.execution["Passed"]),
+        "failed": leading_int(std.execution["Failed or errors"]),
+        "skipped": leading_int(std.execution["Skipped"]),
+        "classes": leading_int(std.execution["Test classes"]),
+    }
+    for key, value in expected.items():
+        if totals[key] != value:
+            sys.exit(f"Error: JUnit logs give {key}={totals[key]}, STD section 5.1 says {value}")
+
+
+def class_result(per_class, name):
+    tests, failed, skipped = per_class[name]
+    return f"{tests - failed - skipped} of {tests} passed" + (f", {skipped} skipped" if skipped else "")
+
+
+def apk_record():
+    """The APK inspection recorded for the STD (TC-SEC-01)."""
+    text = (EVIDENCE_DIR / "apk_inspection.txt").read_text(encoding="utf-8")
+    sha = re.search(r"## sha256sum\s+([0-9a-f]{64})\s+\*?(\S+)", text)
+    size = re.search(r"## size \(bytes\)\s+(\d+)", text)
+    return {"text": text, "sha256": sha.group(1), "name": sha.group(2), "size": int(size.group(1))}
+
+
+def sha256_of(path):
+    digest = hashlib.sha256()
+    with open(path, "rb") as f:
+        for block in iter(lambda: f.read(1 << 20), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def library_version(key):
+    m = re.search(rf'^{key}\s*=\s*"([^"]+)"', VERSIONS_PATH.read_text(encoding="utf-8"), re.M)
+    return m.group(1) if m else "?"
+
+
+def read_curriculum():
+    """Letters, key words, chapters and Blend It words as seeded in DatabaseModule.kt."""
+    src = SEEDS_PATH.read_text(encoding="utf-8")
+    letters = {int(m.group(1)): (m.group(2), m.group(3)) for m in re.finditer(
+        r"VALUES \((\d+), '(\w+)', '[^']*', '[^']*', '(\w+)'\)", src)}
+    groups = [[int(x) for x in g.split(",")] for g in re.findall(r"listOf\(([\d, ]+)\),?\s*// Group \d", src)]
+    words = [(int(g), w) for g, w in re.findall(r'BlendItWord\(\d+, (\d+), "(\w+)"', src)]
+    if len(letters) != 26 or len(groups) != 7 or len(words) != 33:
+        sys.exit(f"Error: curriculum parse found {len(letters)} letters, {len(groups)} chapters, {len(words)} words")
+    chapters = []
+    for number, ids in enumerate(groups, start=1):
+        chapters.append({
+            "number": number,
+            "letters": [letters[i] for i in ids],
+            "words": [w for g, w in words if g == number],
+        })
+    return chapters
+
+
+def release_counts():
+    pictures, generators, release_dates = set(), {}, []
+    for manifest in sorted((REPO_ROOT / "docs" / "image-release").glob("*/manifest.json")):
+        data = json.loads(manifest.read_text(encoding="utf-8"))
+        release_dates.append(manifest.parent.name[:10])
+        for item in data.get("images", []):
+            pictures.add(item["appPath"])
+            tool = item.get("generator", "").split(" (")[0] or "not recorded"
+            generators[tool] = generators.get(tool, 0) + 1
+    clips = 0
+    for manifest in sorted((REPO_ROOT / "docs" / "audio-release").glob("*/manifest.json")):
+        clips += len(json.loads(manifest.read_text(encoding="utf-8")).get("clips", []))
+    return {"pictures": len(pictures), "generators": generators, "clips": clips,
+            "picture_dates": release_dates}
+
+
+def git(*args):
+    # UTF-8, not the locale's code page: some tracked paths are not ASCII (letter_ñ.png).
+    return subprocess.run(["git", "-c", "core.quotepath=false", *args], cwd=REPO_ROOT, capture_output=True,
+                          encoding="utf-8", check=True).stdout
+
+
+def changes_since_apk_h():
+    """Files under app/ that changed after APK H, split into PNG pictures and everything else."""
+    names = [n for n in git("diff", "--name-only", APK_H_COMMIT, "HEAD", "--", "app/").splitlines() if n]
+    pictures = [n for n in names if n.endswith(".png")]
+    return pictures, [n for n in names if not n.endswith(".png")]
+
+
+def count_domain_android_imports():
+    domain = REPO_ROOT / "app" / "src" / "main" / "java" / "com" / "playit" / "app" / "domain"
+    return sum(f.read_text(encoding="utf-8").count("\nimport android.") for f in domain.rglob("*.kt"))
+
+
+def count_repositories():
+    repo_dir = REPO_ROOT / "app" / "src" / "main" / "java" / "com" / "playit" / "app" / "domain" / "repository"
+    return sum(1 for f in repo_dir.glob("*.kt") if re.search(r"^interface \w+Repository\b", f.read_text(encoding="utf-8"), re.M))
+
+
+# Card commits that changed the app between the MVP and APK H (docs/evidence-log.md). The subject
+# and date are read from git, so the table shows what each commit says about itself.
+CARD_COMMITS = [
+    ("01", "930e9ed"), ("02", "cf235dc"), ("03", "467d52c"), ("04", "68887ab"), ("05", "85a6ca2"),
+    ("06", "4deb625"), ("07", "18f7fb8"), ("07b", "a17969d"), ("11", "0d9ad3a"), ("12", "ef03bea"),
+    ("10", "b8e859d"), ("14", "56907fd"), ("17", "082caf4"), ("13", "b909329"), ("18", "5489293"),
+    ("19", "dc6098e"), ("03b", "339f309"), ("20", "9bb8cb7"), ("22", "3be745b"), ("21", "9bac8ca"),
+    ("23", "dd42582"), ("15", "299cea2"), ("24", "20efb22"), ("28", "ac8e8c7"), ("28b", "ed997b6"),
+    ("28c", "0573906"), ("28d", "e7f870e"), ("15b", "b99d839"), ("09c", "0dfc4a2"), ("29b", "89604d7"),
+    ("31e", "1420c84"), ("31d", "cdbbef9"), ("31a", "8f49279"), ("31f", "0320385"),
+]
+
+
+def card_commit_rows():
+    rows = []
+    for card, sha in CARD_COMMITS:
+        out = git("log", "-1", "--date=short", "--format=%h%x09%ad%x09%s", sha).strip()
+        short, day, subject = out.split("\t", 2)
+        rows.append((day, card, short, subject))
+    return sorted(rows)
+
+
+# ==============================================================================
+# PDF BUILDING BLOCKS
+# ==============================================================================
 
 def get_pdf_styles():
-    styles = getSampleStyleSheet()
-    title_style = ParagraphStyle(
-        'DocTitle',
-        parent=styles['Heading1'],
-        fontName='Helvetica-Bold',
-        fontSize=18,
-        leading=22,
-        textColor=PRIMARY,
-        alignment=TA_LEFT,
-        spaceAfter=6
-    )
-    subtitle_style = ParagraphStyle(
-        'DocSubtitle',
-        parent=styles['Normal'],
-        fontName='Helvetica',
-        fontSize=10.5,
-        leading=14,
-        textColor=MUTED_COLOR,
-        alignment=TA_LEFT,
-        spaceAfter=12
-    )
-    h2_style = ParagraphStyle(
-        'SectionH2',
-        parent=styles['Heading2'],
-        fontName='Helvetica-Bold',
-        fontSize=13,
-        leading=16,
-        textColor=PRIMARY,
-        spaceBefore=12,
-        spaceAfter=6
-    )
-    h3_style = ParagraphStyle(
-        'SectionH3',
-        parent=styles['Heading3'],
-        fontName='Helvetica-Bold',
-        fontSize=11,
-        leading=14,
-        textColor=ACCENT,
-        spaceBefore=8,
-        spaceAfter=4
-    )
-    body_style = ParagraphStyle(
-        'BodyDark',
-        parent=styles['Normal'],
-        fontName='Helvetica',
-        fontSize=9.5,
-        leading=13.5,
-        textColor=TEXT_COLOR,
-        spaceAfter=6
-    )
-    body_bold = ParagraphStyle(
-        'BodyBold',
-        parent=body_style,
-        fontName='Helvetica-Bold'
-    )
-    th_style = ParagraphStyle(
-        'TableHeader',
-        fontName='Helvetica-Bold',
-        fontSize=8.5,
-        leading=11,
-        textColor=colors.white,
-        alignment=TA_LEFT
-    )
-    td_style = ParagraphStyle(
-        'TableCell',
-        fontName='Helvetica',
-        fontSize=8,
-        leading=10.5,
-        textColor=TEXT_COLOR,
-        alignment=TA_LEFT
-    )
-    td_bold = ParagraphStyle(
-        'TableCellBold',
-        parent=td_style,
-        fontName='Helvetica-Bold'
-    )
-    meta_label = ParagraphStyle(
-        'MetaLabel',
-        fontName='Helvetica-Bold',
-        fontSize=8.5,
-        leading=11,
-        textColor=PRIMARY
-    )
-    meta_val = ParagraphStyle(
-        'MetaVal',
-        fontName='Helvetica',
-        fontSize=8.5,
-        leading=11,
-        textColor=TEXT_COLOR
-    )
     return {
-        'title': title_style,
-        'subtitle': subtitle_style,
-        'h2': h2_style,
-        'h3': h3_style,
-        'body': body_style,
-        'bold': body_bold,
-        'th': th_style,
-        'td': td_style,
-        'td_bold': td_bold,
-        'meta_label': meta_label,
-        'meta_val': meta_val
+        "title": ParagraphStyle("DocTitle", fontName=BOLD_FONT, fontSize=17, leading=21, textColor=PRIMARY,
+                                alignment=TA_LEFT, spaceAfter=4),
+        "subtitle": ParagraphStyle("DocSubtitle", fontName=BODY_FONT, fontSize=10, leading=13,
+                                   textColor=MUTED_COLOR, spaceAfter=8),
+        "h2": ParagraphStyle("SectionH2", fontName=BOLD_FONT, fontSize=12.5, leading=16, textColor=PRIMARY,
+                             spaceBefore=10, spaceAfter=5),
+        "h3": ParagraphStyle("SectionH3", fontName=BOLD_FONT, fontSize=10.5, leading=13, textColor=PRIMARY,
+                             spaceBefore=6, spaceAfter=3),
+        "body": ParagraphStyle("BodyDark", fontName=BODY_FONT, fontSize=9.5, leading=13.5, textColor=TEXT_COLOR,
+                               spaceAfter=5),
+        "bullet": ParagraphStyle("Bullet", fontName=BODY_FONT, fontSize=9.5, leading=13.5, textColor=TEXT_COLOR,
+                                 leftIndent=14, bulletIndent=4, spaceAfter=2),
+        "bullet2": ParagraphStyle("Bullet2", fontName=BODY_FONT, fontSize=9.5, leading=13.5, textColor=TEXT_COLOR,
+                                  leftIndent=28, bulletIndent=18, spaceAfter=2),
+        "th": ParagraphStyle("TableHeader", fontName=BOLD_FONT, fontSize=8.5, leading=11, textColor=colors.white),
+        "td": ParagraphStyle("TableCell", fontName=BODY_FONT, fontSize=8, leading=10.5, textColor=TEXT_COLOR),
+        "meta_label": ParagraphStyle("MetaLabel", fontName=BOLD_FONT, fontSize=8.5, leading=11, textColor=PRIMARY),
+        "meta_val": ParagraphStyle("MetaVal", fontName=BODY_FONT, fontSize=8.5, leading=11, textColor=TEXT_COLOR),
+        "sign": ParagraphStyle("Sign", fontName=BODY_FONT, fontSize=9.5, leading=14, textColor=TEXT_COLOR),
     }
+
 
 def add_header_banner(story, title, subtitle):
     styles = get_pdf_styles()
-    header_data = []
+    title_flow = [
+        Paragraph(plain("CEBU INSTITUTE OF TECHNOLOGY - UNIVERSITY"),
+                  ParagraphStyle("Inst", fontName=BOLD_FONT, fontSize=10, leading=12, textColor=PRIMARY)),
+        Paragraph(plain("College of Computer Studies, IT411 Capstone & Research 2"),
+                  ParagraphStyle("Dept", fontName=BODY_FONT, fontSize=8.5, leading=11, textColor=MUTED_COLOR)),
+        Spacer(1, 4),
+        Paragraph(plain(title), styles["title"]),
+        Paragraph(plain(subtitle), styles["subtitle"]),
+    ]
     if LOGO_PATH.exists():
-        logo_img = RLImage(str(LOGO_PATH), width=1.1 * inch, height=1.1 * inch * (724 / 1024))
-        title_flow = [
-            Paragraph("CEBU INSTITUTE OF TECHNOLOGY – UNIVERSITY", ParagraphStyle('Inst', fontName='Helvetica-Bold', fontSize=10, leading=12, textColor=PRIMARY)),
-            Paragraph("College of Computer Studies • IT411 Capstone & Research 2", ParagraphStyle('Dept', fontName='Helvetica', fontSize=8.5, leading=11, textColor=MUTED_COLOR)),
-            Spacer(1, 4),
-            Paragraph(title, styles['title']),
-            Paragraph(subtitle, styles['subtitle']),
-        ]
-        t = Table([[logo_img, title_flow]], colWidths=[1.3 * inch, 5.7 * inch])
+        logo = RLImage(str(LOGO_PATH), width=1.1 * inch, height=1.1 * inch * (724 / 1024))
+        t = Table([[logo, title_flow]], colWidths=[1.3 * inch, (PAGE_W - 1.3) * inch])
         t.setStyle(TableStyle([
-            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-            ('BOTTOMPADDING', (0,0), (-1,-1), 0),
-            ('TOPPADDING', (0,0), (-1,-1), 0),
-            ('LEFTPADDING', (0,0), (-1,-1), 0),
-            ('RIGHTPADDING', (0,0), (-1,-1), 0),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("LEFTPADDING", (0, 0), (-1, -1), 0), ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+            ("TOPPADDING", (0, 0), (-1, -1), 0), ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
         ]))
         story.append(t)
     else:
-        story.append(Paragraph(title, styles['title']))
-        story.append(Paragraph(subtitle, styles['subtitle']))
-    story.append(Spacer(1, 10))
+        story.extend(title_flow)
+    story.append(Spacer(1, 8))
+
 
 def add_meta_box(story, rows):
     styles = get_pdf_styles()
-    data = [[Paragraph(k, styles['meta_label']), Paragraph(v, styles['meta_val'])] for k, v in rows]
-    t = Table(data, colWidths=[2.0 * inch, 5.0 * inch])
+    data = [[Paragraph(plain(k), styles["meta_label"]), Paragraph(v, styles["meta_val"])] for k, v in rows]
+    t = Table(data, colWidths=[1.6 * inch, (PAGE_W - 1.6) * inch])
     t.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,-1), ROW_ALT),
-        ('BOX', (0,0), (-1,-1), 1, BORDER_COLOR),
-        ('INNERGRID', (0,0), (-1,-1), 0.5, BORDER_COLOR),
-        ('TOPPADDING', (0,0), (-1,-1), 4),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
-        ('LEFTPADDING', (0,0), (-1,-1), 8),
-        ('RIGHTPADDING', (0,0), (-1,-1), 8),
+        ("BACKGROUND", (0, 0), (-1, -1), ROW_ALT),
+        ("BOX", (0, 0), (-1, -1), 1, BORDER_COLOR),
+        ("INNERGRID", (0, 0), (-1, -1), 0.5, BORDER_COLOR),
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("TOPPADDING", (0, 0), (-1, -1), 4), ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+        ("LEFTPADDING", (0, 0), (-1, -1), 8), ("RIGHTPADDING", (0, 0), (-1, -1), 8),
     ]))
     story.append(t)
-    story.append(Spacer(1, 12))
+    story.append(Spacer(1, 10))
+
+
+def add_table(story, rows, widths):
+    """rows: header first; every cell is Paragraph markup. widths in inches."""
+    styles = get_pdf_styles()
+    data = [[Paragraph(c, styles["th"] if i == 0 else styles["td"]) for c in row] for i, row in enumerate(rows)]
+    t = Table(data, colWidths=[w * inch for w in widths], repeatRows=1)
+    t.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), PRIMARY),
+        ("GRID", (0, 0), (-1, -1), 0.5, BORDER_COLOR),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, ROW_ALT]),
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("TOPPADDING", (0, 0), (-1, -1), 3.5), ("BOTTOMPADDING", (0, 0), (-1, -1), 3.5),
+        ("LEFTPADDING", (0, 0), (-1, -1), 4), ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+    ]))
+    story.append(t)
+    story.append(Spacer(1, 8))
+
+
+def h2(story, text):
+    story.append(Paragraph(plain(text), get_pdf_styles()["h2"]))
+
+
+def h3(story, text):
+    story.append(Paragraph(plain(text), get_pdf_styles()["h3"]))
+
+
+def para(story, markup):
+    story.append(Paragraph(markup, get_pdf_styles()["body"]))
+
+
+def bullets(story, items, level=1):
+    style = get_pdf_styles()["bullet" if level == 1 else "bullet2"]
+    for markup in items:
+        story.append(Paragraph(markup, style, bulletText=chr(0x2022) if _can_draw(chr(0x2022)) else "-"))
+
+
+def build_pdf(path, title, story):
+    def footer(canvas, doc):
+        canvas.saveState()
+        canvas.setFont(BODY_FONT, 7.5)
+        canvas.setFillColor(MUTED_COLOR)
+        canvas.drawString(36, 26, drawable(f"PlayIT, Group 56: {title}"))
+        canvas.drawString(36, 17, drawable(f"Generated {PREPARED_ON} by tools/docs/assemble_midterm_submission.py "
+                                           "from STD v1.0 and the project records."))
+        canvas.drawRightString(letter[0] - 36, 26, f"Page {doc.page}")
+        canvas.restoreState()
+
+    doc = SimpleDocTemplate(str(path), pagesize=letter, leftMargin=36, rightMargin=36, topMargin=36,
+                            bottomMargin=48, title=title, author="PlayIT Capstone Team (Group 56)")
+    doc.build(story, onFirstPage=footer, onLaterPages=footer)
+    print(f"Generated: {path.relative_to(REPO_ROOT)}")
+
+
+def std_cells(row, keep):
+    return [md(row[i]) for i in keep]
+
 
 # ==============================================================================
-# REPORT GENERATORS
+# 01_Software_and_Deployment
 # ==============================================================================
 
-def generate_deployment_guide_pdf(output_path: Path):
-    doc = SimpleDocTemplate(str(output_path), pagesize=letter, leftMargin=36, rightMargin=36, topMargin=36, bottomMargin=36)
+def generate_deployment_guide_pdf(output_path, ctx):
+    apk, std = ctx["apk"], ctx["std"]
     story = []
-    styles = get_pdf_styles()
-
-    add_header_banner(story, "Deployed System & Evaluation Access Instructions", "IT411 Capstone Deliverable 01 — Working Software & Deployment Guide")
+    add_header_banner(story, "Deployed System and Access Instructions",
+                      "Deliverable 01: the working software and how to run it")
     add_meta_box(story, [
-        ("Project Title:", "PlayIT: Offline-First Gamified Early Literacy Mobile Application"),
-        ("Course / Section:", "IT411 Capstone & Research 2 — Section G7"),
-        ("Team Lead & Members:", "Riva, Zendrix (Lead); Palis, John James; Miel, Kaysean; Durano, Ashlee Skye; Bien, Erik Samuel"),
-        ("Adviser:", "Mr. Joemarie C. Amparo"),
-        ("Submission Date:", "October 17, 2026"),
-        ("Target Platform:", "Android 8.0+ (API 26+) — Offline Only (Zero Cloud Dependency)"),
+        ("Project:", plain(PROJECT)),
+        ("Course:", plain(COURSE)),
+        ("Team:", plain(TEAM)),
+        ("Adviser:", plain(ADVISER)),
+        ("Prepared:", plain(PREPARED_ON)),
+        ("Platform:", plain("Android 8.0 or later (minSdk 26, targetSdk 34). Runs fully offline; "
+                            "no account, sign-in or internet connection.")),
     ])
 
-    story.append(Paragraph("1. System Deployment & Live Access Links", styles['h2']))
-    story.append(Paragraph("PlayIT is deployed as a production-grade, signed Android Application Package (APK). Because the application is strictly offline-first (NFR-SEC-01: zero network egress to protect pediatric privacy under RA 10173 and COPPA), evaluation is conducted via direct device installation or Android emulator.", styles['body']))
+    h2(story, "1. What Is Submitted")
+    pictures, other = ctx["changes_since_apk_h"]
+    if other:
+        repo_note = (f"{len(pictures) + len(other)} files under app/ changed after APK H, including code, so a "
+                     "build from the repository is not APK H.")
+    else:
+        dates = [d for d in ctx["releases"]["picture_dates"] if d > "2026-10-14"]
+        repo_note = (f"It also holds {len(pictures)} pictures released after APK H (image releases of "
+                     f"{dates[0]} to {dates[-1]}). No code changed after APK H, so a build from the "
+                     "repository differs from APK H only in those pictures.")
+    add_table(story, [
+        [plain("Item"), plain("Where"), plain("Details")],
+        [plain("App (APK H)"), md(f"`01_Software_and_Deployment/{apk['name']}`"),
+         plain(f"Debug build of commit {APK_H_COMMIT} (branch refactor/hear-say-it), the build tested in "
+               f"STD v1.0. {apk['size']:,} bytes (about {apk['size'] / 1e6:.0f} MB). Signed with the Android "
+               "debug key; it is not a Play Store release.")],
+        [plain("SHA-256 checksum"), md(f"`{apk['sha256']}`"),
+         md("Check the download: `certutil -hashfile <file> SHA256` (Windows) or `sha256sum <file>`.")],
+        [plain("Source code"), md(f"{PUBLIC_REPO_URL} (branch `main`)"),
+         plain("The code of APK H with its tests, documents and release manifests. " + repo_note)],
+        [plain("Documents"), md("`02_Updated_Documentation/`"),
+         plain("SRS v3.0, SDD v2.0, SPMP v2.0, STD v1.0 and the MVP Validation Findings form, in PDF and DOCX.")],
+        [plain("Test records"), md("`03_Testing_and_QA/`"),
+         plain("Performance, usability, defect and acceptance reports, and the raw JUnit logs of the STD run.")],
+    ], [1.25, 2.55, 3.7])
 
-    access_rows = [
-        [Paragraph("Deliverable Link", styles['th']), Paragraph("Access URL / Location", styles['th']), Paragraph("Instructions", styles['th'])],
-        [
-            Paragraph("Live Deployed APK", styles['td_bold']),
-            Paragraph("Google Drive Master Folder:<br/><code>01_Software_and_Deployment/playIT-debug.apk</code>", styles['td']),
-            Paragraph("Direct download & install on Android 8.0+ phone or tablet.", styles['td'])
-        ],
-        [
-            Paragraph("GitHub Repository", styles['td_bold']),
-            Paragraph("<code>https://github.com/zendrix-hub/PlayIT</code>", styles['td']),
-            Paragraph("Official clean academic repository containing all source code and tests.", styles['td'])
-        ],
-        [
-            Paragraph("APK Checksum", styles['td_bold']),
-            Paragraph("SHA-256: <code>d301007f...937d</code> (113 MB)", styles['td']),
-            Paragraph("Verified self-contained binary including Vosk speech model & 141 raster assets.", styles['td'])
-        ]
-    ]
-    t_access = Table(access_rows, colWidths=[1.8 * inch, 3.2 * inch, 2.0 * inch])
-    t_access.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), PRIMARY),
-        ('GRID', (0,0), (-1,-1), 0.5, BORDER_COLOR),
-        ('TOPPADDING', (0,0), (-1,-1), 5),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 5),
-    ]))
-    story.append(t_access)
-    story.append(Spacer(1, 10))
+    h2(story, "2. Installation")
+    h3(story, "Method A: on an Android phone or tablet (recommended)")
+    bullets(story, [
+        plain(f"Copy {apk['name']} to the device (USB cable, Google Drive or Bluetooth)."),
+        plain("Open it from the Files or Downloads app."),
+        plain("If Android asks, allow \"Install unknown apps\" for that app. Android warns because the APK "
+              "does not come from the Play Store."),
+        plain("Tap Install, then open PlayIT."),
+    ])
+    h3(story, "Method B: with ADB")
+    para(story, md(f"With USB debugging on: `adb install -r {apk['name']}`"))
+    h3(story, "Method C: on the Android Emulator")
+    para(story, plain("Drag the APK onto an emulator running Android 8.0 or later. Say It needs a microphone: in "
+                      "the emulator's Extended controls, open Microphone and turn on \"Virtual microphone uses "
+                      "host audio input\"."))
+    para(story, plain("Allow microphone access when Android asks: Say It uses it to hear the child. The "
+                      "recording is judged on the device and never leaves it."))
 
-    story.append(Paragraph("2. Installation Procedures", styles['h2']))
-    story.append(Paragraph("<b>Method A: Direct Android Device Installation (Recommended)</b><br/>"
-                           "1. Transfer <code>playIT-debug.apk</code> to your Android device via USB, Drive, or AirDroid.<br/>"
-                           "2. Open the device Files / Downloads app and tap <code>playIT-debug.apk</code>.<br/>"
-                           "3. If prompted, enable <i>'Install unknown apps'</i> for the file manager.<br/>"
-                           "4. Tap <b>Install</b> and launch <b>PlayIT</b> from the app drawer.", styles['body']))
-
-    story.append(Paragraph("<b>Method B: Android Debug Bridge (ADB Command Line)</b><br/>"
-                           "Connect an Android device with Developer Mode / USB Debugging enabled and run:<br/>"
-                           "<code>adb install -r playIT-debug.apk</code>", styles['body']))
-
-    story.append(Paragraph("3. Demo Walkthrough & Evaluation Credentials", styles['h2']))
-    story.append(Paragraph("• <b>Zero Login / Account Credentials Required</b>: PlayIT enforces complete pediatric data privacy. All learner profiles, lesson progression, and diagnostic logs are stored strictly on-device in SQLite/Room.<br/>"
-                           "• <b>Pre-Seeded Evaluation Profile</b>: Select the pre-configured profile <b>'Zendrix'</b> to immediately access unlocked lesson nodes and historical diagnostic analytics.<br/>"
-                           "• <b>New Profile Creation</b>: Tap <b>'+'</b> on the Profile Select screen to experience the avatar-only onboarding flow (no child typing required per NFR-IND-01).<br/>"
-                           "• <b>Parent Zone Verification Gate</b>: To access the Parent Dashboard, tap the top-left lock icon. Solve the on-screen 2-digit arithmetic problem using the embedded 3x4 keypad (e.g. <i>34 + 28 = 62</i>). This prevents accidental child exits.", styles['body']))
-
-    doc.build(story)
-    print(f"Generated: {output_path}")
-
-def generate_refactoring_evidence_pdf(output_path: Path):
-    doc = SimpleDocTemplate(str(output_path), pagesize=letter, leftMargin=36, rightMargin=36, topMargin=36, bottomMargin=36)
-    story = []
-    styles = get_pdf_styles()
-
-    add_header_banner(story, "Code Refactoring & Architectural Progress Report", "IT411 Capstone Deliverable 01 — Evolution from Initial MVP to Midterm System")
-    add_meta_box(story, [
-        ("Project:", "PlayIT: Offline-First Early Literacy Android App"),
-        ("Focus:", "Architectural Hardening, Pediatric UI Overhaul & Offline Speech Refactoring"),
-        ("Commit Span:", "40+ Architectural Task Cards (Cards 01 through 32)"),
-        ("Test Verification:", "433/433 Automated Unit & Component Tests Green"),
+    h2(story, "3. Walkthrough for Evaluators (no credentials needed)")
+    bullets(story, [
+        plain("Splash: tap Start."),
+        plain("\"Who is playing?\": a new install has no profiles. Tap Add Profile, pick an animal friend and "
+              "tap Let's Play. The child never has to type: the profile takes the animal's name, and a parent "
+              "can change it in the Parent Zone. A device holds up to 6 profiles."),
+        plain("Map: tap the current letter. Chapter 1 teaches m, s, a and i. Each letter runs Hear It, Say It "
+              "and Find It, then Letter Complete with 1 to 3 stars. When every letter of a chapter is done, "
+              "that chapter's Blend It opens."),
+        plain("Say It: tap the microphone and say the key word (\"mouse\" for M). A miss gets a spoken "
+              "correction; the second miss shows the mouth shape beside the microphone; the third says it "
+              "together and moves on. Say It never takes a heart."),
+        plain("Find It: tap the 3 pictures whose names start with the sound. A wrong tap costs 1 of 5 hearts."),
+        plain("Parent Zone: on \"Who is playing?\", tap the Parent Zone button at the top right and answer the "
+              "arithmetic question (a two-digit addition or subtraction). The dashboard shows each letter's "
+              "progress, exports the PDF report, renames or deletes profiles, and shows the voice credit to "
+              "elevenlabs.io."),
     ])
 
-    story.append(Paragraph("1. Executive Summary of Refactoring Progression", styles['h2']))
-    story.append(Paragraph("The PlayIT platform underwent a comprehensive architectural refactoring between the initial MVP validation (September 2026) and the current Midterm Milestone (October 2026). The refactoring directly addressed all 5 MVP validation findings (F-01 to F-05), eradicating structural technical debt, enforcing Clean Architecture boundaries, and elevating pediatric usability to commercial standards (benchmarked against Duolingo ABC and Headspace Kids).", styles['body']))
-
-    refactor_table = [
-        [Paragraph("System Dimension", styles['th']), Paragraph("Initial MVP Architecture (Pre-Refactor)", styles['th']), Paragraph("Refactored Midterm Architecture (Current)", styles['th'])],
-        [
-            Paragraph("Domain Layer Integrity", styles['td_bold']),
-            Paragraph("Leaked <code>android.*</code> imports in business logic; Room entities used directly in presentation layer.", styles['td']),
-            Paragraph("<b>100% Pure Kotlin Domain</b>. Zero Android imports. Distinct Domain Models, Mappers, Repositories, and Calculator managers.", styles['td'])
-        ],
-        [
-            Paragraph("Speech Recognition (ASR)", styles['td_bold']),
-            Paragraph("Unscoped dictionary; accepted letter names ('em') and prefix fragments; high false positive rate.", styles['td']),
-            Paragraph("<b>Phoneme-Foil Scoped Grammar</b>. Distinguishes correct sound from letter names and added vowels ('muh'). Hybrid word-mode echo.", styles['td'])
-        ],
-        [
-            Paragraph("Pediatric Visual Design", styles['td_bold']),
-            Paragraph("Arbitrary 3-color pastel gradients; ungrounded floating cards; accidental red error badges; emojis in text.", styles['td']),
-            Paragraph("<b>Duolingo ABC Pediatric Stages</b>. Calibrated step pastel tints, grounded horizon baselines, white gummy depth cards, <b>Zero-Emoji Policy</b>.", styles['td'])
-        ],
-        [
-            Paragraph("Multi-Screen Adaptability", styles['td_bold']),
-            Paragraph("Fixed dp offsets; layout clipping on compact devices (360x640); cut off Start button on splash.", styles['td']),
-            Paragraph("<b>Adaptive LessonScaffold</b>. Verified across 4 screen sizes (A21s, Compact, Phone, Tablet) via Roborazzi unclipped layout matrix.", styles['td'])
-        ],
-        [
-            Paragraph("Asset Pipeline & Auditing", styles['td_bold']),
-            Paragraph("Placeholder robotic TTS tones; mismatched clipart; irregular transparency halos.", styles['td']),
-            Paragraph("<b>141 Audited Production Assets</b>. Kokoro/ElevenLabs child-paced audio, 90 Argon 4 2D vector illustrations with strict #4A2E18 outlines.", styles['td'])
-        ],
-        [
-            Paragraph("Test Suite & Quality", styles['td_bold']),
-            Paragraph("12 manual test cases; zero automated screenshot tests; brittle ViewModel tests.", styles['td']),
-            Paragraph("<b>433 Automated Tests</b> (JUnit, Robolectric, Roborazzi). 100% pass rate. Automated SHA-256 asset manifest verification.", styles['td'])
-        ],
-    ]
-    t_refactor = Table(refactor_table, colWidths=[1.5 * inch, 2.7 * inch, 2.8 * inch])
-    t_refactor.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), PRIMARY),
-        ('GRID', (0,0), (-1,-1), 0.5, BORDER_COLOR),
-        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, ROW_ALT]),
-        ('TOPPADDING', (0,0), (-1,-1), 4),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
-    ]))
-    story.append(t_refactor)
-    story.append(Spacer(1, 10))
-
-    story.append(Paragraph("2. Refactoring Commit Chronicle (Highlights)", styles['h2']))
-    story.append(Paragraph("• <code>Card 01-03</code>: Speech judge returns explicit error types (LETTER_NAME, ADDED_VOWEL, UNRELATED); tutor prompt ladder.<br/>"
-                           "• <code>Card 04-07b</code>: Hear It modeling sequence; 10s idle re-prompt; avatar-only onboarding.<br/>"
-                           "• <code>Card 11-15b</code>: Real-result star/heart calculations; decodable CVC word list for Blend It (AM, TUB, YAM, ZIP).<br/>"
-                           "• <code>Card 17-23</code>: Calm motion performance; 4-size layout matrix; zero haptic buzzers; Roborazzi test engine.<br/>"
-                           "• <code>Card 28-31f</code>: Hear It clean focus; live SQL star summation; non-pre-solved tile dealing; Headspace splash.<br/>"
-                           "• <code>Card 32</code>: Holistic background UI/UX realignment to Duolingo ABC stages and clinical PDF diagnostic refresh.", styles['body']))
-
-    doc.build(story)
-    print(f"Generated: {output_path}")
-
-def generate_feature_completion_matrix_pdf(output_path: Path):
-    doc = SimpleDocTemplate(str(output_path), pagesize=letter, leftMargin=36, rightMargin=36, topMargin=36, bottomMargin=36)
-    story = []
-    styles = get_pdf_styles()
-
-    add_header_banner(story, "Feature Completion Matrix & System Status", "IT411 Capstone Deliverable 01 — Functional Scope vs. Known Limitations")
-    add_meta_box(story, [
-        ("Project Title:", "PlayIT: Offline-First Early Literacy Android Application"),
-        ("Pedagogical Baseline:", "Marungko Approach (28 Phonemes / 7 Progression Chapters)"),
-        ("System Milestone:", "Midterm Working Software & Test Complete (Ready for Round 2 Field Validation)"),
+    h2(story, "4. Offline Operation and Privacy")
+    vosk = library_version("vosk")
+    bullets(story, [
+        md("No `android.permission.INTERNET`: the app cannot send or receive data (`aapt dump permissions`, "
+           "TC-SEC-01). It requests `RECORD_AUDIO`, plus legacy storage permissions capped at Android 12L "
+           "(SDK 32) and Android 9 (SDK 28). The full output is in `DEPLOYMENT_AND_PERMISSIONS_INSPECTION.txt`."),
+        md("Learner profiles and progress stay in a Room (SQLite) database on the device; Android backup of "
+           "the database is disabled (TC-SEC-02)."),
+        md(f"Speech recognition: Vosk (vosk-android {vosk}) with its small US English model, bundled in the "
+           "APK at `assets/vosk-model`. Nothing is downloaded after installation."),
     ])
 
-    story.append(Paragraph("1. Feature Completion Status by Functional Module", styles['h2']))
+    h2(story, "5. Known Limitations of APK H")
+    para(story, plain("From STD v1.0, sections 4.8 and 7.2:"))
+    defects = {row[0].strip("*"): row for row in std.defects[1:]}
+    bullets(story, [
+        md(f"**DEF-01** ({defects['DEF-01'][3]}): Find It distractors are drawn from every letter, not only "
+           "from letters already mastered (FR-04)."),
+        md(f"**DEF-02** ({defects['DEF-02'][3]}): stars follow hearts lost only; the SRS's accuracy term is "
+           "not applied (FR-06). Team and adviser decision pending."),
+        plain("Sounds: m, s and i are re-made pure sounds; a and the letters of Chapters 2 to 7 still play the "
+              "MVP clips. The teacher audit of the sounds (Gate 3) has not yet been held."),
+        plain("Not in APK H (planned in SDD v2.0 section 2.0): the telemetry log and CSV export, spaced recall, "
+              "session pacing and the voice-driven microphone ripple."),
+    ])
+    build_pdf(output_path, "Deployed System and Access Instructions", story)
 
-    features = [
-        [Paragraph("Module / Requirement", styles['th']), Paragraph("Feature Description", styles['th']), Paragraph("Status", styles['th']), Paragraph("Verification Evidence", styles['th'])],
-        [
-            Paragraph("Module 1: World Map<br/><code>FR-01</code>", styles['td_bold']),
-            Paragraph("Procedural Bohol Chocolate Hills trail, bilingual chapter banners, active aura pulse, lock shake, companion Lily positioning.", styles['td']),
-            Paragraph("<font color='#00C853'><b>Complete</b></font>", styles['td']),
-            Paragraph("MapScreenTest, MapLayoutTest, MapTapRulesTest", styles['td'])
-        ],
-        [
-            Paragraph("Module 2: Hear It<br/><code>FR-02</code>", styles['td_bold']),
-            Paragraph("I-do auditory modeling sequence (phoneme sound -> keyword picture -> carrier phrase), replay counter, centered play button.", styles['td']),
-            Paragraph("<font color='#00C853'><b>Complete</b></font>", styles['td']),
-            Paragraph("HearItViewModelTest, HearItScreenFocusTest", styles['td'])
-        ],
-        [
-            Paragraph("Module 3: Say It<br/><code>FR-03</code>", styles['td_bold']),
-            Paragraph("Edge Vosk speech production judge, prompt ladder feedback, mouth articulation cue on 2nd miss, amplitude reactive Lily bounce.", styles['td']),
-            Paragraph("<font color='#00C853'><b>Complete</b></font>", styles['td']),
-            Paragraph("SpeechValidatorTest, SayItViewModelTest, MicStatusTest", styles['td'])
-        ],
-        [
-            Paragraph("Module 4: Find It<br/><code>FR-04, FR-05</code>", styles['td_bold']),
-            Paragraph("5-card sound discrimination grid, gentle correction highlight (no red), heart-loss feedback, 64dp minimum tap targets.", styles['td']),
-            Paragraph("<font color='#00C853'><b>Complete</b></font>", styles['td']),
-            Paragraph("FindItViewModelTest, GridGeneratorTest", styles['td'])
-        ],
-        [
-            Paragraph("Module 5: Blend It<br/><code>FR-13</code>", styles['td_bold']),
-            Paragraph("Phoneme synthesis sound-out engine (slot 1->2->3 highlights), decodable CVC word bank, non-pre-solved tile shuffling.", styles['td']),
-            Paragraph("<font color='#00C853'><b>Complete</b></font>", styles['td']),
-            Paragraph("BlendItViewModelTest, BlendItTileDealTest", styles['td'])
-        ],
-        [
-            Paragraph("Module 6: Parent Portal<br/><code>FR-11, FR-12</code>", styles['td_bold']),
-            Paragraph("2-digit arithmetic security gate, 28-phoneme accuracy heatmap, letter performance table, offline PDF report generation.", styles['td']),
-            Paragraph("<font color='#00C853'><b>Complete</b></font>", styles['td']),
-            Paragraph("ParentDashboardViewModelTest, ArithmeticGateTest", styles['td'])
-        ],
-        [
-            Paragraph("Data Privacy & Storage<br/><code>FR-14, NFR-SEC-01</code>", styles['td_bold']),
-            Paragraph("100% on-device SQLite/Room persistence, zero INTERNET permission, multi-child profile isolation (up to 6 profiles).", styles['td']),
-            Paragraph("<font color='#00C853'><b>Complete</b></font>", styles['td']),
-            Paragraph("ManifestPrivacyTest, ProfileDaoStarsTest", styles['td'])
-        ],
+
+def write_inspection_txt(output_path, ctx):
+    apk = ctx["apk"]
+    lines = [
+        "PlayIT: APK inspection for the IT411 midterm submission",
+        f"Generated {PREPARED_ON} by tools/docs/assemble_midterm_submission.py",
+        "",
+        f"File in this folder: {apk['name']}",
+        f"SHA-256 of this copy: {apk['copied_sha256']}",
+        f"Matches the checksum recorded in STD v1.0: {'yes' if apk['copied_sha256'] == apk['sha256'] else 'NO'}",
+        f"Size: {apk['size']:,} bytes",
+        "",
+        f"Speech recognition: Vosk (vosk-android {library_version('vosk')}), small US English model,",
+        "  bundled in the APK at assets/vosk-model.",
+        "Haptics: none. The app does not request VIBRATE, and PerformancePolicyTest checks that the code",
+        "  makes no haptic calls (TC-POL-02).",
+        "",
+        "The inspection recorded for STD v1.0 (TC-SEC-01) follows, copied from",
+        f"docs/std/evidence/{EVIDENCE_DIR.name}/apk_inspection.txt:",
+        "-" * 72,
+        apk["text"].rstrip(),
+        "",
     ]
-    t_feat = Table(features, colWidths=[1.6 * inch, 2.7 * inch, 0.9 * inch, 1.8 * inch])
-    t_feat.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), PRIMARY),
-        ('GRID', (0,0), (-1,-1), 0.5, BORDER_COLOR),
-        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, ROW_ALT]),
-        ('TOPPADDING', (0,0), (-1,-1), 4),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
-    ]))
-    story.append(t_feat)
-    story.append(Spacer(1, 10))
+    output_path.write_text("\n".join(lines), encoding="utf-8", newline="\n")
+    print(f"Generated: {output_path.relative_to(REPO_ROOT)}")
 
-    story.append(Paragraph("2. Known Limitations & Post-Midterm Roadmap", styles['h2']))
-    story.append(Paragraph("• <b>Curriculum Freeze (Pending SME Sign-Off)</b>: Letters <code>ñ</code> and <code>ng</code> (4 picture cards: <i>baño, niño, piña, ring</i>) remain intentionally frozen in letter-sound mode pending final reading specialist confirmation.<br/>"
-                           "• <b>Audio Source Certification (Gate 3)</b>: ElevenLabs free-plan clips for AM, TUB, YAM and short /i/ are fully functional and credited in the Parent Zone, with formal teacher audit scheduled prior to final production release.<br/>"
-                           "• <b>Round 2 Field Validation (Weeks 7–8)</b>: Formal deployment in Cebu public school classrooms measuring teacher agreement rate (target $\\ge 80\\%$), false reject rate (target $\\le 15\\%$), and cognitive learnability.", styles['body']))
 
-    doc.build(story)
-    print(f"Generated: {output_path}")
-
-def generate_performance_report_pdf(output_path: Path):
-    doc = SimpleDocTemplate(str(output_path), pagesize=letter, leftMargin=36, rightMargin=36, topMargin=36, bottomMargin=36)
+def generate_refactoring_evidence_pdf(output_path, ctx):
+    std, junit, per_class = ctx["std"], ctx["junit"], ctx["per_class"]
     story = []
-    styles = get_pdf_styles()
-
-    add_header_banner(story, "Performance Testing & Benchmark Report", "IT411 Capstone Deliverable 03 — Empirical Runtime & Workload Profile")
+    add_header_banner(story, "Code Refactoring Evidence",
+                      "Deliverable 01: what changed between the MVP and APK H, and how it was verified")
     add_meta_box(story, [
-        ("Test Environment:", "Samsung Galaxy A21s (Physical Target Device) & Android SDK Emulators"),
-        ("Hardware Profile:", "Samsung Exynos 850 (8x 2.0 GHz Cortex-A55), 3GB RAM, Android 12 (API 31)"),
-        ("Evaluation Standard:", "Android Vitals Best Practices & ISO/IEC 25010 Quality Model"),
+        ("Project:", plain(PROJECT)),
+        ("Baseline:", plain("The MVP build used in the Weeks 1 to 2 validation (Round 1).")),
+        ("Refactored build:", plain(f"Debug APK H, commit {APK_H_COMMIT}, October 14, 2026 "
+                                    "(branch refactor/hear-say-it).")),
+        ("Sources:", plain("MVP Validation Findings form, Section 4 (the MVP approach and the planned change); "
+                           "STD v1.0 (results); git history (commits).")),
     ])
 
-    story.append(Paragraph("1. Executive Summary & Workload Metrics", styles['h2']))
-    story.append(Paragraph("Performance testing was conducted to verify that PlayIT runs reliably on low-cost entry-level hardware commonly available in Philippine public elementary schools and underprivileged households. All tests confirm 0 network egress, sub-second startup, low memory overhead, and smooth 60fps Compose UI transitions.", styles['body']))
+    h2(story, "1. Refactoring Priorities and What APK H Does")
+    para(story, plain("Each priority comes from a Round 1 finding. Status is the STD's result for its test cases; "
+                      "\"Planned\" means the change is specified but not built."))
+    st = std.status
+    rows = [[plain("Priority (requirement)"), plain("MVP approach"), plain("APK H"), plain("Evidence (STD)"),
+             plain("Status")]]
+    rows.append([
+        plain("1. Pure phoneme audio and release gates (FR-02, NFR-AUD-01)"),
+        plain("Letter sounds from Edge-TTS single-letter text, which gave letter names or added vowels "
+              "(\"ma\", \"es\")."),
+        plain("The Hear It sequence keeps sounds apart from key words and carrier lines. /m/, /s/ and /i/ are "
+              "re-made; every clip enters the app only through a release manifest with its SHA-256."),
+        md(f"TC-HI-01 to 05; TC-AUD-03: {st('TC-AUD-03')}"),
+        plain("Partial: a and Chapters 2 to 7 still use MVP clips; the Gate 3 teacher audit is not yet held "
+              "(TC-AUD-02 not run)."),
+    ])
+    rows.append([
+        plain("2. Four-state microphone and prompt ladder (FR-03)"),
+        plain("A static microphone icon with no sign of listening; wrong answers cost hearts."),
+        plain("The microphone shows Idle, Listening, Heard and Result. A miss gets a spoken correction for its "
+              "error type, then a slower re-model with the mouth cue, then saying it together. Say It never "
+              "removes hearts."),
+        md(f"TC-MIC-03: {st('TC-MIC-03')}; TC-SAY-01 to 06"),
+        plain("Done. The ripple that follows the voice's loudness is planned after Round 2 (TC-MIC-02)."),
+    ])
+    rows.append([
+        plain("3. Decodable Blend It words (FR-13)"),
+        plain("Any word whose letters were unlocked could appear, including AIM, BEE, TOY, BOY and ZOO."),
+        plain("All 33 words are decodable with the letters taught; AM, SUM, TUB, YAM and ZIP replace the five in "
+              "the same slots; QUIZ is the one documented exception. Tiles are never dealt already solved."),
+        md(f"TC-BLD-01: {st('TC-BLD-01')}; TC-BLD-02: {st('TC-BLD-02')}"),
+        plain("Done."),
+    ])
+    rows.append([
+        plain("4. On-device telemetry and CSV export (FR-NEW-TEL)"),
+        plain("No interaction log; only overall scores were stored."),
+        plain("Not built. TelemetryLogger, TelemetryEventEntity and the PIN-gated CsvExportManager are planned "
+              "for Room schema v4."),
+        plain("TC-TEL-01, TC-EXP-01 and 02: not run"),
+        plain("Planned; to be re-scheduled before Round 2 (STD section 8.2)."),
+    ])
+    rows.append([
+        plain("5. Sound captions and mouth-shape cues (NFR-ACC-01)"),
+        plain("Sound only; nothing on screen showed the sound or how to make it."),
+        plain("A mouth-shape cue for all 26 letters, shown beside the Say It microphone from the second miss. "
+              "Captions are built but kept out of the child view (team decision, October 10)."),
+        md(f"TC-ACC-01: {st('TC-ACC-01')}; TC-SAY-03: {st('TC-SAY-03')}"),
+        plain("Done; the caption decision awaits the adviser's confirmation."),
+    ])
+    rows.append([
+        plain("6. Adaptive layout and 64 dp touch targets (NFR-ACC-02)"),
+        plain("Fixed heights and 48 dp buttons; on 360x640 dp the main buttons were pushed off screen."),
+        plain("Adaptive PlayItDimens tokens, a shared LessonScaffold and a 64 dp floor on every child-facing "
+              "control, checked on 4 screen sizes."),
+        md(f"TC-ACC-02: {st('TC-ACC-02')}; layout matrix: {junit['layout_runs']} runs, "
+           f"{junit['layout_passed']} passed, {junit['layout_skipped']} skipped by design"),
+        plain("Done."),
+    ])
+    add_table(story, rows, [1.25, 1.35, 2.15, 1.55, 1.2])
 
-    perf_table = [
-        [Paragraph("Metric / Workload", styles['th']), Paragraph("Observed Value", styles['th']), Paragraph("Target Threshold", styles['th']), Paragraph("Evaluation Verdict", styles['th'])],
-        [
-            Paragraph("Cold App Startup Time", styles['td_bold']),
-            Paragraph("<b>720 ms</b> (A21s) / 580 ms (Pixel 7)", styles['td']),
-            Paragraph("&lt; 2,000 ms (Android Vitals)", styles['td']),
-            Paragraph("<font color='#00C853'><b>PASS (Optimal)</b></font>", styles['td'])
-        ],
-        [
-            Paragraph("Vosk Offline ASR Latency", styles['td_bold']),
-            Paragraph("<b>380 ms median</b> (p90: 480 ms)", styles['td']),
-            Paragraph("&lt; 800 ms response window", styles['td']),
-            Paragraph("<font color='#00C853'><b>PASS (Real-Time)</b></font>", styles['td'])
-        ],
-        [
-            Paragraph("Audio Playback Debounce", styles['td_bold']),
-            Paragraph("<b>500 ms active guard</b>", styles['td']),
-            Paragraph("Zero audio overlap / thread lock", styles['td']),
-            Paragraph("<font color='#00C853'><b>PASS (Zero Crash)</b></font>", styles['td'])
-        ],
-        [
-            Paragraph("Peak Native Heap Memory", styles['td_bold']),
-            Paragraph("<b>78.4 MB</b> during active Vosk decode", styles['td']),
-            Paragraph("&lt; 192 MB low-RAM limit", styles['td']),
-            Paragraph("<font color='#00C853'><b>PASS (Low Overhead)</b></font>", styles['td'])
-        ],
-        [
-            Paragraph("UI Frame Rate (Compose M3)", styles['td_bold']),
-            Paragraph("<b>59.4 – 60.0 fps</b> (0 jank frames)", styles['td']),
-            Paragraph("&ge; 55 fps smooth threshold", styles['td']),
-            Paragraph("<font color='#00C853'><b>PASS (Fluid 60fps)</b></font>", styles['td'])
-        ],
-        [
-            Paragraph("Network Egress Throughput", styles['td_bold']),
-            Paragraph("<b>0 bytes / second</b> (0 requests)", styles['td']),
-            Paragraph("Strictly 0 bytes (NFR-SEC-01)", styles['td']),
-            Paragraph("<font color='#00C853'><b>PASS (100% Offline)</b></font>", styles['td'])
-        ],
-        [
-            Paragraph("Storage Footprint", styles['td_bold']),
-            Paragraph("<b>113 MB APK</b> (self-contained)", styles['td']),
-            Paragraph("&lt; 150 MB package budget", styles['td']),
-            Paragraph("<font color='#00C853'><b>PASS (Self-Contained)</b></font>", styles['td'])
-        ],
-    ]
-    t_perf = Table(perf_table, colWidths=[1.8 * inch, 2.3 * inch, 1.7 * inch, 1.2 * inch])
-    t_perf.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), PRIMARY),
-        ('GRID', (0,0), (-1,-1), 0.5, BORDER_COLOR),
-        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, ROW_ALT]),
-        ('TOPPADDING', (0,0), (-1,-1), 4),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
-    ]))
-    story.append(t_perf)
-    story.append(Spacer(1, 10))
-
-    story.append(Paragraph("2. Memory & Offline Security Audit", styles['h2']))
-    story.append(Paragraph("• <b>Zero Permission Leakage</b>: The Android Manifest declares strictly <code>RECORD_AUDIO</code> for on-device acoustic evaluation and <code>VIBRATE</code> for haptic taps. Inspection via <code>aapt dump permissions</code> certifies the complete absence of <code>android.permission.INTERNET</code>.<br/>"
-                           "• <b>Deterministic Asset Decoding</b>: All 141 production raster assets decode synchronously in test environments and stream via optimized bitmap buffers on device, preventing Out-Of-Memory (OOM) faults during rapid letter navigation.", styles['body']))
-
-    doc.build(story)
-    print(f"Generated: {output_path}")
-
-def generate_usability_report_pdf(output_path: Path):
-    doc = SimpleDocTemplate(str(output_path), pagesize=letter, leftMargin=36, rightMargin=36, topMargin=36, bottomMargin=36)
-    story = []
-    styles = get_pdf_styles()
-
-    add_header_banner(story, "Usability Testing & Pediatric Improvements Report", "IT411 Capstone Deliverable 03 — Evidence-Based Iterations from MVP Testing")
-    add_meta_box(story, [
-        ("Pediatric Target Audience:", "Grade 1 Filipino Early Readers (Ages 5–7)"),
-        ("Usability Framework:", "Cognitive Load Theory, Gestalt Psychology & Duolingo ABC Benchmark"),
-        ("Validation Focus:", "Figure-Ground Contrast, Touch Target Floor, Non-Punitive Feedback"),
+    h2(story, "2. Other Changes Made During the Refactoring")
+    bullets(story, [
+        md(f"Stars and hearts follow the child's real results (card 11; STD INC-05). TC-PRG-01: {st('TC-PRG-01')}."),
+        md(f"A re-prompt after 10 s without a touch (NFR-IND-01). TC-IND-01: {st('TC-IND-01')}."),
+        md(f"Avatar-only onboarding: the child never types (NFR-IND-01). TC-PRF-03: {st('TC-PRF-03')}."),
+        md(f"Calm motion: no haptics, portrait only, no endless idle animation (TC-POL-02: {st('TC-POL-02')}); "
+           f"reduced motion is respected (TC-POL-03: {st('TC-POL-03')})."),
+        md(f"No emoji anywhere in the app (TC-POL-01: {st('TC-POL-01')})."),
+        md(f"Pictures enter the app only through image release manifests; every released picture is checked "
+           f"byte for byte (TC-AUD-04: {st('TC-AUD-04')})."),
     ])
 
-    story.append(Paragraph("1. MVP Validation Findings & Applied Solutions", styles['h2']))
-
-    findings = [
-        [Paragraph("MVP Finding", styles['th']), Paragraph("Observed Usability Friction", styles['th']), Paragraph("Engineering & Design Solution Implemented", styles['th'])],
-        [
-            Paragraph("<b>F-01: Voice Recognition Sensitivity</b>", styles['td']),
-            Paragraph("Children uttered full words ('Mouse') or letter names ('em') instead of bare phonemes, causing frustration.", styles['td']),
-            Paragraph("<b>Hybrid Say It Mode</b>: Scoped Vosk grammar, accepting whole-word pronunciation with prompt ladder corrective audio.", styles['td'])
-        ],
-        [
-            Paragraph("<b>F-02: Cognitive Split-Attention</b>", styles['td']),
-            Paragraph("Subtitles in Hear It distracted early pre-readers from the letter shape and keyword illustration.", styles['td']),
-            Paragraph("<b>Clean Visual Focus</b>: Removed captions from child view; reserved mouth articulation cues strictly for Say It expressive help.", styles['td'])
-        ],
-        [
-            Paragraph("<b>F-03: Layout Clipping & Tap Targets</b>", styles['td']),
-            Paragraph("Buttons below 48dp on compact phones caused missed taps and accidental screen exits.", styles['td']),
-            Paragraph("<b>64dp Touch Target Floor</b>: All buttons scaled to $\\ge 64\\text{dp}$; unclipped layout matrix tested across 4 viewports.", styles['td'])
-        ],
-        [
-            Paragraph("<b>F-04: Non-Punitive Feedback</b>", styles['td']),
-            Paragraph("Harsh red alert banners induced performance anxiety and cognitive shutdown in young children.", styles['td']),
-            Paragraph("<b>'No Red' Policy</b>: Replaced red errors with gentle warm apricot/coral (#FF9F43) and positive encouragement chimes.", styles['td'])
-        ],
-        [
-            Paragraph("<b>F-05: Visual Stage Noise</b>", styles['td']),
-            Paragraph("Competing multi-color background gradients camouflaged target cards and caused visual fatigue.", styles['td']),
-            Paragraph("<b>Duolingo ABC Stages</b>: Calibrated functional pastel tints with grounded horizon lines and high-contrast white gummy cards.", styles['td'])
-        ],
-    ]
-    t_find = Table(findings, colWidths=[1.8 * inch, 2.5 * inch, 2.7 * inch])
-    t_find.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), PRIMARY),
-        ('GRID', (0,0), (-1,-1), 0.5, BORDER_COLOR),
-        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, ROW_ALT]),
-        ('TOPPADDING', (0,0), (-1,-1), 4),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
-    ]))
-    story.append(t_find)
-    story.append(Spacer(1, 10))
-
-    story.append(Paragraph("2. Physical Device Testing Summary (Samsung Galaxy A21s)", styles['h2']))
-    story.append(Paragraph("Physical phone trials with Grade 1 age-range learners confirmed:<br/>"
-                           "• <b>Independent Operation</b>: 100% of tested learners completed the 3-sublevel loop without adult prompting after the initial tutorial.<br/>"
-                           "• <b>Mascot Reactivity</b>: Dynamic squashing/bouncing of Lily with child vocal amplitude measurably increased speech attempt confidence.<br/>"
-                           "• <b>Touch Target Accuracy</b>: Zero mis-taps recorded across 120 consecutive interaction cycles.", styles['body']))
-
-    doc.build(story)
-    print(f"Generated: {output_path}")
-
-def generate_defect_log_pdf(output_path: Path):
-    doc = SimpleDocTemplate(str(output_path), pagesize=letter, leftMargin=36, rightMargin=36, topMargin=36, bottomMargin=36)
-    story = []
-    styles = get_pdf_styles()
-
-    add_header_banner(story, "Defect Log & Incident Retest Record", "IT411 Capstone Deliverable 03 — IEEE 829 Software Test Incident Tracking")
-    add_meta_box(story, [
-        ("Test Execution Cycle:", "Refactoring Sprint Cycles 01 through 32"),
-        ("Defect Status:", "7 Closed Incidents / 2 Documented Pedagogical Exceptions"),
-        ("Retest Verdict:", "All Critical, Major, and Minor Blocking Defects Verified Resolved"),
+    h2(story, "3. Architecture Checks")
+    imports = ctx["domain_android_imports"]
+    bullets(story, [
+        md(f"`domain/` is pure Kotlin: {imports} `android.*` imports (counted when this report was generated)."),
+        md(f"{ctx['repositories']} repository interfaces in `domain/repository/`, implemented with Room in "
+           "`data/repository/`."),
+        md(f"Automated suite of the STD run: {junit['tests']} tests in {junit['classes']} classes; "
+           f"{junit['passed']} passed, {junit['failed']} failed, {junit['skipped']} skipped by design "
+           f"(STD section 5.1). `AssetImageTest`: {class_result(per_class, 'AssetImageTest')}."),
     ])
 
-    story.append(Paragraph("1. Closed Defect Log & Retest Verification", styles['h2']))
+    h2(story, "4. Commit Trail (task cards that changed the app)")
+    para(story, plain("Subjects and dates as recorded in git on branch refactor/hear-say-it. The full card-by-card "
+                      "record, with the reviews, is docs/evidence-log.md."))
+    rows = [[plain("Date"), plain("Card"), plain("Commit"), plain("Commit subject")]]
+    for day, card, short, subject in ctx["card_commits"]:
+        rows.append([plain(day), plain(card), md(f"`{short}`"), plain(subject)])
+    add_table(story, rows, [0.8, 0.5, 0.75, 5.45])
+    build_pdf(output_path, "Code Refactoring Evidence", story)
 
-    defects = [
-        [Paragraph("Incident ID", styles['th']), Paragraph("Severity / Description", styles['th']), Paragraph("Root Cause Analysis", styles['th']), Paragraph("Fix & Retest Status", styles['th'])],
-        [
-            Paragraph("<b>INC-01</b><br/>(Card 17b)", styles['td_bold']),
-            Paragraph("<b>Critical</b>: ViewModel init block crashed on uninitialized repository flow.", styles['td']),
-            Paragraph("Property initialization order in Kotlin; flows referenced before dependency injection assigned them.", styles['td']),
-            Paragraph("<font color='#00C853'><b>CLOSED & VERIFIED</b></font><br/>Fixed init order. ViewModelInitOrderTest passing.", styles['td'])
-        ],
-        [
-            Paragraph("<b>INC-02</b><br/>(Card 28d)", styles['td_bold']),
-            Paragraph("<b>Major</b>: Card retained old picture when navigating to next letter.", styles['td']),
-            Paragraph("<code>rememberAssetPainter</code> cached image using static key that did not invalidate on route args change.", styles['td']),
-            Paragraph("<font color='#00C853'><b>CLOSED & VERIFIED</b></font><br/>Keyed by asset path in LaunchedEffect.", styles['td'])
-        ],
-        [
-            Paragraph("<b>INC-03</b><br/>(Card 31e)", styles['td_bold']),
-            Paragraph("<b>Minor</b>: Back button and guidebook icons measured 44-46dp tap targets.", styles['td']),
-            Paragraph("Default IconButton bounds without custom pediatric sizing padding.", styles['td']),
-            Paragraph("<font color='#00C853'><b>CLOSED & VERIFIED</b></font><br/>GummyIconButton enforced at $\\ge 64\\text{dp}$.", styles['td'])
-        ],
-        [
-            Paragraph("<b>INC-04</b><br/>(Card 31f)", styles['td_bold']),
-            Paragraph("<b>Moderate</b>: Blend It occasionally dealt letter tiles already in correct order.", styles['td']),
-            Paragraph("Random shuffle had 1-in-6 probability of reproducing original word string.", styles['td']),
-            Paragraph("<font color='#00C853'><b>CLOSED & VERIFIED</b></font><br/>Looping reshuffle until deal != word.", styles['td'])
-        ],
-        [
-            Paragraph("<b>INC-05</b><br/>(Card 15b)", styles['td_bold']),
-            Paragraph("<b>Major</b>: Audio missing for decodable words AM, TUB, YAM in Chapter 1.", styles['td']),
-            Paragraph("Legacy vocabulary bank lacked decodable CVC recordings for new curriculum words.", styles['td']),
-            Paragraph("<font color='#00C853'><b>CLOSED & VERIFIED</b></font><br/>ElevenLabs child audio released & credited.", styles['td'])
-        ],
-        [
-            Paragraph("<b>INC-06</b><br/>(Card 24b)", styles['td_bold']),
-            Paragraph("<b>Minor</b>: Mouth articulation picture pushed step dots offscreen on A21s.", styles['td']),
-            Paragraph("Row layout lacked fixed spacer bounding beside 88dp play button.", styles['td']),
-            Paragraph("<font color='#00C853'><b>CLOSED & VERIFIED</b></font><br/>72dp bounded slot; HearItScreenFocusTest passing.", styles['td'])
-        ],
-        [
-            Paragraph("<b>INC-07</b><br/>(Card 31a)", styles['td_bold']),
-            Paragraph("<b>Minor</b>: Splash tarsier dome clipped on tall 20:9 aspect ratio screens.", styles['td']),
-            Paragraph("Fixed 420dp height constraint without aspectRatio ceiling scaling.", styles['td']),
-            Paragraph("<font color='#00C853'><b>CLOSED & VERIFIED</b></font><br/>BoxWithConstraints scaling with white Start panel.", styles['td'])
-        ],
-    ]
-    t_def = Table(defects, colWidths=[1.1 * inch, 2.1 * inch, 2.1 * inch, 1.7 * inch])
-    t_def.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), PRIMARY),
-        ('GRID', (0,0), (-1,-1), 0.5, BORDER_COLOR),
-        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, ROW_ALT]),
-        ('TOPPADDING', (0,0), (-1,-1), 3.5),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 3.5),
-    ]))
-    story.append(t_def)
-    story.append(Spacer(1, 10))
 
-    story.append(Paragraph("2. Documented Open Pedagogical Defects", styles['h2']))
-    story.append(Paragraph("• <b>DEF-01 (Find It Distractors)</b>: Distractor cards in the 5-item grid currently pick from all active letters rather than strictly mastered letters. Documented in STD §7.2; fix scheduled for Sprint 4.<br/>"
-                           "• <b>DEF-02 (Star Calculation Weighting)</b>: Star calculation formula is strictly attempt-based; accuracy percentage weighting scheduled for adviser review.", styles['body']))
-
-    doc.build(story)
-    print(f"Generated: {output_path}")
-
-def generate_acceptance_signoff_pdf(output_path: Path):
-    doc = SimpleDocTemplate(str(output_path), pagesize=letter, leftMargin=36, rightMargin=36, topMargin=36, bottomMargin=36)
+def generate_feature_completion_matrix_pdf(output_path, ctx):
+    std, chapters = ctx["std"], ctx["chapters"]
     story = []
-    styles = get_pdf_styles()
-
-    add_header_banner(story, "Requirements Acceptance & Stakeholder Sign-Off", "IT411 Capstone Deliverable 03 — Midterm Quality & Traceability Certification")
+    add_header_banner(story, "Feature Completion Matrix",
+                      "Deliverable 01: each requirement, its feature, and its status on APK H")
+    letters = sum(len(c["letters"]) for c in chapters)
+    words = sum(len(c["words"]) for c in chapters)
     add_meta_box(story, [
-        ("Document Status:", "Midterm Evaluation Certification"),
-        ("Project:", "PlayIT: Offline-First Early Literacy Mobile Application"),
-        ("Adviser:", "Mr. Joemarie C. Amparo"),
-        ("Institution:", "Cebu Institute of Technology – University (College of Computer Studies)"),
+        ("Project:", plain(PROJECT)),
+        ("Build:", plain(f"Debug APK H, commit {APK_H_COMMIT}")),
+        ("Curriculum:", plain(f"{letters} letters in {len(chapters)} chapters (Chapter 1: "
+                              f"{', '.join(l for l, _ in chapters[0]['letters'])}); N with tilde and NG are not "
+                              f"taught (SRS section 1.2). {words} Blend It words.")),
+        ("Source:", plain("STD v1.0 section 3 (requirements, features, test cases and results), copied as "
+                          "written. Status is a short reading of that result.")),
     ])
 
-    story.append(Paragraph("1. Requirements Verification Summary", styles['h2']))
-    story.append(Paragraph("Every functional requirement (FR-01 through FR-14) and non-functional requirement (NFR-AUD-01 through NFR-SEC-01) specified in SRS v3.0 has been systematically tested against the refactored code. The system satisfies all verification criteria required for Midterm deployment.", styles['body']))
+    h2(story, "1. Requirements and Their Status")
 
-    req_summary = [
-        [Paragraph("Requirement ID", styles['th']), Paragraph("Specification Title", styles['th']), Paragraph("Verification Method", styles['th']), Paragraph("Status", styles['th'])],
-        [Paragraph("FR-01", styles['td_bold']), Paragraph("Phonics World Map & Milestone Banners", styles['td']), Paragraph("Robolectric Test + Device Walkthrough", styles['td']), Paragraph("<font color='#00C853'><b>VERIFIED</b></font>", styles['td'])],
-        [Paragraph("FR-02", styles['td_bold']), Paragraph("Hear It Auditory Modeling Sequence", styles['td']), Paragraph("JUnit Unit Test + Audio Check", styles['td']), Paragraph("<font color='#00C853'><b>VERIFIED</b></font>", styles['td'])],
-        [Paragraph("FR-03", styles['td_bold']), Paragraph("Say It Speech Production Evaluation", styles['td']), Paragraph("Vosk Acoustic Model Validation", styles['td']), Paragraph("<font color='#00C853'><b>VERIFIED</b></font>", styles['td'])],
-        [Paragraph("FR-04, FR-05", styles['td_bold']), Paragraph("Find It Discrimination & Visual Feedback", styles['td']), Paragraph("GridGenerator & Layout Matrix", styles['td']), Paragraph("<font color='#00C853'><b>VERIFIED</b></font>", styles['td'])],
-        [Paragraph("FR-11, FR-12", styles['td_bold']), Paragraph("Parent Dashboard & PDF Export", styles['td']), Paragraph("ArithmeticGate & PdfExporter Test", styles['td']), Paragraph("<font color='#00C853'><b>VERIFIED</b></font>", styles['td'])],
-        [Paragraph("FR-13", styles['td_bold']), Paragraph("Blend It Phoneme Blending Engine", styles['td']), Paragraph("BlendItWordSelector & TileDeal Test", styles['td']), Paragraph("<font color='#00C853'><b>VERIFIED</b></font>", styles['td'])],
-        [Paragraph("FR-14, NFR-SEC", styles['td_bold']), Paragraph("Offline-First Privacy & Zero Egress", styles['td']), Paragraph("AAPT Manifest Permissions Inspection", styles['td']), Paragraph("<font color='#00C853'><b>VERIFIED</b></font>", styles['td'])],
-        [Paragraph("NFR-ACC-02", styles['td_bold']), Paragraph("4-Screen Viewport Ergonomics", styles['td']), Paragraph("Roborazzi Layout Matrix (21 captures)", styles['td']), Paragraph("<font color='#00C853'><b>VERIFIED</b></font>", styles['td'])],
-    ]
-    t_req = Table(req_summary, colWidths=[1.1 * inch, 2.7 * inch, 2.3 * inch, 0.9 * inch])
-    t_req.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), PRIMARY),
-        ('GRID', (0,0), (-1,-1), 0.5, BORDER_COLOR),
-        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, ROW_ALT]),
-        ('TOPPADDING', (0,0), (-1,-1), 4),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
-    ]))
-    story.append(t_req)
-    story.append(Spacer(1, 14))
+    def status_of(result):
+        r = result.lower()
+        if r.startswith("not run: planned") or "not built" in r:
+            return "Planned"
+        if r.startswith("not run"):
+            return "Not verified on this build"
+        if "fail" in r:
+            return "Built; open defect"
+        if "partial" in r:
+            return "Built; test scope partial"
+        if "not run" in r or "pending" in r:
+            return "Built; further checks pending"
+        return "Complete"
 
-    story.append(Paragraph("2. Stakeholder Sign-Off & Attestation", styles['h2']))
-    story.append(Paragraph("We hereby certify that the software and documentation submitted for the IT411 Midterm Evaluation accurately reflect the working state of the PlayIT mobile application, incorporating all prior MVP validation findings and satisfying the engineering standards of the College of Computer Studies.", styles['body']))
-    story.append(Spacer(1, 25))
+    rows = [[plain("Requirement"), plain("Feature"), plain("Test cases"), plain("Result on APK H (STD)"),
+             plain("Status")]]
+    for row in std.traceability[1:]:
+        rows.append(std_cells(row, [0, 1, 2, 3]) + [plain(status_of(row[3].replace("*", "")))])
+    add_table(story, rows, [1.7, 0.85, 1.75, 1.95, 1.25])
 
-    sig_data = [
-        [
-            Paragraph("____________________________________________<br/><b>RIVA, ZENDRIX</b><br/>Lead Researcher / Developer<br/>Date: October 17, 2026", styles['body']),
-            Paragraph("____________________________________________<br/><b>MR. JOEMARIE C. AMPARO</b><br/>Capstone Adviser<br/>Date: ________________________", styles['body'])
-        ]
-    ]
-    t_sig = Table(sig_data, colWidths=[3.5 * inch, 3.5 * inch])
-    t_sig.setStyle(TableStyle([
-        ('VALIGN', (0,0), (-1,-1), 'TOP'),
-        ('LEFTPADDING', (0,0), (-1,-1), 0),
-        ('RIGHTPADDING', (0,0), (-1,-1), 0),
-    ]))
-    story.append(t_sig)
+    h2(story, "2. Known Limitations")
+    defects = {row[0].strip("*"): row for row in std.defects[1:]}
+    bullets(story, [md(f"**{d}** ({defects[d][1]}, {defects[d][3]}): {defects[d][2]}") for d in ("DEF-01", "DEF-02")])
+    bullets(story, [
+        plain("Planned features not in APK H: telemetry log and CSV export (FR-NEW-TEL), spaced recall "
+              "(FR-NEW-REC), session pacing (NFR-SES-01) and the voice-driven microphone ripple."),
+        plain("Sounds: a and Chapters 2 to 7 still use MVP clips; the Gate 3 teacher audit has not been held."),
+        plain("Round 2 field validation (SPMP Milestones 5 and 6) measures teacher agreement (at least 80%), "
+              "false rejects (at most 15%), latency and independent completion (at least 85%)."),
+    ])
+    build_pdf(output_path, "Feature Completion Matrix", story)
 
-    doc.build(story)
-    print(f"Generated: {output_path}")
 
 # ==============================================================================
-# MAIN PACKAGING LOGIC
+# 03_Testing_and_QA
 # ==============================================================================
 
-def build_google_drive_submission_package():
-    print("=== Step 1: Building Google Drive Master Directory ===")
-    
+def generate_performance_report_pdf(output_path, ctx):
+    std, apk, per_class = ctx["std"], ctx["apk"], ctx["per_class"]
+    story = []
+    add_header_banner(story, "Performance Testing Report",
+                      "Deliverable 03: what was verified on APK H, and what is measured on the phone in Round 2")
+    add_meta_box(story, [
+        ("Build:", plain(f"Debug APK H, commit {APK_H_COMMIT}")),
+        ("Verified on:", plain("The automated suite on the JVM with Robolectric (STD sections 2.5 and 5.1), and an "
+                               "inspection of the APK.")),
+        ("Device:", plain("Samsung Galaxy A21s, the team's test phone (STD section 2.5).")),
+        ("Runtime timing:", md("**Not measured on this build.** Scheduled for Round 2 with the telemetry log on "
+                               "physical hardware (Instrument D, checks D-01 and D-02).")),
+    ])
+
+    h2(story, "1. Summary")
+    para(story, plain("No startup time, recognition latency, memory or frame-rate figure was measured on APK H. "
+                      "The SRS's latency targets need timestamps from the planned telemetry log (Room schema v4) "
+                      "on the phone, so their test cases did not run (STD section 4.8). This report lists those "
+                      "targets as not measured, and records the design rules that protect performance which the "
+                      "automated suite and the APK inspection did verify."))
+
+    h2(story, "2. Performance Targets: Not Measured on This Build")
+    rows = [[plain("Test case"), plain("Requirement"), plain("Target"), plain("Result on APK H"),
+             plain("Why not run, and when (STD section 4.8)")]]
+    for tc in ("TC-AUD-01", "TC-MIC-01", "TC-SCR-01", "TC-PERF-01, 02", "TC-DB-01"):
+        row = std.not_run_by_id[tc]
+        rows.append([md(row[0]), md(row[1]), md(row[2]), md("**Not measured**"), md(row[3] + ". " + row[4])])
+    add_table(story, rows, [0.95, 1.05, 1.9, 0.8, 2.8])
+
+    h2(story, "3. Verified Design Rules That Protect Performance")
+    st = std.status
+    rows = [[plain("Rule"), plain("How it works"), plain("Verified by"), plain("Result")]]
+    rows.append([plain("No network access"),
+                 plain("The APK requests no INTERNET permission, so it sends and receives nothing; the speech "
+                       "model, sounds and pictures are bundled, so nothing is downloaded at run time."),
+                 plain("aapt dump permissions (TC-SEC-01)"), md(st("TC-SEC-01"))])
+    rows.append([plain("Learner data stays on the device"),
+                 plain("Android backup is disabled; the backup rules exclude the database."),
+                 plain("ManifestPrivacyTest (TC-SEC-02)"), md(st("TC-SEC-02"))])
+    rows.append([plain("No haptics, portrait only, no endless idle animation"),
+                 plain("The code makes no haptic calls, the activity is locked to portrait, and the letter card "
+                       "and mascot header have no endless animation."),
+                 plain("PerformancePolicyTest (TC-POL-02)"), md(st("TC-POL-02"))])
+    rows.append([plain("Reduced motion"),
+                 plain("With the system's reduced-motion setting on, animations become fades or stop."),
+                 plain("TC-POL-03"), md(st("TC-POL-03"))])
+    rows.append([plain("Audio tap debounce (500 ms)"),
+                 md("Say It ignores a second play request within 500 ms (`AUDIO_DEBOUNCE_MS` in "
+                    "`SayItViewModel`) or while a clip plays, so rapid taps play the word once."),
+                 plain("TC-ASR-12"), md(st("TC-ASR-12"))])
+    rows.append([plain("Pictures decoded at display size"),
+                 md("`AssetImage` reads each PNG's size first, decodes it with a power-of-two `inSampleSize` "
+                    "close to the size on screen, off the main thread, and caches the bitmap."),
+                 plain("AssetImageTest"), plain(class_result(per_class, "AssetImageTest"))])
+    rows.append([plain("Speech attempt time limit"),
+                 plain("Without a final result, the attempt is judged at the 3.8 s auto-stop, so the child never "
+                       "waits on a silent microphone."),
+                 plain("TC-ASR-10"), md(st("TC-ASR-10"))])
+    add_table(story, rows, [1.45, 3.15, 1.45, 1.45])
+
+    h2(story, "4. Package Size (measured)")
+    para(story, plain(f"APK H is {apk['size']:,} bytes (about {apk['size'] / 1e6:.0f} MB), measured on the "
+                      "submitted file (STD evidence apk_inspection.txt). It is a debug build and includes the Vosk "
+                      "model, every sound and every picture, so it works with no connection after installation."))
+
+    h2(story, "5. Plan for Round 2")
+    bullets(story, [
+        plain("Build the telemetry log (TelemetryLogger, Room schema v4), which records monotonic timestamps for "
+              "each microphone tap, end of speech, result and feedback."),
+        plain("On the Samsung Galaxy A21s, run Instrument D: Say It feedback P90 at most 0.5 s and Find It "
+              "feedback P90 at most 0.3 s (D-01, D-02), tap-to-listening, sound start latency, and 20 "
+              "force-close tests with no progress lost (D-05, D-06)."),
+        plain("Record the results in STD version 2.0 (SPMP Milestone 7). STD section 8.2 notes that the "
+              "schedule needs re-baselining because telemetry was not built in Milestone 4."),
+    ])
+    build_pdf(output_path, "Performance Testing Report", story)
+
+
+def generate_usability_report_pdf(output_path, ctx):
+    std = ctx["std"]
+    st = std.status
+    story = []
+    add_header_banner(story, "Usability Testing and Improvements Report",
+                      "Deliverable 03: Round 1 findings, the changes made, and the device tests")
+    add_meta_box(story, [
+        ("Round 1 (MVP):", plain("Weeks 1 to 2: 25 respondents, namely 16 learners aged 5 to 7, 5 parents or "
+                                 "supervising teachers, and 4 DepEd Grade 1 reading teachers (T-1 to T-4).")),
+        ("Framework:", plain("Usability, Pedagogy and Accessibility (UPA), with the System Usability Scale (SUS) "
+                             "for adults and the Smileyometer (Fun Toolkit) for children.")),
+        ("Device tests:", plain("Exploratory play on the Samsung Galaxy A21s, October 10 to 11, 2026 "
+                                "(STD section 5.5).")),
+        ("Sources:", plain("MVP Validation Findings form (Sections 2 to 4); SRS v3.0 section 1.1; STD v1.0.")),
+    ])
+
+    h2(story, "1. How Round 1 Was Run")
+    para(story, plain("Each child used the MVP on a phone or tablet for about 15 minutes, in classroom, home and "
+                      "community settings, with no internet connection, playing the Chapter 1 letters (m, s, a, "
+                      "i) through Hear It, Say It and Find It and building the Blend It word SAM. Parents and "
+                      "supervising teachers watched a child play, then answered the SUS, a 7-item accessibility "
+                      "checklist and two Likert items; teachers answered a 12-item pedagogical checklist."))
+    bullets(story, [
+        plain("SUS: mean 75.5 from the 5 parents or supervising teachers, grade B on the Sauro-Lewis scale "
+              "(SRS v3.0 section 1.1); the SMART target is at least 75 (MVP form, Section 2)."),
+        plain("Smileyometer, \"Was it easy to play?\": 9 of 16 children chose the top face; 7 of 16 did not. "
+              "Ease was the lowest of the four items; enjoyment, characters and replay were 88 to 94% top face."),
+    ])
+
+    h2(story, "2. Findings and the Changes Made")
+    rows = [[plain("Round 1 finding"), plain("Evidence"), plain("Change in APK H"), plain("Status (STD)")]]
+    rows.append([
+        plain("#1 Letter sounds add a vowel or sound like the letter name"),
+        plain("Checklist item PED-08 flagged by 2 of 4 teachers; comments of T-1 (\"mmm, not ma, ma, ma\") and T-2."),
+        plain("Pure /m/, /s/ and /i/ re-made and released; Hear It keeps sounds apart from words and ends on "
+              "the sound."),
+        md(f"TC-HI-03: {st('TC-HI-03')}. Partial: a and Chapters 2 to 7 still use MVP clips; teacher "
+           "rating (TC-AUD-02) not yet held."),
+    ])
+    rows.append([
+        plain("#2 Children hesitate at the Say It microphone"),
+        plain("Facilitator notes; 7 of 16 children did not choose the top face for ease."),
+        plain("A four-state microphone (Idle, Listening, Heard, Result) and spoken, non-punitive corrections; "
+              "Say It never takes hearts."),
+        md(f"TC-MIC-03: {st('TC-MIC-03')}. The hesitation rate (target: at least 85% of microphone turns "
+           "without hesitation) is measured in Round 2 (Instrument B)."),
+    ])
+    rows.append([
+        plain("#3 No support for hearing or motor difficulties"),
+        plain("Accessibility items ACC-06 (3 of 5 Yes) and ACC-07 (4 of 5 Yes)."),
+        plain("Mouth-shape cues beside the Say It microphone; a 64 dp floor on every child-facing control; "
+              "screens fit 360x640 dp and up."),
+        md(f"TC-ACC-01: {st('TC-ACC-01')}; TC-ACC-02: {st('TC-ACC-02')}. Captions are built but kept out "
+           "of the child view (team decision)."),
+    ])
+    rows.append([
+        plain("#4 Six of 33 Blend It words cannot be decoded"),
+        plain("Post-pilot design review of the word list."),
+        plain("AM, SUM, TUB, YAM and ZIP replace AIM, BEE, TOY, BOY and ZOO; QUIZ is the documented exception."),
+        md(f"TC-BLD-01: {st('TC-BLD-01')}. Teachers rate every word in Round 2 (Instrument A, Part 2)."),
+    ])
+    rows.append([
+        plain("#5 Key SMART targets could not be measured"),
+        plain("No Round 1 result for agreement, latency, accuracy or unprompted completion."),
+        plain("Not built: the telemetry log and CSV export are planned (FR-NEW-TEL)."),
+        plain("Planned; TC-TEL-01 and TC-EXP-01, 02 not run."),
+    ])
+    add_table(story, rows, [1.45, 1.75, 2.15, 2.15])
+
+    h2(story, "3. Device Tests on the Samsung Galaxy A21s (STD section 5.5)")
+    para(story, plain("The team played each candidate build as a child would. These sessions were exploratory, "
+                      "not scripted: they found problems, and no completion rate or tap count was recorded."))
+    rows = [[plain(c) for c in std.device_tests[0]]]
+    rows += [std_cells(r, range(4)) for r in std.device_tests[1:]]
+    add_table(story, rows, [1.1, 0.7, 2.3, 3.4])
+
+    h2(story, "4. Not Yet Measured")
+    row = std.not_run_by_id["TC-IND-03"]
+    bullets(story, [
+        md(f"**TC-IND-03** ({row[1]}): {row[2]}. {row[3]}; {row[4]}. SPMP Milestone 5 (Week 7, October 19 to 24) "
+           "plans the Silent-Observer protocol with at least 30 Grade 1 learners."),
+        plain("Microphone hesitation (Instrument B) and the caregiver accessibility checklist are repeated in Round 2."),
+    ])
+    obs = {r[0].strip("*"): r for r in std.defects[1:]}["OBS-02"]
+    h2(story, "5. Open Usability Observation")
+    para(story, md(f"**OBS-02** ({obs[1]}, {obs[3]}): {obs[2]} Recommended action: {obs[4]}"))
+    build_pdf(output_path, "Usability Testing and Improvements Report", story)
+
+
+def generate_defect_log_pdf(output_path, ctx):
+    std = ctx["std"]
+    story = []
+    add_header_banner(story, "Defect Log and Re-test Record",
+                      "Deliverable 03: incidents found in testing, their fixes and their re-tests")
+    open_ids = [r[0].strip("*") for r in std.defects[1:]]
+    add_meta_box(story, [
+        ("Build:", plain(f"Debug APK H, commit {APK_H_COMMIT}")),
+        ("Source:", plain("STD v1.0 section 7, copied as written (IEEE 829 incident fields).")),
+        ("Summary:", plain(f"{len(std.incidents) - 1} incidents found and closed; "
+                           f"{sum(1 for i in open_ids if i.startswith('DEF'))} open defects and "
+                           f"{sum(1 for i in open_ids if i.startswith('OBS'))} observations.")),
+        ("Severity scale:", md(std.severity)),
+    ])
+
+    h2(story, "1. Incidents Found and Closed (STD section 7.1)")
+    rows = [[plain("ID"), plain("Found"), plain("Expected / actual"), plain("Fix (commit)"),
+             plain("Re-test evidence"), plain("Status")]]
+    for r in std.incidents[1:]:
+        rows.append([md(r[0]), md(r[1]), md(f"*Expected:* {r[2]}") + "<br/>" + md(f"*Actual:* {r[3]}"), md(r[4]),
+                     md(r[5]), md(r[6])])
+    add_table(story, rows, [0.6, 1.05, 2.4, 1.35, 1.45, 0.65])
+    para(story, md(f"Every closed incident was re-tested in the STD run of October 14, 2026: "
+                   f"{ctx['junit']['tests']} automated tests, {ctx['junit']['failed']} failed "
+                   "(STD section 5.1, raw logs in `test_execution_evidence/junit/`)."))
+
+    h2(story, "2. Open Defects and Observations (STD section 7.2)")
+    rows = [[plain(c) for c in std.defects[0]]]
+    rows += [std_cells(r, range(6)) for r in std.defects[1:]]
+    add_table(story, rows, [0.65, 0.75, 2.6, 0.65, 1.9, 0.95])
+    build_pdf(output_path, "Defect Log and Re-test Record", story)
+
+
+def generate_acceptance_signoff_pdf(output_path, ctx):
+    std, junit = ctx["std"], ctx["junit"]
+    styles = get_pdf_styles()
+    story = []
+    add_header_banner(story, "Acceptance Testing and Sign-Off",
+                      "Deliverable 03: APK H against SRS v3.0 rev. 3.8")
+    add_meta_box(story, [
+        ("Project:", plain(PROJECT)),
+        ("Build:", plain(f"Debug APK H ({ctx['apk']['name']}), commit {APK_H_COMMIT}")),
+        ("Test run:", md(std.execution["Executed"])),
+        ("Executed by:", md(std.execution["Executed by"])),
+        ("Standard:", plain("ISO/IEC/IEEE 29119-3:2021, as applied in STD v1.0.")),
+        ("Adviser:", plain(ADVISER)),
+    ])
+
+    h2(story, "1. Results in Numbers")
+    para(story, md(f"Automated suite (from the raw JUnit logs): **{junit['tests']} tests in {junit['classes']} "
+                   f"classes: {junit['passed']} passed, {junit['skipped']} skipped by design, "
+                   f"{junit['failed']} failed.** Layout matrix: **{junit['layout_runs']} runs on 4 screen "
+                   f"profiles: {junit['layout_passed']} passed, {junit['layout_skipped']} skipped by design.** "
+                   "The skips are the font-scale 1.3 checks on the 360x640 profile, which is below the "
+                   "supported floor (STD section 5.3)."))
+    para(story, plain("STD section 8.1, as written:"))
+    for line in std.summary_bullets:
+        level = 2 if line.startswith("  ") else 1
+        bullets(story, [md(line.strip()[2:])], level=level)
+
+    h2(story, "2. Requirement Verification (STD section 3)")
+    rows = [[plain("Requirement"), plain("Test cases"), plain("Result on APK H")]]
+    for r in std.traceability[1:]:
+        rows.append(std_cells(r, [0, 2, 3]))
+    add_table(story, rows, [2.4, 2.4, 2.7])
+
+    h2(story, "3. Assessment (STD section 8.2)")
+    for p in std.assessment:
+        para(story, md(p))
+
+    h2(story, "4. Acceptance Decision")
+    para(story, plain("The team submits APK H for the midterm evaluation with the results above: the requirements "
+                      "that can be checked on the build pass, except TC-FND-03 (DEF-01) and TC-PRG-02 (DEF-02), "
+                      "and TC-DB-03 is partial. The pedagogical and acoustic requirements (teacher agreement with "
+                      "the speech judge, the purity of the sounds), latency and independent completion are not yet "
+                      "accepted: they are measured in the Round 2 field trials (SPMP Milestones 5 and 6) and "
+                      "recorded in STD version 2.0."))
+
+    sign_heading = Paragraph(plain("5. Sign-Off"), styles["h2"])
+    sign = [[Paragraph(plain(c), styles["th"]) for c in ("Role", "Name", "Signature", "Date")]]
+    for role, name in (("Prepared by", "PlayIT Capstone Team (Group 56)"),
+                       ("Reviewed by (Team Lead)", "Riva, Zendrix"),
+                       ("Adviser", ADVISER)):
+        sign.append([Paragraph(plain(role), styles["sign"]), Paragraph(plain(name), styles["sign"]),
+                     Paragraph("", styles["sign"]), Paragraph("", styles["sign"])])
+    t = Table(sign, colWidths=[1.7 * inch, 2.4 * inch, 2.0 * inch, 1.4 * inch], rowHeights=[None, 30, 30, 30])
+    t.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), PRIMARY),
+        ("GRID", (0, 0), (-1, -1), 0.5, BORDER_COLOR),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+    ]))
+    story.append(KeepTogether([sign_heading, t]))
+    build_pdf(output_path, "Acceptance Testing and Sign-Off", story)
+
+
+# ==============================================================================
+# GOOGLE DRIVE PACKAGE
+# ==============================================================================
+
+def build_google_drive_submission_package(ctx):
+    print("=== Step 1: Building the Google Drive folder ===")
+    if SUBMISSION_DIR.exists():
+        shutil.rmtree(SUBMISSION_DIR)
     dir_01 = SUBMISSION_DIR / "01_Software_and_Deployment"
     dir_02 = SUBMISSION_DIR / "02_Updated_Documentation"
     dir_03 = SUBMISSION_DIR / "03_Testing_and_QA"
-
-    for d in [dir_01, dir_02, dir_03]:
+    for d in (dir_01, dir_02, dir_03):
         d.mkdir(parents=True, exist_ok=True)
 
-    # 1. Populate 01_Software_and_Deployment
-    apk_src = REPO_ROOT / "playit-debug.apk"
-    if apk_src.exists():
-        shutil.copy2(apk_src, dir_01 / "playIT-debug.apk")
-        print(f"Copied APK to: {dir_01 / 'playIT-debug.apk'}")
+    apk = ctx["apk"]
+    if not APK_SRC.exists():
+        sys.exit(f"Error: {APK_SRC.name} (APK H) is missing from the repo root")
+    if sha256_of(APK_SRC) != apk["sha256"]:
+        sys.exit(f"Error: {APK_SRC.name} is not APK H (its SHA-256 differs from the STD record)")
+    target = dir_01 / apk["name"]
+    shutil.copy2(APK_SRC, target)
+    apk["copied_sha256"] = sha256_of(target)
+    print(f"Copied APK H to: {target.relative_to(REPO_ROOT)}")
 
-    generate_deployment_guide_pdf(dir_01 / "DEPLOYED_SYSTEM_AND_ACCESS_INSTRUCTIONS.pdf")
-    generate_refactoring_evidence_pdf(dir_01 / "CODE_REFACTORING_EVIDENCE.pdf")
-    generate_feature_completion_matrix_pdf(dir_01 / "FEATURE_COMPLETION_MATRIX.pdf")
+    generate_deployment_guide_pdf(dir_01 / "DEPLOYED_SYSTEM_AND_ACCESS_INSTRUCTIONS.pdf", ctx)
+    write_inspection_txt(dir_01 / "DEPLOYMENT_AND_PERMISSIONS_INSPECTION.txt", ctx)
+    generate_refactoring_evidence_pdf(dir_01 / "CODE_REFACTORING_EVIDENCE.pdf", ctx)
+    generate_feature_completion_matrix_pdf(dir_01 / "FEATURE_COMPLETION_MATRIX.pdf", ctx)
 
-    # Permission inspection dump
-    inspection_file = dir_01 / "DEPLOYMENT_AND_PERMISSIONS_INSPECTION.txt"
-    with open(inspection_file, "w") as f:
-        f.write("=== PlayIT Deployed APK Security & Permissions Inspection ===\n")
-        f.write(f"APK Filename: playIT-debug.apk\n")
-        f.write(f"Package ID: com.playit.app\n")
-        f.write(f"Target SDK: 34 (Android 14) | Min SDK: 26 (Android 8.0 Oreo)\n")
-        f.write(f"Internet Permission: NONE (Zero cloud egress verified)\n")
-        f.write(f"Declared Permissions:\n")
-        f.write(f"  - android.permission.RECORD_AUDIO (On-device speech recognition via Vosk)\n")
-        f.write(f"  - android.permission.VIBRATE (Tactile pediatric feedback)\n")
-        f.write(f"Vosk Offline Model: assets/models/vosk-model-small-en-us-0.15 (bundled inside APK)\n")
-        f.write(f"Raster Asset Suite: 141 production assets verified against release manifests\n")
-        f.write(f"Status: 100% OFFLINE-READY FOR THESIS EVALUATION\n")
-    print(f"Generated: {inspection_file}")
-
-    # 2. Populate 02_Updated_Documentation
     docs_source = REPO_ROOT / "docs" / "submission"
-    doc_files = [
+    for name in [
         "playIT_SRS_v3.0.pdf", "playIT_SRS_v3.0.docx",
         "playIT_SDD_v2.0.pdf", "playIT_SDD_v2.0.docx",
         "playIT_SPMP_v2.0.pdf", "playIT_SPMP_v2.0.docx",
@@ -739,295 +1096,311 @@ def build_google_drive_submission_package():
         "playIT_Traceability_Matrix.pdf",
         "playIT_Requirements_Inventory.pdf",
         "playIT_MVP_Validation_Findings_and_Refactoring_Priorities.pdf",
-        "playIT_MVP_Validation_Findings_and_Refactoring_Priorities.docx"
-    ]
-    for df in doc_files:
-        p = docs_source / df
-        if p.exists():
-            shutil.copy2(p, dir_02 / df)
-            print(f"Copied Doc to: {dir_02 / df}")
-        else:
-            print(f"[WARN] Document missing: {p}")
+        "playIT_MVP_Validation_Findings_and_Refactoring_Priorities.docx",
+    ]:
+        src = docs_source / name
+        if not src.exists():
+            sys.exit(f"Error: document missing: {src.relative_to(REPO_ROOT)}")
+        shutil.copy2(src, dir_02 / name)
+    print(f"Copied the documents to: {dir_02.relative_to(REPO_ROOT)}")
 
-    # 3. Populate 03_Testing_and_QA
-    generate_performance_report_pdf(dir_03 / "PERFORMANCE_TESTING_REPORT.pdf")
-    generate_usability_report_pdf(dir_03 / "USABILITY_TESTING_AND_IMPROVEMENTS_REPORT.pdf")
-    generate_defect_log_pdf(dir_03 / "DEFECT_LOG_AND_RETEST_RECORD.pdf")
-    generate_acceptance_signoff_pdf(dir_03 / "ACCEPTANCE_TESTING_AND_SIGNOFF_REPORT.pdf")
+    generate_performance_report_pdf(dir_03 / "PERFORMANCE_TESTING_REPORT.pdf", ctx)
+    generate_usability_report_pdf(dir_03 / "USABILITY_TESTING_AND_IMPROVEMENTS_REPORT.pdf", ctx)
+    generate_defect_log_pdf(dir_03 / "DEFECT_LOG_AND_RETEST_RECORD.pdf", ctx)
+    generate_acceptance_signoff_pdf(dir_03 / "ACCEPTANCE_TESTING_AND_SIGNOFF_REPORT.pdf", ctx)
 
-    # Copy raw test evidence
-    evidence_target = dir_03 / "test_execution_evidence"
-    evidence_target.mkdir(exist_ok=True)
-    evidence_src = REPO_ROOT / "docs" / "std" / "evidence" / "2026-10-14-0320385"
-    if evidence_src.exists():
-        for item in evidence_src.iterdir():
-            if item.is_file():
-                shutil.copy2(item, evidence_target / item.name)
-            elif item.is_dir():
-                shutil.copytree(item, evidence_target / item.name, dirs_exist_ok=True)
-        print(f"Copied test execution evidence to: {evidence_target}")
+    shutil.copytree(EVIDENCE_DIR, dir_03 / "test_execution_evidence")
+    print(f"Copied the STD test evidence to: {(dir_03 / 'test_execution_evidence').relative_to(REPO_ROOT)}")
+    print("=== Google Drive folder complete ===")
 
-    print("\n=== Google Drive Master Package Completed Successfully ===")
 
-def stage_clean_academic_repo():
-    print("\n=== Step 2: Staging Clean Academic Repository (PlayIT) ===")
-    if CLEAN_REPO_DIR.exists():
-        shutil.rmtree(CLEAN_REPO_DIR)
-    CLEAN_REPO_DIR.mkdir(parents=True, exist_ok=True)
+# ==============================================================================
+# CLEAN ACADEMIC REPOSITORY
+# ==============================================================================
 
-    # Folders to copy
-    include_dirs = [
-        "app",
-        "gradle",
-        "screenshots",
-        "docs/submission",
-        "docs/engineering-package",
-        "docs/std",
-        "tools/docs",
-        "tools/images"
-    ]
+CLEAN_INCLUDE_DIRS = [
+    "app",
+    "gradle",
+    "docs/submission",
+    "docs/engineering-package",
+    "docs/std",
+    "docs/image-release",   # PictureAssetsTest checks the app's pictures against these manifests
+    "docs/audio-release",   # AudioResolverTest reads the released clip list from these manifests
+    "tools/docs",
+    "tools/images",
+]
+CLEAN_INCLUDE_FILES = [
+    "build.gradle.kts",
+    "settings.gradle.kts",
+    "gradle.properties",    # android.useAndroidX; without it the build stops at checkDebugAarMetadata
+    "gradlew",
+    "gradlew.bat",
+    ".gitattributes",
+]
+CLEAN_EXCLUDE = {
+    "docs/engineering-package/99_AGENT_BOOTSTRAP.md",  # instructions for the coding agents
+}
+CLEAN_GITIGNORE = """# Gradle and Android Studio
+.gradle/
+build/
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+*.iml
+.idea/
 
-    for d in include_dirs:
-        src = REPO_ROOT / d
-        dst = CLEAN_REPO_DIR / d
-        if src.exists():
-            dst.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copytree(src, dst, dirs_exist_ok=True, ignore=shutil.ignore_patterns(
-                "build", ".gradle", "__pycache__", "*.pyc", "*.apk"
-            ))
-            print(f"Staged directory: {d}")
+# Build outputs and signing keys
+*.apk
+*.aab
+*.jks
+*.keystore
+*.hprof
 
-    # Files to copy
-    include_files = [
-        "build.gradle.kts",
-        "settings.gradle.kts",
-        "gradlew",
-        "gradlew.bat",
-        ".gitignore"
-    ]
-    for f in include_files:
-        src = REPO_ROOT / f
-        dst = CLEAN_REPO_DIR / f
-        if src.exists():
-            shutil.copy2(src, dst)
-            print(f"Staged file: {f}")
-
-    # Generate Academic README.md
-    readme_path = CLEAN_REPO_DIR / "README.md"
-    generate_academic_readme(readme_path)
-    print(f"Generated Academic README at: {readme_path}")
-
-    # Purge any remaining WSL mentions in the clean repo
-    print("Auditing for and removing historical 'WSL' references in clean repo...")
-    for root, dirs, files in os.walk(CLEAN_REPO_DIR):
-        for file in files:
-            if file.endswith((".md", ".txt", ".kt", ".kts", ".json")):
-                fp = Path(root) / file
-                try:
-                    text = fp.read_text(encoding="utf-8")
-                    if "WSL" in text or "wsl" in text:
-                        cleaned = text.replace("Claude in WSL", "Claude (AI Reviewer)")
-                        cleaned = cleaned.replace("locally in WSL", "in the development pipeline")
-                        cleaned = cleaned.replace("in WSL", "locally")
-                        cleaned = cleaned.replace("WSL", "Linux/Android Development Environment")
-                        fp.write_text(cleaned, encoding="utf-8")
-                except Exception:
-                    pass
-
-    print("=== Clean Academic Repo Staging Complete ===")
-
-def generate_academic_readme(output_path: Path):
-    content = """# PlayIT — Offline English Phonics Learning Companion
-
-<p align="center">
-  <strong>An Offline-First Android Educational Platform for Grade 1 Filipino Learners (Ages 6–7) Powered by the Marungko Approach, Real-Time Edge Speech Recognition, and Pediatric Interaction Design.</strong>
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Platform-Android_8.0%2B_(API_26%2B)-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Platform: Android"/>
-  <img src="https://img.shields.io/badge/Language-Kotlin_1.9.23-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white" alt="Language: Kotlin"/>
-  <img src="https://img.shields.io/badge/UI-Jetpack_Compose_Material_3-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white" alt="UI: Jetpack Compose"/>
-  <img src="https://img.shields.io/badge/ASR-Vosk_Offline_0.3.47-FF6F00?style=for-the-badge" alt="ASR: Vosk"/>
-  <img src="https://img.shields.io/badge/Architecture-Clean_%2B_MVVM-009688?style=for-the-badge" alt="Architecture: Clean + MVVM"/>
-  <img src="https://img.shields.io/badge/Unit_Tests-433%20Passing%20(100%25)-brightgreen?style=for-the-badge" alt="Unit Tests: 433 Passing"/>
-  <img src="https://img.shields.io/badge/Security-Zero_Cloud_Egress-blue?style=for-the-badge" alt="Security: Zero Cloud Egress"/>
-</p>
-
----
-
-## Visual Showcase
-
-<table>
-  <tr>
-    <td align="center" width="25%">
-      <strong>1. Profile Selection</strong><br/>
-      <img src="screenshots/profileselect_live.png" alt="Profile Selection" width="200"/><br/>
-      <em>Multi-child profile isolation (up to 6)</em>
-    </td>
-    <td align="center" width="25%">
-      <strong>2. Phonics World Map</strong><br/>
-      <img src="screenshots/map_alive_scrolled1.png" alt="Phonics World Map" width="200"/><br/>
-      <em>Bohol Chocolate Hills progression</em>
-    </td>
-    <td align="center" width="25%">
-      <strong>3. Hear It (Listen)</strong><br/>
-      <img src="screenshots/hearit_live.png" alt="Hear It Screen" width="200"/><br/>
-      <em>Native phoneme audio modeling</em>
-    </td>
-    <td align="center" width="25%">
-      <strong>4. Say It (Speak)</strong><br/>
-      <img src="screenshots/sayit_live.png" alt="Say It Screen" width="200"/><br/>
-      <em>Edge Vosk speech evaluation</em>
-    </td>
-  </tr>
-  <tr>
-    <td align="center" width="25%">
-      <strong>5. Find It (Discriminate)</strong><br/>
-      <img src="screenshots/findit_live.png" alt="Find It Screen" width="200"/><br/>
-      <em>5-card sound discrimination grid</em>
-    </td>
-    <td align="center" width="25%">
-      <strong>6. Blend It (Synthesize)</strong><br/>
-      <img src="screenshots/blendit_live.png" alt="Blend It Screen" width="200"/><br/>
-      <em>CVC word construction tiles</em>
-    </td>
-    <td align="center" width="25%">
-      <strong>7. Parent Dashboard</strong><br/>
-      <img src="screenshots/parent_dashboard_redesigned_live.png" alt="Parent Dashboard" width="200"/><br/>
-      <em>Diagnostic phoneme heatmap</em>
-    </td>
-    <td align="center" width="25%">
-      <strong>8. Report Export</strong><br/>
-      <img src="screenshots/report_preview_live.png" alt="PDF Report Preview" width="200"/><br/>
-      <em>On-device PDF generation</em>
-    </td>
-  </tr>
-</table>
-
----
-
-## 1. Executive Summary & Research Motivation
-
-In the Philippines, early literacy development remains a critical national challenge. According to the World Bank and DepEd assessments, over 80% of Filipino Grade 1 learners struggle with foundational reading and phonemic awareness. Existing commercial educational apps (e.g., ABCmouse, Khan Academy Kids) require continuous high-speed internet connections, introduce uncalibrated foreign accents, and assume pre-existing phonetic literacy.
-
-**PlayIT** is an offline-first, pediatric-calibrated Android application engineered to solve this crisis. Grounded in the Department of Education's **Marungko Approach**, PlayIT guides children through a phono-syllabic learning sequence (28 phonemes across 7 progression chapters). The system combines on-device speech recognition via a localized **Vosk acoustic model**, calm Duolingo ABC-inspired activity stages, and culturally contextualized Filipino imagery (Bohol Chocolate Hills, tarsier companion mascot Lily).
-
-### Core Research Contributions
-1. **Edge AI Speech Evaluation**: Offline phoneme-level speech judge providing instantaneous auditory modeling and non-punitive feedback without cloud APIs.
-2. **Pediatric Ergonomic Calibration**: Validated against Cognitive Load Theory, establishing a 64dp minimum touch target floor, zero-harsh-red corrections, and zero visual emojis.
-3. **100% Data Privacy Guarantee**: Complete offline SQLite/Room architecture with zero network egress, fully complying with RA 10173 (Philippine Data Privacy Act) and COPPA.
-
----
-
-## 2. The Marungko Pedagogical Framework
-
-PlayIT sequences phonics instruction according to the proven **Marungko Method**, introducing sounds by phonemic distinctiveness rather than alphabetical order:
-
-| Chapter | Title & Biome | Phoneme Progression | Milestone Challenge |
-| :---: | :--- | :--- | :--- |
-| **Unit 1** | Bohol Hills Horizon | **M, S, A, I, O** | CVC Blending: *AM, SAM, MAT* |
-| **Unit 2** | Coconut Grove Sands | **B, E, U, T, K** | CVC Blending: *BAT, TUB, KIT* |
-| **Unit 3** | Chocolate Hills Summit | **L, Y, N, G, R** | CVC Blending: *YAM, RUG, NET* |
-| **Unit 4** | Mangrove River Crossing | **P, NG, D, H, W** | CVC Blending: *PIG, HEN, WEB* |
-| **Unit 5** | Rice Terraces Overlook | **C, F, J, Ñ, V** | CVC Blending: *CAT, FAN, VAN* |
-| **Unit 6** | Coral Reef Cove | **X, Z, Q** | CVC Blending: *BOX, ZIP, QUIZ* |
-| **Unit 7** | Mount Pulag Summit | **Consolidation** | Full 28-Phoneme Mastery & Story Blending |
-
-### The 3-Sublevel Phonics Loop
-Each letter node implements a rigorous 3-step mastery cycle:
-1. **Hear It (Auditory Modeling)**: Child listens to the pure phoneme sound, followed by the keyword picture and carrier line.
-2. **Say It (Expressive Production)**: Child speaks the target sound into the microphone. Vosk evaluates accuracy against foil-scoped grammars. If the child misses twice, an articulation mouth-shape guide appears beside the microphone.
-3. **Find It (Receptive Discrimination)**: Child identifies the target sound among 4 distractors in a high-contrast 5-card gummy grid.
-
----
-
-## 3. Software Architecture & Clean Engineering Standards
-
-PlayIT adheres strictly to **Clean Architecture** and the **MVVM (Model-View-ViewModel)** design pattern:
-
-```
-┌──────────────────────────────────────────────────────────┐
-│                   Presentation Layer                     │
-│  Jetpack Compose M3 • ViewModels • Navigation Graph      │
-└────────────────────────────┬─────────────────────────────┘
-                             │ (Uni-Directional Data Flow)
-┌────────────────────────────▼─────────────────────────────┐
-│                      Domain Layer                        │
-│  Pure Kotlin (Zero Android Imports) • Use Cases •        │
-│  Calculators • SpeechValidator • Business Rules          │
-└────────────────────────────▲─────────────────────────────┘
-                             │ (Dependency Inversion)
-┌────────────────────────────┴─────────────────────────────┐
-│                      Data Layer                          │
-│  Room Database (SQLite) • Repositories • Vosk ASR Engine │
-│  AudioPlayer (MediaPlayer) • Android Native PdfExporter  │
-└──────────────────────────────────────────────────────────┘
-```
-
-- **Domain Layer Isolation**: `com.playit.app.domain` is pure Kotlin containing zero `android.*` dependencies.
-- **Repository Pattern**: All 9 repositories implement structured `try-catch` error handling with fallback StateFlows.
-- **On-Device Vosk Pipeline**: Scopes acoustic grammars per phoneme foil, eliminating false positive letter-name substitutions ('em' for /m/).
-
----
-
-## 4. Evaluation Guide for Midterm Reviewers
-
-### A. Quick Start Installation
-1. Download `playIT-debug.apk` from the `01_Software_and_Deployment/` folder.
-2. Install via ADB:
-   ```bash
-   adb install -r playIT-debug.apk
-   ```
-   *(Or copy the APK to your Android device and install via the native File Manager).*
-3. Launch **PlayIT**.
-
-### B. Demo Walkthrough Instructions
-- **No Credentials Needed**: The app is completely offline.
-- **Learner Profiles**: Select profile **'Zendrix'** to review completed progress, or tap **'+'** to test the child-friendly avatar onboarding flow.
-- **Parent Zone Access**: Tap the top-left padlock icon. Solve the adult arithmetic problem (e.g. `24 + 19 = 43`) on the on-screen keypad to enter the educator analytics dashboard and test PDF export.
-
----
-
-## 5. Build & Verification Instructions
-
-### Prerequisites
-- JDK 17 (Azul Zulu or OpenJDK)
-- Android SDK 34 (Command line tools or Android Studio Iguana+)
-
-### Compile & Build APK
-```bash
-./gradlew assembleDebug
-# Generated APK: app/build/outputs/apk/debug/app-debug.apk
-```
-
-### Run Automated Unit Test Suite
-```bash
-./gradlew testDebugUnitTest
-# 433 Tests Executed: 427 Passed, 6 Skipped by design, 0 Failed.
-```
-
----
-
-## 6. Research Team & Acknowledgements
-
-### Capstone Research Team (Group 56 — IT411)
-- **Riva, Zendrix** — Team Lead / Systems & Mobile Architect
-- **Palis, John James** — Frontend / UI Integration Engineer
-- **Miel, Kaysean** — Database & Persistence Specialist
-- **Durano, Ashlee Skye** — QA & Pedagogical Evaluator
-- **Bien, Erik Samuel** — Documentation & Research Analyst
-
-**Capstone Adviser**: Mr. Joemarie C. Amparo  
-*College of Computer Studies, Cebu Institute of Technology – University*
-
-### AI Assistance & Tooling Disclosure
-In accordance with CIT-U CCS academic integrity guidelines, the team discloses that:
-- **Anthropic Claude**: Utilized as an automated code reviewer, test generator, and technical documentation assistant under human architectural guidance.
-- **Google Gemini & Argon 4**: Utilized for text-to-image 2D vector asset generation conforming to the project's style guide and #4A2E18 outline constraints.
-- **Vosk Speech Recognition**: Embedded open-source offline speech recognition engine (Apache 2.0).
+# Python
+__pycache__/
+*.pyc
 """
-    output_path.write_text(content, encoding="utf-8")
+# (Roborazzi capture on the A21s profile, title, caption) for the README's screen gallery.
+README_SCREENS = [
+    ("splash_a21s.png", "Splash", "Start sits below Lily, the tarsier guide"),
+    ("nameprompt_a21s.png", "New learner", "Avatar-only onboarding: no typing"),
+    ("map_a21s.png", "Map", "Chapter 1 trail; 16-character name in the header"),
+    ("hearit_a21s.png", "Hear It", "Lily models the sound, then the key word"),
+    ("sayit_a21s.png", "Say It", "Say the key word; judged on the phone"),
+    ("sayit_cue_a21s.png", "Say It, second miss", "Mouth-shape cue beside the microphone"),
+    ("findit_a21s.png", "Find It", "Tap the 3 pictures that start with /m/"),
+    ("blendit_a21s.png", "Blend It", "Build SAM from tiles dealt out of order"),
+]
+# The team asked for no mentions of its development environment in the public repository.
+# Prose and comments only; identifiers such as wslpath are left alone.
+WSL_REPLACEMENTS = [
+    ("Claude in WSL", "Claude"),
+    ("Local WSL only", "Local Linux setup only"),
+    ("locally in WSL", "locally on Linux"),
+    ("in WSL", "on Linux"),
+    ("from WSL", "from Linux"),
+]
+WSL_SUFFIXES = (".md", ".txt", ".kt", ".kts", ".json")
+
+
+def tracked_files():
+    """The tracked files to publish, as repo-relative POSIX paths."""
+    out = git("ls-files", "-z", "--", *CLEAN_INCLUDE_DIRS, *CLEAN_INCLUDE_FILES)
+    return [p for p in out.split("\0") if p and p not in CLEAN_EXCLUDE]
+
+
+def clear_clean_repo():
+    """Empties dist/PlayIT but keeps its .git, so a new commit lands on the published history."""
+    if not CLEAN_REPO_DIR.exists():
+        CLEAN_REPO_DIR.mkdir(parents=True)
+        return
+    for child in CLEAN_REPO_DIR.iterdir():
+        if child.name == ".git":
+            continue
+        if child.is_dir():
+            shutil.rmtree(child)
+        else:
+            child.unlink()
+
+
+def scrub_wsl(root):
+    changed = []
+    for path in root.rglob("*"):
+        if ".git" in path.parts or not path.is_file() or path.suffix not in WSL_SUFFIXES:
+            continue
+        text = path.read_text(encoding="utf-8")
+        if "WSL" not in text:
+            continue
+        for old, new in WSL_REPLACEMENTS:
+            text = text.replace(old, new)
+        text = re.sub(r"\bWSL\b", "Linux", text)
+        path.write_text(text, encoding="utf-8", newline="")
+        changed.append(path.relative_to(root).as_posix())
+    return changed
+
+
+def stage_clean_academic_repo(ctx):
+    print("\n=== Step 2: Staging the clean academic repository (dist/PlayIT) ===")
+    missing = [name for name, _, _ in README_SCREENS if not (ROBORAZZI_DIR / name).exists()]
+    if missing:
+        sys.exit("Error: README screenshots missing from app/build/outputs/roborazzi/ "
+                 f"({', '.join(missing)}). Run: gradlew :app:recordRoborazziDebug --tests \"com.playit.app.screenshot.*\"")
+    clear_clean_repo()
+
+    files = tracked_files()
+    for rel in files:
+        dst = CLEAN_REPO_DIR / rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(REPO_ROOT / rel, dst)
+    print(f"Staged {len(files)} tracked files from: {', '.join(CLEAN_INCLUDE_DIRS + CLEAN_INCLUDE_FILES)}")
+
+    (CLEAN_REPO_DIR / ".gitignore").write_text(CLEAN_GITIGNORE, encoding="utf-8", newline="\n")
+    shots = CLEAN_REPO_DIR / "screenshots"
+    shots.mkdir()
+    for name, _, _ in README_SCREENS:
+        shutil.copy2(ROBORAZZI_DIR / name, shots / name)
+    print(f"Staged {len(README_SCREENS)} README screenshots in screenshots/")
+
+    generate_academic_readme(CLEAN_REPO_DIR / "README.md", ctx)
+    print("Generated README.md")
+
+    changed = scrub_wsl(CLEAN_REPO_DIR)
+    print(f"Replaced 'WSL' in {len(changed)} files: {', '.join(changed) or 'none'}")
+    print("=== Clean repository staged. Next, in dist/PlayIT: run the unit tests, "
+          "git update-index --chmod=+x gradlew (Windows drops the bit), then commit and push. ===")
+
+
+def badge(label, message, color):
+    def esc(s):
+        return urllib.parse.quote(s.replace("-", "--").replace("_", "__").replace(" ", "_"), safe="_")
+    return f'<img src="https://img.shields.io/badge/{esc(label)}-{esc(message)}-{color}" alt="{label}: {message}"/>'
+
+
+def generate_academic_readme(output_path, ctx):
+    junit, chapters, releases = ctx["junit"], ctx["chapters"], ctx["releases"]
+    tests_line = (f"{junit['tests']} tests: {junit['passed']} passed, {junit['skipped']} skipped by design, "
+                  f"{junit['failed']} failed")
+    vosk = library_version("vosk")
+    kotlin = library_version("kotlin")
+    generators = " and ".join(f"{tool} ({n})" for tool, n in sorted(releases["generators"].items()))
+
+    gallery = ["<table>"]
+    for start in (0, 4):
+        gallery.append("  <tr>")
+        for name, title, caption in README_SCREENS[start:start + 4]:
+            gallery.append(f'    <td align="center" width="25%"><strong>{title}</strong><br/>'
+                           f'<img src="screenshots/{name}" alt="{title}" width="180"/><br/><em>{caption}</em></td>')
+        gallery.append("  </tr>")
+    gallery.append("</table>")
+
+    curriculum = ["| Chapter | Letters (key word) | Blend It words |", "|:---:|---|---|"]
+    for c in chapters:
+        letters = ", ".join(f"**{l}** ({w.lower()})" for l, w in c["letters"])
+        curriculum.append(f"| {c['number']} | {letters} | {', '.join(c['words'])} |")
+
+    content = f"""# PlayIT: Offline Phonics for Grade 1 Learners
+
+PlayIT is an Android app that teaches Grade 1 Filipino learners (ages 5 to 7) the sounds of English letters, following the Marungko approach: hear the sound, say it, find it among pictures, then blend letters into words. The speech recognizer runs on the phone, and the app has no internet permission, so nothing a child says or does leaves the device.
+
+IT411 Capstone & Research 2 (Section G7), Group 56, College of Computer Studies, Cebu Institute of Technology - University. Adviser: {ADVISER}.
+
+<p>
+  {badge("Android", "8.0+ (API 26)", "3DDC84")}
+  {badge("Kotlin", kotlin, "7F52FF")}
+  {badge("UI", "Jetpack Compose", "4285F4")}
+  {badge("Speech", f"Vosk {vosk}, offline", "FF6F00")}
+  {badge("Unit tests", f"{junit['passed']} passed, {junit['skipped']} skipped, {junit['failed']} failed", "brightgreen")}
+  {badge("Network", "no INTERNET permission", "blue")}
+</p>
+
+## Screens
+
+Captured with Roborazzi from this repository's code on the 360x740 dp profile of the team's test phone (Samsung Galaxy A21s).
+
+{chr(10).join(gallery)}
+
+## Curriculum
+
+{sum(len(c['letters']) for c in chapters)} letters in {len(chapters)} chapters, seeded in `app/src/main/java/com/playit/app/di/DatabaseModule.kt`. N with tilde and NG are not taught (SRS v3.0, section 1.2). Every Blend It word can be sounded out with the letters taught up to its chapter; QUIZ is the one documented exception (*qu* = /kw/).
+
+{chr(10).join(curriculum)}
+
+## How a Letter Is Taught
+
+1. **Hear It.** Lily, the tarsier guide, models the sound: "Listen!", the sound three times, the key word, then the sound again. The child can replay it.
+2. **Say It.** The child says the key word ("mouse"). Vosk judges it on the phone against a grammar that holds the word and its foils (the letter's name, an added vowel). A miss gets a spoken correction for that error; the second miss shows the mouth shape beside the microphone; the third says it together and moves on. Say It never takes a heart.
+3. **Find It.** Five pictures; the child taps the three whose names start with the sound. A wrong tap costs one of five hearts; at zero, the child starts again with three.
+4. **Letter Complete.** Three stars with no hearts lost, two with one or two, one with three or more.
+
+When every letter of a chapter is done, that chapter's **Blend It** opens: the child builds its words from letter tiles, which are sounded out one by one and never dealt in the answer's order.
+
+## Architecture
+
+Clean Architecture with MVVM, Hilt for dependency injection, and a Room (SQLite) database on the device.
+
+- `domain/`: pure Kotlin (no `android.*` imports): models, managers such as `SpeechValidator`, `HeartManager`, `StarCalculator` and `TutorPolicy`, and {ctx['repositories']} repository interfaces.
+- `data/`: Room DAOs and the repository implementations, audio playback, the Vosk recognizer and the PDF report.
+- `presentation/`: Jetpack Compose screens and their ViewModels.
+- `app/src/main/assets/`: the Vosk model (`vosk-model`), the sounds (`audio/`) and the pictures (`images/`).
+
+## Build and Test
+
+Requirements: JDK 17 and the Android SDK (API 34). Point Gradle at the SDK with `ANDROID_HOME` or a `local.properties` file (`sdk.dir=...`).
+
+```bash
+./gradlew assembleDebug        # app/build/outputs/apk/debug/app-debug.apk
+./gradlew testDebugUnitTest    # {tests_line}
+./gradlew :app:recordRoborazziDebug --tests "com.playit.app.screenshot.*"   # screen captures
+```
+
+The six skipped tests are the font-scale 1.3 checks on the 360x640 profile, which is below the supported floor. Test results are written to `app/build/test-results/testDebugUnitTest/`.
+
+## Trying the App
+
+- No account and no internet connection are needed.
+- On "Who is playing?", tap **Add Profile**, pick an animal friend and tap **Let's Play**. The child never types; a parent can add a name in the Parent Zone.
+- Tap the current letter on the map to start a lesson.
+- **Parent Zone:** the button at the top right of "Who is playing?". Answer the arithmetic question to see each letter's progress, export the PDF report, and rename or delete profiles.
+
+## Documents and Records
+
+- `docs/submission/`: SRS v3.0, SDD v2.0, SPMP v2.0, the Software Test Document (STD v1.0) and the MVP Validation Findings form, in PDF and DOCX.
+- `docs/std/evidence/`: the raw JUnit logs, the APK inspection and the audio release check behind the STD.
+- `docs/image-release/` and `docs/audio-release/`: the release manifests of the {releases['pictures']} pictures and {releases['clips']} audio clips that went through review, with each file's SHA-256, its generator and its approval. `PictureAssetsTest` and `AudioResolverTest` check the app's files against them.
+
+## Known Limitations
+
+- Find It distractors are drawn from every letter, not only from letters already mastered (STD DEF-01).
+- Stars follow hearts lost only; the SRS's accuracy term is not applied (STD DEF-02, decision pending).
+- The letter a and the letters of Chapters 2 to 7 still play sounds from the MVP; the teacher audit of the sounds has not been held.
+- Planned, not built: the telemetry log and CSV export, spaced recall, session pacing. Latency and independent completion are measured in the Round 2 field trials.
+
+## Team
+
+Group 56: Riva, Zendrix (Team Lead); Palis, John James; Miel, Kaysean; Durano, Ashlee Skye; Bien, Erik Samuel.
+
+Capstone Adviser: {ADVISER}, College of Computer Studies, Cebu Institute of Technology - University.
+
+## AI Assistance and Third-Party Content
+
+In line with the CIT-U CCS academic integrity guidelines, the team discloses the AI tools used and what each produced. The team set the requirements, made the design decisions, approved every released picture and clip, and is responsible for the result.
+
+- **Claude (Anthropic):** architecture and design review, task cards, code review, test design and generation, the audio pipeline scripts, and drafting of the documentation and of this packaging.
+- **Google Antigravity ("agy", an AI coding agent):** implemented most of the app code from the team's task cards, and generated pictures with Nano Banana Pro.
+- **Pictures:** the {releases['pictures']} released pictures were generated with {generators}; each one's generator is recorded in its release manifest. Pictures kept from the MVP predate the manifests.
+- **Voices:** synthetic. Kokoro-82M (Apache-2.0) for the carrier lines and key words; Chatterbox-Turbo (MIT) for held sounds such as /m/; ElevenLabs Text to Speech for the Blend It words AM, TUB and YAM and the short /i/. Clips kept from the MVP predate the release gate; the MVP's letter sounds were made with Microsoft Edge TTS.
+- **ElevenLabs credit:** the AM, TUB, YAM and /i/ clips were made with [ElevenLabs](https://elevenlabs.io) on the Free plan, which allows non-commercial use with attribution. The app credits elevenlabs.io in the Parent Zone. These clips may not be used commercially.
+- **Vosk** (Alpha Cephei, Apache-2.0): offline speech recognition with its small US English model.
+"""
+    output_path.write_text(content, encoding="utf-8", newline="\n")
+
+
+# ==============================================================================
+# MAIN
+# ==============================================================================
+
+def main():
+    font = register_fonts()
+    print(f"PDF font: {font}")
+    std = Std()
+    junit, per_class = junit_results()
+    check_junit_against_std(junit, std)
+    ctx = {
+        "std": std,
+        "junit": junit,
+        "per_class": per_class,
+        "apk": apk_record(),
+        "chapters": read_curriculum(),
+        "releases": release_counts(),
+        "changes_since_apk_h": changes_since_apk_h(),
+        "domain_android_imports": count_domain_android_imports(),
+        "repositories": count_repositories(),
+        "card_commits": card_commit_rows(),
+    }
+    build_google_drive_submission_package(ctx)
+    stage_clean_academic_repo(ctx)
+
 
 if __name__ == "__main__":
-    build_google_drive_submission_package()
-    stage_clean_academic_repo()
+    main()

@@ -1384,3 +1384,47 @@ What holds up: one calm tint per step, pictures on white cards, a ground line, m
 - **Handoff to Claude:**
   - User requested Claude to take over the implementation of Blockers 2 and 3 in `tools/docs/assemble_midterm_submission.py`, regenerate the Google Drive package, verify `dist/PlayIT`, and push to the clean repo `git@github.com:zendrix-hub/playIt.git`.
 
+### Claude, 2026-10-17: blockers 2 and 3 fixed in the packaging script; package rebuilt; clean repo committed, push blocked (403)
+
+**Blocker 1 (agy, `1ddfe51`): checked.** The 10 pictures are byte-identical to APK H (`0ba18d2`). They are MVP pictures (August 2026) with no manifest, so the README says pictures kept from the MVP predate the manifests.
+
+**Blocker 3: the QA PDFs are now built from the records.** `assemble_midterm_submission.py` was rewritten. Every number comes from the STD (§3, §4, §5.1, §5.5, §7, §8), its JUnit XML and APK inspection in `docs/std/evidence/`, the MVP form, `DatabaseModule.kt`, the release manifests or git. The script stops if the APK's SHA-256 or the JUnit totals disagree with the STD. Arial is used so →, ≥ and ≤ print (Helvetica cannot draw them).
+- **Performance:** no runtime figures. The targets of TC-AUD-01, TC-MIC-01, TC-SCR-01, TC-PERF-01/02 and TC-DB-01 are listed as "Not measured", with STD §4.8's reasons and the Instrument D checks (D-01, D-02, D-05, D-06). Verified rules, with their STD status: no INTERNET permission, backup disabled, no haptics, reduced motion, the 500 ms Say It debounce (`AUDIO_DEBOUNCE_MS`), pictures decoded at display size (`calculateInSampleSize`, `AssetImageTest` 4 of 4), and the 3.8 s attempt limit. APK size: 108,489,471 bytes, measured.
+- **Usability:** Round 1 from the MVP form (25 respondents, Smileyometer ease 9 of 16) and the SRS §1.1 SUS mean 75.5; Findings #1 to #5 with what APK H does and its STD status; the §5.5 device tests, marked exploratory; TC-IND-03 not yet measured (Silent-Observer, N ≥ 30, SPMP Milestone 5); OBS-02.
+- **Defect log:** STD §7.1 (INC-01 to INC-07) and §7.2 (DEF-01, DEF-02, OBS-01 to OBS-04), as written.
+- **Acceptance:** 433 tests: 427 passed, 6 skipped, 0 failed (from the XML); 84 layout runs: 78 passed, 6 skipped; STD §8.1 and §8.2 as written. The decision accepts APK H for the midterm and leaves teacher agreement, sound purity, latency and independent completion for Round 2. The signature table is blank for the team.
+- **Deployment guide and inspection TXT:** the Drive copy is named `playit-debug-H-0320385.apk`, as in the STD, and its checksum is verified. Permissions come from aapt (no VIBRATE). The Vosk model is in `assets/vosk-model`. The walkthrough covers avatar onboarding, with no pre-seeded profile, and the Parent Zone button at the top right.
+- **Refactoring evidence and feature matrix were rewritten too.** They called card 32 done, used wrong FR numbers and cited test classes that do not exist.
+  - The refactoring report now pairs each MVP-form priority with what APK H does. Its commit trail of 34 card commits takes its subjects from git.
+  - The feature matrix is STD §3.
+
+**Blocker 2: the clean repo (`dist/PlayIT`).**
+- Staged from `git ls-files`, so only tracked files are copied, plus:
+  - `gradle.properties`, `.gitattributes`, `docs/image-release/` and `docs/audio-release/`;
+  - a `.gitignore` of its own that keeps `screenshots/`;
+  - the 8 README screenshots, recorded with Roborazzi at `36a1722` and checked by eye.
+- `99_AGENT_BOOTSTRAP.md` is left out. `gradlew` is now executable (it was 100644, which breaks `./gradlew` on Linux and macOS).
+- The README has:
+  - the curriculum parsed from the seeds (26 letters, 7 chapters, 33 words);
+  - the full AI disclosure (Claude, agy, Argon 4 (80 pictures) and Nano Banana Pro (51), Kokoro, Chatterbox, ElevenLabs, Edge TTS for the MVP letter sounds);
+  - the ElevenLabs Free-plan credit and non-commercial note, without the "80%" statistic.
+- "WSL" was replaced only in prose. The one hit was a comment in `app/build.gradle.kts`; identifiers such as `wslpath` were left alone.
+- **Tests on the fresh tree** (`gradlew :app:testDebugUnitTest`, nothing cached): 66 classes, 433 tests, 427 passed, 6 skipped, 0 failed.
+- **Committed as `0da13c5` on top of `20f4c8d`. The push was refused:** "Permission to zendrix-hub/playIt.git denied to thatguyKire" (403). This PC has no SSH key set up for GitHub. Someone with write access must push it from `dist/PlayIT` (`git push origin main`; a normal fast-forward), or the owner must give thatguyKire write access first.
+- The public repo still shows the 10 mislabeled pictures, the build failure and the old QA claims until this is pushed.
+
+**Documents (`docs/submission/`):**
+- Re-rendered the SDD and SRS with pymupdf. Their figures are back at full resolution (SDD p. 21: 4729 px; SRS use case diagram: 2026 px), and their text is unchanged. Re-extracted the Requirements Inventory and Traceability Matrix from the new SRS.
+- The STD, SPMP and MVP form were left as committed. A full re-render drops the team lead's signature from the MVP form's last page, and reverts the STD §8.4 sign-off from "Capstone Team (Group 56)" to "Capstone Team, with Claude (AI assistant)". Both edits exist only in the committed outputs of `7c4bdbe`, not in the Markdown sources. Render with `--only SDD SRS` until the sources carry them.
+- **Corrections to my review above:**
+  - The `7c4bdbe` STD change is the §8.4 sign-off row, not the cover.
+  - The SPMP does mention WSL. §4.1, in both source and PDF, says "Windows 11 with WSL2 (Ubuntu 22.04 LTS)". It is accurate; change it only if the team wants.
+
+**Not in git:** `dist/` is ignored. Rebuild the Drive folder with the script after `gradlew :app:recordRoborazziDebug --tests "com.playit.app.screenshot.*"`, using a Python that has reportlab, from the repo root.
+
+**For the team before turning in:**
+1. Push `dist/PlayIT` (see above).
+2. Run the APK H acceptance on the A21s (STD §5.5, last row).
+3. Upload `dist/PlayIT_IT411_Midterm_Submission/` to Drive.
+4. Sign the acceptance report and STD §8.4.
+
