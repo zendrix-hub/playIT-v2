@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
+    id("io.github.takahirom.roborazzi")
 }
 
 
@@ -77,6 +78,18 @@ android {
             excludes += "/META-INDEX/{AL2.0,LGPL2.1}"
         }
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            // Local WSL only: the proxy re-signs TLS, so Robolectric reads android-all from a curl-fetched folder.
+            System.getenv("ROBOLECTRIC_DEPS_DIR")?.let { dir ->
+                all {
+                    it.systemProperty("robolectric.offline", "true")
+                    it.systemProperty("robolectric.dependency.dir", dir)
+                }
+            }
+        }
+    }
 }
 
 dependencies {
@@ -112,6 +125,12 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation("io.mockk:mockk:1.13.10")
+    testImplementation("org.robolectric:robolectric:4.13")
+    testImplementation("io.github.takahirom.roborazzi:roborazzi:1.26.0")
+    testImplementation("io.github.takahirom.roborazzi:roborazzi-compose:1.26.0")
+    testImplementation("io.github.takahirom.roborazzi:roborazzi-junit-rule:1.26.0")
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.compose.ui.test.junit4)
 
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)

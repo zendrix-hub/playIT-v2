@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.domain.calculator.LetterStatusCalculatorTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-14T14:13:46" hostname="LAPTOP-REHI7A0K" time="0.001">
+  <properties/>
+  <testcase name="accuracy 80 percent or higher with low failed attempts returns GREEN" classname="com.playit.app.domain.calculator.LetterStatusCalculatorTest" time="0.001"/>
+  <testcase name="3 or more failed attempts returns RED even with high accuracy" classname="com.playit.app.domain.calculator.LetterStatusCalculatorTest" time="0.0"/>
+  <testcase name="accuracy between 50 and 79 percent with low failed attempts returns YELLOW" classname="com.playit.app.domain.calculator.LetterStatusCalculatorTest" time="0.0"/>
+  <testcase name="accuracy under 50 percent returns RED" classname="com.playit.app.domain.calculator.LetterStatusCalculatorTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

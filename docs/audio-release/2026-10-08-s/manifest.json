@@ -1,0 +1,24 @@
+{
+  "release": "2026-10-08-s",
+  "approvedBy": "user (listening review page 2026-10-01-heldsound-s-a-i, scored 5 on 2026-10-08; shipped at its own length by the user's choice)",
+  "teacherAudit": "pending, required before merge to main",
+  "clips": [
+    {
+      "clipId": "ph_s",
+      "file": "phonemes/ph_s.wav",
+      "text": "/s/ held (Sssss.)",
+      "voice": "Chatterbox-Turbo voice-cloned from the Kokoro reference (af_heart*0.7+af_bella*0.3)",
+      "speed": null,
+      "sourceBatch": "2026-10-01-heldsound-s-a-i",
+      "sourceFile": "s/cb_t1_s2.wav",
+      "reviewCsv": "2026-10-01-heldsound-s-a-i_review.csv",
+      "userVerdict": "score 5/5",
+      "userNote": "",
+      "teacherAudit": "pending",
+      "license": "MIT (Chatterbox-Turbo)",
+      "sha256": "a3c53911618eb4e8bbfd70ef51e4c0ae080c69b48ec5ed5698f4bca8fa7d8009",
+      "tool": "tools/audio/chatterbox_lab.py held take, text 'Sssss.', seed 2 (tools/audio/heldsound_batch.py)",
+      "note": "1.19 s of sound, longer than the spec's ~800 ms; the user chose to ship it unchanged on 2026-10-08, and the teacher audit may ask for a trim. Voiced 0% (no vowel tail). AGENTS.md held-sound decision (adviser confirmation pending)"
+    }
+  ]
+}

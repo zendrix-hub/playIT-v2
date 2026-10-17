@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.presentation.theme.PlayItMotionTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-14T14:14:24" hostname="LAPTOP-REHI7A0K" time="0.004">
+  <properties/>
+  <testcase name="durationsInsideAnimationGuide" classname="com.playit.app.presentation.theme.PlayItMotionTest" time="0.0"/>
+  <testcase name="reducedMotionSnaps" classname="com.playit.app.presentation.theme.PlayItMotionTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.playit.app.presentation.components.rememberAssetPainter
+import com.playit.app.presentation.map.components.CompanionAnimal
 import com.playit.app.presentation.theme.*
 
 /**
@@ -29,7 +30,7 @@ fun AvatarCircle(
     modifier: Modifier = Modifier
 ) {
     val clampedId = avatarId.coerceIn(1, 6)
-    val avatarPath = "images/mascot/avatar_0$clampedId.png"
+    val avatarPath = CompanionAnimal.fromId(clampedId).assetPath
     val bgColors = listOf(
         AquaAdventure,
         SunnyGold,

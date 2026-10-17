@@ -1,0 +1,150 @@
+@startuml class_m6_parent_dashboard
+!include _style.iuml
+hide empty members
+
+title Class Diagram, Module 6: Telemetry, Parent Dashboard and Diagnostics\nSDD §2.0 (Parent PDF report), §3.5.2 CSV Export (planned)
+
+package "presentation" {
+  class ArithmeticGuardDialog <<Composable>> {
+    +onPass()
+    +onDismiss()
+  }
+  class ParentDashboardScreen <<Composable>>
+  class ParentDashboardViewModel <<HiltViewModel>> {
+    +uiState : StateFlow<ParentDashboardUiState>
+    +noProfilesLeft : StateFlow<Boolean>
+    +selectProfile(profile)
+    +exportPdfReport()
+    +renameProfile(profile, newName)
+    +deleteProfile(profile)
+  }
+  class ParentDashboardUiState <<data>> {
+    +profiles : List<Profile>
+    +selectedProfile : Profile?
+    +dashboardData : ProfileDashboardData?
+    +isLoading : Boolean
+    +exportStatus : ExportStatus
+  }
+  interface ExportStatus <<sealed>>
+  class "Idle" as EIdle <<object>>
+  class Exporting <<object>>
+  class Success {
+    +file : File
+  }
+  class Error {
+    +message : String
+  }
+}
+
+package "domain" {
+  class ArithmeticGateManager {
+    +generateProblem() : ArithmeticProblem
+    +validateAnswer(problem, input) : Boolean
+  }
+  class ArithmeticProblem <<data>> {
+    +operand1 : Int
+    +operand2 : Int
+    +operator : String
+    +expectedAnswer : Int
+  }
+  class ReportGenerator {
+    +generateDashboardData(profileId) : ProfileDashboardData?
+    +generateReportData(profileId) : ReportData?
+  }
+  class LetterStatusCalculator {
+    +calculateStatus(accuracy, failedAttempts) : RiskStatus
+  }
+  class RetentionCalculator {
+    +calculate7DayRetention(...) : Float
+  }
+  enum RiskStatus {
+    GREEN
+    YELLOW
+    RED
+  }
+  class ProfileDashboardData <<data>> {
+    +profile : Profile
+    +totalStars : Int
+    +retentionScore : Float
+    +overallAccuracy : Float
+    +letterPerformances : List<LetterPerformance>
+  }
+  class ReportData <<data>> {
+    +profileName : String
+    +generatedDate : String
+    +totalStars : Int
+    +atRiskLetters : List<LetterPerformance>
+  }
+  interface ProfileRepository
+  interface PhonemeRepository
+  interface LessonProgressRepository
+  interface SayItAttemptRepository
+  interface FindItAttemptRepository
+  interface BlendItProgressRepository
+}
+
+package "data" {
+  class PdfExporter {
+    +exportReport(reportData) : Result<File>
+    <i>Android PdfDocument, app-specific storage</i>
+  }
+  class SessionManager <<Singleton>>
+}
+
+package "planned (SDD 3.5, FR-NEW-TEL)" {
+  class TelemetryLogger <<planned>> {
+    +log(event)
+  }
+  class CsvExportManager <<planned>> {
+    +exportCsv(profileId) : File
+  }
+  class TelemetryEventEntity <<planned>>
+}
+
+ArithmeticGuardDialog --> ArithmeticGateManager
+ArithmeticGateManager ..> ArithmeticProblem
+ArithmeticGuardDialog ..> ParentDashboardScreen : opens on success
+ParentDashboardScreen --> ParentDashboardViewModel
+ParentDashboardViewModel *-- ParentDashboardUiState
+ParentDashboardUiState --> ExportStatus
+ExportStatus <|.. EIdle
+ExportStatus <|.. Exporting
+ExportStatus <|.. Success
+ExportStatus <|.. Error
+ParentDashboardViewModel --> ProfileRepository
+ParentDashboardViewModel --> ReportGenerator
+ParentDashboardViewModel --> PdfExporter
+ParentDashboardViewModel --> SessionManager
+ReportGenerator --> ProfileRepository
+ReportGenerator --> PhonemeRepository
+ReportGenerator --> LessonProgressRepository
+ReportGenerator --> SayItAttemptRepository
+ReportGenerator --> FindItAttemptRepository
+ReportGenerator --> BlendItProgressRepository
+ReportGenerator --> LetterStatusCalculator
+ReportGenerator --> RetentionCalculator
+ReportGenerator ..> ProfileDashboardData : creates
+ReportGenerator ..> ReportData : creates
+LetterStatusCalculator ..> RiskStatus
+PdfExporter ..> ReportData : renders
+TelemetryLogger ..> TelemetryEventEntity : would write
+CsvExportManager ..> TelemetryEventEntity : would read
+ParentDashboardViewModel ..> CsvExportManager : would call
+
+
+' Layout only: stack classes in columns so the diagram is not one long row.
+ProfileRepository -[hidden]down- PhonemeRepository
+PhonemeRepository -[hidden]down- LessonProgressRepository
+SayItAttemptRepository -[hidden]down- FindItAttemptRepository
+FindItAttemptRepository -[hidden]down- BlendItProgressRepository
+LetterStatusCalculator -[hidden]down- RetentionCalculator
+EIdle -[hidden]down- Exporting
+Success -[hidden]down- Error
+TelemetryLogger -[hidden]down- CsvExportManager
+
+note bottom of RiskStatus
+  GREEN: accuracy 80% or more (mastered)
+  YELLOW: 50 to 79% (developing)
+  RED: under 50% or 3+ failed attempts (at risk)
+end note
+@enduml

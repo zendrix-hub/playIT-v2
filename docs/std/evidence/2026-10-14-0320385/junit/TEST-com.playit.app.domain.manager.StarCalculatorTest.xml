@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.domain.manager.StarCalculatorTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-14T14:13:46" hostname="LAPTOP-REHI7A0K" time="0.005">
+  <properties/>
+  <testcase name="oneOrTwoHeartsLost_returnsTwoStars" classname="com.playit.app.domain.manager.StarCalculatorTest" time="0.001"/>
+  <testcase name="threeOrMoreHeartsLost_returnsOneStar" classname="com.playit.app.domain.manager.StarCalculatorTest" time="0.003"/>
+  <testcase name="zeroHeartsLost_returnsThreeStars" classname="com.playit.app.domain.manager.StarCalculatorTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.presentation.splash.SplashScreenTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-14T14:14:24" hostname="LAPTOP-REHI7A0K" time="0.382">
+  <properties/>
+  <testcase name="motionPolicy_followsReducedMotion" classname="com.playit.app.presentation.splash.SplashScreenTest" time="0.07"/>
+  <testcase name="start_callsOnStart" classname="com.playit.app.presentation.splash.SplashScreenTest" time="0.147"/>
+  <testcase name="blink_closesBothEyes" classname="com.playit.app.presentation.splash.SplashScreenTest" time="0.076"/>
+  <testcase name="wink_closesOnlyTheRightEye_thenReopens" classname="com.playit.app.presentation.splash.SplashScreenTest" time="0.089"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

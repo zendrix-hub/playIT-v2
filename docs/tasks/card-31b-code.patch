@@ -1,0 +1,271 @@
+diff --git a/app/src/main/java/com/playit/app/data/audio/AudioResolver.kt b/app/src/main/java/com/playit/app/data/audio/AudioResolver.kt
+index b976186..5592835 100644
+--- a/app/src/main/java/com/playit/app/data/audio/AudioResolver.kt
++++ b/app/src/main/java/com/playit/app/data/audio/AudioResolver.kt
+@@ -7,14 +7,18 @@ import java.util.concurrent.atomic.AtomicInteger
+ 
+ private const val TAG = "AudioResolver"
+ 
++/**
++ * The app's sound effects. Card 31b removed the Blend It buzzer (never played) and the heart-loss whoosh
++ * (a wrong answer now plays one soft "not yet" pop, then Lily's kind words), and added a neutral tap for
++ * taking a Blend It tile back.
++ */
+ enum class SfxEvent(val filenameSuffix: String) {
+     CORRECT_CHIME("correct_chime"),
+     INCORRECT_POP("incorrect_pop"),
+-    HEART_LOSS_WHOOSH("heart_loss_whoosh"),
++    TILE_TAP("tile_tap"),
+     HEART_RECOVERY_SPARKLE("heart_recovery_sparkle"),
+     NODE_UNLOCK_CHIME("node_unlock_chime"),
+     LEVEL_COMPLETE_FANFARE("level_complete_fanfare"),
+-    BLENDIT_BUZZ("blendit_buzz"),
+     STREAK_BADGE_UNLOCK("streak_badge_unlock")
+ }
+ 
+@@ -116,11 +120,26 @@ class AudioResolver @Inject constructor() {
+         return "audio/keywords/kw_$clean.wav"
+     }
+ 
++    /**
++     * Sound effects released from Kenney's CC0 packs, levelled 6 dB under Lily's voice
++     * (docs/audio-release/2026-10-13-sfx, card 31b); any other event stays on its old MP3.
++     */
++    private val releasedSfx = setOf(
++        "correct_chime",
++        "incorrect_pop",
++        "tile_tap",
++        "heart_recovery_sparkle",
++        "node_unlock_chime",
++        "level_complete_fanfare",
++        "streak_badge_unlock"
++    )
++
+     /**
+      * Resolves the asset path for an SFX event.
+      */
+     fun getSfxPath(event: SfxEvent): String {
+-        return "audio/ui/sfx_${event.filenameSuffix}.mp3"
++        val ext = if (event.filenameSuffix in releasedSfx) "wav" else "mp3"
++        return "audio/ui/sfx_${event.filenameSuffix}.$ext"
+     }
+ 
+     /**
+diff --git a/app/src/main/java/com/playit/app/presentation/blendit/BlendItViewModel.kt b/app/src/main/java/com/playit/app/presentation/blendit/BlendItViewModel.kt
+index 1c72e21..c4c15a1 100644
+--- a/app/src/main/java/com/playit/app/presentation/blendit/BlendItViewModel.kt
++++ b/app/src/main/java/com/playit/app/presentation/blendit/BlendItViewModel.kt
+@@ -256,8 +256,8 @@ class BlendItViewModel @Inject constructor(
+             _placedTiles.value = currentPlaced
+             _tileBank.value = _tileBank.value + removedChar
+ 
+-            val popSfx = audioResolver.getSfxPath(SfxEvent.INCORRECT_POP)
+-            audioPlayer.playAssetAudio(popSfx)
++            // Taking a tile back is allowed, so it gets a neutral tap, not the "not yet" pop (card 31b).
++            audioPlayer.playAssetAudio(audioResolver.getSfxPath(SfxEvent.TILE_TAP))
+         }
+     }
+ 
+@@ -323,10 +323,10 @@ class BlendItViewModel @Inject constructor(
+             _totalHeartsLost.value = heartManager.sessionHeartsLost
+             _wrongAttemptsForCurrentWord.value += 1
+ 
++            // One soft "not yet", then the kind words; the heart animation shows the loss (card 31b).
+             val sfxPop = audioResolver.getSfxPath(SfxEvent.INCORRECT_POP)
+-            val sfxWhoosh = audioResolver.getSfxPath(SfxEvent.HEART_LOSS_WHOOSH)
+             val voEncourage = audioResolver.getRotatingEncourageVo()
+-            audioPlayer.playSequence(listOf(sfxPop, sfxWhoosh, voEncourage))
++            audioPlayer.playSequence(listOf(sfxPop, voEncourage))
+ 
+             if (isGameOver) {
+                 _uiState.value = BlendItUiState.HeartDepleted
+diff --git a/app/src/main/java/com/playit/app/presentation/findit/FindItViewModel.kt b/app/src/main/java/com/playit/app/presentation/findit/FindItViewModel.kt
+index f97bf1d..f564fa6 100644
+--- a/app/src/main/java/com/playit/app/presentation/findit/FindItViewModel.kt
++++ b/app/src/main/java/com/playit/app/presentation/findit/FindItViewModel.kt
+@@ -212,17 +212,12 @@ class FindItViewModel @Inject constructor(
+             val isGameOver = heartManager.deductHeart()
+             _hearts.value = heartManager.currentHearts
+ 
++            // One soft "not yet", then the kind words; the heart animation shows the loss (card 31b).
+             val sfxPop = audioResolver.getSfxPath(SfxEvent.INCORRECT_POP)
+-            val sfxWhoosh = audioResolver.getSfxPath(SfxEvent.HEART_LOSS_WHOOSH)
+             val vo = audioResolver.getRotatingEncourageVo()
+ 
+-            if (isGameOver) {
+-                _state.value = FindItState.GameOver
+-                audioPlayer.playSequence(listOf(sfxPop, sfxWhoosh, vo))
+-            } else {
+-                _state.value = FindItState.Incorrect(item)
+-                audioPlayer.playSequence(listOf(sfxPop, sfxWhoosh, vo))
+-            }
++            _state.value = if (isGameOver) FindItState.GameOver else FindItState.Incorrect(item)
++            audioPlayer.playSequence(listOf(sfxPop, vo))
+         }
+     }
+ 
+diff --git a/app/src/test/java/com/playit/app/data/audio/AudioCompletenessCheckTest.kt b/app/src/test/java/com/playit/app/data/audio/AudioCompletenessCheckTest.kt
+index ea67c5d..3b416e2 100644
+--- a/app/src/test/java/com/playit/app/data/audio/AudioCompletenessCheckTest.kt
++++ b/app/src/test/java/com/playit/app/data/audio/AudioCompletenessCheckTest.kt
+@@ -55,15 +55,15 @@ class AudioCompletenessCheckTest {
+         "vo_return_welcome_01.mp3"
+     )
+ 
++    // The Kenney CC0 set from release 2026-10-13-sfx; the buzzer and the whoosh are gone (card 31b).
+     private val requiredSfxFiles = listOf(
+-        "sfx_correct_chime.mp3",
+-        "sfx_incorrect_pop.mp3",
+-        "sfx_heart_loss_whoosh.mp3",
+-        "sfx_heart_recovery_sparkle.mp3",
+-        "sfx_node_unlock_chime.mp3",
+-        "sfx_level_complete_fanfare.mp3",
+-        "sfx_blendit_buzz.mp3",
+-        "sfx_streak_badge_unlock.mp3"
++        "sfx_correct_chime.wav",
++        "sfx_incorrect_pop.wav",
++        "sfx_tile_tap.wav",
++        "sfx_heart_recovery_sparkle.wav",
++        "sfx_node_unlock_chime.wav",
++        "sfx_level_complete_fanfare.wav",
++        "sfx_streak_badge_unlock.wav"
+     )
+ 
+     @Test
+@@ -72,7 +72,7 @@ class AudioCompletenessCheckTest {
+         assertEquals(32, requiredWords.size)
+         assertEquals(19, requiredVoLines.size)
+         assertEquals(2, legacyVoLines.size)
+-        assertEquals(8, requiredSfxFiles.size)
++        assertEquals(7, requiredSfxFiles.size)
+     }
+ 
+     @Test
+diff --git a/app/src/test/java/com/playit/app/data/audio/AudioResolverTest.kt b/app/src/test/java/com/playit/app/data/audio/AudioResolverTest.kt
+index dc4b13f..5e22fd6 100644
+--- a/app/src/test/java/com/playit/app/data/audio/AudioResolverTest.kt
++++ b/app/src/test/java/com/playit/app/data/audio/AudioResolverTest.kt
+@@ -121,16 +121,29 @@ class AudioResolverTest {
+         assertEquals("audio/vo/tutor/car_your_turn.wav", audioResolver.getTutorPath("car_your_turn"))
+     }
+ 
++    /** Every sound effect resolves to its released Kenney WAV (release 2026-10-13-sfx, card 31b). */
+     @Test
+     fun getSfxPath_returnsCorrectPaths() {
+-        assertEquals("audio/ui/sfx_correct_chime.mp3", audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME))
+-        assertEquals("audio/ui/sfx_incorrect_pop.mp3", audioResolver.getSfxPath(SfxEvent.INCORRECT_POP))
+-        assertEquals("audio/ui/sfx_heart_loss_whoosh.mp3", audioResolver.getSfxPath(SfxEvent.HEART_LOSS_WHOOSH))
+-        assertEquals("audio/ui/sfx_heart_recovery_sparkle.mp3", audioResolver.getSfxPath(SfxEvent.HEART_RECOVERY_SPARKLE))
+-        assertEquals("audio/ui/sfx_node_unlock_chime.mp3", audioResolver.getSfxPath(SfxEvent.NODE_UNLOCK_CHIME))
+-        assertEquals("audio/ui/sfx_level_complete_fanfare.mp3", audioResolver.getSfxPath(SfxEvent.LEVEL_COMPLETE_FANFARE))
+-        assertEquals("audio/ui/sfx_blendit_buzz.mp3", audioResolver.getSfxPath(SfxEvent.BLENDIT_BUZZ))
+-        assertEquals("audio/ui/sfx_streak_badge_unlock.mp3", audioResolver.getSfxPath(SfxEvent.STREAK_BADGE_UNLOCK))
++        assertEquals("audio/ui/sfx_correct_chime.wav", audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME))
++        assertEquals("audio/ui/sfx_incorrect_pop.wav", audioResolver.getSfxPath(SfxEvent.INCORRECT_POP))
++        assertEquals("audio/ui/sfx_tile_tap.wav", audioResolver.getSfxPath(SfxEvent.TILE_TAP))
++        assertEquals("audio/ui/sfx_heart_recovery_sparkle.wav", audioResolver.getSfxPath(SfxEvent.HEART_RECOVERY_SPARKLE))
++        assertEquals("audio/ui/sfx_node_unlock_chime.wav", audioResolver.getSfxPath(SfxEvent.NODE_UNLOCK_CHIME))
++        assertEquals("audio/ui/sfx_level_complete_fanfare.wav", audioResolver.getSfxPath(SfxEvent.LEVEL_COMPLETE_FANFARE))
++        assertEquals("audio/ui/sfx_streak_badge_unlock.wav", audioResolver.getSfxPath(SfxEvent.STREAK_BADGE_UNLOCK))
++    }
++
++    /** The buzzer and the whoosh are gone, and every remaining sound effect is on disk (card 31b). */
++    @Test
++    fun sfx_noBuzzOrWhoosh_andEveryFileExists() {
++        val names = SfxEvent.values().map { it.filenameSuffix }
++        assertTrue("buzzer still an event", "blendit_buzz" !in names)
++        assertTrue("whoosh still an event", "heart_loss_whoosh" !in names)
++        val assetsDir = listOf(File("src/main/assets"), File("app/src/main/assets")).first { it.exists() }
++        SfxEvent.values().forEach {
++            val f = File(assetsDir, audioResolver.getSfxPath(it))
++            assertTrue("missing ${f.path}", f.exists() && f.length() > 0L)
++        }
+     }
+ 
+     @Test
+diff --git a/app/src/test/java/com/playit/app/presentation/blendit/BlendItViewModelTest.kt b/app/src/test/java/com/playit/app/presentation/blendit/BlendItViewModelTest.kt
+index 5a58eaf..0325f96 100644
+--- a/app/src/test/java/com/playit/app/presentation/blendit/BlendItViewModelTest.kt
++++ b/app/src/test/java/com/playit/app/presentation/blendit/BlendItViewModelTest.kt
+@@ -259,12 +259,12 @@ class BlendItViewModelTest {
+         verify(exactly = 1) { audioPlayer.playAssetAudio("vo_path.mp3", any()) }
+     }
+ 
++    /** A wrong word plays one soft "not yet" pop, then the kind words: no buzzer, no whoosh (card 31b). */
+     @Test
+-    fun wrongSubmit_playsSoftPop_notBuzz() = runTest {
++    fun wrongSubmit_playsOneSoftPop_thenKindWords() = runTest {
+         val capturedSequences = mutableListOf<List<String>>()
+         every { audioPlayer.playSequence(capture(capturedSequences), any()) } just Runs
+-        every { audioResolver.getSfxPath(SfxEvent.INCORRECT_POP) } returns "sfx_pop.mp3"
+-        every { audioResolver.getSfxPath(SfxEvent.BLENDIT_BUZZ) } returns "sfx_buzz.mp3"
++        every { audioResolver.getSfxPath(SfxEvent.INCORRECT_POP) } returns "sfx_pop.wav"
+ 
+         viewModel = BlendItViewModel(
+             blendItWordRepository, blendItAttemptRepository, blendItWordSelector,
+@@ -281,8 +281,26 @@ class BlendItViewModelTest {
+         viewModel.submitWord()
+         advanceUntilIdle()
+ 
+-        assertTrue(capturedSequences.any { it.contains("sfx_pop.mp3") })
+-        assertFalse(capturedSequences.any { it.contains("sfx_buzz.mp3") })
++        assertTrue(capturedSequences.contains(listOf("sfx_pop.wav", "encourage_vo.mp3")))
++    }
++
++    /** Taking a tile back is allowed: a neutral tap, never the "not yet" pop (card 31b). */
++    @Test
++    fun removeTile_playsNeutralTap() = runTest {
++        every { audioResolver.getSfxPath(SfxEvent.TILE_TAP) } returns "sfx_tap.wav"
++        every { audioResolver.getSfxPath(SfxEvent.INCORRECT_POP) } returns "sfx_pop.wav"
++        viewModel = BlendItViewModel(
++            blendItWordRepository, blendItAttemptRepository, blendItWordSelector,
++            sessionManager, audioPlayer, audioResolver, savedStateHandle
++        )
++        advanceUntilIdle()
++
++        viewModel.placeTile(viewModel.tileBank.value.first())
++        viewModel.removeTile(0)
++        advanceUntilIdle()
++
++        verify(exactly = 1) { audioPlayer.playAssetAudio("sfx_tap.wav", any()) }
++        verify(exactly = 0) { audioPlayer.playAssetAudio("sfx_pop.wav", any()) }
+     }
+ 
+     /** Builds the view model with S, A, M placed, ready to submit; returns nothing, uses [viewModel]. */
+diff --git a/app/src/test/java/com/playit/app/presentation/findit/FindItViewModelTest.kt b/app/src/test/java/com/playit/app/presentation/findit/FindItViewModelTest.kt
+index 9f92ff0..2cc1084 100644
+--- a/app/src/test/java/com/playit/app/presentation/findit/FindItViewModelTest.kt
++++ b/app/src/test/java/com/playit/app/presentation/findit/FindItViewModelTest.kt
+@@ -3,6 +3,7 @@ package com.playit.app.presentation.findit
+ import androidx.lifecycle.SavedStateHandle
+ import com.playit.app.data.audio.AudioPlayer
+ import com.playit.app.data.audio.AudioResolver
++import com.playit.app.data.audio.SfxEvent
+ import com.playit.app.domain.manager.FindItPictureItem
+ import com.playit.app.domain.manager.GridGenerator
+ import com.playit.app.domain.model.Phoneme
+@@ -224,6 +225,24 @@ class FindItViewModelTest {
+         verify(exactly = 1) { audioPlayer.playAssetAudio("vo_path.mp3", any()) }
+     }
+ 
++    /** A wrong tap plays one soft "not yet" pop, then the kind words; the whoosh is gone (card 31b). */
++    @Test
++    fun wrongTap_playsOneSoftPop_thenKindWords() = runTest {
++        every { audioResolver.getSfxPath(SfxEvent.INCORRECT_POP) } returns "sfx_pop.wav"
++        val sequences = mutableListOf<List<String>>()
++        every { audioPlayer.playSequence(capture(sequences), any()) } just Runs
++        viewModel = FindItViewModel(
++            phonemeRepository, findItAttemptRepository, gridGenerator,
++            sessionManager, audioPlayer, audioResolver, savedStateHandle
++        )
++        advanceUntilIdle()
++
++        viewModel.selectPictureItem(mockPictureGrid[3])
++        advanceUntilIdle()
++
++        assertTrue(sequences.contains(listOf("sfx_pop.wav", "encourage_vo")))
++    }
++
+     @Test
+     fun wrongTaps_countIntoSessionHeartsLost() = runTest {
+         viewModel = FindItViewModel(

@@ -47,7 +47,7 @@ fun ProfileCard(
         depthHeight = 6.dp,
         modifier = modifier
             .fillMaxWidth()
-            .height(112.dp)
+            .heightIn(min = 112.dp)
             .semantics(mergeDescendants = true) {
                 contentDescription = accessibilityDescription
             }

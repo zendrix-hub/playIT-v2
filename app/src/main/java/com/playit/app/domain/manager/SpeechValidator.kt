@@ -1,5 +1,7 @@
 package com.playit.app.domain.manager
 
+import com.playit.app.domain.model.SpeechErrorType
+import com.playit.app.domain.model.SpeechJudgement
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -15,7 +17,87 @@ import javax.inject.Singleton
  * Strictly pure Kotlin — zero android.* imports per 02_ARCHITECTURE_SUMMARY.md §3.
  */
 @Singleton
-class SpeechValidator @Inject constructor() {
+class SpeechValidator internal constructor(
+    private val soundModeEnabled: Boolean
+) {
+
+    @Inject constructor() : this(SOUND_MODE_ENABLED)
+
+    companion object {
+        val CONTINUOUS = setOf("a", "e", "i", "o", "u", "f", "l", "m", "n", "r", "s", "v", "z")
+
+        /**
+         * Sound mode accepts a held continuous sound (>= 400 ms, no foil reported). Off until an
+         * on-device test with children shows held letter names are caught: in the spike, Vosk
+         * reported "em" and "es" as blank or [unk], which this rule would accept
+         * (docs/spikes/vosk-foil-spike.md). While off, judgeSound still reports foils and
+         * returns UNCONFIRMED for everything else.
+         */
+        const val SOUND_MODE_ENABLED = false
+    }
+
+    private val letterNames: Map<String, List<String>> = mapOf(
+        "a" to listOf("a", "ay"),
+        "b" to listOf("b", "bee", "be"),
+        "c" to listOf("c", "see", "sea"),
+        "d" to listOf("d", "dee"),
+        "e" to listOf("e", "ee"),
+        "f" to listOf("f", "ef"),
+        "g" to listOf("g", "gee", "jee"),
+        "h" to listOf("h", "aitch", "eych"),
+        "i" to listOf("i", "eye"),
+        "j" to listOf("j", "jay"),
+        "k" to listOf("k", "kay"),
+        "l" to listOf("l", "el"),
+        "m" to listOf("m", "em"),
+        "n" to listOf("n", "en"),
+        "o" to listOf("o", "oh"),
+        "p" to listOf("p", "pee"),
+        "q" to listOf("q", "cue", "queue"),
+        "r" to listOf("r", "ar"),
+        "s" to listOf("s", "es"),
+        "t" to listOf("t", "tee", "tea"),
+        "u" to listOf("u", "you", "yu"),
+        "v" to listOf("v", "vee"),
+        "w" to listOf("w", "double"),
+        "x" to listOf("x", "ex", "eks"),
+        "y" to listOf("y", "why"),
+        "z" to listOf("z", "zee", "zed")
+    )
+
+    private val addedVowelForms: Map<String, List<String>> = mapOf(
+        "b" to listOf("ba", "buh"),
+        "c" to listOf("ca", "cuh", "ka", "kuh"),
+        "d" to listOf("da", "duh"),
+        "f" to listOf("fa", "fuh"),
+        "g" to listOf("ga", "guh"),
+        "h" to listOf("ha", "huh"),
+        "j" to listOf("ja", "juh"),
+        "k" to listOf("ka", "kuh"),
+        "l" to listOf("la", "luh"),
+        "m" to listOf("ma", "muh"),
+        "n" to listOf("na", "nuh"),
+        "p" to listOf("pa", "puh"),
+        "q" to listOf("qa", "quh", "kwa"),
+        "r" to listOf("ra", "ruh"),
+        "s" to listOf("sa", "suh"),
+        "t" to listOf("ta", "tuh"),
+        "v" to listOf("va", "vuh"),
+        "w" to listOf("wa", "wuh"),
+        "x" to listOf("xa", "xuh", "eks"),
+        "y" to listOf("ya", "yuh"),
+        "z" to listOf("za", "zuh")
+    )
+
+    private val substitutions: Map<String, List<String>> = mapOf(
+        "f" to listOf("p", "pa", "pee"),
+        "v" to listOf("b", "ba", "bee"),
+        "z" to listOf("s", "sa", "es")
+    )
+
+    private val seededExampleWords: Set<String> by lazy {
+        wordAcceptedVariants.keys + wordAcceptedVariants.values.flatten()
+    }
 
     /**
      * Map of each of the 26 Marungko phonemes (with legacy fallback support) to their accepted phonetic transcriptions,
@@ -145,39 +227,168 @@ class SpeechValidator @Inject constructor() {
     }
 
     /**
+     * Judges an attempt in sound mode (isolated phoneme practice / recall checks).
+     *
+     * Checked in this order:
+     * 1. Tokenize like validate(). Letter name foil -> LETTER_NAME. Added vowel foil -> ADDED_VOWEL.
+     *    Substitution foil -> SUBSTITUTION. Seeded example word -> OTHER_WORD. All isCorrect = false.
+     * While sound mode is off (SOUND_MODE_ENABLED), steps 2-5 are skipped: UNCONFIRMED, false.
+     * 2. If letter not in CONTINUOUS, return UNCONFIRMED, false (stops judged in word mode).
+     * 3. If sustainedMs == null, return UNCONFIRMED, false.
+     * 4. If sustainedMs >= 400 and transcript is blank or only [unk], return NONE, true.
+     * 5. Otherwise return NO_SPEECH, false.
+     */
+    fun judgeSound(
+        recognizedText: String?,
+        letter: String,
+        sustainedMs: Int?
+    ): SpeechJudgement {
+        val cleanLetter = letter.lowercase().trim()
+        val cleanText = recognizedText?.lowercase()?.trim() ?: ""
+        val tokens = cleanText.split(Regex("[\\s,.-]+")).filter { it.isNotBlank() }
+
+        val targetLetterNames = letterNames[cleanLetter] ?: emptyList()
+        val targetAddedVowels = addedVowelForms[cleanLetter] ?: emptyList()
+        val targetSubstitutions = substitutions[cleanLetter] ?: emptyList()
+
+        if (tokens.any { it in targetLetterNames }) {
+            return SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.LETTER_NAME, heard = cleanText)
+        }
+        if (tokens.any { it in targetAddedVowels }) {
+            return SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.ADDED_VOWEL, heard = cleanText)
+        }
+        if (tokens.any { it in targetSubstitutions }) {
+            return SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.SUBSTITUTION, heard = cleanText)
+        }
+        if (tokens.any { it in seededExampleWords }) {
+            return SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.OTHER_WORD, heard = cleanText)
+        }
+
+        if (!soundModeEnabled) {
+            return SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.UNCONFIRMED, heard = cleanText)
+        }
+        if (cleanLetter !in CONTINUOUS) {
+            return SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.UNCONFIRMED, heard = cleanText)
+        }
+        if (sustainedMs == null) {
+            return SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.UNCONFIRMED, heard = cleanText)
+        }
+        if (sustainedMs >= 400 && (cleanText.isEmpty() || cleanText == "[unk]" || (tokens.isNotEmpty() && tokens.all { it == "[unk]" }))) {
+            return SpeechJudgement(isCorrect = true, errorType = SpeechErrorType.NONE, heard = cleanText)
+        }
+
+        return SpeechJudgement(isCorrect = false, errorType = SpeechErrorType.NO_SPEECH, heard = cleanText)
+    }
+
+    /**
+     * Judges an attempt in word mode (Say It word lessons).
+     * Blank gives NO_SPEECH. validateWord() true gives NONE, true.
+     * Letter-name token gives LETTER_NAME. Added-vowel token gives ADDED_VOWEL.
+     * Anything else gives OTHER_WORD.
+     */
+    fun judgeWord(
+        recognizedText: String?,
+        targetWord: String,
+        letter: String
+    ): SpeechJudgement {
+        if (recognizedText.isNullOrBlank()) {
+            return SpeechJudgement(
+                isCorrect = false,
+                errorType = SpeechErrorType.NO_SPEECH,
+                heard = ""
+            )
+        }
+
+        val cleanText = recognizedText.lowercase().trim()
+        if (validateWord(cleanText, targetWord)) {
+            return SpeechJudgement(
+                isCorrect = true,
+                errorType = SpeechErrorType.NONE,
+                heard = cleanText
+            )
+        }
+
+        val tokens = cleanText.split(Regex("[\\s,.-]+")).filter { it.isNotBlank() }
+        val cleanLetter = letter.lowercase().trim()
+        val targetLetterNames = letterNames[cleanLetter] ?: emptyList()
+        val targetAddedVowels = addedVowelForms[cleanLetter] ?: emptyList()
+
+        if (tokens.any { it in targetLetterNames }) {
+            return SpeechJudgement(
+                isCorrect = false,
+                errorType = SpeechErrorType.LETTER_NAME,
+                heard = cleanText
+            )
+        }
+        if (tokens.any { it in targetAddedVowels }) {
+            return SpeechJudgement(
+                isCorrect = false,
+                errorType = SpeechErrorType.ADDED_VOWEL,
+                heard = cleanText
+            )
+        }
+
+        return SpeechJudgement(
+            isCorrect = false,
+            errorType = SpeechErrorType.OTHER_WORD,
+            heard = cleanText
+        )
+    }
+
+    /**
+     * Scoped grammar for Vosk recognizer.
+     * Word mode (targetWord != null): accepted word variants + that letter's foils.
+     * Sound mode (targetWord == null): that letter's foils only ([unk] appended by VoskRecognizer).
+     */
+    fun grammarFor(letter: String, targetWord: String?): List<String> {
+        val cleanLetter = letter.lowercase().trim()
+        val targetLetterNames = letterNames[cleanLetter] ?: emptyList()
+        val targetAddedVowels = addedVowelForms[cleanLetter] ?: emptyList()
+        val targetSubstitutions = substitutions[cleanLetter] ?: emptyList()
+
+        val foils = targetLetterNames + targetAddedVowels + targetSubstitutions
+
+        return if (targetWord != null) {
+            val wordVariants = getAcceptedWordVariants(targetWord)
+            (wordVariants + foils).distinct()
+        } else {
+            foils.distinct()
+        }
+    }
+
+    /**
      * Validates if the recognized speech transcript corresponds to the target phoneme.
      *
      * @param recognizedText Raw text output from speech recognition.
      * @param targetPhoneme Target letter or phoneme identifier (e.g. "m", "ng", "ñ").
      * @return true if speech matches the phoneme's accepted variations or phonetic profile.
      */
+    @Deprecated("Use judgeSound or judgeWord")
     fun validate(recognizedText: String?, targetPhoneme: String): Boolean {
-        if (recognizedText.isNullOrBlank()) return false
-
-        val cleanText = recognizedText.lowercase().trim()
         val cleanTarget = targetPhoneme.lowercase().trim()
 
-        // 1. Exact match or direct substring match
-        if (cleanText == cleanTarget) return true
+        if (cleanTarget == "ng" || cleanTarget == "ñ") {
+            if (recognizedText.isNullOrBlank()) return false
 
-        val acceptedList = phonemeAcceptedVariants[cleanTarget] ?: listOf(cleanTarget)
+            val cleanText = recognizedText.lowercase().trim()
 
-        // 2. Tokenize transcript into individual words and clean tokens
-        val tokens = cleanText.split(Regex("[\\s,.-]+")).filter { it.isNotBlank() }
+            // 1. Exact match or direct substring match
+            if (cleanText == cleanTarget) return true
 
-        // 3. Direct match against accepted list
-        for (accepted in acceptedList) {
-            if (cleanText == accepted) return true
-            if (tokens.contains(accepted)) return true
-        }
+            val acceptedList = phonemeAcceptedVariants[cleanTarget] ?: listOf(cleanTarget)
 
-        // 4. Starting phonetic match (e.g. saying "muh" or "ma" for 'm')
-        for (token in tokens) {
-            if (token.startsWith(cleanTarget) && token.length <= cleanTarget.length + 2) {
-                return true
+            // 2. Tokenize transcript into individual words and clean tokens
+            val tokens = cleanText.split(Regex("[\\s,.-]+")).filter { it.isNotBlank() }
+
+            // 3. Direct match against accepted list
+            for (accepted in acceptedList) {
+                if (cleanText == accepted) return true
+                if (tokens.contains(accepted)) return true
             }
+
+            return false
         }
 
-        return false
+        return judgeSound(recognizedText, cleanTarget, null).isCorrect
     }
 }

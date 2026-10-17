@@ -1,0 +1,78 @@
+@startuml seq_m4_blend_it
+!include _style.iuml
+autonumber "<b>0."
+hide footbox
+
+title Sequence Diagram, Module 4: Blend It word, sound-out and group completion (SDD §3.4, FR-13)
+
+actor "Child" as Child
+participant "BlendItScreen" as Screen
+participant "BlendItViewModel" as VM
+participant "BlendItWordRepository" as Words
+participant "BlendItWordSelector" as Selector
+participant "HeartManager" as Hearts
+participant "BlendItAttemptRepository" as Attempts
+participant "AudioPlayer" as Player
+participant "BlendItCompleteViewModel" as Done
+participant "BlendItStarThresholds" as Stars
+participant "BlendItProgressRepository" as Progress
+participant "StreakTracker" as Streak
+database "Room" as DB
+
+== Load the chapter's words ==
+Screen -> VM : create (groupId)
+activate VM
+VM -> Words : getWordsForGroup(groupId).first()
+Words -> DB : SELECT FROM blend_it_words WHERE groupId = :id
+Words --> VM : decodable words (seeded, FR-13)
+VM -> Selector : selectWordsForSession(groupId, words)
+Selector --> VM : the session's words (e.g. SAM)
+VM --> Screen : 3 slots, letter tiles, hint card "Tap to hear word"
+
+== Build and check the word ==
+Child -> Screen : taps tiles S, A, M
+Screen -> VM : placeTile(letter) x3
+VM -> Player : playAssetAudio(sound of each letter)
+Child -> Screen : taps Check Word
+Screen -> VM : submitWord()
+VM ->> Attempts : saveAttempt(BlendItAttempt(profileId, groupId, wordId, isCorrect))
+Attempts -> DB : INSERT INTO blend_it_attempts
+
+alt the tiles spell the word
+  VM -> Hearts : checkRecovery(consecutiveCorrectWords)
+  VM --> Screen : uiState = WordCorrect
+  loop each letter i of "sam"
+    VM --> Screen : highlightedSlotIndex = i
+    VM -> Player : playAndAwait(ph_<letter>, min 750 ms, max 2 s)
+  end
+  VM --> Screen : highlightedSlotIndex = ALL_SLOTS (every tile lit)
+  VM -> VM : wait 500 ms (BLEND_PAUSE_MS)
+  VM -> Player : playAndAwait(word "sam", max 2.5 s)
+  VM -> Player : playSequence([sfx_correct_chime, rotating "correct"])
+  alt more words
+    VM -> VM : setupWordAtIndex(next)
+  else last word
+    VM --> Screen : uiState = SessionComplete
+  end
+else wrong word
+  VM -> Hearts : deductHeart()
+  VM -> Player : playSequence([sfx_incorrect_pop, sfx_heart_loss_whoosh, encouragement])
+  alt hearts reach 0
+    VM --> Screen : uiState = HeartDepleted (3-heart restart dialog)
+  else
+    VM --> Screen : uiState = WordIncorrect(heartsLeft)
+  end
+end
+deactivate VM
+
+== Group complete ==
+Screen -> Done : navigate (groupId, heartsLost, wordsCorrect, totalWords)
+activate Done
+Done -> Stars : calculateStars(groupId, heartsLost, wordsCorrect, totalWords)
+Stars --> Done : stars (1 to 3)
+Done -> Progress : saveProgress(BlendItProgress(..., starsEarned, isCompleted = true))
+Progress -> DB : INSERT OR REPLACE INTO blend_it_progress\n(UNIQUE profileId, groupId)
+Done -> Streak : recordActivity(profileId)
+Done -> Player : fanfare, complete line, next cue
+deactivate Done
+@enduml

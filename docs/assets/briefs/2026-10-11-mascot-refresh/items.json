@@ -1,0 +1,166 @@
+{
+ "batch": "2026-10-11-mascot-refresh",
+ "size": "1024x1024",
+ "variants_per_round": 2,
+ "app_images": "app/src/main/assets/images",
+ "style_prompt": "Flat vector children's illustration in exactly the style of the attached style reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red, simple enough to read at 64 px. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no watermark.",
+ "style_refs": [
+  "app/src/main/assets/images/_style-reference-sheet/anchor_letter-card.png",
+  "app/src/main/assets/images/pictures/picture_mouse.png",
+  "app/src/main/assets/images/pictures/picture_cat.png",
+  "app/src/main/assets/images/pictures/picture_sun.png"
+ ],
+ "notes": "Attach style_refs plus the item's own refs (identity: what must not change). Lily is redrawn, not redesigned (AGENTS.md). Each animal keeps its current animal and main colour, because a child already picked it as their avatar.",
+ "items": [
+  {
+   "id": "lily_idle",
+   "word": "Lily idle",
+   "why": "default mascot state (MascotState.IDLE)",
+   "app_file": "mascot/lily_idle.png",
+   "refs": [
+    "app/src/main/assets/images/mascot/lily_idle.png",
+    "app/src/main/assets/images/mascot/lily_idle.png"
+   ],
+   "subject": "Standing relaxed, both hands resting together in front of her belly, a warm closed-mouth smile, eyes open and looking at the viewer.",
+   "prompt": "Standing relaxed, both hands resting together in front of her belly, a warm closed-mouth smile, eyes open and looking at the viewer. Lily, the PlayIT mascot: the small orange tarsier in the attached identity reference (lily_idle.png), redrawn in the style above but not redesigned. Keep the same species, the same orange fur with a lighter cream belly oval, the same very big round brown eyes with a white gleam, big round ears with light-orange insides, small pink cheek blush, the long thin tail curling up behind her with a small tuft, small feet, and thin arms with round pale finger pads. Full body, standing, front view, centred, filling about 80% of the square's height. The same character, proportions, colours and size in every Lily picture of this set; only the pose changes. Flat vector children's illustration in exactly the style of the attached style reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red, simple enough to read at 64 px. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no watermark."
+  },
+  {
+   "id": "lily_listening",
+   "word": "Lily listening",
+   "why": "Hear It while the sound plays; Say It while the mic listens (MascotState.LISTENING)",
+   "app_file": "mascot/lily_listening.png",
+   "refs": [
+    "app/src/main/assets/images/mascot/lily_idle.png",
+    "app/src/main/assets/images/mascot/lily_listening.png"
+   ],
+   "subject": "Listening carefully: one hand cupped behind one ear, head tilted a little, eyes open and curious, mouth closed in a small smile. No headphones.",
+   "prompt": "Listening carefully: one hand cupped behind one ear, head tilted a little, eyes open and curious, mouth closed in a small smile. No headphones. Lily, the PlayIT mascot: the small orange tarsier in the attached identity reference (lily_idle.png), redrawn in the style above but not redesigned. Keep the same species, the same orange fur with a lighter cream belly oval, the same very big round brown eyes with a white gleam, big round ears with light-orange insides, small pink cheek blush, the long thin tail curling up behind her with a small tuft, small feet, and thin arms with round pale finger pads. Full body, standing, front view, centred, filling about 80% of the square's height. The same character, proportions, colours and size in every Lily picture of this set; only the pose changes. Flat vector children's illustration in exactly the style of the attached style reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red, simple enough to read at 64 px. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no watermark."
+  },
+  {
+   "id": "lily_celebrating",
+   "word": "Lily celebrating",
+   "why": "correct answers and complete screens (MascotState.CELEBRATING)",
+   "app_file": "mascot/lily_celebrating.png",
+   "refs": [
+    "app/src/main/assets/images/mascot/lily_idle.png",
+    "app/src/main/assets/images/mascot/lily_celebrating.png"
+   ],
+   "subject": "Celebrating: both arms raised high, a big open-mouth smile, eyes happily closed in two curves, two or three small yellow sparkles near her hands. No confetti strips.",
+   "prompt": "Celebrating: both arms raised high, a big open-mouth smile, eyes happily closed in two curves, two or three small yellow sparkles near her hands. No confetti strips. Lily, the PlayIT mascot: the small orange tarsier in the attached identity reference (lily_idle.png), redrawn in the style above but not redesigned. Keep the same species, the same orange fur with a lighter cream belly oval, the same very big round brown eyes with a white gleam, big round ears with light-orange insides, small pink cheek blush, the long thin tail curling up behind her with a small tuft, small feet, and thin arms with round pale finger pads. Full body, standing, front view, centred, filling about 80% of the square's height. The same character, proportions, colours and size in every Lily picture of this set; only the pose changes. Flat vector children's illustration in exactly the style of the attached style reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red, simple enough to read at 64 px. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no watermark."
+  },
+  {
+   "id": "lily_encouraging",
+   "word": "Lily encouraging",
+   "why": "gentle retries and the map greeting chip (MascotState.ENCOURAGING)",
+   "app_file": "mascot/lily_encouraging.png",
+   "refs": [
+    "app/src/main/assets/images/mascot/lily_idle.png",
+    "app/src/main/assets/images/mascot/lily_encouraging.png"
+   ],
+   "subject": "Encouraging: one thumb up beside her body, a gentle reassuring smile, both eyes soft and kind.",
+   "prompt": "Encouraging: one thumb up beside her body, a gentle reassuring smile, both eyes soft and kind. Lily, the PlayIT mascot: the small orange tarsier in the attached identity reference (lily_idle.png), redrawn in the style above but not redesigned. Keep the same species, the same orange fur with a lighter cream belly oval, the same very big round brown eyes with a white gleam, big round ears with light-orange insides, small pink cheek blush, the long thin tail curling up behind her with a small tuft, small feet, and thin arms with round pale finger pads. Full body, standing, front view, centred, filling about 80% of the square's height. The same character, proportions, colours and size in every Lily picture of this set; only the pose changes. Flat vector children's illustration in exactly the style of the attached style reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red, simple enough to read at 64 px. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no watermark."
+  },
+  {
+   "id": "lily_thinking",
+   "word": "Lily thinking",
+   "why": "loading and noisy-room messages (MascotState.THINKING)",
+   "app_file": "mascot/lily_thinking.png",
+   "refs": [
+    "app/src/main/assets/images/mascot/lily_idle.png",
+    "app/src/main/assets/images/mascot/lily_thinking.png"
+   ],
+   "subject": "Thinking: one finger touching her chin, eyes looking up and to the side, mouth a small calm line.",
+   "prompt": "Thinking: one finger touching her chin, eyes looking up and to the side, mouth a small calm line. Lily, the PlayIT mascot: the small orange tarsier in the attached identity reference (lily_idle.png), redrawn in the style above but not redesigned. Keep the same species, the same orange fur with a lighter cream belly oval, the same very big round brown eyes with a white gleam, big round ears with light-orange insides, small pink cheek blush, the long thin tail curling up behind her with a small tuft, small feet, and thin arms with round pale finger pads. Full body, standing, front view, centred, filling about 80% of the square's height. The same character, proportions, colours and size in every Lily picture of this set; only the pose changes. Flat vector children's illustration in exactly the style of the attached style reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red, simple enough to read at 64 px. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no watermark."
+  },
+  {
+   "id": "lily_pointing",
+   "word": "Lily pointing",
+   "why": "after Hear It plays, pointing at the content beside her (MascotState.POINTING)",
+   "app_file": "mascot/lily_pointing.png",
+   "refs": [
+    "app/src/main/assets/images/mascot/lily_idle.png",
+    "app/src/main/assets/images/mascot/lily_pointing.png"
+   ],
+   "subject": "Pointing: one arm stretched out to the viewer's right, one finger pointing at something beside her, looking at the viewer with a friendly smile.",
+   "prompt": "Pointing: one arm stretched out to the viewer's right, one finger pointing at something beside her, looking at the viewer with a friendly smile. Lily, the PlayIT mascot: the small orange tarsier in the attached identity reference (lily_idle.png), redrawn in the style above but not redesigned. Keep the same species, the same orange fur with a lighter cream belly oval, the same very big round brown eyes with a white gleam, big round ears with light-orange insides, small pink cheek blush, the long thin tail curling up behind her with a small tuft, small feet, and thin arms with round pale finger pads. Full body, standing, front view, centred, filling about 80% of the square's height. The same character, proportions, colours and size in every Lily picture of this set; only the pose changes. Flat vector children's illustration in exactly the style of the attached style reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red, simple enough to read at 64 px. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no watermark."
+  },
+  {
+   "id": "lily_waving",
+   "word": "Lily waving",
+   "why": "welcome and onboarding (MascotState.WAVING)",
+   "app_file": "mascot/lily_waving.png",
+   "refs": [
+    "app/src/main/assets/images/mascot/lily_idle.png",
+    "app/src/main/assets/images/mascot/lily_waving.png"
+   ],
+   "subject": "Waving hello: the hand on the viewer's right raised beside her head with an open palm, a big friendly smile.",
+   "prompt": "Waving hello: the hand on the viewer's right raised beside her head with an open palm, a big friendly smile. Lily, the PlayIT mascot: the small orange tarsier in the attached identity reference (lily_idle.png), redrawn in the style above but not redesigned. Keep the same species, the same orange fur with a lighter cream belly oval, the same very big round brown eyes with a white gleam, big round ears with light-orange insides, small pink cheek blush, the long thin tail curling up behind her with a small tuft, small feet, and thin arms with round pale finger pads. Full body, standing, front view, centred, filling about 80% of the square's height. The same character, proportions, colours and size in every Lily picture of this set; only the pose changes. Flat vector children's illustration in exactly the style of the attached style reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red, simple enough to read at 64 px. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no watermark."
+  },
+  {
+   "id": "avatar_01_cat",
+   "word": "Miki the cat",
+   "why": "profile avatar (AvatarCircle) and the map companion beside the active node",
+   "app_file": "characters/avatar_01_cat.png",
+   "refs": [
+    "app/src/main/assets/images/characters/avatar_01_cat.png"
+   ],
+   "subject": "Miki the cat: orange fur with a cream muzzle and cream inner ears, pointed ears, three tiny whisker dots on each cheek.",
+   "prompt": "Miki the cat: orange fur with a cream muzzle and cream inner ears, pointed ears, three tiny whisker dots on each cheek. One round, front-view head of a friendly cartoon animal, the same animal and main colour as the attached current avatar, redrawn in the style above but not redesigned. Head only, no body, centred, filling about 62% of the square. Big round brown eyes with a white gleam, small pink cheek blush and a small closed smile. The same eye style, outline weight and head size for all six animals of this set. Flat vector children's illustration in exactly the style of the attached style reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red, simple enough to read at 64 px. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no watermark."
+  },
+  {
+   "id": "avatar_02_monkey",
+   "word": "Milo the monkey",
+   "why": "profile avatar (AvatarCircle) and the map companion beside the active node",
+   "app_file": "characters/avatar_02_monkey.png",
+   "refs": [
+    "app/src/main/assets/images/characters/avatar_02_monkey.png"
+   ],
+   "subject": "Milo the monkey: warm brown fur, a light tan heart-shaped face, round ears on the sides with tan insides.",
+   "prompt": "Milo the monkey: warm brown fur, a light tan heart-shaped face, round ears on the sides with tan insides. One round, front-view head of a friendly cartoon animal, the same animal and main colour as the attached current avatar, redrawn in the style above but not redesigned. Head only, no body, centred, filling about 62% of the square. Big round brown eyes with a white gleam, small pink cheek blush and a small closed smile. The same eye style, outline weight and head size for all six animals of this set. Flat vector children's illustration in exactly the style of the attached style reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red, simple enough to read at 64 px. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no watermark."
+  },
+  {
+   "id": "avatar_03_bunny",
+   "word": "Bella the bunny",
+   "why": "profile avatar (AvatarCircle) and the map companion beside the active node",
+   "app_file": "characters/avatar_03_bunny.png",
+   "refs": [
+    "app/src/main/assets/images/characters/avatar_03_bunny.png"
+   ],
+   "subject": "Bella the bunny: white fur, two long upright ears with pink insides, a tiny pink nose.",
+   "prompt": "Bella the bunny: white fur, two long upright ears with pink insides, a tiny pink nose. One round, front-view head of a friendly cartoon animal, the same animal and main colour as the attached current avatar, redrawn in the style above but not redesigned. Head only, no body, centred, filling about 62% of the square. Big round brown eyes with a white gleam, small pink cheek blush and a small closed smile. The same eye style, outline weight and head size for all six animals of this set. Flat vector children's illustration in exactly the style of the attached style reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red, simple enough to read at 64 px. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no watermark."
+  },
+  {
+   "id": "avatar_04_bear",
+   "word": "Barnaby the bear",
+   "why": "profile avatar (AvatarCircle) and the map companion beside the active node",
+   "app_file": "characters/avatar_04_bear.png",
+   "refs": [
+    "app/src/main/assets/images/characters/avatar_04_bear.png"
+   ],
+   "subject": "Barnaby the bear: honey-brown fur, round ears with cream insides, a cream muzzle with a small dark nose.",
+   "prompt": "Barnaby the bear: honey-brown fur, round ears with cream insides, a cream muzzle with a small dark nose. One round, front-view head of a friendly cartoon animal, the same animal and main colour as the attached current avatar, redrawn in the style above but not redesigned. Head only, no body, centred, filling about 62% of the square. Big round brown eyes with a white gleam, small pink cheek blush and a small closed smile. The same eye style, outline weight and head size for all six animals of this set. Flat vector children's illustration in exactly the style of the attached style reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red, simple enough to read at 64 px. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no watermark."
+  },
+  {
+   "id": "avatar_05_frog",
+   "word": "Finley the frog",
+   "why": "profile avatar (AvatarCircle) and the map companion beside the active node",
+   "app_file": "characters/avatar_05_frog.png",
+   "refs": [
+    "app/src/main/assets/images/characters/avatar_05_frog.png"
+   ],
+   "subject": "Finley the frog: bright leaf-green skin, two round eyes sitting on top of the head, a wide gentle smile, a cream mouth area.",
+   "prompt": "Finley the frog: bright leaf-green skin, two round eyes sitting on top of the head, a wide gentle smile, a cream mouth area. One round, front-view head of a friendly cartoon animal, the same animal and main colour as the attached current avatar, redrawn in the style above but not redesigned. Head only, no body, centred, filling about 62% of the square. Big round brown eyes with a white gleam, small pink cheek blush and a small closed smile. The same eye style, outline weight and head size for all six animals of this set. Flat vector children's illustration in exactly the style of the attached style reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red, simple enough to read at 64 px. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no watermark."
+  },
+  {
+   "id": "avatar_06_owl",
+   "word": "Ollie the owl",
+   "why": "profile avatar (AvatarCircle) and the map companion beside the active node",
+   "app_file": "characters/avatar_06_owl.png",
+   "refs": [
+    "app/src/main/assets/images/characters/avatar_06_owl.png"
+   ],
+   "subject": "Ollie the owl: soft purple feathers, two small ear tufts, big round eyes with cream rims, a small yellow beak.",
+   "prompt": "Ollie the owl: soft purple feathers, two small ear tufts, big round eyes with cream rims, a small yellow beak. One round, front-view head of a friendly cartoon animal, the same animal and main colour as the attached current avatar, redrawn in the style above but not redesigned. Head only, no body, centred, filling about 62% of the square. Big round brown eyes with a white gleam, small pink cheek blush and a small closed smile. The same eye style, outline weight and head size for all six animals of this set. Flat vector children's illustration in exactly the style of the attached style reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red, simple enough to read at 64 px. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no watermark."
+  }
+ ]
+}

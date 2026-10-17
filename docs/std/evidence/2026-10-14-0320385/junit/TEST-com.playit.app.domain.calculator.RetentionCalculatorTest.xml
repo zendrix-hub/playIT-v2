@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.domain.calculator.RetentionCalculatorTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-14T14:13:46" hostname="LAPTOP-REHI7A0K" time="0.004">
+  <properties/>
+  <testcase name="calculates percentage correctly for attempts within 7 days" classname="com.playit.app.domain.calculator.RetentionCalculatorTest" time="0.003"/>
+  <testcase name="no attempts in 7-day window returns 0 retention" classname="com.playit.app.domain.calculator.RetentionCalculatorTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -48,7 +48,10 @@ fun CelebrationOverlay(
 
     val reducedMotion = LocalReducedMotion.current
 
-    if (reducedMotion) {
+    if (reducedMotion && type == CelebrationType.CONFETTI) {
+        // Reduced motion: no particles at all; the reward screen itself carries the moment.
+        LaunchedEffect(type) { onFinished() }
+    } else if (reducedMotion) {
         ReducedMotionCelebration(type = type, onFinished = onFinished, modifier = modifier)
     } else {
         FullMotionCelebration(type = type, onFinished = onFinished, modifier = modifier, colors = colors)
@@ -122,56 +125,55 @@ private fun FullMotionCelebration(
     }
 }
 
+/** One confetti piece of the centre burst: flies out at [angleRad], then falls. */
+private data class BurstPiece(
+    val angleRad: Float,
+    val speed: Float,       // share of the screen's smaller side covered by the throw
+    val size: Float,        // dp
+    val color: Color,
+    val isCircle: Boolean,
+    val rotationSpeed: Float
+)
+
+/** Confetti bursts from the centre of the screen (where the reward is), at most 24 pieces. */
 @Composable
 private fun ConfettiCanvas(progress: Float, customColors: List<Color>? = null) {
     val colors = customColors ?: listOf(
         Mango, Leaf, Ube, Guava, Cloud
     )
-    val particles = remember {
-        List(40) {
-            ConfettiParticle(
-                xRange = Random.nextFloat(),
-                yOffset = Random.nextFloat() * -0.5f, // Start slightly above
-                size = Random.nextFloat() * 6 + 4, // 4-10
+    val pieces = remember {
+        List(24) { i ->
+            BurstPiece(
+                angleRad = ((i / 24f) * 2f * PI.toFloat()) + (Random.nextFloat() - 0.5f) * 0.4f,
+                speed = Random.nextFloat() * 0.25f + 0.25f,
+                size = Random.nextFloat() * 6 + 6, // 6-12
                 color = colors.random(),
                 isCircle = Random.nextBoolean(),
-                rotationSpeed = (Random.nextFloat() - 0.5f) * 720f,
-                fallSpeed = Random.nextFloat() * 1.5f + 0.5f,
-                drift = (Random.nextFloat() - 0.5f) * 0.5f
+                rotationSpeed = (Random.nextFloat() - 0.5f) * 540f
             )
         }
     }
 
     Canvas(modifier = Modifier.fillMaxSize()) {
-        val canvasWidth = size.width
-        val canvasHeight = size.height
+        val cx = size.width / 2f
+        val cy = size.height / 2f
+        val reach = size.minDimension
+        // Fast throw that eases out, then a gentle fall; fade over the last third.
+        val throwT = 1f - (1f - progress) * (1f - progress)
+        val alpha = if (progress < 0.66f) 1f else ((1f - progress) / 0.34f).coerceIn(0f, 1f)
 
-        particles.forEach { p ->
-            val startX = p.xRange * canvasWidth
-            val startY = p.yOffset * canvasHeight
-            
-            // Progress goes 0 to 1
-            // Distance fallen
-            val currentY = startY + (canvasHeight * 1.5f * p.fallSpeed * progress)
-            val currentX = startX + (canvasWidth * p.drift * progress)
-            val currentRotation = p.rotationSpeed * progress
-
-            if (currentY < canvasHeight + 100.dp.toPx()) {
-                withTransform({
-                    translate(left = currentX, top = currentY)
-                    rotate(degrees = currentRotation)
-                }) {
-                    if (p.isCircle) {
-                        drawCircle(
-                            color = p.color,
-                            radius = p.size.dp.toPx() / 2f
-                        )
-                    } else {
-                        drawRect(
-                            color = p.color,
-                            size = Size(p.size.dp.toPx(), (p.size * 0.6f).dp.toPx())
-                        )
-                    }
+        pieces.forEach { p ->
+            val dist = reach * p.speed * throwT
+            val x = cx + cos(p.angleRad) * dist
+            val y = cy + sin(p.angleRad) * dist + reach * 0.25f * progress * progress
+            withTransform({
+                translate(left = x, top = y)
+                rotate(degrees = p.rotationSpeed * progress)
+            }) {
+                if (p.isCircle) {
+                    drawCircle(color = p.color.copy(alpha = alpha), radius = p.size.dp.toPx() / 2f)
+                } else {
+                    drawRect(color = p.color.copy(alpha = alpha), size = Size(p.size.dp.toPx(), (p.size * 0.6f).dp.toPx()))
                 }
             }
         }
@@ -311,17 +313,6 @@ private fun DrawScope.drawStar(color: Color, radius: Float, points: Int = 5, inn
     path.close()
     drawPath(path = path, color = color)
 }
-
-private data class ConfettiParticle(
-    val xRange: Float,
-    val yOffset: Float,
-    val size: Float,
-    val color: Color,
-    val isCircle: Boolean,
-    val rotationSpeed: Float,
-    val fallSpeed: Float,
-    val drift: Float
-)
 
 private data class StarParticle(
     val angleRad: Float,

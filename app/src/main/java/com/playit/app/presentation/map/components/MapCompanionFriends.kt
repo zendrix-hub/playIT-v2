@@ -1,50 +1,24 @@
 package com.playit.app.presentation.map.components
 
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.playit.app.presentation.components.rememberAssetPainter
-import com.playit.app.presentation.theme.Cloud
-import com.playit.app.presentation.theme.DarkBrownOutline
-import com.playit.app.presentation.theme.Ink
-import com.playit.app.presentation.theme.Leaf
-import com.playit.app.presentation.theme.LexendFontFamily
-import com.playit.app.presentation.theme.LocalReducedMotion
 
 enum class CompanionAnimal(val id: Int, val displayName: String, val assetPath: String) {
     CAT(1, "Miki", "images/characters/avatar_01_cat.png"),
@@ -148,8 +122,9 @@ fun generateCompanionPlacements(
 }
 
 /**
- * Renders the full-body animal avatar companions along the map trail with
- * Splash Screen-like breathing and gentle floating animations.
+ * Draws the child's own avatar beside the current node, still (card 22: no endless motion on the
+ * map; the current node's pulse ring is the one moving thing). The other animal friends are no
+ * longer drawn; generateCompanionPlacements still lists them for anyone who needs them.
  */
 @Composable
 fun MapCompanionFriends(
@@ -162,128 +137,42 @@ fun MapCompanionFriends(
 ) {
     if (nodeCount <= 0 || nodeCenters.isEmpty()) return
 
-    val isReducedMotion = LocalReducedMotion.current
-    var tappedCompanionId by remember { mutableStateOf<Int?>(null) }
-
-    // Synchronized breathing animation matching Splash Screen physics
-    val infiniteTransition = rememberInfiniteTransition(label = "CompanionBreathe")
-
-    val breatheScaleY by infiniteTransition.animateFloat(
-        initialValue = 1.0f,
-        targetValue = 1.055f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1100, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "CompanionBreatheY"
-    )
-    val breatheScaleX by infiniteTransition.animateFloat(
-        initialValue = 1.0f,
-        targetValue = 0.965f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1100, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "CompanionBreatheX"
-    )
-
-    // Gentle vertical bobbing
-    val floatOffset by infiniteTransition.animateFloat(
-        initialValue = -3.5f,
-        targetValue = 3.5f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1600, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "CompanionFloat"
-    )
-
     BoxWithConstraints(modifier = modifier) {
         val density = androidx.compose.ui.platform.LocalDensity.current.density
-        val canvasWidthDp = maxWidth.value
-
-        val placedCompanions = generateCompanionPlacements(
+        val leader = generateCompanionPlacements(
             nodeCount = nodeCount,
             nodeCenters = nodeCenters,
             activeNodeIndex = activeNodeIndex,
             activeAvatarId = activeAvatarId,
-            canvasWidthDp = canvasWidthDp,
+            canvasWidthDp = maxWidth.value,
             density = density
-        )
+        ).firstOrNull { it.isExplorerLeader } ?: return@BoxWithConstraints
 
-        placedCompanions.forEach { companion ->
-            val charWidth = if (companion.isExplorerLeader) 78.dp else 68.dp
-            val charHeight = if (companion.isExplorerLeader) 78.dp else 68.dp
-            val animY = if (isReducedMotion) 0f else floatOffset
-            val showBubble = (companion.isUnlocked || companion.isExplorerLeader || tappedCompanionId == companion.animal.id) && companion.cheerPhrase != null
-
+        val charSize = 78.dp
+        Box(
+            modifier = Modifier
+                .offset(x = leader.offsetDp.x.dp, y = leader.offsetDp.y.dp)
+                .size(charSize)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) { onCompanionTap?.invoke(leader.animal) },
+            contentAlignment = Alignment.Center
+        ) {
+            // Ambient Ground Contact Shadow
             Box(
                 modifier = Modifier
-                    .offset(x = companion.offsetDp.x.dp, y = (companion.offsetDp.y + animY).dp)
-                    .size(width = charWidth, height = charHeight + 18.dp),
-                contentAlignment = Alignment.BottomCenter
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    // Speech cheer bubble (Shown for reached/unlocked levels and when tapped)
-                    if (showBubble && companion.cheerPhrase != null) {
-                        Box(
-                            modifier = Modifier
-                                .background(Cloud, RoundedCornerShape(999.dp))
-                                .border(1.5.dp, DarkBrownOutline, RoundedCornerShape(999.dp))
-                                .padding(horizontal = 7.dp, vertical = 2.5.dp)
-                        ) {
-                            Text(
-                                text = companion.cheerPhrase,
-                                fontFamily = LexendFontFamily,
-                                fontSize = 9.5.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = if (companion.isExplorerLeader) Leaf else Ink
-                            )
-                        }
-                    }
-
-                    // Character with Breathing & Floating Motion
-                    Box(
-                        modifier = Modifier
-                            .size(charWidth, charHeight)
-                            .graphicsLayer {
-                                if (!isReducedMotion) {
-                                    scaleY = breatheScaleY
-                                    scaleX = breatheScaleX
-                                    transformOrigin = TransformOrigin(0.5f, 1f)
-                                }
-                            }
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null
-                            ) {
-                                tappedCompanionId = companion.animal.id
-                                onCompanionTap?.invoke(companion.animal)
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        // Ambient Ground Contact Shadow
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .offset(y = 2.dp)
-                                .size(width = charWidth * 0.65f, height = 8.dp)
-                                .background(Color(0x2E1F3A3D), CircleShape)
-                        )
-
-                        // Character Graphic
-                        Image(
-                            painter = rememberAssetPainter(companion.animal.assetPath),
-                            contentDescription = "${companion.animal.displayName} Companion",
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-                }
-            }
+                    .align(Alignment.BottomCenter)
+                    .offset(y = 2.dp)
+                    .size(width = charSize * 0.65f, height = 8.dp)
+                    .background(Color(0x2E1F3A3D), CircleShape)
+            )
+            Image(
+                painter = rememberAssetPainter(leader.animal.assetPath),
+                contentDescription = "${leader.animal.displayName}, your explorer",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize()
+            )
         }
     }
 }

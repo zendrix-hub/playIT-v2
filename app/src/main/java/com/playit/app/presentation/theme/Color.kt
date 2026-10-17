@@ -116,6 +116,16 @@ val CloudShadow = SurfaceCardShadow
 // Upgraded crisp border outline
 val DarkBrownOutline = ModernBorder
 
+// Lily the tarsier, sampled from images/mascot/lily_idle.png (image release 2026-10-12-mascot), so the
+// drawn splash tarsier matches her pictures. LilyOutline is the art's dark-brown line (style guide #4A2E18).
+val LilyOrange = Color(0xFFF97B27)
+val LilyOrangeShade = Color(0xFFDD621F)
+val LilyEarInner = Color(0xFFFEAC7A)
+val LilyCream = Color(0xFFFDEBD3)
+val LilyBlush = Color(0xFFFC9898)
+val LilyPupil = Color(0xFF3B1F0A)
+val LilyOutline = Color(0xFF4A2E18)
+
 val DestructiveRed = Color(0xFFE53935)
 val DestructiveRedShadow = Color(0xFFB71C1C)
 

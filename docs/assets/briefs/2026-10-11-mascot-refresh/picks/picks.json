@@ -1,0 +1,15 @@
+{
+ "lily_idle": "round-01/lily_idle__v1.png",
+ "lily_listening": "round-01/lily_listening__v1.png",
+ "lily_celebrating": "round-01/lily_celebrating__v1.png",
+ "lily_encouraging": "round-01/lily_encouraging__v1.png",
+ "lily_thinking": "round-01/lily_thinking__v2.png",
+ "lily_pointing": "round-02/lily_pointing__v2.png",
+ "lily_waving": "round-02/lily_waving__v2.png",
+ "avatar_01_cat": "round-02/avatar_01_cat__v2.png",
+ "avatar_02_monkey": "round-02/avatar_02_monkey__v2.png",
+ "avatar_03_bunny": "round-03/avatar_03_bunny__v2.png",
+ "avatar_04_bear": "round-02/avatar_04_bear__v1.png",
+ "avatar_05_frog": "round-03/avatar_05_frog__v1.png",
+ "avatar_06_owl": "round-03/avatar_06_owl__v1.png"
+}

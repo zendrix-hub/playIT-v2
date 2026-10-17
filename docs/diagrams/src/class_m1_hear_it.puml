@@ -1,0 +1,122 @@
+@startuml class_m1_hear_it
+!include _style.iuml
+hide empty members
+
+title Class Diagram, Module 1: Letter-Sound Acquisition (Hear It)\nSDD §3.1 Audio Subsystem, §4.1 Hear It Workflow
+
+package "presentation" {
+  class HearItScreen <<Composable>> {
+    +HearItScreen(viewModel, onNext, onBack)
+    <i>letter card, play button, step dots;</i>
+    <i>no mouth cue or caption, card 28c</i>
+  }
+  class HearItViewModel <<HiltViewModel>> {
+    +phoneme : StateFlow<Phoneme?>
+    +isPlaying : StateFlow<Boolean>
+    +playCount : StateFlow<Int>
+    +nextHighlighted : StateFlow<Boolean>
+    +caption : StateFlow<String?>  <i>not shown</i>
+    +articulation : ArticulationGroup  <i>not shown</i>
+    +playModelingSequence()
+    +playPhonemeSound()
+    +onUserInteraction()
+    +retry()
+    -buildSequence(template) : List<String>
+  }
+  class LetterCard <<Composable>>
+  class IdleTimer {
+    +start()
+    +touch()
+    +stop()
+    <i>10 s idle re-prompt (NFR-IND-01)</i>
+  }
+}
+
+package "domain" {
+  class HearItSequenceBuilder <<object>> {
+    +TEMPLATE : List<String>
+    +build(template, phonemePath, keyWordPath, tutorPath) : List<String>
+    +replayTemplate() : List<String>
+    +pauseMillis(entry) : Long?
+  }
+  class CaptionText <<object>> {
+    +forClip(path, letter, word) : String?
+  }
+  enum ArticulationGroup {
+    LIPS_TOGETHER
+    TEETH_ON_LIP
+    TONGUE_UP
+    TEETH_CLOSE
+    BACK_OF_MOUTH
+    ROUND_LIPS
+    WIDE_OPEN
+    SMILE
+    OPEN_BREATH
+    +assetPath : String
+  }
+  class Phoneme <<data>> {
+    +id : Int
+    +letter : String
+    +audioPath : String
+    +imagePath : String
+    +exampleWord : String
+  }
+  interface PhonemeRepository {
+    +getAllPhonemes() : Flow<List<Phoneme>>
+    +getPhonemeById(id) : Phoneme?
+    +getPhonemeByLetter(letter) : Phoneme?
+  }
+}
+
+package "data" {
+  class AudioPlayer <<Singleton>> {
+    -soundPool : SoundPool
+    -mediaPlayer : MediaPlayer?
+    +playAssetAudio(path, onComplete)
+    +playSequence(paths, onItem, onComplete)
+    +playSfx(event)
+    +stop()
+  }
+  class AudioResolver <<Singleton>> {
+    +getPhonemePath(letter) : String
+    +getKeyWordPath(word) : String
+    +getTutorPath(id) : String
+    +getUiPath(id) : String
+    +getSfxPath(event) : String
+  }
+  class PhonemeRepositoryImpl
+  class PhonemeDao <<Room DAO>>
+}
+
+package "planned (SDD §3.1)" {
+  class AudioComposer <<planned>> {
+    +compose(steps) : List<AudioClip>
+  }
+  class AudioPlaybackManager <<planned>> {
+    +play(clips)
+  }
+}
+
+HearItScreen --> HearItViewModel : observes StateFlows
+HearItScreen *-- LetterCard
+HearItViewModel *-- IdleTimer
+HearItViewModel --> PhonemeRepository
+HearItViewModel --> AudioPlayer
+HearItViewModel --> AudioResolver
+HearItViewModel ..> HearItSequenceBuilder : builds the sequence
+HearItViewModel ..> CaptionText
+HearItViewModel ..> ArticulationGroup
+PhonemeRepository ..> Phoneme
+PhonemeRepositoryImpl ..|> PhonemeRepository
+PhonemeRepositoryImpl --> PhonemeDao
+AudioPlayer --> AudioResolver
+AudioPlayer ..> HearItSequenceBuilder : pauseMillis()
+AudioComposer ..> HearItSequenceBuilder : would generalize
+AudioPlaybackManager ..> AudioPlayer : would replace
+
+note bottom of HearItSequenceBuilder
+  car_listen, car_this_letter_says,
+  PHONEME, PAUSE_500, PHONEME, PAUSE_500, PHONEME,
+  KEYWORD, PHONEME  (card 28: ends on the sound)
+end note
+@enduml

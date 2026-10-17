@@ -1,3 +1,5 @@
+Superseded for audio by docs/specs/hear-say-refactor.md §2.3 (Kokoro, Sep 2026).
+
 # 33 — Audio Effectiveness Research
 
 > Companion to the rewritten `ELEVENLABS_AUDIO_GENERATION_DRAFT.md`. This
