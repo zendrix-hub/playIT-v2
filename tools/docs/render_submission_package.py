@@ -183,13 +183,23 @@ def build_cover(doc, meta: dict, title: str):
         add_inline(p, text.upper() if caps else text, size=size, color=color, bold=bold)
         return p
 
-    centered(institution, 13, TEAL, bold=True, before=36, caps=True)
+    logo_path = SUBMISSION_DIR / "logocit-1.png"
+    if logo_path.exists():
+        p_logo = doc.add_paragraph()
+        p_logo.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p_logo.paragraph_format.space_before = Pt(10)
+        p_logo.paragraph_format.space_after = Pt(8)
+        p_logo.add_run().add_picture(str(logo_path), width=Inches(1.6))
+        centered(institution, 13, TEAL, bold=True, before=4, caps=True)
+    else:
+        centered(institution, 13, TEAL, bold=True, before=36, caps=True)
+
     if college:
         centered(college, 11, TEXT, after=2)
     if "Degree Program" in fields:
         centered(fields.pop("Degree Program"), 10, MUTED, after=0)
 
-    centered(title, 24, TEAL, bold=True, before=96, after=10)
+    centered(title, 24, TEAL, bold=True, before=48 if logo_path.exists() else 96, after=10)
     project = meta["project"]
     if "—" in project:
         name, subtitle = (s.strip() for s in project.split("—", 1))
@@ -199,7 +209,7 @@ def build_cover(doc, meta: dict, title: str):
         centered(project, 14, PLUM, bold=True)
 
     spacer = doc.add_paragraph()
-    spacer.paragraph_format.space_before = Pt(70)
+    spacer.paragraph_format.space_before = Pt(36 if logo_path.exists() else 70)
     table = doc.add_table(rows=0, cols=2)
     table.autofit = False
     for label, value in fields.items():
@@ -303,7 +313,7 @@ try {{
         return False
     try:
         res = subprocess.run([shell, "-NoProfile", "-NonInteractive", "-Command", script],
-                             capture_output=True, text=True, timeout=300)
+                             capture_output=True, text=True, timeout=300, stdin=subprocess.DEVNULL)
     except (OSError, subprocess.TimeoutExpired) as e:
         print(f"[WARN] Word export failed: {e}")
         return False

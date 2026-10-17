@@ -20,8 +20,9 @@ import re
 from pathlib import Path
 from pypdf import PdfReader, PdfWriter
 from reportlab.lib.pagesizes import letter
+from reportlab.lib.units import inch
 from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image as RLImage
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
 
@@ -139,17 +140,25 @@ def generate_cover_pdf(
         alignment=TA_LEFT,
     )
 
-    story = [
+    story = []
+    logo_path = SUBMISSION_DIR / "logocit-1.png"
+    if logo_path.exists():
+        img = RLImage(str(logo_path), width=1.6 * inch, height=1.6 * inch * (724 / 1024))
+        img.hAlign = "CENTER"
+        story.append(img)
+        story.append(Spacer(1, 8))
+
+    story.extend([
         Paragraph("CEBU INSTITUTE OF TECHNOLOGY – UNIVERSITY", inst_style),
         Paragraph("College of Computer Studies", college_style),
         Paragraph("Bachelor of Science in Information Technology", degree_style),
-        Spacer(1, 20),
+        Spacer(1, 14),
         Paragraph("IT411 CAPSTONE 2 DELIVERABLE — STANDALONE EXTRACTION", doc_badge_style),
-        Spacer(1, 15),
+        Spacer(1, 12),
         Paragraph(title, title_style),
         Paragraph(subtitle, subtitle_style),
-        Spacer(1, 35),
-    ]
+        Spacer(1, 24),
+    ])
 
     meta_rows = [
         (

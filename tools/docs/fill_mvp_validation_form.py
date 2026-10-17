@@ -21,6 +21,7 @@ from pathlib import Path
 import docx
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Inches, Pt, RGBColor
 from docx.text.paragraph import Paragraph
 
@@ -650,6 +651,13 @@ def _fill_declaration(doc, form):
 def build_form(source: Path = SOURCE, template: Path = TEMPLATE, output: Path = OUTPUT) -> Path:
     form = parse_form_md(source)
     doc = docx.Document(template)
+    logo_path = REPO / "docs" / "submission" / "logocit-1.png"
+    if logo_path.exists():
+        p = doc.paragraphs[0].insert_paragraph_before()
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p.paragraph_format.space_before = Pt(4)
+        p.paragraph_format.space_after = Pt(12)
+        p.add_run().add_picture(str(logo_path), width=Inches(1.5))
     _fill_section1(doc, form)
     _fill_section2(doc, form)
     _fill_section3(doc, form)
