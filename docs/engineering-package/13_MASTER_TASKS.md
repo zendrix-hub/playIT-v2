@@ -272,7 +272,7 @@ Each card ticks its own item in its commit (see `docs/tasks/AGY_RUNBOOK.md`). A 
 - [x] Card 13: Approved batch-1 pictures in the app (FR-05)
 - [x] Card 03b: Say It corrections from fragments around the sound (FR-03)
 - [x] Card 14: Privacy pack: no cloud backup, delete a child's data, privacy notice (FR-14)
-- [x] Card 15: Decodable Blend It word list, 5 words per chapter, teacher-confirmed (FR-13). Word list by user decision 2026-10-09; teacher confirmation and AM/TUB/YAM/ZIP assets pending
+- [x] Card 15: Decodable Blend It word list, 5 words per chapter, teacher-confirmed (FR-13). Word list by user decision 2026-10-09; AM/TUB/YAM/ZIP audio and picture assets released
 - [ ] Card 16: Blend It word card fits its text (screenshot finding) (FR-13). Superseded by card 20
 - [x] Card 17: Performance and calm motion: no haptics, downscaled images, no endless idle animation, portrait (NFR-PERF-01)
 - [x] Card 17b: ViewModel init blocks run after every property (crash fix from Claude's dry run)
@@ -302,6 +302,6 @@ Each card ticks its own item in its commit (see `docs/tasks/AGY_RUNBOOK.md`). A 
 - [ ] Card 31b: One calm sound set from Kenney's CC0 packs; a wrong answer plays one soft sound (NFR-AUD-01, NFR-IND-01). Listening review with Zendrix; code ready as a patch
 - [ ] Card 31c: Lily's Say It and Find It lines fit the bubble (NFR-IND-01, NFR-AUD-01). Listening review with Zendrix; code ready as a patch
 - [x] Card 31d: One message at a time on Hear It, Say It, the new profile and the letter's end screen (NFR-IND-01, NFR-ACC-02)
-- [x] Card 31e: The map's one header card, 16 sp text, 64 dp buttons and no harsh red (NFR-ACC-02)
 - [x] Card 31f: Blend It never deals a word's tiles already solved (FR-13)
+- [x] 2D Asset Refresh: Full Argon 4 illustration refresh across Find It (26 letters), Blend It (36 words), Archipelago map terrain props (16 props), and child reward badges (4 rewards) released via releases 2026-10-15 through 2026-10-17-map-and-rewards (90 new assets, 141 total manifest entries, 0 fail audit, 100% PictureAssetsTest pass) (FR-05, FR-13, NFR-ACC-02)
 
