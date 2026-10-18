@@ -703,6 +703,7 @@ def generate_refactoring_evidence_pdf(output_path, ctx):
         ("Baseline:", plain("The MVP build used in the Weeks 1 to 2 validation (Round 1).")),
         ("Refactored build:", plain(f"Debug APK H, commit {APK_H_COMMIT}, October 14, 2026 "
                                     "(branch refactor/hear-say-it).")),
+        ("Pull request:", plain('<a href="https://github.com/zendrix-hub/playIT-v2/pull/2" color="#0B57D0"><u>https://github.com/zendrix-hub/playIT-v2/pull/2</u></a> (201 commits, +43k lines)')),
         ("Sources:", plain("MVP Validation Findings form, Section 4 (the MVP approach and the planned change); "
                            "STD v1.0 (results); git history (commits).")),
     ])

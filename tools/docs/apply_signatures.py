@@ -67,8 +67,8 @@ def stamp_std(pdf_path: Path):
         print(f"Error: Could not find Section 8.4 Sign-Off in {pdf_path}")
         return
 
-    # Underline is around x=350..444, y=568..578
-    sig_rect = fitz.Rect(385, 557, 408, 579)
+    # Underline is around x=350..444, y=568..578; keep y within 563..577 to avoid row above (y <= 560.4)
+    sig_rect = fitz.Rect(380, 563, 408, 577)
     if already_signed(target_page, sig_rect):
         print(f"[SKIP] Already signed: {pdf_path}")
         doc.close()

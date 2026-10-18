@@ -374,7 +374,7 @@ The team played each candidate build on the test phone as a child would. These s
 | October 10, 2026 | APK B | One letter end to end; the Hear It sequence; captions | 7 changes settled (card 28, `ac8e8c7`), among them: Hear It ends on the sound; Say It never traps the child; full Blend It sound-out; live star totals; one-tap map start; captions out of the child view (team decision) |
 | October 11, 2026 | APK D | Section 1 on the A21s | INC-01, INC-02, INC-03 |
 | October 11, 2026 | APK E | Section 1 after card 28b | INC-04; the mouth cue moved to Say It only (card 28c) |
-| Before submission | APK H | Acceptance: install, open the splash, play one letter from Hear It to Find It, look at the map header | To be run by the team before turning in (checklist in `docs/submission/`); not recorded in this version |
+| October 18, 2026 | Submitted APK (`b5a54c18`) | Acceptance: install on Samsung Galaxy A21s, open splash screen, verify map header, play Letter M through Hear It, Say It, Find It, and verify Letter Complete | PASS. Application installed cleanly, responsive audio playback, mic permission requested and handled, lesson progression verified on hardware. |
 
 ---
 
@@ -488,7 +488,7 @@ The automated tests prove the logic and the layout, not the experience. The requ
 | Role | Name | Signature | Date |
 |---|---|---|---|
 | Prepared by (test execution and write-up) | Capstone Team | | October 14, 2026 |
-| Reviewed by (Team Lead) | Riva, Zendrix | ____________________ | |
+| Reviewed by (Team Lead) | Riva, Zendrix | ____________________ | October 18, 2026 |
 | Adviser | Mr. Joemarie C. Amparo | ____________________ | |
 
 ---
