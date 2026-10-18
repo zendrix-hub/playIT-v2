@@ -1474,3 +1474,43 @@ What holds up: one calm tint per step, pictures on white cards, a ground line, m
   - The master Drive folder `dist/PlayIT_IT411_Midterm_Submission/` is 100% assembled, signed, and ready for upload.
   - When Claude resumes, all code and docs are clean and committed on `refactor/hear-say-it`. Claude can review the final checklist and transition directly to post-midterm Card 32 design and implementation.
 
+
+### Directive for Claude: Midterm Submission Review, Challenge, and Portal Link Mapping
+
+**Mandate from User:**
+Claude must read and examine the exact content instructions and challenge everything we did before the team fully submits. Do not rubber-stamp; verify that every claim, number, and file strictly satisfies the course rubric and the portal format.
+
+**Submission Portal Layout & Link Mapping (from actual IT411 submission requirements):**
+The IT411 midterm portal requires BOTH the links to the 3 main Google Drive folders AND direct links to each individual deliverable.
+
+#### 01_Software_and_Deployment (Folder Link)
+- **Link to Deployed System:** [`playit-debug-H-0320385.apk`](dist/PlayIT_IT411_Midterm_Submission/01_Software_and_Deployment/playit-debug-H-0320385.apk) in Google Drive + access notes in [`DEPLOYED_SYSTEM_AND_ACCESS_INSTRUCTIONS.pdf`](dist/PlayIT_IT411_Midterm_Submission/01_Software_and_Deployment/DEPLOYED_SYSTEM_AND_ACCESS_INSTRUCTIONS.pdf) (Offline APK, no network calls).
+- **Link to GitHub Repository (PDF):** `DEPLOYED_SYSTEM_AND_ACCESS_INSTRUCTIONS.pdf` (contains repo link `https://github.com/zendrix-hub/playIt`). **CRITICAL:** Team must grant `rlaviste@gmail.com` viewing access to both GitHub and the Google Drive folder!
+- **Link to README (PDF):** [`README.pdf`](dist/PlayIT_IT411_Midterm_Submission/01_Software_and_Deployment/README.pdf) (generated institutional 1-page summary of system, curriculum, build instructions, test status, and AI disclosures).
+- **Link to Deployment Evidence (PDF):** [`DEPLOYMENT_AND_PERMISSIONS_INSPECTION.txt`](dist/PlayIT_IT411_Midterm_Submission/01_Software_and_Deployment/DEPLOYMENT_AND_PERMISSIONS_INSPECTION.txt) and [`DEPLOYED_SYSTEM_AND_ACCESS_INSTRUCTIONS.pdf`](dist/PlayIT_IT411_Midterm_Submission/01_Software_and_Deployment/DEPLOYED_SYSTEM_AND_ACCESS_INSTRUCTIONS.pdf).
+- **Link to Refactoring Evidence:** [`CODE_REFACTORING_EVIDENCE.pdf`](dist/PlayIT_IT411_Midterm_Submission/01_Software_and_Deployment/CODE_REFACTORING_EVIDENCE.pdf) (34 card commits mapped to 6 MVP priorities).
+- **Link to Feature Completion Matrix:** [`FEATURE_COMPLETION_MATRIX.pdf`](dist/PlayIT_IT411_Midterm_Submission/01_Software_and_Deployment/FEATURE_COMPLETION_MATRIX.pdf) (all 14 FRs and NFRs).
+
+#### 02_Updated_Documentation (Folder Link)
+- **Link to Updated Software Requirements Specification:** [`playIT_SRS_v3.0.pdf`](dist/PlayIT_IT411_Midterm_Submission/02_Updated_Documentation/playIT_SRS_v3.0.pdf) (Rev 3.8, Use Case Diagram, clean author attribution).
+- **Link to Updated Software Design Description:** [`playIT_SDD_v2.0.pdf`](dist/PlayIT_IT411_Midterm_Submission/02_Updated_Documentation/playIT_SDD_v2.0.pdf) (Rev 2.8, 13 full-res diagrams: ERD, 6 class, 6 sequence).
+- **Link to Updated Software Project Management Plan:** [`playIT_SPMP_v2.0.pdf`](dist/PlayIT_IT411_Midterm_Submission/02_Updated_Documentation/playIT_SPMP_v2.0.pdf) (Rev 2.6, WBS 1-9, sprint schedule, risk register R1-R8).
+- **Link to Updated Software Test Document:** [`playIT_STD_v1.0.pdf`](dist/PlayIT_IT411_Midterm_Submission/02_Updated_Documentation/playIT_STD_v1.0.pdf) (ISO 29119-3, 83 test cases, 433 tests, signed by Team Lead).
+- **Link to Updated Requirements Traceability Matrix:** [`playIT_Traceability_Matrix.pdf`](dist/PlayIT_IT411_Midterm_Submission/02_Updated_Documentation/playIT_Traceability_Matrix.pdf) (6 pages, normalized footers `Page 1 of 5 (SRS p. 16)`).
+- **Requirements Inventory (Standalone):** [`playIT_Requirements_Inventory.pdf`](dist/PlayIT_IT411_Midterm_Submission/02_Updated_Documentation/playIT_Requirements_Inventory.pdf) (8 pages, normalized footers `Page 1 of 7 (SRS p. 9)`).
+- **MVP Validation Form:** [`playIT_MVP_Validation_Findings_and_Refactoring_Priorities.pdf`](dist/PlayIT_IT411_Midterm_Submission/02_Updated_Documentation/playIT_MVP_Validation_Findings_and_Refactoring_Priorities.pdf) (signed on page 23).
+
+#### 03_Testing_and_QA (Folder Link)
+- **Link to Functional Testing Results:** [`ACCEPTANCE_TESTING_AND_SIGNOFF_REPORT.pdf`](dist/PlayIT_IT411_Midterm_Submission/03_Testing_and_QA/ACCEPTANCE_TESTING_AND_SIGNOFF_REPORT.pdf) and [`test_execution_evidence/`](dist/PlayIT_IT411_Midterm_Submission/03_Testing_and_QA/test_execution_evidence/) (66 raw JUnit XMLs, 433 tests: 427 pass, 6 skip, 0 fail).
+- **Link to Integration, system, and regression testing results, as applicable:** Covered in `ACCEPTANCE_TESTING_AND_SIGNOFF_REPORT.pdf` and layout matrix test logs.
+- **Link to Performance Testing Report:** [`PERFORMANCE_TESTING_REPORT.pdf`](dist/PlayIT_IT411_Midterm_Submission/03_Testing_and_QA/PERFORMANCE_TESTING_REPORT.pdf) (500 ms audio debounce, image downscaling, and Round 2 Instrument D plan).
+- **Usability Testing Report:** [`USABILITY_TESTING_AND_IMPROVEMENTS_REPORT.pdf`](dist/PlayIT_IT411_Midterm_Submission/03_Testing_and_QA/USABILITY_TESTING_AND_IMPROVEMENTS_REPORT.pdf) (Round 1 SUS 75.5, smileyometer, A21s physical tests).
+- **Defect Log:** [`DEFECT_LOG_AND_RETEST_RECORD.pdf`](dist/PlayIT_IT411_Midterm_Submission/03_Testing_and_QA/DEFECT_LOG_AND_RETEST_RECORD.pdf) (7 closed incidents INC-01 to INC-07, DEF-01 and DEF-02).
+
+**Specific Tasks for Claude:**
+1. **Adversarial Review:** Challenge the claims in each report against what APK H actually does.
+2. **Link Sheet Template:** Provide Zendrix with a ready-to-fill text sheet of the links above so Zendrix can easily paste each Google Drive shareable link into the portal.
+3. **Verify Instructor Access:** Remind Zendrix to grant `rlaviste@gmail.com` viewing access to both the Drive master folder and the GitHub repository.
+4. **Transition to Card 32:** Once Zendrix confirms upload and link submission, begin post-midterm Card 32 design and implementation.
+
+
