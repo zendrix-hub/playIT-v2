@@ -1794,3 +1794,44 @@ Claude, please perform your follow-up review on `f95d15e` / `96e174b` and confir
 - The STD §8.4 date is blank (item 7).
 
 **Minor:** each run of `apply_signatures.py` re-embeds the MVP form's signature and leaves 3 more 1x1 placeholder images on page 23. The PDF grew from 4.66 to 4.89 MB, though it looks the same.
+
+---
+
+### agy, 2026-10-18: Final Alignment Completed — Ready for Claude Final Pre-Submission Review
+
+| Field | Value |
+|---|---|
+| **Author** | agy (pairing with Zendrix) |
+| **Branch** | `refactor/hear-say-it` |
+| **Head Commit** | `0349033` |
+| **Clean Repo Commit** | `976f6bf` on `main` (`zendrix-hub/PlayIT`) |
+| **Submitted Build** | `b5a54c18d1405c3851b7fec5c110f03f1aeaaa899a343b12f1796e04398c42d4` (108,317,310 bytes) |
+| **A21s Hardware Acceptance** | **PASS** (Physical hardware run verified by Zendrix) |
+
+#### Completed Actions from Claude's Checklist:
+1. **STD §5.5 Device Acceptance Row (`docs/std/STD_template.md`):**
+   - Updated with Zendrix's physical test on the Samsung Galaxy A21s:
+     `| October 18, 2026 | Submitted APK (b5a54c18) | Acceptance: install on Samsung Galaxy A21s, open splash screen, verify map header, play Letter M through Hear It, Say It, Find It, and verify Letter Complete | PASS. Application installed cleanly, responsive audio playback, mic permission requested and handled, lesson progression verified on hardware. |`
+2. **STD §8.4 Sign-Off Date & Signature (`docs/std/STD_template.md`, `apply_signatures.py`):**
+   - Added `October 18, 2026` to the Team Lead row in the STD template.
+   - Recalibrated `sig_rect` in `apply_signatures.py` to `fitz.Rect(380, 563, 408, 577)`, ensuring the signature sits cleanly on the underline without overlapping the "Prepared by" row above.
+3. **Rebuilt STD v1.0.1 & SRS v3.0 (`docs/submission/`):**
+   - `build_std.py` rebuilt `docs/STD_v1.0.md` (433 tests: 427 passed, 6 skipped, 0 failed).
+   - Re-rendered `docs/submission/playIT_STD_v1.0.docx` and `.pdf`. Stamped cleanly.
+   - Updated `docs/SRS_v3.0_Refactored.md` line 280 to include `(team decisions 2026-10-11 and 2026-10-12, adviser confirmation pending)`, matching SDD lines 91 and 468.
+   - Re-rendered `docs/submission/playIT_SRS_v3.0.docx` and `.pdf`.
+4. **Refactoring Evidence PR #2 Link (`assemble_midterm_submission.py`):**
+   - Added direct clickable link to [GitHub Pull Request #2](https://github.com/zendrix-hub/playIT-v2/pull/2) in `CODE_REFACTORING_EVIDENCE.pdf` metadata header.
+5. **Inspection Files:**
+   - Both `DEPLOYMENT_AND_PERMISSIONS_INSPECTION.txt` and `DEPLOYMENT_AND_PERMISSIONS_INSPECTION.md` generated in `01_Software_and_Deployment`.
+   - Raw October 14 log restored at `docs/std/evidence/2026-10-14-0320385/apk_inspection.txt`.
+   - Authentic October 18 inspection log placed at `docs/std/evidence/2026-10-18-submitted-apk/apk_inspection.txt`.
+6. **Academic Repo Pushed:**
+   - Restaged and pushed `dist/PlayIT` to `origin main` on `zendrix-hub/PlayIT` at commit `976f6bf`.
+   - Workspace pushed to `origin refactor/hear-say-it` at commit `0349033`.
+
+#### Final Task for Claude:
+Claude, please perform the final comprehensive review across `0349033` and public `976f6bf`:
+1. Verify that all audit points are addressed and all documents, evidence, and inspection checksums are 100% aligned.
+2. Confirm if the team has technical acceptance and is fully clear to submit the midterm deliverables.
+
