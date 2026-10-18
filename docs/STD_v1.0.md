@@ -16,6 +16,7 @@
 | Version | Date | Primary Author(s) | Description |
 |:---:|:---:|:---:|---|
 | **1.0** | October 14, 2026 | Capstone Team | First issue. Specifies the test cases for SRS v3.0 rev. 3.8, records a clean run of the whole automated suite on the code of debug APK H (433 test cases: 427 passed, 6 skipped by design, 0 failed), the 4-size layout matrix, two inspections of the build, and the incidents found in testing. It reports two open defects found while writing it (DEF-01, DEF-02). The tables of results are generated from the raw JUnit logs by `tools/docs/build_std.py`, which stops if a cited test is missing or did not pass. |
+| **1.0.1** | October 18, 2026 | Capstone Team | The test item is now the team lead's build of the same commit `0320385` (SHA-256 `b5a54c18…42d4`, 108,317,310 bytes), the file installed on the team's Samsung Galaxy A21s and submitted for the midterm. The build inspected on October 14 (`d301007f…937d`, 108,489,471 bytes) was made from that commit on another PC. The two differ only in the debug signing key, the line endings of 8 text files of the speech model, and code that the compiler and Hilt generate; no class written by the team, picture or sound differs (`docs/std/evidence/2026-10-18-submitted-apk/apk_inspection.txt`). The submitted file was inspected on October 18 with the same permissions as on October 14 (§5.4). No test result changed. |
 
 ---
 
@@ -31,7 +32,7 @@ For every test case it states the input, the expected result taken from the SRS,
 The structure follows ISO/IEC/IEEE 29119-3:2021 (test documentation), condensed for one build: test plan (§2), test case specifications (§4), execution log (§5, Appendix A), incident report (§7) and test completion report (§8).
 
 ### 1.2 Test Item and Scope
-- **Test item:** PlayIT debug APK H, `playit-debug-H-0320385.apk` (SHA-256 `b5a54c18…42d4`), built from branch `refactor/hear-say-it` at commit `0320385`. This is the build submitted with the SDD v2.0 rev. 2.8, SRS v3.0 rev. 3.8 and SPMP v2.0 rev. 2.6.
+- **Test item:** PlayIT debug APK H, `playit-debug-H-0320385.apk` (SHA-256 `b5a54c18…42d4`), built from branch `refactor/hear-say-it` at commit `0320385` on the team lead's PC. This is the build submitted with the SDD v2.0 rev. 2.8, SRS v3.0 rev. 3.8 and SPMP v2.0 rev. 2.6. An earlier build of the same commit (SHA-256 `d301007f…937d`) was inspected on October 14; revision 1.0.1 above records the change.
 - **In scope:** all automated unit, component and layout tests in `app/src/test/`; the 4-size layout matrix; an inspection of the APK's permissions; an integrity check of every released audio clip; and the phone tests the team ran on earlier builds, which found the incidents in §7.1.
 - **Out of scope for this run** (each listed in §4.8): Round 2 field validation with learners and teachers (Weeks 7–8), the Gate 3 teacher audit of audio, timing measured on the device, and the features the SDD §2.0 lists as planned (telemetry and CSV export, spaced recall, session pacing, the voice-driven mic ripple).
 
@@ -350,7 +351,7 @@ Every test class of the suite, the feature and requirement it verifies, and its 
 The 6 skips are the font-scale 1.3 checks on the 360x640 profile (`fontScale13_mainActionVisible`, `sayIt_micVisible_fontScale13`, `findIt_fontScale13`, `complete_continueVisible_fontScale13`, `splash_startVisible_fontScale13`, `nameprompt_letsPlayVisible_fontScale13`). They skip by design through `assumeFontScaleChecks()`: a 360x640 screen at 130% text is below the supported floor. The same 6 checks pass on the other three profiles (§6.2).
 
 ### 5.4 Inspections
-**APK permissions (TC-SEC-01).** Output of `aapt dump permissions` on the submitted file (full log in `apk_inspection.txt`):
+**APK permissions (TC-SEC-01).** `tools/docs/inspect_apk.py` ran `aapt dump permissions` on the submitted file on October 18, 2026 (full log in `docs/std/evidence/2026-10-18-submitted-apk/apk_inspection.txt`); the run of October 14 on the earlier build of the same commit gave the same permissions (`docs/std/evidence/2026-10-14-0320385/apk_inspection.txt`). Output:
 
 ```
 package: com.playit.app

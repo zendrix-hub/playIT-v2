@@ -1747,3 +1747,50 @@ Inspected live via HTTP:
 #### 3. Ready for Claude Review
 Claude, please perform your follow-up review on `f95d15e` / `96e174b` and confirm if all Option B alignment requirements are satisfied for final submission.
 
+
+---
+
+### Claude, 2026-10-18: review of Option B (`f95d15e`, `b6d7cd7`, public `96e174b`)
+
+**Verdict: Option B is a fair choice, but one change in it has to be undone.** The STD may name the team lead's build. But `f95d15e` edited the raw October 14 inspection log (`docs/std/evidence/2026-10-14-0320385/apk_inspection.txt`): it now says that `b5a54c18` (108,317,310 bytes) was inspected "on 2026-10-14 22:21". That run was of `d301007f`; nobody inspected `b5a54c18` until today. Changing what a dated log recorded is falsifying evidence, even when the new numbers are true of the new file. The same edited log is in the public repo (`96e174b`) and is copied into Drive's `DEPLOYMENT_AND_PERMISSIONS_INSPECTION.txt` and `.md`. Drive is now inconsistent too: `test_execution_evidence/apk_inspection.txt` there still has the real October 14 log (`d301007f`).
+
+**Fixed in this commit (docs and tools only; no PDF re-rendered):**
+- **October 14 log:** restored to what was actually run.
+- **New inspection, `docs/std/evidence/2026-10-18-submitted-apk/apk_inspection.txt`:** a real inspection of the file behind the portal link (downloaded today), made by the new `tools/docs/inspect_apk.py`.
+  - **Permissions:** identical to October 14, and no INTERNET permission.
+  - **Signer certificate:** each build's is recorded.
+  - **Comparison with `d301007f`:** they differ only in 3 signature files, the line endings of 8 Vosk model text files, and 284 class checksums. Of those, 282 are compiler-generated lambdas and 2 are Hilt key providers. No class written by the team, picture or sound differs. So `b5a54c18` is the same code as APK H.
+- **STD (`STD_template.md`, then `build_std.py` into `STD_v1.0.md`):**
+  - new revision **1.0.1** (October 18) recording the change of test item and why;
+  - §1.2 names both builds;
+  - §5.4 cites the October 18 log, and notes that October 14 gave the same permissions.
+  - The directive requires revision history with reasons, and this change had none.
+- **`assemble_midterm_submission.py`:**
+  - The APK record and both inspection files now come from the October 18 log.
+  - The Drive evidence folder gains `submitted_apk_inspection_2026-10-18/`.
+  - **The `.md` inspection:**
+    - it no longer cites `ZeroInternetPermissionTest`, which does not exist (STD OBS-04 says INTERNET is checked by inspection only);
+    - it no longer prints "(Identical byte-for-byte)" whatever the result;
+    - it no longer cites TC-SEC-03, which does not exist.
+  - I checked it by rebuilding the Drive folder with the portal's APK.
+- **Kept from Option B:** the copy fixes for WSL (`safe_copytree`, `copyfile`) and the single accepted hash.
+
+**For Zendrix, in this order:**
+1. **STD:** run `python tools/docs/render_submission_package.py --only STD`, then `python tools/docs/apply_signatures.py`. The committed STD PDF and DOCX predate revision 1.0.1. Only the team lead signs.
+2. **§5.5 row:** if you played the submitted APK on the A21s, replace the last row of §5.5 ("Before submission | APK H | ... not recorded") in `docs/std/STD_template.md`. Give the date, the build (`b5a54c18`), what you checked and the result. Then run `build_std.py` before step 1. The STD's own checklist (§8) asks for this acceptance before turning in, and revision 1.0.1 says the file was installed on the A21s. Claude cannot write that row for you.
+3. **Drive folder:** rebuild it with the `b5a54c18` APK in `Documents/playIT-apk/`. Then replace these on Drive with "Manage versions", so the links stay the same:
+   - `01/DEPLOYMENT_AND_PERMISSIONS_INSPECTION.txt` and `.md`
+   - `02/playIT_STD_v1.0.pdf` and `.docx`
+   - `03/PERFORMANCE_TESTING_REPORT.pdf`: one source reference changed.
+
+   Also upload the new folder `03/test_execution_evidence/submitted_apk_inspection_2026-10-18/`. Keep the existing `test_execution_evidence/apk_inspection.txt`: it is the real October 14 log.
+4. **Public repo:** restage and push `dist/PlayIT`, so `zendrix-hub/playIt` gets the restored log, the new evidence folder and the STD sources.
+
+**Still open from the audit above:**
+- **The performance report has no runtime results.** It still fails the directive's item 3 and reminder 3.
+- The README screenshots show newer art than the APK (item 4).
+- There is no link to the refactoring commits or PR #2 (item 5).
+- The adviser-confirmation wording differs between the SDD and SRS (item 6).
+- The STD §8.4 date is blank (item 7).
+
+**Minor:** each run of `apply_signatures.py` re-embeds the MVP form's signature and leaves 3 more 1x1 placeholder images on page 23. The PDF grew from 4.66 to 4.89 MB, though it looks the same.

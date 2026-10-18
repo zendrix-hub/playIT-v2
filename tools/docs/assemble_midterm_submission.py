@@ -59,6 +59,8 @@ LOGO_PATH = REPO_ROOT / "docs" / "submission" / "logocit-1.png"
 STD_PATH = REPO_ROOT / "docs" / "STD_v1.0.md"
 MVP_FORM_PATH = REPO_ROOT / "docs" / "MVP_Validation_Findings_and_Refactoring_Priorities_Filled.md"
 EVIDENCE_DIR = REPO_ROOT / "docs" / "std" / "evidence" / "2026-10-14-0320385"
+# The submitted APK is the team lead's build of the same commit, inspected again (STD revision 1.0.1)
+SUBMITTED_APK_DIR = REPO_ROOT / "docs" / "std" / "evidence" / "2026-10-18-submitted-apk"
 APK_SRC = REPO_ROOT / "playit-debug.apk"
 APK_H_COMMIT = "0320385"
 SEEDS_PATH = REPO_ROOT / "app" / "src" / "main" / "java" / "com" / "playit" / "app" / "di" / "DatabaseModule.kt"
@@ -279,8 +281,8 @@ def class_result(per_class, name):
 
 
 def apk_record():
-    """The APK inspection recorded for the STD (TC-SEC-01)."""
-    text = (EVIDENCE_DIR / "apk_inspection.txt").read_text(encoding="utf-8")
+    """The inspection of the submitted APK recorded for the STD (TC-SEC-01, section 5.4)."""
+    text = (SUBMITTED_APK_DIR / "apk_inspection.txt").read_text(encoding="utf-8")
     sha = re.search(r"## sha256sum\s+([0-9a-f]{64})\s+\*?(\S+)", text)
     size = re.search(r"## size \(bytes\)\s+(\d+)", text)
     return {"text": text, "sha256": sha.group(1), "name": sha.group(2), "size": int(size.group(1))}
@@ -640,7 +642,7 @@ def write_inspection_txt(output_path, ctx):
         "  makes no haptic calls (TC-POL-02).",
         "",
         "The inspection recorded for STD v1.0 (TC-SEC-01) follows, copied from",
-        f"docs/std/evidence/{EVIDENCE_DIR.name}/apk_inspection.txt:",
+        f"docs/std/evidence/{SUBMITTED_APK_DIR.name}/apk_inspection.txt:",
         "-" * 72,
         apk["text"].rstrip(),
         "",
@@ -666,21 +668,21 @@ def write_inspection_txt(output_path, ctx):
         f"| **File Name** | `{apk['name']}` |",
         f"| **File Size** | {apk_size:,} bytes |",
         f"| **SHA-256 Checksum** | `{apk['copied_sha256']}` |",
-        f"| **Matches STD v1.0 Checksum** | **{'Yes' if matches == 'yes' else 'NO'}** (Identical byte-for-byte) |",
+        f"| **Matches STD v1.0 Checksum** | **{'Yes' if matches == 'yes' else 'NO'}** |",
         "",
         "---",
         "",
         "## 2. Core Capabilities & Architecture Boundaries",
         "",
         f"- **Speech Recognition:** Vosk (`vosk-android {library_version('vosk')}`), with bundled small US English model (`assets/vosk-model`). Operates completely offline with zero external network access.",
-        "- **Haptic Feedback:** None. The application requests zero `VIBRATE` permissions, verified by `PerformancePolicyTest` (TC-POL-02).",
-        "- **Network Access:** Zero `android.permission.INTERNET` requested or bundled. Verified by `ZeroInternetPermissionTest` (TC-SEC-01).",
+        "- **Haptic Feedback:** None. The APK does not request `VIBRATE`, and `PerformancePolicyTest` checks that the code makes no haptic calls (TC-POL-02).",
+        "- **Network Access:** The APK does not request `android.permission.INTERNET` (`aapt dump permissions`, TC-SEC-01, log below). This is checked by inspection only; no automated test covers it (STD OBS-04).",
         "",
         "---",
         "",
-        "## 3. Raw Inspection Log (TC-SEC-01 / TC-SEC-03)",
+        "## 3. Raw Inspection Log (TC-SEC-01)",
         "",
-        f"The following log is copied from `docs/std/evidence/{EVIDENCE_DIR.name}/apk_inspection.txt`:",
+        f"The following log is copied from `docs/std/evidence/{SUBMITTED_APK_DIR.name}/apk_inspection.txt`:",
         "",
         "```text",
         apk["text"].rstrip(),
@@ -916,7 +918,7 @@ def generate_performance_report_pdf(output_path, ctx):
 
     h2(story, "4. Package Size (measured)")
     para(story, plain(f"APK H is {apk['size']:,} bytes (about {apk['size'] / 1e6:.0f} MB), measured on the "
-                      "submitted file (STD evidence apk_inspection.txt). It is a debug build and includes the Vosk "
+                      "submitted file (STD section 5.4). It is a debug build and includes the Vosk "
                       "model, every sound and every picture, so it works with no connection after installation."))
 
     h2(story, "5. Plan for Round 2")
@@ -1506,6 +1508,7 @@ def build_google_drive_submission_package(ctx):
     generate_acceptance_signoff_pdf(dir_03 / "ACCEPTANCE_TESTING_AND_SIGNOFF_REPORT.pdf", ctx)
 
     safe_copytree(EVIDENCE_DIR, dir_03 / "test_execution_evidence")
+    safe_copytree(SUBMITTED_APK_DIR, dir_03 / "test_execution_evidence" / "submitted_apk_inspection_2026-10-18")
     if POST_APK_H_RUN_DIR.exists():
         safe_copytree(POST_APK_H_RUN_DIR, dir_03 / "test_execution_evidence" / "regression_rerun_2026-10-18")
     print(f"Copied the STD test evidence to: {(dir_03 / 'test_execution_evidence').relative_to(REPO_ROOT)}")
