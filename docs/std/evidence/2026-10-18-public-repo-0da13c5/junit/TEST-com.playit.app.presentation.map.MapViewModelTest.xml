@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.presentation.map.MapViewModelTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-10-18T01:36:03" hostname="LAPTOP-REHI7A0K" time="0.719">
+  <properties/>
+  <testcase name="onUnlockShown_clears" classname="com.playit.app.presentation.map.MapViewModelTest" time="0.616"/>
+  <testcase name="clearSession_clearsActiveProfile" classname="com.playit.app.presentation.map.MapViewModelTest" time="0.006"/>
+  <testcase name="unlockedNode_playsStartCue" classname="com.playit.app.presentation.map.MapViewModelTest" time="0.006"/>
+  <testcase name="unlockBetweenLoads_setsNewlyUnlocked" classname="com.playit.app.presentation.map.MapViewModelTest" time="0.012"/>
+  <testcase name="lockedNode_playsLockedCue" classname="com.playit.app.presentation.map.MapViewModelTest" time="0.004"/>
+  <testcase name="mapNodes_generatesLetterNodesAndBlendItNode" classname="com.playit.app.presentation.map.MapViewModelTest" time="0.017"/>
+  <testcase name="userStats_aggregatesProfileAndAchievements" classname="com.playit.app.presentation.map.MapViewModelTest" time="0.012"/>
+  <testcase name="returnFromLesson_afterResubscribe_setsNewlyUnlocked" classname="com.playit.app.presentation.map.MapViewModelTest" time="0.025"/>
+  <testcase name="audioActions_invokeAudioPlayerCorrectly" classname="com.playit.app.presentation.map.MapViewModelTest" time="0.01"/>
+  <testcase name="init_recordsActivityAndResetsStreakIfInactive" classname="com.playit.app.presentation.map.MapViewModelTest" time="0.011"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

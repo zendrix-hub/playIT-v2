@@ -1514,3 +1514,35 @@ The IT411 midterm portal requires BOTH the links to the 3 main Google Drive fold
 4. **Transition to Card 32:** Once Zendrix confirms upload and link submission, begin post-midterm Card 32 design and implementation.
 
 
+
+### Claude, 2026-10-18: review of the final midterm package, portal link sheet, fixes to the packaging
+
+Reviewed against `midterm_goal/midterm_goal.md` (the course's Weeks 1 to 9 targets) and the portal layout in the directive above. The portal field list itself is not in the repository, Gmail or Drive; the mapping follows the directive's list.
+
+**Fixed in `tools/` (this commit):**
+- **APK check restored** (`assemble_midterm_submission.py`). Since `ad28486` a missing APK became an empty placeholder named `playit-debug-H-0320385.apk`, and a different APK only printed a warning; in both cases the inspection TXT still reported the STD's checksum as the copy's. Now the script looks in the repo root, `~/Documents/playIT-apk/` and the old WSL path, copies only a file whose SHA-256 is APK H's, records the copy's own checksum, and stops otherwise.
+- **Traceability Matrix footers** (`extract_srs_standalone_deliverables.py`). The relabelling found the footer by a fixed portrait position, so the three landscape RTM pages still read "Page 16/17/18 of 20". It now finds the "Page X of N" span on any page, replaces the whole line at the same centre, size and colour, and stops if a content page has no footer. Both standalone PDFs regenerated; every content page reads "Page i of N (SRS p. X)", and the text copies and searches correctly.
+- **`apply_signatures.py`** stamped the STD and the acceptance report again on every run (the STD in `docs/submission/` is already signed, so a second run would put two signatures on it). It now skips a page whose signature box already holds an image. Tested on copies.
+- **New deliverables the portal asks for, built from the same records:**
+  - `01/README.pdf`: the README the directive maps to "Link to README (PDF)" did not exist. It is now rendered from the same Markdown as the public `README.md`, with the screen gallery.
+  - `03/FUNCTIONAL_TEST_RESULTS.pdf`: STD sections 4.1 to 4.8 and 8.1 as written (83 test cases with input, expected, actual, evidence, status). The directive mapped this field to the acceptance report, which has requirement-level results only.
+  - `03/INTEGRATION_SYSTEM_AND_REGRESSION_TEST_RESULTS.pdf`: the STD never uses the words integration, system or regression, so the field had no real target. The report maps the course's test types to STD levels L1 to L6 and says what is not covered: the 7 classes that join two real parts (`ProfileDaoStarsTest` on real SQLite, `HearItScreenFocusTest` with the real ViewModel, the asset and manifest checks; 46 of 46 passed); the layout matrix, inspections and A21s sessions; the suite history from `docs/evidence-log.md` (298 to 433, every recorded run passing), the regression test of each INC; and a re-run after APK H. Every ViewModel test mocks its collaborators and nothing runs on a device; the report says so.
+  - `docs/std/evidence/2026-10-18-public-repo-0da13c5/`: the 66 JUnit XML files of that re-run (fresh clone of the public repo, 433 / 427 / 6 skipped / 0 failed).
+- **README:** a "Midterm Build" section says the repository is APK H's code plus 80 later pictures, and that the screenshots show those pictures; the unverified phrase "In line with the CIT-U CCS academic integrity guidelines" is gone.
+- **Public repo staging** leaves out `tools/docs/signature_zendrix_transparent.png` and `apply_signatures.py`.
+- `docs/submission/PORTAL_LINK_SHEET.md`: the link sheet for the team lead (build steps, sharing with rlaviste@gmail.com, one row per portal field, gaps).
+
+**Checked and correct:** the walkthrough against the APK H code (6 profiles, 5 hearts, the arithmetic gate, Start, Add Profile, Let's Play, the top-right Parent Zone, the elevenlabs.io credit, avatar names); the QA reports against the STD; the 02 documents against `docs/submission/` at HEAD; the MVP form and STD signatures sit cleanly on their lines; the MVP form DOCX has the same text as before `45eb43c` (only the old signature image is gone).
+
+**For the team lead to decide (not changed by Claude):**
+1. **`45eb43c` changed what the specs claim, not only their wording.** "Adviser confirmation pending" was removed from the amended requirements (FR-02 item 4, NFR-AUD-01, NFR-ACC-01 items 1 and 2), and `[proposed]` became `[Planned — Round 2 Scope]` (the 15 s sequence, the automatic mic, 70% recall, the 12-minute session), including inside the revision 3.1 entry, which now describes the October 5 revision differently from what it did. If the adviser has confirmed these, add that confirmation with its date; if not, restore the two labels. The package also contradicts itself now: the refactoring evidence says the caption decision "awaits the adviser's confirmation", and the deployment guide says DEF-02 is a "team and adviser decision pending".
+2. **AI attribution was removed from the specs' revision tables and the STD's "Executed by".** The README and `README.pdf` keep the full AI disclosure, and `README.pdf` is now in the package. Check the course's AI policy.
+3. **The team lead's signature is public.** `tools/docs/signature_zendrix_transparent.png` is in `zendrix-hub/playIT-v2`, which is public; removing it now leaves it in the history. The signed STD and MVP form PDFs would also go to the public academic repo with the next push. Decide whether the public repo should carry signed PDFs.
+4. **STD section 8.4:** the team lead's row is signed but its date is blank (the acceptance report says October 18).
+5. **The Drive folder must be rebuilt from this commit** (see the link sheet), then the acceptance report signed.
+
+**Gaps a grader can see** (in the link sheet): no evidence yet that APK H runs on a phone (STD 5.5 last row); no usability test of the refactored app with users; four planned features not built; thin integration testing.
+
+**Public academic repo:** restaged from this commit and committed locally in `dist/PlayIT`; not pushed, waiting for the team's answer on item 3.
+
+**Card 32** waits for the team lead to confirm the upload and the links (directive, task 4).

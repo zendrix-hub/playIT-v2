@@ -15,6 +15,11 @@ from pathlib import Path
 import fitz  # PyMuPDF
 
 REPO = Path(__file__).resolve().parent.parent.parent
+
+
+def already_signed(page, rect):
+    """True if an image already overlaps rect: running the script twice must not stamp a second signature."""
+    return any(fitz.Rect(info["bbox"]).intersects(rect) for info in page.get_image_info())
 SIG_PNG = REPO / "tools" / "docs" / "signature_zendrix_transparent.png"
 SUBMISSION_DIR = REPO / "dist" / "PlayIT_IT411_Midterm_Submission"
 DOCS_SUBMISSION = REPO / "docs" / "submission"
@@ -64,6 +69,10 @@ def stamp_std(pdf_path: Path):
 
     # Underline is around x=350..444, y=568..578
     sig_rect = fitz.Rect(385, 557, 408, 579)
+    if already_signed(target_page, sig_rect):
+        print(f"[SKIP] Already signed: {pdf_path}")
+        doc.close()
+        return
     target_page.insert_image(sig_rect, filename=str(SIG_PNG))
 
     temp_path = pdf_path.with_suffix(".tmp.pdf")
@@ -90,6 +99,10 @@ def stamp_acceptance_report(pdf_path: Path):
 
     # Table cell for Team Lead: x in 331.2..475.2, y in 110..140
     sig_rect = fitz.Rect(365, 112, 395, 138)
+    if already_signed(target_page, sig_rect):
+        print(f"[SKIP] Already signed: {pdf_path}")
+        doc.close()
+        return
     target_page.insert_image(sig_rect, filename=str(SIG_PNG))
 
     # Insert date in the Date column

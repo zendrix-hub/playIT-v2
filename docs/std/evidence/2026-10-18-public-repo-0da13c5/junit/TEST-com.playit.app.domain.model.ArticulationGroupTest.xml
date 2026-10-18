@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.domain.model.ArticulationGroupTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-10-18T01:35:42" hostname="LAPTOP-REHI7A0K" time="0.004">
+  <properties/>
+  <testcase name="lipsTogether" classname="com.playit.app.domain.model.ArticulationGroupTest" time="0.0"/>
+  <testcase name="shortVowelsAreNotRoundLips" classname="com.playit.app.domain.model.ArticulationGroupTest" time="0.0"/>
+  <testcase name="rDoesNotRoundTheLips" classname="com.playit.app.domain.model.ArticulationGroupTest" time="0.0"/>
+  <testcase name="everyLetterMapsToItsMouthShape" classname="com.playit.app.domain.model.ArticulationGroupTest" time="0.0"/>
+  <testcase name="teethOnLip" classname="com.playit.app.domain.model.ArticulationGroupTest" time="0.0"/>
+  <testcase name="jAndQRoundTheLips" classname="com.playit.app.domain.model.ArticulationGroupTest" time="0.0"/>
+  <testcase name="caseAndSpacesIgnored" classname="com.playit.app.domain.model.ArticulationGroupTest" time="0.0"/>
+  <testcase name="everyLetterHasAGroup" classname="com.playit.app.domain.model.ArticulationGroupTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

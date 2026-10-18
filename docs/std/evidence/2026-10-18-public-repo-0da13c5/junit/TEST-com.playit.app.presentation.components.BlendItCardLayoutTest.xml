@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.presentation.components.BlendItCardLayoutTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-18T01:35:59" hostname="LAPTOP-REHI7A0K" time="0.563">
+  <properties/>
+  <testcase name="hintLine_staysInsideCard" classname="com.playit.app.presentation.components.BlendItCardLayoutTest" time="0.563"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

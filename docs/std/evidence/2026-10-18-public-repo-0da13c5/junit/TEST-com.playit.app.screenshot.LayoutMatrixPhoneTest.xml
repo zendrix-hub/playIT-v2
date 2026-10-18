@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.screenshot.LayoutMatrixPhoneTest" tests="21" skipped="0" failures="0" errors="0" timestamp="2026-10-18T01:36:13" hostname="LAPTOP-REHI7A0K" time="1.932">
+  <properties/>
+  <testcase name="blendIt_tilesVisible" classname="com.playit.app.screenshot.LayoutMatrixPhoneTest" time="0.089"/>
+  <testcase name="splash_startVisible" classname="com.playit.app.screenshot.LayoutMatrixPhoneTest" time="0.063"/>
+  <testcase name="complete_continueVisible_fontScale13" classname="com.playit.app.screenshot.LayoutMatrixPhoneTest" time="0.131"/>
+  <testcase name="findIt_fontScale13" classname="com.playit.app.screenshot.LayoutMatrixPhoneTest" time="0.098"/>
+  <testcase name="nameprompt_letsPlayVisible_fontScale13" classname="com.playit.app.screenshot.LayoutMatrixPhoneTest" time="0.103"/>
+  <testcase name="lessonScaffold_bottomBarAndBodyVisible" classname="com.playit.app.screenshot.LayoutMatrixPhoneTest" time="0.077"/>
+  <testcase name="complete_continueVisible" classname="com.playit.app.screenshot.LayoutMatrixPhoneTest" time="0.139"/>
+  <testcase name="map_unitBannerTitleFits" classname="com.playit.app.screenshot.LayoutMatrixPhoneTest" time="0.228"/>
+  <testcase name="map_currentNodeVisible" classname="com.playit.app.screenshot.LayoutMatrixPhoneTest" time="0.098"/>
+  <testcase name="sayIt_mouthCueBesideMic" classname="com.playit.app.screenshot.LayoutMatrixPhoneTest" time="0.113"/>
+  <testcase name="fontScale13_mainActionVisible" classname="com.playit.app.screenshot.LayoutMatrixPhoneTest" time="0.072"/>
+  <testcase name="nameprompt_letsPlayVisible" classname="com.playit.app.screenshot.LayoutMatrixPhoneTest" time="0.059"/>
+  <testcase name="hearIt_stepsAboveNext" classname="com.playit.app.screenshot.LayoutMatrixPhoneTest" time="0.059"/>
+  <testcase name="sayIt_micVisible_fontScale13" classname="com.playit.app.screenshot.LayoutMatrixPhoneTest" time="0.071"/>
+  <testcase name="findIt_wholeGridVisible" classname="com.playit.app.screenshot.LayoutMatrixPhoneTest" time="0.096"/>
+  <testcase name="map_buttonsAre64dp" classname="com.playit.app.screenshot.LayoutMatrixPhoneTest" time="0.136"/>
+  <testcase name="tablet_contentWidthCapped" classname="com.playit.app.screenshot.LayoutMatrixPhoneTest" time="0.048"/>
+  <testcase name="splash_startVisible_fontScale13" classname="com.playit.app.screenshot.LayoutMatrixPhoneTest" time="0.066"/>
+  <testcase name="sayIt_micVisible" classname="com.playit.app.screenshot.LayoutMatrixPhoneTest" time="0.068"/>
+  <testcase name="splash_lilyFaceClearOfStart" classname="com.playit.app.screenshot.LayoutMatrixPhoneTest" time="0.052"/>
+  <testcase name="hearIt_playVisible" classname="com.playit.app.screenshot.LayoutMatrixPhoneTest" time="0.066"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

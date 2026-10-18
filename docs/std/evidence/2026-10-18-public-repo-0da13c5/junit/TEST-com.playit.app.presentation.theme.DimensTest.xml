@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.presentation.theme.DimensTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-18T01:36:06" hostname="LAPTOP-REHI7A0K" time="0.005">
+  <properties/>
+  <testcase name="textNeverBelow16sp" classname="com.playit.app.presentation.theme.DimensTest" time="0.004"/>
+  <testcase name="a21sIsRegular" classname="com.playit.app.presentation.theme.DimensTest" time="0.0"/>
+  <testcase name="childTargetsNeverBelow64dp" classname="com.playit.app.presentation.theme.DimensTest" time="0.0"/>
+  <testcase name="compactUnder700dpTall" classname="com.playit.app.presentation.theme.DimensTest" time="0.0"/>
+  <testcase name="tabletIsWide" classname="com.playit.app.presentation.theme.DimensTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

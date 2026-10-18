@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.presentation.sayit.SayItViewModelTest" tests="38" skipped="0" failures="0" errors="0" timestamp="2026-10-18T01:36:05" hostname="LAPTOP-REHI7A0K" time="0.916">
+  <properties/>
+  <testcase name="secondMiss_showsMouthCue" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.315"/>
+  <testcase name="evaluateSpeech_addedVowel_setsIncorrectWithAddedVowel" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.011"/>
+  <testcase name="onResult_finalLetterName_setsIncorrectWithLetterName" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.029"/>
+  <testcase name="idle_noNudgeOnceHidden" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.013"/>
+  <testcase name="secondMiss_playsWatchMyLips" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.012"/>
+  <testcase name="idle_tenSecondsWithoutTouch_nudgesOnce" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.014"/>
+  <testcase name="loadPhoneme_smePendingLetter_usesLegacyLetterMode" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.023"/>
+  <testcase name="recognizerStoppedExternally_returnsToIdle" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.011"/>
+  <testcase name="onResult_partialAddedVowelThenTimeout_setsIncorrectWithAddedVowel" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.014"/>
+  <testcase name="letterSoundMode_correctionDropsKeyWord" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.012"/>
+  <testcase name="startListening_setsLetterScopedGrammar" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.014"/>
+  <testcase name="wordMode_letterSoundTranscript_isIncorrect" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.024"/>
+  <testcase name="idle_waitsWhileTheModelPlays" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.035"/>
+  <testcase name="thirdMiss_micRestsAndNextUnlocks" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.015"/>
+  <testcase name="firstLetterNameMiss_playsLetterNameCorrection" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.014"/>
+  <testcase name="onResult_partialAddedVowelThenFinalWord_isCorrect" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.025"/>
+  <testcase name="playWordAudio_whenListening_stopsListeningAndPlaysAudio" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.015"/>
+  <testcase name="evaluateSpeech_recordsMultipleAttemptsInList" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.012"/>
+  <testcase name="partialSpeech_setsHeard" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.013"/>
+  <testcase name="loadPhoneme_wordMode_exposesNormalizedTargetWord" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.01"/>
+  <testcase name="playWordAudio_rapidTaps_debounced" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.013"/>
+  <testcase name="correctAfterMiss_praises_andCanContinue" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.012"/>
+  <testcase name="loadPhoneme_resetsLastHeard" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.01"/>
+  <testcase name="loadPhoneme_invalidId_setsLoadError" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.008"/>
+  <testcase name="wordMode_promptPlaysIntroVoThenWordAudio" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.015"/>
+  <testcase name="otherWordMiss_playsListenRemodel" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.012"/>
+  <testcase name="loadPhoneme_validId_loadsPhoneme" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.01"/>
+  <testcase name="evaluateSpeech_incorrectTranscript_setsIncorrectState" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.01"/>
+  <testcase name="lastHeard_tracksAttemptNumber" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.011"/>
+  <testcase name="evaluateSpeech_correctTranscript_setsCorrectState" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.02"/>
+  <testcase name="evaluateSpeech_letterName_setsIncorrectWithLetterName" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.012"/>
+  <testcase name="thirdMiss_emitsLeadAndMoveOn_andSavesIncorrect" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.021"/>
+  <testcase name="onResult_partialLetterNameThenFinalWord_isCorrect" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.028"/>
+  <testcase name="afterLeadAndMoveOn_startListeningIsIgnored" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.014"/>
+  <testcase name="evaluateSpeech_setsLastHeard" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.011"/>
+  <testcase name="addedVowelError_triggersFbNoAhSpokenCorrection" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.019"/>
+  <testcase name="evaluateSpeech_incorrectTranscript_doesNotDeductHeart" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.025"/>
+  <testcase name="onResult_partialFoil_keepsListening" classname="com.playit.app.presentation.sayit.SayItViewModelTest" time="0.03"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

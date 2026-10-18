@@ -5,9 +5,14 @@ assemble_midterm_submission.py
 Builds the IT411 midterm package from the project's own records, so the reports say what the STD says.
 
 1. dist/PlayIT_IT411_Midterm_Submission/ (the Google Drive folder)
-   01_Software_and_Deployment/  APK H, deployment guide, refactoring evidence, feature matrix, APK inspection
-   02_Updated_Documentation/    the rendered SRS, SDD, SPMP, STD and MVP form from docs/submission/
-   03_Testing_and_QA/           performance, usability, defect and acceptance reports, raw JUnit logs
+   01_Software_and_Deployment/  APK H, deployment guide, README.pdf, refactoring evidence, feature matrix,
+                                APK inspection
+   02_Updated_Documentation/    the rendered SRS, SDD, SPMP, STD and MVP form from docs/submission/, and the
+                                Requirements Inventory and Traceability Matrix cut from the SRS
+   03_Testing_and_QA/           functional; integration, system and regression; performance, usability,
+                                defect and acceptance reports; raw JUnit logs
+   The acceptance report is generated unsigned; the team lead signs it afterwards
+   (tools/docs/apply_signatures.py, or by hand).
 2. dist/PlayIT/ (the public academic repository, github.com/zendrix-hub/playIt)
    The tracked files that the build and the tests need, the image and audio release manifests,
    README.md and its screenshots. An existing dist/PlayIT/.git is kept, so the result can be
@@ -37,9 +42,10 @@ from pathlib import Path
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_LEFT
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import landscape, letter
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import inch
+from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Image as RLImage
@@ -394,13 +400,21 @@ def get_pdf_styles():
                                   leftIndent=28, bulletIndent=18, spaceAfter=2),
         "th": ParagraphStyle("TableHeader", fontName=BOLD_FONT, fontSize=8.5, leading=11, textColor=colors.white),
         "td": ParagraphStyle("TableCell", fontName=BODY_FONT, fontSize=8, leading=10.5, textColor=TEXT_COLOR),
+        "td_small": ParagraphStyle("TableCellSmall", fontName=BODY_FONT, fontSize=7, leading=9, textColor=TEXT_COLOR),
+        "code": ParagraphStyle("Code", fontName="Courier", fontSize=8, leading=10.5, textColor=TEXT_COLOR,
+                               backColor=ROW_ALT, borderColor=BORDER_COLOR, borderWidth=0.5, borderPadding=5,
+                               spaceBefore=4, spaceAfter=8),
+        "caption": ParagraphStyle("Caption", fontName=BODY_FONT, fontSize=7.5, leading=9.5, textColor=MUTED_COLOR,
+                                  alignment=1),
+        "cell_title": ParagraphStyle("CellTitle", fontName=BOLD_FONT, fontSize=8.5, leading=11, textColor=PRIMARY,
+                                     alignment=1),
         "meta_label": ParagraphStyle("MetaLabel", fontName=BOLD_FONT, fontSize=8.5, leading=11, textColor=PRIMARY),
         "meta_val": ParagraphStyle("MetaVal", fontName=BODY_FONT, fontSize=8.5, leading=11, textColor=TEXT_COLOR),
         "sign": ParagraphStyle("Sign", fontName=BODY_FONT, fontSize=9.5, leading=14, textColor=TEXT_COLOR),
     }
 
 
-def add_header_banner(story, title, subtitle):
+def add_header_banner(story, title, subtitle, width=PAGE_W):
     styles = get_pdf_styles()
     title_flow = [
         Paragraph(plain("CEBU INSTITUTE OF TECHNOLOGY - UNIVERSITY"),
@@ -413,7 +427,7 @@ def add_header_banner(story, title, subtitle):
     ]
     if LOGO_PATH.exists():
         logo = RLImage(str(LOGO_PATH), width=1.1 * inch, height=1.1 * inch * (724 / 1024))
-        t = Table([[logo, title_flow]], colWidths=[1.3 * inch, (PAGE_W - 1.3) * inch])
+        t = Table([[logo, title_flow]], colWidths=[1.3 * inch, (width - 1.3) * inch])
         t.setStyle(TableStyle([
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
             ("LEFTPADDING", (0, 0), (-1, -1), 0), ("RIGHTPADDING", (0, 0), (-1, -1), 0),
@@ -425,10 +439,10 @@ def add_header_banner(story, title, subtitle):
     story.append(Spacer(1, 8))
 
 
-def add_meta_box(story, rows):
+def add_meta_box(story, rows, width=PAGE_W):
     styles = get_pdf_styles()
     data = [[Paragraph(plain(k), styles["meta_label"]), Paragraph(v, styles["meta_val"])] for k, v in rows]
-    t = Table(data, colWidths=[1.6 * inch, (PAGE_W - 1.6) * inch])
+    t = Table(data, colWidths=[1.6 * inch, (width - 1.6) * inch])
     t.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), ROW_ALT),
         ("BOX", (0, 0), (-1, -1), 1, BORDER_COLOR),
@@ -441,10 +455,10 @@ def add_meta_box(story, rows):
     story.append(Spacer(1, 10))
 
 
-def add_table(story, rows, widths):
+def add_table(story, rows, widths, cell_style="td"):
     """rows: header first; every cell is Paragraph markup. widths in inches."""
     styles = get_pdf_styles()
-    data = [[Paragraph(c, styles["th"] if i == 0 else styles["td"]) for c in row] for i, row in enumerate(rows)]
+    data = [[Paragraph(c, styles["th"] if i == 0 else styles[cell_style]) for c in row] for i, row in enumerate(rows)]
     t = Table(data, colWidths=[w * inch for w in widths], repeatRows=1)
     t.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), PRIMARY),
@@ -476,7 +490,7 @@ def bullets(story, items, level=1):
         story.append(Paragraph(markup, style, bulletText=chr(0x2022) if _can_draw(chr(0x2022)) else "-"))
 
 
-def build_pdf(path, title, story):
+def build_pdf(path, title, story, pagesize=letter):
     def footer(canvas, doc):
         canvas.saveState()
         canvas.setFont(BODY_FONT, 7.5)
@@ -484,10 +498,10 @@ def build_pdf(path, title, story):
         canvas.drawString(36, 26, drawable(f"PlayIT, Group 56: {title}"))
         canvas.drawString(36, 17, drawable(f"Generated {PREPARED_ON} by tools/docs/assemble_midterm_submission.py "
                                            "from STD v1.0 and the project records."))
-        canvas.drawRightString(letter[0] - 36, 26, f"Page {doc.page}")
+        canvas.drawRightString(pagesize[0] - 36, 26, f"Page {doc.page}")
         canvas.restoreState()
 
-    doc = SimpleDocTemplate(str(path), pagesize=letter, leftMargin=36, rightMargin=36, topMargin=36,
+    doc = SimpleDocTemplate(str(path), pagesize=pagesize, leftMargin=36, rightMargin=36, topMargin=36,
                             bottomMargin=48, title=title, author="PlayIT Capstone Team (Group 56)")
     doc.build(story, onFirstPage=footer, onLaterPages=footer)
     print(f"Generated: {path.relative_to(REPO_ROOT)}")
@@ -517,15 +531,7 @@ def generate_deployment_guide_pdf(output_path, ctx):
     ])
 
     h2(story, "1. What Is Submitted")
-    pictures, other = ctx["changes_since_apk_h"]
-    if other:
-        repo_note = (f"{len(pictures) + len(other)} files under app/ changed after APK H, including code, so a "
-                     "build from the repository is not APK H.")
-    else:
-        dates = [d for d in ctx["releases"]["picture_dates"] if d > "2026-10-14"]
-        repo_note = (f"It also holds {len(pictures)} pictures released after APK H (image releases of "
-                     f"{dates[0]} to {dates[-1]}). No code changed after APK H, so a build from the "
-                     "repository differs from APK H only in those pictures.")
+    repo_note = repo_vs_apk_h(ctx).replace("this repository", "the repository")
     add_table(story, [
         [plain("Item"), plain("Where"), plain("Details")],
         [plain("App (APK H)"), md(f"`01_Software_and_Deployment/{apk['name']}`"),
@@ -536,10 +542,15 @@ def generate_deployment_guide_pdf(output_path, ctx):
          md("Check the download: `certutil -hashfile <file> SHA256` (Windows) or `sha256sum <file>`.")],
         [plain("Source code"), md(f"{PUBLIC_REPO_URL} (branch `main`)"),
          plain("The code of APK H with its tests, documents and release manifests. " + repo_note)],
+        [plain("README"), md("`01_Software_and_Deployment/README.pdf`"),
+         plain("The repository's README.md as a PDF: the app, its curriculum, how to build and test it, and the "
+               "AI disclosure.")],
         [plain("Documents"), md("`02_Updated_Documentation/`"),
-         plain("SRS v3.0, SDD v2.0, SPMP v2.0, STD v1.0 and the MVP Validation Findings form, in PDF and DOCX.")],
+         plain("SRS v3.0, SDD v2.0, SPMP v2.0, STD v1.0 and the MVP Validation Findings form, in PDF and DOCX; the "
+               "Requirements Inventory and the Traceability Matrix, cut from the SRS.")],
         [plain("Test records"), md("`03_Testing_and_QA/`"),
-         plain("Performance, usability, defect and acceptance reports, and the raw JUnit logs of the STD run.")],
+         plain("Functional, integration, system and regression results; performance, usability, defect and "
+               "acceptance reports; and the raw JUnit logs of the STD run.")],
     ], [1.25, 2.55, 3.7])
 
     h2(story, "2. Installation")
@@ -1058,6 +1069,297 @@ def generate_acceptance_signoff_pdf(output_path, ctx):
     build_pdf(output_path, "Acceptance Testing and Sign-Off", story)
 
 
+def std_test_case_tables(std):
+    """(heading, rows) for STD sections 4.1 to 4.8, as written."""
+    out, title, buf = [], None, []
+    for line in section_lines(std.text, "## 4.") + ["### end"]:
+        if line.startswith("### "):
+            if title:
+                tables = md_tables(buf)
+                if tables:
+                    out.append((title, tables[0]))
+            title, buf = line[4:].strip(), []
+        else:
+            buf.append(line)
+    return out
+
+
+def generate_functional_results_pdf(output_path, ctx):
+    std = ctx["std"]
+    width = 10.0  # landscape letter, 0.5 in margins
+    story = []
+    add_header_banner(story, "Functional Test Results",
+                      "Deliverable 03: every test case of STD v1.0 with its input, expected and actual result",
+                      width=width)
+    add_meta_box(story, [
+        ("Build:", plain(f"Debug APK H ({ctx['apk']['name']}), commit {APK_H_COMMIT}")),
+        ("Test run:", md(std.execution["Executed"])),
+        ("Source:", plain("STD v1.0 sections 4.1 to 4.8 and 8.1, copied as written. The actual results and the "
+                          "statuses come from the raw JUnit logs in test_execution_evidence/junit/ (STD section 5).")),
+    ], width=width)
+    h2(story, "Results in Numbers (STD section 8.1)")
+    for line in std.summary_bullets:
+        bullets(story, [md(line.strip()[2:])], level=2 if line.startswith("  ") else 1)
+    for title, rows in std_test_case_tables(std):
+        h2(story, title)
+        if title.startswith("4.8"):
+            widths = [1.0, 1.0, 2.6, 2.7, 2.7]
+        else:
+            widths = [0.8, 0.75, 0.75, 1.45, 1.9, 1.9, 1.65, 0.8]
+        add_table(story, [[md(c) for c in rows[0]]] + [[md(c) for c in r] for r in rows[1:]], widths,
+                  cell_style="td_small")
+    build_pdf(output_path, "Functional Test Results", story, pagesize=landscape(letter))
+
+
+# Test classes that join two real parts of the app, as the course's "integration testing" means it. Every
+# other ViewModel test mocks its repositories, recognizer and audio, so it is a component test (STD level L2).
+INTEGRATION_CLASSES = [
+    ("ProfileDaoStarsTest", "Room DAO and SQLite",
+     "The star totals and the profile list come from the real SQL, on an in-memory Room database (no mock)."),
+    ("HearItScreenFocusTest", "Screen and ViewModel",
+     "The Hear It screen composed with its real ViewModel and a fake lesson repository; only audio is mocked."),
+    ("AssetImageLoadTest", "Picture component and asset files",
+     "The picture component decodes the app's real PNG files; a new path replaces the old picture; a missing "
+     "file shows nothing instead of crashing."),
+    ("AudioResolverTest", "Code, audio assets and release manifests",
+     "Every sound path the lessons ask for resolves to a shipped file, and the released clips are the ones the "
+     "audio release manifests list."),
+    ("AudioCompletenessCheckTest", "Seeded lessons and audio assets",
+     "Every sound and word prompt the seeded lessons need exists in the app's assets."),
+    ("PictureAssetsTest", "Code, image assets and release manifests",
+     "Every Find It picture exists; every released picture matches its manifest byte for byte; every mouth cue "
+     "is released."),
+    ("BlendItWordSeedsTest", "Seed data and curriculum",
+     "The seeded Blend It words use only the letters taught up to their chapter."),
+]
+SCREEN_CLASSES = ["LayoutMatrixCompactTest", "LayoutMatrixA21sTest", "LayoutMatrixPhoneTest",
+                  "LayoutMatrixTabletTest", "HearItScreenshotTest", "FindItScreenshotTest", "BlendItScreenshotTest",
+                  "LetterCompleteScreenshotTest", "NamePromptScreenshotTest", "SplashScreenTest"]
+POLICY_CLASSES = [("ManifestPrivacyTest", "TC-SEC-02: Android backup of the learner database is disabled"),
+                  ("ZeroEmojiPolicyTest", "TC-POL-01: no emoji in any source or string"),
+                  ("PerformancePolicyTest", "TC-POL-02: no haptics, portrait only, no endless idle animation")]
+POST_APK_H_RUN_DIR = REPO_ROOT / "docs" / "std" / "evidence" / "2026-10-18-public-repo-0da13c5"
+
+
+def suite_history():
+    """Full-suite results recorded per card in docs/evidence-log.md: (card, commit, result) with a test count,
+    and the number of GitHub Actions runs recorded as passing (those rows give no count)."""
+    rows, counted, ci_runs = [], set(), set()
+    for line in (REPO_ROOT / "docs" / "evidence-log.md").read_text(encoding="utf-8").splitlines():
+        cells = [c.strip() for c in line.strip().strip("|").split("|")] if line.startswith("| ") else []
+        if len(cells) < 6 or not re.match(r"\d", cells[0]):
+            continue
+        card, ci = cells[0], cells[4]
+        ci_runs.update(re.findall(r"actions/runs/(\d+)\) pass", ci))
+        count = re.search(r"(\d{3})/\1(?! manifest)", ci)  # "141/141 manifest matches" is not a suite run
+        base = card.replace(" (accepted)", "")
+        sha = re.search(r"\b[0-9a-f]{7}\b", cells[3])
+        sha = sha.group(0) if sha else dict(CARD_COMMITS).get(base, "")
+        if count and base not in counted:
+            counted.add(base)
+            skipped = re.search(r"(\d+) skipped", ci)
+            rows.append((int(count.group(1)), base, sha,
+                         f"pass ({count.group(0)}" + (f", {skipped.group(1)} skipped" if skipped else "") + ")"))
+    return sorted(rows), len(ci_runs)
+
+
+def junit_dir_totals(junit_dir):
+    t = {"tests": 0, "failed": 0, "skipped": 0, "classes": 0}
+    for xml_path in junit_dir.glob("TEST-*.xml"):
+        root = ET.parse(xml_path).getroot()
+        t["tests"] += int(root.get("tests"))
+        t["skipped"] += int(root.get("skipped"))
+        t["failed"] += int(root.get("failures")) + int(root.get("errors"))
+        t["classes"] += 1
+    t["passed"] = t["tests"] - t["failed"] - t["skipped"]
+    return t
+
+
+def generate_integration_system_regression_pdf(output_path, ctx):
+    std, junit, per_class = ctx["std"], ctx["junit"], ctx["per_class"]
+    story = []
+    add_header_banner(story, "Integration, System and Regression Testing Results",
+                      "Deliverable 03: how APK H was tested beyond single units, what passed, and what is not covered")
+    add_meta_box(story, [
+        ("Build:", plain(f"Debug APK H ({ctx['apk']['name']}), commit {APK_H_COMMIT}")),
+        ("Test run:", md(std.execution["Executed"])),
+        ("Sources:", plain("STD v1.0 sections 2.1, 5, 6 and 7.1; the raw JUnit logs in test_execution_evidence/; "
+                           "the card-by-card record in docs/evidence-log.md.")),
+    ])
+
+    h2(story, "1. The Course's Test Types and the STD's Test Levels")
+    para(story, plain("STD v1.0 organises its tests by level (section 2.1). This table maps those levels to the "
+                      "test types the course names, says where each result is, and what is not covered."))
+    integ = [c for c, _, _ in INTEGRATION_CLASSES]
+    integ_tests = sum(per_class[c][0] for c in integ)
+    integ_passed = sum(per_class[c][0] - per_class[c][1] - per_class[c][2] for c in integ)
+    add_table(story, [
+        [plain("Course test type"), plain("What PlayIT has (STD level)"), plain("Result on APK H"),
+         plain("Not covered")],
+        [plain("Functional"), plain("L1 unit and L2 component tests behind 83 test cases (STD section 4)"),
+         plain("See FUNCTIONAL_TEST_RESULTS.pdf"), plain("Field and device measures (STD section 4.8)")],
+        [plain("Integration"), plain(f"{len(integ)} classes that join two real parts of the app (section 2 below)"),
+         plain(f"{integ_passed} of {integ_tests} tests passed"),
+         plain("ViewModel tests mock their repositories, recognizer and audio; the Vosk recognizer is never run "
+               "on recorded speech; there is no instrumented test on a device.")],
+        [plain("System"), plain("L3 screens on 4 screen profiles; L4 inspection of the built APK and of the "
+                                "released audio; L5 play sessions on the Samsung Galaxy A21s (section 3)"),
+         plain(f"Layout matrix {junit['layout_passed']} of {junit['layout_runs']} runs passed, "
+               f"{junit['layout_skipped']} skipped by design; inspections pass"),
+         plain("APK H itself has not yet been played on the phone (STD section 5.5, last row); the phone "
+               "sessions were exploratory, not scripted.")],
+        [plain("Regression"), plain("The whole suite re-run from clean at every card, and a test kept for every "
+                                    "closed incident (section 4)"),
+         plain(f"{junit['tests']} tests: {junit['passed']} passed, {junit['failed']} failed at APK H"),
+         plain("No automated run on the phone.")],
+        [plain("Acceptance"), plain("APK H against SRS v3.0"), plain("See ACCEPTANCE_TESTING_AND_SIGNOFF_REPORT.pdf"),
+         plain("Teacher agreement, sound purity, latency and independent completion (Round 2)")],
+    ], [1.0, 2.35, 1.75, 2.4])
+
+    h2(story, "2. Integration Tests")
+    rows = [[plain("Test class"), plain("Joins"), plain("What it checks"), plain("Result")]]
+    for name, joins, what in INTEGRATION_CLASSES:
+        rows.append([md(f"`{name}`"), plain(joins), plain(what), plain(class_result(per_class, name))])
+    add_table(story, rows, [1.7, 1.45, 3.25, 1.1])
+
+    h2(story, "3. System Tests")
+    h3(story, "3.1 Screens on four screen profiles (STD level L3, section 6)")
+    para(story, plain("Each screen is drawn by Robolectric with its real Compose code on Compact 360x640, A21s "
+                      "360x740, Phone 411x891 and Tablet 800x1280 dp, and at font scale 1.3; Roborazzi saves a "
+                      "capture of each. The ViewModels' repositories and audio are fakes."))
+    rows = [[plain("Test class"), plain("Result")]]
+    rows += [[md(f"`{c}`"), plain(class_result(per_class, c))] for c in SCREEN_CLASSES]
+    add_table(story, rows, [3.0, 4.5])
+    h3(story, "3.2 Inspections of the build (STD level L4, section 5.4)")
+    rows = [[plain("Check"), plain("Result")],
+            [plain("TC-SEC-01: aapt dump permissions on the submitted APK: no INTERNET permission"),
+             plain("PASS (DEPLOYMENT_AND_PERMISSIONS_INSPECTION.txt)")],
+            [plain("TC-AUD-03: every released audio clip against the app's copy, by SHA-256"),
+             plain("PASS (test_execution_evidence/audio_release_check.txt)")]]
+    rows += [[plain(what), plain(class_result(per_class, c))] for c, what in POLICY_CLASSES]
+    add_table(story, rows, [5.0, 2.5])
+    h3(story, "3.3 Play sessions on the Samsung Galaxy A21s (STD level L5, section 5.5)")
+    add_table(story, [[md(c) for c in std.device_tests[0]]] + [[md(c) for c in r] for r in std.device_tests[1:]],
+              [1.0, 0.7, 2.6, 3.2])
+
+    h2(story, "4. Regression Tests")
+    h3(story, "4.1 The whole suite at every card")
+    history, ci_runs = suite_history()
+    para(story, plain(f"Every task card ran the whole suite before its commit. Cards 00 to 19 ran it on GitHub "
+                      f"Actions ({ci_runs} runs recorded as passing; the log gives no counts). From card 03b on, "
+                      "the card's local run is recorded with its count (tests run / tests run without a failure; "
+                      "the skipped tests are the font-scale checks). Every recorded run passed; the suite grew as "
+                      "each card added its tests."))
+    rows = [[plain("Card"), plain("Commit"), plain("Result as recorded in docs/evidence-log.md")]]
+    rows += [[plain(card), md(f"`{sha}`") if sha else plain("-"), plain(result)] for _, card, sha, result in history]
+    rows.append([plain("APK H (STD run)"), md(f"`{APK_H_COMMIT}`"),
+                 plain(f"{junit['passed']} passed, {junit['skipped']} skipped by design, {junit['failed']} failed "
+                       f"of {junit['tests']} (raw JUnit logs)")])
+    if (POST_APK_H_RUN_DIR / "junit").exists():
+        after = junit_dir_totals(POST_APK_H_RUN_DIR / "junit")
+        rows.append([plain("After APK H"), md("`0da13c5`"),
+                     plain(f"{after['passed']} passed, {after['skipped']} skipped by design, {after['failed']} failed "
+                           f"of {after['tests']}: a fresh clone of the public repository (APK H code and the "
+                           "pictures released after it), October 18, 2026 (raw JUnit logs in "
+                           "test_execution_evidence/regression_rerun_2026-10-18/)")])
+    add_table(story, rows, [1.2, 0.9, 5.4])
+    h3(story, "4.2 A test kept for every closed incident (STD section 7.1)")
+    para(story, plain("Each incident found in phone tests or reviews was fixed with a test that stays in the "
+                      "suite, so the same fault fails the build if it comes back."))
+    inc = std.incidents
+    add_table(story, [[md(inc[0][i]) for i in (0, 1, 4, 5, 6)]] + [[md(r[i]) for i in (0, 1, 4, 5, 6)] for r in inc[1:]],
+              [0.7, 1.9, 2.1, 2.1, 0.7])
+
+    h2(story, "5. Not Covered, and the Plan")
+    bullets(story, [
+        plain("No instrumented test runs on a phone or an emulator, and the Vosk recognizer is not run on recorded "
+              "speech in any automated test. The speech judge's rules are unit-tested on transcripts "
+              "(TC-ASR-07 to 13); its agreement with teachers is measured in Round 2 (TC-ASR-01 to 06)."),
+        plain("APK H's own phone check (install, splash, one letter from Hear It to Find It, the map header) is "
+              "to be run by the team before turning in (STD section 5.5)."),
+        plain("Device timing, latency and force-close tests need the planned telemetry log (STD section 4.8; "
+              "PERFORMANCE_TESTING_REPORT.pdf)."),
+    ])
+    build_pdf(output_path, "Integration, System and Regression Testing Results", story)
+
+
+def generate_readme_pdf(output_path, ctx):
+    """README.md of the public repository as a PDF, from the same Markdown, with the screen gallery."""
+    styles = get_pdf_styles()
+    lines = academic_readme_markdown(ctx).splitlines()
+    facts = [html.unescape(a) for a in re.findall(r'alt="([^"]+)"', "\n".join(lines)) if ":" in a]
+    story = []
+    add_header_banner(story, lines[0].lstrip("# "), "Deliverable 01: the README of the source code repository")
+    add_meta_box(story, [
+        ("Repository:", plain(f"{PUBLIC_REPO_URL} (branch main)")),
+        ("Midterm build:", plain(f"Debug APK H, commit {APK_H_COMMIT}: 01_Software_and_Deployment/{ctx['apk']['name']}")),
+        ("At a glance:", plain("; ".join(facts))),
+    ])
+    buf = []
+
+    def flush():
+        if buf:
+            para(story, md(" ".join(buf)))
+            buf.clear()
+
+    i = 1
+    while i < len(lines):
+        line = lines[i]
+        if line.startswith("<p>"):                      # the badges, shown in the box above
+            while not lines[i].startswith("</p>"):
+                i += 1
+        elif line.startswith("<table>"):                # the screen gallery
+            flush()
+            while not lines[i].startswith("</table>"):
+                i += 1
+            cells = []
+            for name, title, caption in README_SCREENS:
+                path = ROBORAZZI_DIR / name
+                w, h = ImageReader(str(path)).getSize()
+                cells.append([Paragraph(plain(title), styles["cell_title"]),
+                              RLImage(str(path), width=1.55 * inch, height=1.55 * inch * h / w),
+                              Paragraph(plain(caption), styles["caption"])])
+            for row in (cells[:4], cells[4:]):
+                t = Table([row], colWidths=[PAGE_W / 4 * inch] * 4)
+                t.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"), ("ALIGN", (0, 0), (-1, -1), "CENTER")]))
+                story.append(t)
+                story.append(Spacer(1, 6))
+        elif line.startswith("## "):
+            flush()
+            h2(story, line[3:])
+        elif line.startswith("```"):
+            flush()
+            code = []
+            i += 1
+            while not lines[i].startswith("```"):
+                code.append(lines[i])
+                i += 1
+            story.append(Paragraph("<br/>".join(plain(c).replace("  ", "&nbsp; ") for c in code), styles["code"]))
+        elif line.startswith("|"):
+            flush()
+            table = []
+            while i < len(lines) and lines[i].startswith("|"):
+                table.append(lines[i])
+                i += 1
+            rows = md_tables(table)[0]
+            add_table(story, [[md(c) for c in r] for r in rows], [0.8, 3.9, 2.8])
+            continue
+        elif line.startswith("- "):
+            flush()
+            bullets(story, [md(line[2:])])
+        elif re.match(r"\d+\. ", line):
+            flush()
+            n, rest = line.split(". ", 1)
+            story.append(Paragraph(md(rest), styles["bullet"], bulletText=f"{n}."))
+        elif not line.strip():
+            flush()
+        else:
+            buf.append(line)
+        i += 1
+    flush()
+    build_pdf(output_path, "README", story)
+
+
 # ==============================================================================
 # GOOGLE DRIVE PACKAGE
 # ==============================================================================
@@ -1075,31 +1377,27 @@ def build_google_drive_submission_package(ctx):
     for d in (dir_01, dir_02, dir_03):
         d.mkdir(parents=True, exist_ok=True)
 
+    # APK H may sit in the repo root or in Documents/playIT-apk. The copy must be APK H, byte for byte: the
+    # inspection TXT reports the copy's own checksum, so a wrong or missing APK stops the build instead of
+    # shipping a placeholder under APK H's name.
     apk = ctx["apk"]
-    apk_candidates = [
-        APK_SRC,
-        REPO_ROOT.parent.parent / "Documents" / "playIT-apk" / apk["name"],
-        Path("/mnt/c/Users/Zendrix/Documents/playIT-apk") / apk["name"],
-    ]
-    found_apk = None
-    for cand in apk_candidates:
-        if cand.exists():
-            found_apk = cand
-            break
+    candidates = [APK_SRC, Path.home() / "Documents" / "playIT-apk" / apk["name"],
+                  Path("/mnt/c/Users/Zendrix/Documents/playIT-apk") / apk["name"]]
+    found = [c for c in candidates if c.exists()]
+    source = next((c for c in found if sha256_of(c) == apk["sha256"]), None)
+    if source is None:
+        sys.exit(f"Error: APK H ({apk['name']}, SHA-256 {apk['sha256'][:16]}...) not found. Looked in: "
+                 + ", ".join(str(c) for c in candidates)
+                 + (f". Found, with a different checksum: {', '.join(str(c) for c in found)}" if found else ""))
     target = dir_01 / apk["name"]
-    if found_apk:
-        shutil.copy2(found_apk, target)
-        actual_sha = sha256_of(target)
-        if actual_sha != apk["sha256"]:
-            print(f"[WARN] Local APK SHA-256 ({actual_sha[:16]}...) differs from STD ({apk['sha256'][:16]}...)")
-        apk["copied_sha256"] = apk["sha256"]
-        print(f"Copied APK to: {target.relative_to(REPO_ROOT)} (from {found_apk})")
-    else:
-        print(f"[WARN] {apk['name']} not found locally; creating placeholder for Drive upload")
-        target.touch()
-        apk["copied_sha256"] = apk["sha256"]
+    shutil.copy2(source, target)
+    apk["copied_sha256"] = sha256_of(target)
+    if apk["copied_sha256"] != apk["sha256"]:
+        sys.exit(f"Error: the copy of APK H in {target.parent.name} does not match its source")
+    print(f"Copied APK H to: {target.relative_to(REPO_ROOT)} (from {source})")
 
     generate_deployment_guide_pdf(dir_01 / "DEPLOYED_SYSTEM_AND_ACCESS_INSTRUCTIONS.pdf", ctx)
+    generate_readme_pdf(dir_01 / "README.pdf", ctx)
     write_inspection_txt(dir_01 / "DEPLOYMENT_AND_PERMISSIONS_INSPECTION.txt", ctx)
     generate_refactoring_evidence_pdf(dir_01 / "CODE_REFACTORING_EVIDENCE.pdf", ctx)
     generate_feature_completion_matrix_pdf(dir_01 / "FEATURE_COMPLETION_MATRIX.pdf", ctx)
@@ -1124,12 +1422,17 @@ def build_google_drive_submission_package(ctx):
             print(f"[WARN] Could not overwrite {name} (may be locked by viewer): {e}")
     print(f"Copied the documents to: {dir_02.relative_to(REPO_ROOT)}")
 
+    generate_functional_results_pdf(dir_03 / "FUNCTIONAL_TEST_RESULTS.pdf", ctx)
+    generate_integration_system_regression_pdf(dir_03 / "INTEGRATION_SYSTEM_AND_REGRESSION_TEST_RESULTS.pdf", ctx)
     generate_performance_report_pdf(dir_03 / "PERFORMANCE_TESTING_REPORT.pdf", ctx)
     generate_usability_report_pdf(dir_03 / "USABILITY_TESTING_AND_IMPROVEMENTS_REPORT.pdf", ctx)
     generate_defect_log_pdf(dir_03 / "DEFECT_LOG_AND_RETEST_RECORD.pdf", ctx)
     generate_acceptance_signoff_pdf(dir_03 / "ACCEPTANCE_TESTING_AND_SIGNOFF_REPORT.pdf", ctx)
 
     shutil.copytree(EVIDENCE_DIR, dir_03 / "test_execution_evidence", dirs_exist_ok=True)
+    if POST_APK_H_RUN_DIR.exists():
+        shutil.copytree(POST_APK_H_RUN_DIR, dir_03 / "test_execution_evidence" / "regression_rerun_2026-10-18",
+                        dirs_exist_ok=True)
     print(f"Copied the STD test evidence to: {(dir_03 / 'test_execution_evidence').relative_to(REPO_ROOT)}")
     print("=== Google Drive folder complete ===")
 
@@ -1159,6 +1462,8 @@ CLEAN_INCLUDE_FILES = [
 ]
 CLEAN_EXCLUDE = {
     "docs/engineering-package/99_AGENT_BOOTSTRAP.md",  # instructions for the coding agents
+    "tools/docs/signature_zendrix_transparent.png",    # a person's signature does not belong in a public repo
+    "tools/docs/apply_signatures.py",                  # needs that signature
 }
 CLEAN_GITIGNORE = """# Gradle and Android Studio
 .gradle/
@@ -1240,12 +1545,15 @@ def scrub_wsl(root):
     return changed
 
 
-def stage_clean_academic_repo(ctx):
-    print("\n=== Step 2: Staging the clean academic repository (dist/PlayIT) ===")
+def require_readme_screens():
     missing = [name for name, _, _ in README_SCREENS if not (ROBORAZZI_DIR / name).exists()]
     if missing:
         sys.exit("Error: README screenshots missing from app/build/outputs/roborazzi/ "
                  f"({', '.join(missing)}). Run: gradlew :app:recordRoborazziDebug --tests \"com.playit.app.screenshot.*\"")
+
+
+def stage_clean_academic_repo(ctx):
+    print("\n=== Step 2: Staging the clean academic repository (dist/PlayIT) ===")
     clear_clean_repo()
 
     files = tracked_files()
@@ -1277,7 +1585,25 @@ def badge(label, message, color):
     return f'<img src="https://img.shields.io/badge/{esc(label)}-{esc(message)}-{color}" alt="{label}: {message}"/>'
 
 
+def repo_vs_apk_h(ctx):
+    """One sentence on how the repository's code differs from APK H, from git."""
+    pictures, other = ctx["changes_since_apk_h"]
+    if other:
+        return (f"{len(pictures) + len(other)} files under app/ changed after APK H, including code, so a build "
+                "from this repository is not APK H.")
+    if not pictures:
+        return "No file under app/ changed after APK H, so a build from this repository is APK H."
+    dates = [d for d in ctx["releases"]["picture_dates"] if d > "2026-10-14"]
+    return (f"It also holds {len(pictures)} pictures released after APK H (image releases of {dates[0]} to "
+            f"{dates[-1]}). No code changed after APK H, so a build from this repository differs from APK H only "
+            "in those pictures.")
+
+
 def generate_academic_readme(output_path, ctx):
+    output_path.write_text(academic_readme_markdown(ctx), encoding="utf-8", newline="\n")
+
+
+def academic_readme_markdown(ctx):
     junit, chapters, releases = ctx["junit"], ctx["chapters"], ctx["releases"]
     tests_line = (f"{junit['tests']} tests: {junit['passed']} passed, {junit['skipped']} skipped by design, "
                   f"{junit['failed']} failed")
@@ -1314,9 +1640,13 @@ IT411 Capstone & Research 2 (Section G7), Group 56, College of Computer Studies,
   {badge("Network", "no INTERNET permission", "blue")}
 </p>
 
+## The Midterm Build
+
+The build submitted for the IT411 midterm is debug **APK H**, built from commit `{APK_H_COMMIT}` of the team's development branch and tested in the Software Test Document (STD v1.0, in `docs/submission/`). This repository holds that code with its tests. {repo_vs_apk_h(ctx)}
+
 ## Screens
 
-Captured with Roborazzi from this repository's code on the 360x740 dp profile of the team's test phone (Samsung Galaxy A21s).
+Captured with Roborazzi from this repository's code on the 360x740 dp profile of the team's test phone (Samsung Galaxy A21s){", so they show the pictures released after APK H" if ctx["changes_since_apk_h"][0] else ""}.
 
 {chr(10).join(gallery)}
 
@@ -1384,7 +1714,7 @@ Capstone Adviser: {ADVISER}, College of Computer Studies, Cebu Institute of Tech
 
 ## AI Assistance and Third-Party Content
 
-In line with the CIT-U CCS academic integrity guidelines, the team discloses the AI tools used and what each produced. The team set the requirements, made the design decisions, approved every released picture and clip, and is responsible for the result.
+The team discloses the AI tools used and what each produced. The team set the requirements, made the design decisions, approved every released picture and clip, and is responsible for the result.
 
 - **Claude (Anthropic):** architecture and design review, task cards, code review, test design and generation, the audio pipeline scripts, and drafting of the documentation and of this packaging.
 - **Google Antigravity ("agy", an AI coding agent):** implemented most of the app code from the team's task cards, and generated pictures with Nano Banana Pro.
@@ -1393,7 +1723,7 @@ In line with the CIT-U CCS academic integrity guidelines, the team discloses the
 - **ElevenLabs credit:** the AM, TUB, YAM and /i/ clips were made with [ElevenLabs](https://elevenlabs.io) on the Free plan, which allows non-commercial use with attribution. The app credits elevenlabs.io in the Parent Zone. These clips may not be used commercially.
 - **Vosk** (Alpha Cephei, Apache-2.0): offline speech recognition with its small US English model.
 """
-    output_path.write_text(content, encoding="utf-8", newline="\n")
+    return content
 
 
 # ==============================================================================
@@ -1403,6 +1733,7 @@ In line with the CIT-U CCS academic integrity guidelines, the team discloses the
 def main():
     font = register_fonts()
     print(f"PDF font: {font}")
+    require_readme_screens()
     std = Std()
     junit, per_class = junit_results()
     check_junit_against_std(junit, std)
