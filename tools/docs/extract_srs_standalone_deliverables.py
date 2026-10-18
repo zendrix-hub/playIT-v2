@@ -267,8 +267,34 @@ def build_requirements_inventory():
     with open(out_path, "wb") as f:
         writer.write(f)
 
+    _normalize_footers(out_path, SECTION_3)
+
     print(f"  [OK] Saved {out_path.name} ({len(writer.pages)} pages: 1 cover + {len(SECTION_3)} content, "
           f"{pages_label(SECTION_3)})")
+
+
+def _normalize_footers(pdf_path: Path, orig_range: range):
+    """Normalize standalone footers from 'Page X of 20' to 'Page i of N (SRS p. X)'."""
+    import fitz
+    doc = fitz.open(pdf_path)
+    total_content = len(orig_range)
+    for i, orig_p in enumerate(orig_range, start=1):
+        page_idx = i  # 0 is cover, 1..N are content pages
+        if page_idx >= len(doc):
+            break
+        page = doc[page_idx]
+        p_list = page.search_for("Page ")
+        footer_p = [p for p in p_list if p.y0 > 740]
+        if footer_p:
+            redact_rect = fitz.Rect(footer_p[0].x0 - 2, 748, 560, 762)
+            page.add_redact_annot(redact_rect, fill=(1, 1, 1))
+            page.apply_redactions()
+            new_text = f"Page {i} of {total_content} (SRS p. {orig_p + 1})"
+            page.insert_text(fitz.Point(footer_p[0].x0, 757), new_text, fontsize=8, fontname="helv", color=(0.4, 0.45, 0.5))
+    temp_path = pdf_path.with_suffix(".tmp.pdf")
+    doc.save(temp_path, deflate=True)
+    doc.close()
+    temp_path.replace(pdf_path)
 
 
 def build_traceability_matrix():
@@ -295,6 +321,8 @@ def build_traceability_matrix():
 
     with open(out_path, "wb") as f:
         writer.write(f)
+
+    _normalize_footers(out_path, SECTION_4_ON)
 
     print(f"  [OK] Saved {out_path.name} ({len(writer.pages)} pages: 1 cover + {len(SECTION_4_ON)} content, "
           f"{pages_label(SECTION_4_ON)})")
