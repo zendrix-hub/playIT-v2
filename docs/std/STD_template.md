@@ -16,7 +16,7 @@
 | Version | Date | Primary Author(s) | Description |
 |:---:|:---:|:---:|---|
 | **1.0** | October 14, 2026 | Capstone Team | First issue. Specifies the test cases for SRS v3.0 rev. 3.8, records a clean run of the whole automated suite on the code of debug APK H ({{COUNT:tests}} test cases: {{COUNT:passed}} passed, {{COUNT:skipped}} skipped by design, {{COUNT:failed}} failed), the 4-size layout matrix, two inspections of the build, and the incidents found in testing. It reports two open defects found while writing it (DEF-01, DEF-02). The tables of results are generated from the raw JUnit logs by `tools/docs/build_std.py`, which stops if a cited test is missing or did not pass. |
-| **1.0.1** | October 18, 2026 | Capstone Team | The test item is now the team lead's build of the same commit `0320385` (SHA-256 `b5a54c18…42d4`, 108,317,310 bytes), the file installed on the team's Samsung Galaxy A21s and submitted for the midterm. The build inspected on October 14 (`d301007f…937d`, 108,489,471 bytes) was made from that commit on another PC. The two differ only in the debug signing key, the line endings of 8 text files of the speech model, and code that the compiler and Hilt generate; no class written by the team, picture or sound differs (`docs/std/evidence/2026-10-18-submitted-apk/apk_inspection.txt`). The submitted file was inspected on October 18 with the same permissions as on October 14 (§5.4). No test result changed. |
+| **1.0.1** | October 18, 2026 | Capstone Team | The test item is now the team lead's build of the same commit `0320385` (SHA-256 `b5a54c18…42d4`, 108,317,310 bytes), the file installed on the team's Samsung Galaxy A21s and submitted for the midterm. The build inspected on October 14 (`d301007f…937d`, 108,489,471 bytes) was made from that commit on another PC. The two differ only in the debug signing key, the line endings of 8 text files of the speech model, and code that the compiler and Hilt generate; no class written by the team, picture or sound differs (`docs/std/evidence/2026-10-18-submitted-apk/apk_inspection.txt`). The submitted file was inspected on October 18 with the same permissions as on October 14 (§5.4). No automated test result changed. The team then ran the acceptance check of the submitted file on the A21s (§5.5, October 18: pass), and the team lead reviewed and signed this version (§8.4). |
 
 ---
 
@@ -33,7 +33,7 @@ The structure follows ISO/IEC/IEEE 29119-3:2021 (test documentation), condensed 
 
 ### 1.2 Test Item and Scope
 - **Test item:** PlayIT debug APK H, `playit-debug-H-0320385.apk` (SHA-256 `b5a54c18…42d4`), built from branch `refactor/hear-say-it` at commit `0320385` on the team lead's PC. This is the build submitted with the SDD v2.0 rev. 2.8, SRS v3.0 rev. 3.8 and SPMP v2.0 rev. 2.6. An earlier build of the same commit (SHA-256 `d301007f…937d`) was inspected on October 14; revision 1.0.1 above records the change.
-- **In scope:** all automated unit, component and layout tests in `app/src/test/`; the 4-size layout matrix; an inspection of the APK's permissions; an integrity check of every released audio clip; and the phone tests the team ran on earlier builds, which found the incidents in §7.1.
+- **In scope:** all automated unit, component and layout tests in `app/src/test/`; the 4-size layout matrix; an inspection of the APK's permissions; an integrity check of every released audio clip; the phone tests the team ran on earlier builds, which found the incidents in §7.1; and the acceptance check of the submitted APK on the phone (§5.5).
 - **Out of scope for this run** (each listed in §4.8): Round 2 field validation with learners and teachers (Weeks 7–8), the Gate 3 teacher audit of audio, timing measured on the device, and the features the SDD §2.0 lists as planned (telemetry and CSV export, spaced recall, session pacing, the voice-driven mic ripple).
 
 ### 1.3 References
@@ -68,7 +68,7 @@ The structure follows ISO/IEC/IEEE 29119-3:2021 (test documentation), condensed 
 | **L2 Component** | ViewModels with mocked repositories, audio and recognizer (MockK, coroutine test clock); Room DAO on an in-memory database | JUnit 4, Robolectric, kotlinx-coroutines-test | §4, §5 |
 | **L3 UI and layout** | Compose screens on 4 screen profiles and at font scale 1.3; screen captures | Robolectric, Compose UI test, Roborazzi | §6 |
 | **L4 Inspection** | The built APK's permissions; the released audio against the app's files; source policies (no emoji, no haptics) | `aapt dump`, `tools/docs/check_audio_release.py`, policy tests | §5.4 |
-| **L5 Device (manual)** | The app on a Samsung Galaxy A21s, played as a child would | Team phone tests of APK B, D and E; APK H acceptance before submission | §5.5, §7.1 |
+| **L5 Device (manual)** | The app on a Samsung Galaxy A21s, played as a child would | Team phone tests of APK B, D and E; acceptance check of the submitted APK, October 18 | §5.5, §7.1 |
 | **L6 Field** | Learners, parents and teachers (Round 2) | SPMP Milestones 5–6, Weeks 7–8 | §4.8 (not run) |
 
 ### 2.2 Test Design Techniques
@@ -230,7 +230,7 @@ Each table gives the input, the expected result (from the SRS), the actual resul
 | **TC-POL-03** | NFR-ACC-02 | Accessibility | Reduced motion on (system setting) | Animations become fades or stop; nothing moves by itself | Splash, motion tokens and heart wobble are still with reduced motion | {{tc: SplashScreenTest.motionPolicy_followsReducedMotion, PlayItMotionTest.reducedMotionSnaps, FeedbackEffectsTest.heartWobble_reducedMotionIsStill}} |
 | **TC-AUD-03** | NFR-AUD-01.4 | Inspection | Compare every clip in the 7 audio release manifests with the app's file (SHA-256) | Every released clip the app ships is byte-identical to its release | 76 released clips: 69 identical (PASS), 0 different, 7 approved but not used by APK H (no reference in the code). 159 shipped files predate the release gate (the MVP clips the SRS lists as pending) | `docs/std/evidence/2026-10-14-0320385/audio_release_check.txt` (`tools/docs/check_audio_release.py`) | **PASS** (69 of 69 shipped clips) |
 | **TC-AUD-04** | FR-04, NFR-ACC-01 | Inspection | Compare every released picture with the app's file (SHA-256); every grid picture exists | Identical bytes; no missing picture | All identical; all grid pictures present | {{tc: PictureAssetsTest.releasedPicturesMatchManifest, PictureAssetsTest.everyGridPictureExists}} |
-| **TC-SEC-01** | NFR-SEC-01 | Inspection | `aapt dump permissions` on the submitted APK | No `android.permission.INTERNET`; only the microphone (and legacy storage, capped at old Android versions) | Permissions: `RECORD_AUDIO`; `READ_EXTERNAL_STORAGE` (max SDK 32); `WRITE_EXTERNAL_STORAGE` (max SDK 28); the app's own receiver permission. **No INTERNET** | `docs/std/evidence/2026-10-14-0320385/apk_inspection.txt` | **PASS** |
+| **TC-SEC-01** | NFR-SEC-01 | Inspection | `aapt dump permissions` on the submitted APK | No `android.permission.INTERNET`; only the microphone (and legacy storage, capped at old Android versions) | Permissions: `RECORD_AUDIO`; `READ_EXTERNAL_STORAGE` (max SDK 32); `WRITE_EXTERNAL_STORAGE` (max SDK 28); the app's own receiver permission. **No INTERNET** | `docs/std/evidence/2026-10-18-submitted-apk/apk_inspection.txt` (October 18, the submitted file); the same permissions on October 14 (`docs/std/evidence/2026-10-14-0320385/apk_inspection.txt`, the earlier build of the same commit) | **PASS** |
 | **TC-SEC-02** | NFR-SEC-01 | Inspection | Read the manifest and backup rules | Learner data is not copied off the device by Android backup | `allowBackup="false"`; the backup rules exclude the database (and all other app data); the data-extraction rules name the database | {{tc: ManifestPrivacyTest.backupIsDisabled}} |
 | **TC-POL-01** | Team policy | Inspection | Scan every `.kt` and `.xml` file in `app/src/main` | No emoji anywhere in the app | 0 violations | {{tc: ZeroEmojiPolicyTest.noEmojiInAppSources}} |
 | **TC-POL-02** | Team policy | Inspection | Scan the code | No haptics; portrait only; no endless idle animation on the letter card or mascot header | 0 haptic calls; portrait locked; no endless idle motion | {{tc: PerformancePolicyTest.*}} |
@@ -287,7 +287,7 @@ package com.playit.app, versionName 1.0.0, minSdk 26, targetSdk 34
 **Audio releases (TC-AUD-03).** `tools/docs/check_audio_release.py` read the 7 release manifests in `docs/audio-release/` (76 clips) and compared each with the app's file by SHA-256: 69 identical, 0 different, 7 approved but not used by APK H. Of the 228 audio files the app ships, 69 come from a release and 159 are MVP clips from before the release gate (words 115, phonemes 29, UI lines 15); the SRS lists their remake and teacher audit as pending.
 
 ### 5.5 Device Tests on the Samsung Galaxy A21s
-The team played each candidate build on the test phone as a child would. These sessions are exploratory, not scripted; what they found is in §7.1.
+The team played each candidate build on the test phone as a child would. These sessions are exploratory, not scripted; what they found is in §7.1. The last row is the acceptance check of the submitted APK, run before turning it in.
 
 | Date | Build | What was checked | Result |
 |---|---|---|---|
@@ -374,12 +374,11 @@ APK H does what the SRS requires for every behaviour that can be checked on the 
 The automated tests prove the logic and the layout, not the experience. The requirements that matter most for the research objectives still need people and the phone: teacher agreement with the speech judge (TC-ASR-01 to 06), the purity of the sounds (TC-AUD-02), latency (TC-PERF), and independent completion (TC-IND-03). They are scheduled in Round 2 (SPMP Milestones 5 and 6). Three items the SPMP placed in Milestone 4 (Week 6) are not in APK H: telemetry, the CSV export and the Gate 3 teacher audit. Their test cases (TC-TEL-01, TC-EXP-01, TC-EXP-02, TC-AUD-02) move with them, and the latency measures (TC-PERF) depend on the telemetry, so the schedule needs re-baselining before Round 2.
 
 ### 8.3 Next Steps
-1. Before turning in: run the APK H acceptance on the A21s (§5.5).
-2. Write the fix card for DEF-01; take DEF-02 and OBS-01 to the team and the adviser as SRS amendments.
-3. Add the tests named in OBS-03 and OBS-04.
-4. Re-baseline the SPMP for the Milestone 4 items not yet built (telemetry, CSV export) and the Gate 3 teacher audit.
-5. When cards 31b and 31c ship, re-run this suite and the layout matrix, and update this document (OBS-02 should close).
-6. Round 2: run the test cases of §4.8 and record them in version 2.0 of this document (SPMP Milestone 7: "verified STD execution logs").
+1. Write the fix card for DEF-01; take DEF-02 and OBS-01 to the team and the adviser as SRS amendments.
+2. Add the tests named in OBS-03 and OBS-04.
+3. Re-baseline the SPMP for the Milestone 4 items not yet built (telemetry, CSV export) and the Gate 3 teacher audit.
+4. When cards 31b and 31c ship, re-run this suite and the layout matrix, and update this document (OBS-02 should close).
+5. Round 2: run the test cases of §4.8 and record them in version 2.0 of this document (SPMP Milestone 7: "verified STD execution logs").
 
 ### 8.4 Sign-Off
 

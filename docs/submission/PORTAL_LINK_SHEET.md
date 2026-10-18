@@ -10,7 +10,7 @@ For the team lead. One row per portal field: the file to link, where it is in th
    python tools/docs/assemble_midterm_submission.py
    python tools/docs/apply_signatures.py
    ```
-   The first command makes the README screenshots. The second needs APK H (`playit-debug-H-0320385.apk`, SHA-256 `b5a54c18...42d4`) in the repo root or in `Documents/playIT-apk/`; it stops if the file is missing or different. The third signs the acceptance report: the team lead runs it, nobody else. It leaves the already-signed STD as it is and puts the MVP form's signature back in the same place.
+   The first command makes the README screenshots. The second needs APK H (`playit-debug-H-0320385.apk`, SHA-256 `b5a54c18...42d4`) in the repo root or in `Documents/playIT-apk/`; it stops if the file is missing or different. The third signs the acceptance report: the team lead runs it, nobody else. It leaves the already-signed STD and MVP form as they are.
 2. **Upload** the whole `dist/PlayIT_IT411_Midterm_Submission/` folder to Google Drive, keeping its three subfolders.
 3. **Share** the uploaded master folder with the course instructor, Mr. Ralph P. Laviste (`rlaviste@gmail.com`), as **Viewer**. The files inside inherit it. If the portal is opened by other graders, also set General access to "Anyone with the link: Viewer".
 4. **GitHub needs no invitation:** https://github.com/zendrix-hub/playIt is public. Do not add the instructor as a collaborator; that gives write access.
@@ -32,7 +32,7 @@ For the team lead. One row per portal field: the file to link, where it is in th
 | Link to GitHub Repository | https://github.com/zendrix-hub/PlayIT | Public academic GitHub repository (or link `README.pdf` if a PDF link is required). | https://github.com/zendrix-hub/PlayIT |
 | Link to README (PDF) | `README.pdf` | The repository's README as a PDF: the app, the curriculum, build and test, how the repository relates to APK H, the AI disclosure and the ElevenLabs credit. | https://drive.google.com/file/d/13yW2TLtzZQYhlksqZ3Xjh-M_xJjMM99o/view?usp=sharing |
 | Link to Deployment Evidence | `DEPLOYED_SYSTEM_AND_ACCESS_INSTRUCTIONS.pdf` | How to install and run APK H, its checksum, permissions and known limitations. | https://drive.google.com/file/d/1hyae8ibXs7kEwuxZSpgeWBIgBlWgxwcQ/view?usp=sharing |
-| Link to Refactoring Evidence | `CODE_REFACTORING_EVIDENCE.pdf` | The 6 MVP-form priorities, what APK H does for each, the STD result, and the 34 card commits. | https://drive.google.com/file/d/104coSrKXUXeLXYImqFK2jK1PgXiHk-Oq/view?usp=sharing |
+| Link to Refactoring Evidence | `CODE_REFACTORING_EVIDENCE.pdf` | The 6 MVP-form priorities, what APK H does for each, the STD result, the 34 card commits, and the link to the development pull request (https://github.com/zendrix-hub/playIT-v2/pull/2). | https://drive.google.com/file/d/104coSrKXUXeLXYImqFK2jK1PgXiHk-Oq/view?usp=sharing |
 | Link to Feature Completion Matrix | `FEATURE_COMPLETION_MATRIX.pdf` | Every requirement in STD section 3 with its test cases, result and status (complete, built with checks pending, open defect, planned). | https://drive.google.com/file/d/1Nxvdq5413DWgVFjj1xXXoA2AsAwp8hws/view?usp=sharing |
 
 ## 02_Updated_Documentation
@@ -63,7 +63,7 @@ The DOCX copies in this folder are editable sources; link the PDFs.
 
 ## Gaps a grader can see (not fixable by documents)
 
-- **No evidence yet that APK H runs on a phone.** STD section 5.5's last row ("APK H acceptance") is still open. Install APK H on the A21s, play one letter from Hear It to Find It, and take 3 to 5 photos or a short screen recording. Put them in `01_Software_and_Deployment/DEPLOYMENT_EVIDENCE_A21s/`, and link that folder from the Deployment Evidence field as well. This is also the only device test of the submitted build.
+- **The phone check has no photos.** STD section 5.5 records the team's acceptance check of the submitted APK on the A21s (October 18, pass), but nothing in the package shows it. If the team has photos or a screen recording, put them in `01_Software_and_Deployment/DEPLOYMENT_EVIDENCE_A21s/` and link that folder from the Deployment Evidence field as well. It is the only device test of the submitted build.
 - **No runtime performance figure.** The course directive asks for the workload, response times, throughput, error rate and other metrics, with actual results; the performance report measures only the APK size. This needs a measured run of APK H on the A21s.
 - **Usability:** the course directive puts final user and stakeholder validation after the midterm, so Round 1 results with the changes made answer this item. The refactored app has not yet been tried by users.
 - **Not feature-complete:** telemetry and CSV export, spaced recall and session pacing are planned, not built (the feature matrix says so).

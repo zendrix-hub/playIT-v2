@@ -67,6 +67,8 @@ SEEDS_PATH = REPO_ROOT / "app" / "src" / "main" / "java" / "com" / "playit" / "a
 VERSIONS_PATH = REPO_ROOT / "gradle" / "libs.versions.toml"
 ROBORAZZI_DIR = REPO_ROOT / "app" / "build" / "outputs" / "roborazzi"
 PUBLIC_REPO_URL = "https://github.com/zendrix-hub/playIt"
+# The development branch refactor/hear-say-it, as a draft pull request; it holds every commit in CARD_COMMITS
+PULL_REQUEST_URL = "https://github.com/zendrix-hub/playIT-v2/pull/2"
 
 PROJECT = "PlayIT: An Offline-First Gamified Early Literacy Mobile Application"
 COURSE = "IT411 Capstone & Research 2, Section G7"
@@ -703,7 +705,8 @@ def generate_refactoring_evidence_pdf(output_path, ctx):
         ("Baseline:", plain("The MVP build used in the Weeks 1 to 2 validation (Round 1).")),
         ("Refactored build:", plain(f"Debug APK H, commit {APK_H_COMMIT}, October 14, 2026 "
                                     "(branch refactor/hear-say-it).")),
-        ("Pull request:", plain('<a href="https://github.com/zendrix-hub/playIT-v2/pull/2" color="#0B57D0"><u>https://github.com/zendrix-hub/playIT-v2/pull/2</u></a> (201 commits, +43k lines)')),
+        ("Pull request:", plain(f"{PULL_REQUEST_URL} (draft): the development branch, with every commit in "
+                                "section 4, and the pictures and documents added after APK H.")),
         ("Sources:", plain("MVP Validation Findings form, Section 4 (the MVP approach and the planned change); "
                            "STD v1.0 (results); git history (commits).")),
     ])
@@ -946,7 +949,8 @@ def generate_usability_report_pdf(output_path, ctx):
                                  "supervising teachers, and 4 DepEd Grade 1 reading teachers (T-1 to T-4).")),
         ("Framework:", plain("Usability, Pedagogy and Accessibility (UPA), with the System Usability Scale (SUS) "
                              "for adults and the Smileyometer (Fun Toolkit) for children.")),
-        ("Device tests:", plain("Exploratory play on the Samsung Galaxy A21s, October 10 to 11, 2026 "
+        ("Device tests:", plain("Exploratory play on the Samsung Galaxy A21s, October 10 to 11, 2026, and the "
+                                f"acceptance check of the submitted APK, {std.device_tests[-1][0]} "
                                 "(STD section 5.5).")),
         ("Sources:", plain("MVP Validation Findings form (Sections 2 to 4); SRS v3.0 section 1.1; STD v1.0.")),
     ])
@@ -1102,6 +1106,8 @@ def generate_acceptance_signoff_pdf(output_path, ctx):
                       "the speech judge, the purity of the sounds), latency and independent completion are not yet "
                       "accepted: they are measured in the Round 2 field trials (SPMP Milestones 5 and 6) and "
                       "recorded in STD version 2.0."))
+    day, build, checked, result = std.device_tests[-1][:4]
+    para(story, md(f"**On the phone** (STD section 5.5, {day}, {build}): {checked}. {result}"))
 
     sign_heading = Paragraph(plain("5. Sign-Off"), styles["h2"])
     sign = [[Paragraph(plain(c), styles["th"]) for c in ("Role", "Name", "Signature", "Date")]]
@@ -1270,8 +1276,8 @@ def generate_integration_system_regression_pdf(output_path, ctx):
                                 "released audio; L5 play sessions on the Samsung Galaxy A21s (section 3)"),
          plain(f"Layout matrix {junit['layout_passed']} of {junit['layout_runs']} runs passed, "
                f"{junit['layout_skipped']} skipped by design; inspections pass"),
-         plain("APK H itself has not yet been played on the phone (STD section 5.5, last row); the phone "
-               "sessions were exploratory, not scripted.")],
+         plain("The submitted APK was played on the phone once, in the acceptance check (STD section 5.5, "
+               "last row); the other sessions played earlier builds. No session recorded counts or timings.")],
         [plain("Regression"), plain("The whole suite re-run from clean at every card, and a test kept for every "
                                     "closed incident (section 4)"),
          plain(f"{junit['tests']} tests: {junit['passed']} passed, {junit['failed']} failed at APK H"),
@@ -1339,8 +1345,8 @@ def generate_integration_system_regression_pdf(output_path, ctx):
         plain(instrumented + " The Vosk recognizer is not run on recorded speech in any automated test: the "
               "speech judge's rules are unit-tested on transcripts (TC-ASR-07 to 13), and its agreement with "
               "teachers is measured in Round 2 (TC-ASR-01 to 06)."),
-        plain("APK H's own phone check (install, splash, one letter from Hear It to Find It, the map header) is "
-              "to be run by the team before turning in (STD section 5.5)."),
+        plain(f"The submitted APK's phone check ({std.device_tests[-1][0]}) was one play-through of one letter "
+              "by the team (STD section 5.5, last row), not a scripted test with counts."),
         plain("Device timing, latency and force-close tests need the planned telemetry log (STD section 4.8; "
               "PERFORMANCE_TESTING_REPORT.pdf)."),
     ])

@@ -1835,3 +1835,65 @@ Claude, please perform the final comprehensive review across `0349033` and publi
 1. Verify that all audit points are addressed and all documents, evidence, and inspection checksums are 100% aligned.
 2. Confirm if the team has technical acceptance and is fully clear to submit the midterm deliverables.
 
+---
+
+### Claude, 2026-10-18: final pre-submission review (`0349033`, `61d3944`, public `976f6bf`)
+
+**Verdict: the repository, the public repo and the evidence logs now agree, but 9 files on Drive are out of date, and the performance report still has no measured results.** Technical acceptance of the alignment (checksums, evidence, documents) is given once steps 1 to 3 below are done. Not fully clear to submit: the directive's performance item is still unmet (see the end).
+
+**Checked and correct:**
+- **Public repo `976f6bf`:** every file it shares with this branch is identical, except `README.md`, `.gitignore` and `app/build.gradle.kts`, which are meant to differ. The October 14 log is the real one. The README states the 80 pictures released after APK H.
+- **Drive, up to date:**
+  - 01: both inspection files (they quote the October 18 log, `b5a54c18`, "yes").
+  - 02: the SRS, SDD, SPMP, Traceability Matrix and Requirements Inventory are byte-identical to what this commit builds. So is the STD of `0349033`; its signature sits on the line.
+  - 03: both evidence logs in `test_execution_evidence/` are byte-identical to the repo's.
+- **STD §5.5 acceptance row, §8.4 date, SRS wording (`0349033`):** accepted. The A21s row is the team lead's own record; there are no photos of it (see the link sheet).
+
+**Found and fixed in this commit (documents and tools only; no PDF re-rendered, nothing signed):**
+- **`CODE_REFACTORING_EVIDENCE.pdf` printed raw HTML.** The PR line went through `plain()`, which escapes markup, so Drive's copy shows `<a href="..." color="#0B57D0"><u>...</u></a> (201 commits, +43k lines)`. The line is now the plain URL. The commit count is removed: PR #2 is at 207 commits and still growing. All 34 card commits are in PR #2 (checked).
+- **The STD still said the acceptance check was pending:**
+  - §8.3's step 1 read "Before turning in: run the APK H acceptance"; it is removed, and the later steps are renumbered.
+  - §2.1 (level L5) and §1.2 (scope) now include the acceptance check of the submitted APK.
+  - The §5.5 introduction says its last row is that check, not exploratory play.
+- **TC-SEC-01 cited the October 14 log** (the earlier build) as the evidence for "the submitted APK". It now cites the October 18 log, plus the October 14 one for the same result.
+- **STD revision 1.0.1** now records the acceptance check and the sign-off, so revision history has a reason for every change.
+- **Reports that still said the phone check was pending, or left it out:**
+  - integration report: "APK H itself has not yet been played on the phone", and "to be run by the team before turning in";
+  - usability report: device tests "October 10 to 11" only;
+  - acceptance report: did not mention the device acceptance at all.
+  
+  All three now read the last row of STD §5.5.
+- **`apply_signatures.py`** re-stamped the MVP form on every run. Each run added a placeholder image and a new copy of the signature (4.66 MB on Drive, 4.98 MB in the repo; the text is the same). It now skips a page that already has the transparent signature. I tested it on a copy; I did not sign anything.
+- **`PORTAL_LINK_SHEET.md`:** the phone-check gap is updated (it was run; there are no photos), and the refactoring row names the PR link.
+
+**Stale on Drive regardless of this commit** (built before Option B). My previous list missed the first one:
+- `01/DEPLOYED_SYSTEM_AND_ACCESS_INSTRUCTIONS.pdf` (the Deployment Evidence field) still gives SHA-256 `d301007f...937d` and 108,489,471 bytes. A grader who checks the downloaded APK against it gets a mismatch.
+- `03/PERFORMANCE_TESTING_REPORT.pdf` still gives the APK size as 108,489,471 bytes.
+
+**For Zendrix, in this order:**
+1. **Build and sign:** with the `b5a54c18` APK in `Documents/playIT-apk/`, from the repo root:
+   ```
+   python tools/docs/render_submission_package.py --only STD
+   python tools/docs/assemble_midterm_submission.py
+   python tools/docs/apply_signatures.py
+   ```
+   The last command signs the STD (in `docs/submission/` and in the Drive folder) and the acceptance report. The team lead runs it, nobody else. Commit the STD PDF and DOCX.
+2. **Replace on Drive** with "Manage versions", so the links stay the same:
+   - **01:** `DEPLOYED_SYSTEM_AND_ACCESS_INSTRUCTIONS.pdf`, `CODE_REFACTORING_EVIDENCE.pdf`
+   - **02:** `playIT_STD_v1.0.pdf`, `playIT_STD_v1.0.docx`
+   - **03:** `FUNCTIONAL_TEST_RESULTS.pdf`, `INTEGRATION_SYSTEM_AND_REGRESSION_TEST_RESULTS.pdf`, `PERFORMANCE_TESTING_REPORT.pdf`, `USABILITY_TESTING_AND_IMPROVEMENTS_REPORT.pdf`, `ACCEPTANCE_TESTING_AND_SIGNOFF_REPORT.pdf` (the signed one)
+   
+   The rest of Drive is current; leave it.
+3. **Public repo:** restage and push `dist/PlayIT` (STD template and PDFs, the link sheet, the two tools).
+4. **Optional:**
+   - If there are photos or a recording of the October 18 phone check, add `01/DEPLOYMENT_EVIDENCE_A21s/`.
+   - Rename PR #2: its title still reads "Hear It / Say It refactor (cards 00-04)".
+   - The PR link opens the development repo to the grader, including `docs/tasks/` (these handoffs). That is the team's call.
+
+**Still open: performance (directive item 3, reminder 3).** The report measures only the APK size; the directive asks for workload, response times, throughput and error rate "with actual results". Documents cannot close this; it needs a measured run of the submitted APK on the A21s. A run over USB with `adb` would take about 30 minutes:
+- cold and warm start times (`am start -W`, 10 each);
+- frame times and jank (`dumpsys gfxinfo`);
+- memory (`dumpsys meminfo`);
+- an error rate from a fixed-seed `monkey` run of 5,000 events (crashes and ANRs per 1,000 events).
+
+Claude can write that script and the report section on request. Otherwise the team submits knowing this item is unmet, and the report says so plainly, as it does now.
