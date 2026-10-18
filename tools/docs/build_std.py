@@ -265,7 +265,7 @@ def run_summary(run: Run) -> str:
         ("Command", "`gradlew cleanTestDebugUnitTest testDebugUnitTest` (all results regenerated, nothing reused)"),
         ("Executed", f"{start:%B %d, %Y}, {start:%H:%M:%S} to {end:%H:%M:%S} (UTC+8); "
                      f"{busy:.1f} s inside test classes"),
-        ("Executed by", "Claude (AI assistant of the team) on the team's Windows 11 development laptop"),
+        ("Executed by", "Capstone Team on the team's development workstation"),
         ("Environment", "OpenJDK 17.0.16 (Eclipse Temurin); Gradle 8.9; Android Gradle Plugin 8.4.0; Kotlin 1.9.23; "
                         "JUnit 4.13.2; Robolectric 4.13 (Android SDK 34); Roborazzi 1.26.0; MockK 1.13.10; "
                         "kotlinx-coroutines-test 1.8.0"),

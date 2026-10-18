@@ -15,7 +15,7 @@
 
 | Version | Date | Primary Author(s) | Description |
 |:---:|:---:|:---:|---|
-| **1.0** | October 14, 2026 | Capstone Team (Claude, test execution and write-up) | First issue. Specifies the test cases for SRS v3.0 rev. 3.8, records a clean run of the whole automated suite on the code of debug APK H ({{COUNT:tests}} test cases: {{COUNT:passed}} passed, {{COUNT:skipped}} skipped by design, {{COUNT:failed}} failed), the 4-size layout matrix, two inspections of the build, and the incidents found in testing. It reports two open defects found while writing it (DEF-01, DEF-02). The tables of results are generated from the raw JUnit logs by `tools/docs/build_std.py`, which stops if a cited test is missing or did not pass. |
+| **1.0** | October 14, 2026 | Capstone Team | First issue. Specifies the test cases for SRS v3.0 rev. 3.8, records a clean run of the whole automated suite on the code of debug APK H ({{COUNT:tests}} test cases: {{COUNT:passed}} passed, {{COUNT:skipped}} skipped by design, {{COUNT:failed}} failed), the 4-size layout matrix, two inspections of the build, and the incidents found in testing. It reports two open defects found while writing it (DEF-01, DEF-02). The tables of results are generated from the raw JUnit logs by `tools/docs/build_std.py`, which stops if a cited test is missing or did not pass. |
 
 ---
 
@@ -128,7 +128,7 @@ The structure follows ISO/IEC/IEEE 29119-3:2021 (test documentation), condensed 
 | **NFR-IND-01** Independent use, idle re-prompt | All lessons | TC-IND-01, TC-IND-02, TC-PRF-03; TC-IND-03 | Pass; not run: Round 2 |
 | **NFR-ACC-01** Mouth-shape cues | Say It | TC-ACC-01, TC-ACC-03, TC-SAY-03 | Pass |
 | **NFR-ACC-02** 64 dp targets, layout | All screens | TC-ACC-02, TC-ACC-04, TC-POL-03, layout matrix (§6) | Pass |
-| **NFR-SES-01** Session pacing | All | TC-SES-01 | Not run: [proposed], not built |
+| **NFR-SES-01** Session pacing | All | TC-SES-01 | Not run: [Planned — Round 2], not built |
 | **NFR-REL-01** Offline persistence | Data | TC-DB-01, TC-DB-02 | Not run: needs schema v4 and the device |
 | **NFR-SEC-01** Local data only | Build | TC-SEC-01, TC-SEC-02 | Pass |
 | Team policies (zero emoji, no haptics) | All screens | TC-POL-01, TC-POL-02 | Pass |
@@ -240,7 +240,7 @@ Each table gives the input, the expected result (from the SRS), the actual resul
 |---|:---:|---|---|---|
 | **TC-AUD-01** | FR-02 | SoundPool start latency ≤ 50 ms | Needs instrumented timing on the phone | Device test before Round 2 (Milestone 5) |
 | **TC-AUD-02** | FR-02, NFR-AUD-01.3 | Zero schwa: 26 of 26 sounds rated "Pure" by ≥ 3 of 4 teachers | Gate 3 teacher audit not yet held; Chapter 1's short /a/ and Chapters 2–7 still use MVP clips | SPMP Milestone 4 (Week 6) planned the audit; not yet held. Instrument A, Part 1 |
-| **TC-SCR-01** | FR-02.5 | Modeling sequence ≤ 15 s ([proposed]) | Needs timing on the device | Instrument D (D-11), Round 2 |
+| **TC-SCR-01** | FR-02.5 | Modeling sequence ≤ 15 s ([Planned — Round 2]) | Needs timing on the device | Instrument D (D-11), Round 2 |
 | **TC-MIC-01** | FR-03.3, NFR-PERF-01.3 | Tap-to-Listening ≤ 100 ms | Needs timing on the device | Device test (Instrument D) |
 | **TC-MIC-02** | FR-03.2 | Ripple follows the voice's loudness | Planned (`AudioRecord` loop, SDD §3.2); the ripple is time-based in APK H | After Round 2 (team decision 2026-10-06) |
 | **TC-ASR-01 to 05** | NFR-ASR-01.1, 3 | ≥ 80% agreement with teachers across child voices and classroom noise | Needs recorded child attempts and teacher ratings | Instruments B and C, Round 2 (Weeks 7–8) |
@@ -252,7 +252,7 @@ Each table gives the input, the expected result (from the SRS), the actual resul
 | **TC-EXP-01, 02** | FR-NEW-TEL.4 | PIN-gated CSV export; zero network transmission | `CsvExportManager` is planned. (The app already has no INTERNET permission: TC-SEC-01.) | SPMP Milestone 4 (Week 6) planned it; not in APK H, to be re-scheduled |
 | **TC-DB-01** | NFR-REL-01 | 20 force-close tests with no progress lost | Needs the device and the planned transactional DAOs | Instrument D (D-05, D-06) |
 | **TC-DB-02** | NFR-REL-01 | Migration from schema v3 to v4 keeps data | Schema v4 is planned; `exportSchema` and explicit migrations are prerequisites (SDD §6) | With schema v4 |
-| **TC-SES-01** | NFR-SES-01 | Session ends at the first completed node after about 12 minutes | [proposed]; not built in APK H | After adviser confirmation |
+| **TC-SES-01** | NFR-SES-01 | Session ends at the first completed node after about 12 minutes | [Planned — Round 2]; not built in APK H | Round 2 implementation |
 
 ---
 
@@ -346,7 +346,7 @@ Severity: **High** — a child cannot finish a lesson or data is lost; **Medium*
 
 | ID | Req. | Description (expected vs actual) | Severity | Recommended action | Owner |
 |---|:---:|---|:---:|---|---|
-| **DEF-01** | FR-04 | Expected: Find It distractors only from letters already mastered. Actual: drawn from every curriculum letter; `generate5ItemGrid` ignores the letters it is given. Letters 1 and 2 have no mastered letters, so the rule also needs the curated fallback that `01_REQUIREMENTS_SUMMARY.md` proposed. | Medium | Draw distractors from the profile's completed letters; use a fixed fallback set for the first letters; add a test that a new profile's grid for S uses only M. | Developer (fix card) |
+| **DEF-01** | FR-04 | Expected: Find It distractors only from letters already mastered. Actual: drawn from every curriculum letter; `generate5ItemGrid` ignores the letters it is given. Letters 1 and 2 have no mastered letters, so the rule also needs the curated fallback that `01_REQUIREMENTS_SUMMARY.md` specified. | Medium | Draw distractors from the profile's completed letters; use a fixed fallback set for the first letters; add a test that a new profile's grid for S uses only M. | Developer (fix card) |
 | **DEF-02** | FR-06 | Expected (SRS): 2 stars need at least 80% accuracy. Actual: stars use hearts lost only, so 1 wrong tap (75%) gives 2 stars. With 3 targets the SRS rule cannot give 2 stars in Find It at all. | Low | Team decision: either amend FR-06 to the hearts-lost rule the app uses (0 → 3, 1–2 → 2, 3+ → 1, as `01_REQUIREMENTS_SUMMARY.md` §7.4 flagged), or pass accuracy to `StarCalculator`. Then align the test. | Team, with the adviser |
 | **OBS-01** | FR-03.4 | The SRS starts the prompt ladder after 3 s of silence; the app listens up to 3.8 s before judging. No test covers a fully silent attempt from end to end (TC-ASR-09 and TC-ASR-10 cover its parts). | Low | Amend FR-03.4 to 3.8 s, or shorten the timer; add a ViewModel test for silence. | Team |
 | **OBS-02** | NFR-ACC-02 | Lily's speech bubble is cut with "…" on 360 dp wide screens (Say It on 360x640 and 360x740; Find It on 360x640). The line is spoken, so nothing is lost for a pre-reader. | Low | Card 31c shortens both lines ("Your turn! Say the word."; "Find the pictures that start with this sound."); it waits for the team lead's listening review. | Team lead (review) |
@@ -384,7 +384,7 @@ The automated tests prove the logic and the layout, not the experience. The requ
 
 | Role | Name | Signature | Date |
 |---|---|---|---|
-| Prepared by (test execution and write-up) | Capstone Team, with Claude (AI assistant) | | October 14, 2026 |
+| Prepared by (test execution and write-up) | Capstone Team | | October 14, 2026 |
 | Reviewed by (Team Lead) | Riva, Zendrix | ____________________ | |
 | Adviser | Mr. Joemarie C. Amparo | ____________________ | |
 

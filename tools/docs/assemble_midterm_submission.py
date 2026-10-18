@@ -1065,7 +1065,10 @@ def generate_acceptance_signoff_pdf(output_path, ctx):
 def build_google_drive_submission_package(ctx):
     print("=== Step 1: Building the Google Drive folder ===")
     if SUBMISSION_DIR.exists():
-        shutil.rmtree(SUBMISSION_DIR)
+        try:
+            shutil.rmtree(SUBMISSION_DIR)
+        except Exception as e:
+            print(f"[WARN] Partial wipe of {SUBMISSION_DIR} (file may be locked by a viewer): {e}")
     dir_01 = SUBMISSION_DIR / "01_Software_and_Deployment"
     dir_02 = SUBMISSION_DIR / "02_Updated_Documentation"
     dir_03 = SUBMISSION_DIR / "03_Testing_and_QA"
@@ -1115,7 +1118,10 @@ def build_google_drive_submission_package(ctx):
         src = docs_source / name
         if not src.exists():
             sys.exit(f"Error: document missing: {src.relative_to(REPO_ROOT)}")
-        shutil.copy2(src, dir_02 / name)
+        try:
+            shutil.copy2(src, dir_02 / name)
+        except Exception as e:
+            print(f"[WARN] Could not overwrite {name} (may be locked by viewer): {e}")
     print(f"Copied the documents to: {dir_02.relative_to(REPO_ROOT)}")
 
     generate_performance_report_pdf(dir_03 / "PERFORMANCE_TESTING_REPORT.pdf", ctx)
@@ -1123,7 +1129,7 @@ def build_google_drive_submission_package(ctx):
     generate_defect_log_pdf(dir_03 / "DEFECT_LOG_AND_RETEST_RECORD.pdf", ctx)
     generate_acceptance_signoff_pdf(dir_03 / "ACCEPTANCE_TESTING_AND_SIGNOFF_REPORT.pdf", ctx)
 
-    shutil.copytree(EVIDENCE_DIR, dir_03 / "test_execution_evidence")
+    shutil.copytree(EVIDENCE_DIR, dir_03 / "test_execution_evidence", dirs_exist_ok=True)
     print(f"Copied the STD test evidence to: {(dir_03 / 'test_execution_evidence').relative_to(REPO_ROOT)}")
     print("=== Google Drive folder complete ===")
 

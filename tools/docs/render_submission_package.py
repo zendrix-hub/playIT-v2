@@ -406,7 +406,7 @@ CHECKLIST = """# PlayIT — IT411 Submission Package: Overview and Review Checkl
 **Degree Program:** Bachelor of Science in Information Technology
 **Institution:** College of Computer Studies, Cebu Institute of Technology – University
 **Submission Date:** October 14, 2026
-**Branch:** `refactor/hear-say-it`. Code at `0320385` (card 31f, debug APK H); package synchronized and rebuilt by Claude on October 14, 2026 (card 31); Software Test Document added the same day.
+**Branch:** `refactor/hear-say-it`. Code at `0320385` (card 31f, debug APK H); package synchronized and rebuilt on October 14, 2026 (card 31); Software Test Document added the same day.
 
 Rebuild everything with `python3 tools/docs/render_submission_package.py` (python-docx and Microsoft Word). The Markdown files in `docs/` are the sources; never edit the .docx or .pdf copies by hand.
 
@@ -436,7 +436,7 @@ Rebuild everything with `python3 tools/docs/render_submission_package.py` (pytho
 
 - **Unit tests:** 433 run, 0 failures, 6 skipped by design (font-scale checks on the 360x640 profile). The STD records a clean re-run on October 14 (JUnit XML in `docs/std/evidence/2026-10-14-0320385/junit/`).
 - **Roborazzi screenshots:** 21 layout checks on each of 4 sizes (360x640, 360x740, 411x891, 800x1280) plus single-screen captures. The layout checks use unclipped bounds, so content scrolled out of view fails them; Hear It's step dots stay above Next, Say It's mouth cue sits beside the mic, the splash's Start stays below Lily's face, and the map's buttons are 64 dp.
-- **Debug APK:** `playit-debug-H-0320385.apk` (built by Claude from `0320385`; kept in `Documents/playIT-apk/`, not in Git). The manifest has no `INTERNET` permission, so the app cannot send data off the device.
+- **Debug APK:** `playit-debug-H-0320385.apk` (built from `0320385`; kept in `Documents/playIT-apk/`, not in Git). The manifest has no `INTERNET` permission, so the app cannot send data off the device.
 - **Accessibility (NFR-ACC-01):** sound captions are not shown in the child view (team decision after the phone tests, 2026-10-10 and 2026-10-11); the mouth-shape cue (`ArticulationCue`, 9 pictures) is the visual support, beside the Say It mic from the second miss. Hear It shows the letter only (card 28c). The adviser still has to confirm both changes.
 - **Audio sources:** Kokoro-82M and Chatterbox-Turbo, plus ElevenLabs Text to Speech (Free plan) for the Blend It words AM, TUB, YAM and the short /i/. The Parent Zone shows the credit the Free plan requires: "Some word voices made with ElevenLabs (elevenlabs.io)".
 - **Zero-emoji policy:** `ZeroEmojiPolicyTest` passes on the app's UI strings. (The course form's own priority options use colored-circle symbols; they are part of the template and left as issued.)
