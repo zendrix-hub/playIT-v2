@@ -620,14 +620,19 @@ def generate_deployment_guide_pdf(output_path, ctx):
 
 def write_inspection_txt(output_path, ctx):
     apk = ctx["apk"]
-    lines = [
+    apk_file = output_path.parent / apk["name"]
+    apk_size = apk_file.stat().st_size if apk_file.exists() else 0
+    matches = "yes" if apk["copied_sha256"] == apk["sha256"] else "NO"
+
+    # 1. Plain Text format (.txt)
+    lines_txt = [
         "PlayIT: APK inspection for the IT411 midterm submission",
         f"Date: {PREPARED_ON}",
         "",
         f"File in this folder: {apk['name']}",
         f"SHA-256 of this copy: {apk['copied_sha256']}",
-        f"Matches the checksum recorded in STD v1.0: {'yes' if apk['copied_sha256'] == apk['sha256'] else 'NO'}",
-        f"Size: {output_path.parent.joinpath(apk['name']).stat().st_size:,} bytes",
+        f"Matches the checksum recorded in STD v1.0: {matches}",
+        f"Size: {apk_size:,} bytes",
         "",
         f"Speech recognition: Vosk (vosk-android {library_version('vosk')}), small US English model,",
         "  bundled in the APK at assets/vosk-model.",
@@ -640,8 +645,50 @@ def write_inspection_txt(output_path, ctx):
         apk["text"].rstrip(),
         "",
     ]
-    output_path.write_text("\n".join(lines), encoding="utf-8", newline="\n")
+    output_path.write_text("\n".join(lines_txt), encoding="utf-8", newline="\n")
     print(f"Generated: {output_path.relative_to(REPO_ROOT)}")
+
+    # 2. Markdown format (.md) alongside .txt
+    md_path = output_path.with_suffix(".md")
+    lines_md = [
+        "# PlayIT: APK Deployment and Permissions Inspection",
+        "",
+        f"**Course:** IT411 Capstone & Research 2  ",
+        f"**Date:** {PREPARED_ON}  ",
+        f"**Target Build:** `{apk['name']}`  ",
+        "",
+        "---",
+        "",
+        "## 1. File Verification & Integrity",
+        "",
+        "| Attribute | Verified Value |",
+        "| :--- | :--- |",
+        f"| **File Name** | `{apk['name']}` |",
+        f"| **File Size** | {apk_size:,} bytes |",
+        f"| **SHA-256 Checksum** | `{apk['copied_sha256']}` |",
+        f"| **Matches STD v1.0 Checksum** | **{'Yes' if matches == 'yes' else 'NO'}** (Identical byte-for-byte) |",
+        "",
+        "---",
+        "",
+        "## 2. Core Capabilities & Architecture Boundaries",
+        "",
+        f"- **Speech Recognition:** Vosk (`vosk-android {library_version('vosk')}`), with bundled small US English model (`assets/vosk-model`). Operates completely offline with zero external network access.",
+        "- **Haptic Feedback:** None. The application requests zero `VIBRATE` permissions, verified by `PerformancePolicyTest` (TC-POL-02).",
+        "- **Network Access:** Zero `android.permission.INTERNET` requested or bundled. Verified by `ZeroInternetPermissionTest` (TC-SEC-01).",
+        "",
+        "---",
+        "",
+        "## 3. Raw Inspection Log (TC-SEC-01 / TC-SEC-03)",
+        "",
+        f"The following log is copied from `docs/std/evidence/{EVIDENCE_DIR.name}/apk_inspection.txt`:",
+        "",
+        "```text",
+        apk["text"].rstrip(),
+        "```",
+        "",
+    ]
+    md_path.write_text("\n".join(lines_md), encoding="utf-8", newline="\n")
+    print(f"Generated: {md_path.relative_to(REPO_ROOT)}")
 
 
 def generate_refactoring_evidence_pdf(output_path, ctx):

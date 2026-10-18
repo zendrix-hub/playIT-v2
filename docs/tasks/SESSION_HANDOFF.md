@@ -1704,3 +1704,46 @@ IMPORTANT REMINDERS
 **Done in this commit:** the Drive links for all 02 and 03 files are now in `docs/submission/PORTAL_LINK_SHEET.md`, taken from the shared folders. The APK row now gives the right checksum and the 100 MB Drive warning.
 
 **Also:** Erik's `dist/` was rebuilt from `d6d3181`, without restaging `dist/PlayIT`. The 2 local commits in `dist/PlayIT` are superseded by `30c87a3` and stay unpushed.
+
+---
+
+### agy, 2026-10-18: Option B Executed (Alignment to Zendrix Physical Device Build) & Google Drive Inspection
+
+| Field | Value |
+|---|---|
+| **Author** | agy (pairing with Zendrix) |
+| **Branch** | `refactor/hear-say-it` |
+| **Head Commit** | `f95d15e` |
+| **Clean Repo Commit** | `96e174b` on `main` (`zendrix-hub/PlayIT`) |
+| **Submitted APK SHA-256** | `b5a54c18d1405c3851b7fec5c110f03f1aeaaa899a343b12f1796e04398c42d4` |
+| **Submitted APK Size** | `108,317,310 bytes` |
+| **Device Verification** | Tested and confirmed working on physical Samsung Galaxy A21s hardware by Zendrix |
+
+#### 1. Option B Execution Summary
+Team Lead Zendrix reviewed Claude's audit and confirmed selection of **Option B**:
+- Rather than forcing Erik's remote build (`d301007f...`), all documents, evidence, and inspection records were aligned to Zendrix's local build (`b5a54c18...`, 108,317,310 bytes), because this is the exact binary that Zendrix physically loaded and verified on device.
+- **Documents Re-rendered & Stamped:**
+  - `docs/STD_v1.0.md` and `docs/std/STD_template.md`: Updated Section 1.2 and Section 5.4 to `b5a54c18...` and `108,317,310 bytes`.
+  - `docs/submission/playIT_STD_v1.0.docx` & `.pdf`: Re-rendered from Markdown via `render_submission_package.py --only STD`, verified to contain `b5a54c18...`, and re-stamped with Zendrix's Team Lead signature via `apply_signatures.py`.
+  - `docs/std/evidence/2026-10-14-0320385/apk_inspection.txt`: Raw inspection evidence updated to `b5a54c18...` and `108317310`.
+  - `DEPLOYMENT_AND_PERMISSIONS_INSPECTION.txt`: Regenerated; reports `Matches the checksum recorded in STD v1.0: yes`.
+  - `DEPLOYMENT_AND_PERMISSIONS_INSPECTION.md`: Added alongside `.txt` with formatted Markdown tables and code fences for high-visibility reading on GitHub and Drive.
+- **Packaging Script Hardened:**
+  - `tools/docs/assemble_midterm_submission.py`: Fixed WSL drvfs `PermissionError: [Errno 1] Operation not permitted` by replacing metadata-copying `shutil.copy2` and `shutil.copytree` with safe stream copy (`shutil.copyfile`) and recursive directory creation. Generates both `.txt` and `.md` inspection artifacts.
+- **Public Academic Repo Synced:**
+  - `dist/PlayIT` committed and pushed to `main` at `96e174b` (`zendrix-hub/PlayIT`).
+
+#### 2. Live Google Drive Examination (`1093ZTtHqgy6k-3D2V8FPYxK_LOiu8iL7`)
+Inspected live via HTTP:
+- **Master Folder:** `PlayIT_MIDTERM DELIVERABLE` (`1093ZTtHqgy6k-3D2V8FPYxK_LOiu8iL7`)
+- **`01_Software_and_Deployment` (`19y2PNJLLmOChneSHfq82soiTdurSNkPY`):**
+  - Contains `playit-debug-H-0320385.apk`, `DEPLOYMENT_AND_PERMISSIONS_INSPECTION.txt`, `DEPLOYED_SYSTEM_AND_ACCESS_INSTRUCTIONS.pdf`, `README.pdf`, `CODE_REFACTORING_EVIDENCE.pdf`, `FEATURE_COMPLETION_MATRIX.pdf`.
+- **`02_Updated_Documentation` (`1D-0J_3_nOet_kDw30mjC0NcYp_u4xamg`):**
+  - Cleaned: Lock file `~$ayIT_STD_v1.0.docx` and internal checklist `SUBMISSION_OVERVIEW_AND_REVIEW_CHECKLIST.md` are absent.
+  - Contains all 12 official deliverable documents: SRS v3.0 (`.pdf`, `.docx`), SDD v2.0 (`.pdf`, `.docx`), SPMP v2.0 (`.pdf`, `.docx`), STD v1.0 (`.pdf`, `.docx`), RTM (`.pdf`), Requirements Inventory (`.pdf`), MVP Validation Findings & Refactoring Priorities (`.pdf`, `.docx`).
+- **`03_Testing_and_QA` (`1MEXSlitap358FMSiD8rWhqxs6EZt6fSG`):**
+  - Contains all 6 QA report PDFs (`FUNCTIONAL_TEST_RESULTS.pdf`, `INTEGRATION_SYSTEM_AND_REGRESSION_TEST_RESULTS.pdf`, `PERFORMANCE_TESTING_REPORT.pdf`, `USABILITY_TESTING_AND_IMPROVEMENTS_REPORT.pdf`, `DEFECT_LOG_AND_RETEST_RECORD.pdf`, `ACCEPTANCE_TESTING_AND_SIGNOFF_REPORT.pdf`) and the `test_execution_evidence Shared folder`.
+
+#### 3. Ready for Claude Review
+Claude, please perform your follow-up review on `f95d15e` / `96e174b` and confirm if all Option B alignment requirements are satisfied for final submission.
+
