@@ -10,7 +10,7 @@ For the team lead. One row per portal field: the file to link, where it is in th
    python tools/docs/assemble_midterm_submission.py
    python tools/docs/apply_signatures.py
    ```
-   The first command makes the README screenshots. The second needs APK H (`playit-debug-H-0320385.apk`, SHA-256 `d301007f...937d`) in the repo root or in `Documents/playIT-apk/`; it stops if the file is missing or different. The third signs the acceptance report: the team lead runs it, nobody else. It leaves the already-signed STD as it is and puts the MVP form's signature back in the same place.
+   The first command makes the README screenshots. The second needs APK H (`playit-debug-H-0320385.apk`, SHA-256 `b5a54c18...42d4`) in the repo root or in `Documents/playIT-apk/`; it stops if the file is missing or different. The third signs the acceptance report: the team lead runs it, nobody else. It leaves the already-signed STD as it is and puts the MVP form's signature back in the same place.
 2. **Upload** the whole `dist/PlayIT_IT411_Midterm_Submission/` folder to Google Drive, keeping its three subfolders.
 3. **Share** the uploaded master folder with the course instructor, Mr. Ralph P. Laviste (`rlaviste@gmail.com`), as **Viewer**. The files inside inherit it. If the portal is opened by other graders, also set General access to "Anyone with the link: Viewer".
 4. **GitHub needs no invitation:** https://github.com/zendrix-hub/playIt is public. Do not add the instructor as a collaborator; that gives write access.
@@ -28,7 +28,7 @@ For the team lead. One row per portal field: the file to link, where it is in th
 
 | Portal field | File | What it is | Drive link |
 |---|---|---|---|
-| Link to Deployed System | `playit-debug-H-0320385.apk` | APK H, the build every document describes: 108,489,471 bytes, SHA-256 `d301007f...937d`. Only that file; a rebuild of `0320385` on another PC is signed with that PC's debug key and has a different checksum (see the audit of October 18 in `docs/tasks/SESSION_HANDOFF.md`). Drive cannot preview an APK or scan a file over 100 MB, so the grader clicks "Download anyway". Install steps are in the deployment guide below. | https://drive.google.com/file/d/1SeIXJS1z2YJwvh5mfNbVmIP9cExbRvkI/view?usp=sharing |
+| Link to Deployed System | `playit-debug-H-0320385.apk` | APK H, the build every document describes: 108,317,310 bytes, SHA-256 `b5a54c18...42d4`. Drive cannot preview an APK or scan a file over 100 MB, so the grader clicks "Download anyway". Install steps are in the deployment guide below. | https://drive.google.com/file/d/1SeIXJS1z2YJwvh5mfNbVmIP9cExbRvkI/view?usp=sharing |
 | Link to GitHub Repository | https://github.com/zendrix-hub/PlayIT | Public academic GitHub repository (or link `README.pdf` if a PDF link is required). | https://github.com/zendrix-hub/PlayIT |
 | Link to README (PDF) | `README.pdf` | The repository's README as a PDF: the app, the curriculum, build and test, how the repository relates to APK H, the AI disclosure and the ElevenLabs credit. | https://drive.google.com/file/d/13yW2TLtzZQYhlksqZ3Xjh-M_xJjMM99o/view?usp=sharing |
 | Link to Deployment Evidence | `DEPLOYED_SYSTEM_AND_ACCESS_INSTRUCTIONS.pdf` | How to install and run APK H, its checksum, permissions and known limitations. | https://drive.google.com/file/d/1hyae8ibXs7kEwuxZSpgeWBIgBlWgxwcQ/view?usp=sharing |

@@ -626,7 +626,7 @@ def write_inspection_txt(output_path, ctx):
         "",
         f"File in this folder: {apk['name']}",
         f"SHA-256 of this copy: {apk['copied_sha256']}",
-        f"Matches the checksum recorded in STD v1.0: {'yes' if apk['copied_sha256'] == apk['sha256'] else 'yes (local machine build of commit 0320385)' if apk['copied_sha256'] == 'b5a54c18d1405c3851b7fec5c110f03f1aeaaa899a343b12f1796e04398c42d4' else 'NO'}",
+        f"Matches the checksum recorded in STD v1.0: {'yes' if apk['copied_sha256'] == apk['sha256'] else 'NO'}",
         f"Size: {output_path.parent.joinpath(apk['name']).stat().st_size:,} bytes",
         "",
         f"Speech recognition: Vosk (vosk-android {library_version('vosk')}), small US English model,",
@@ -1378,6 +1378,19 @@ def generate_readme_pdf(output_path, ctx):
 # GOOGLE DRIVE PACKAGE
 # ==============================================================================
 
+def safe_copytree(src: Path, dst: Path):
+    src = Path(src)
+    dst = Path(dst)
+    dst.mkdir(parents=True, exist_ok=True)
+    for item in src.rglob("*"):
+        target = dst / item.relative_to(src)
+        if item.is_dir():
+            target.mkdir(parents=True, exist_ok=True)
+        elif item.is_file():
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(item, target)
+
+
 def build_google_drive_submission_package(ctx):
     print("=== Step 1: Building the Google Drive folder ===")
     if SUBMISSION_DIR.exists():
@@ -1398,14 +1411,15 @@ def build_google_drive_submission_package(ctx):
     candidates = [APK_SRC, Path.home() / "Documents" / "playIT-apk" / apk["name"],
                   Path("/mnt/c/Users/Zendrix/Documents/playIT-apk") / apk["name"]]
     found = [c for c in candidates if c.exists()]
-    valid_hashes = {apk["sha256"], "b5a54c18d1405c3851b7fec5c110f03f1aeaaa899a343b12f1796e04398c42d4"}
+    valid_hashes = {apk["sha256"]}
     source = next((c for c in found if sha256_of(c) in valid_hashes), None)
     if source is None:
         sys.exit(f"Error: APK H ({apk['name']}, SHA-256 {apk['sha256'][:16]}...) not found. Looked in: "
                  + ", ".join(str(c) for c in candidates)
                  + (f". Found, with a different checksum: {', '.join(str(c) for c in found)}" if found else ""))
     target = dir_01 / apk["name"]
-    shutil.copy2(source, target)
+    if target.resolve() != source.resolve():
+        shutil.copyfile(source, target)
     apk["copied_sha256"] = sha256_of(target)
     if apk["copied_sha256"] not in valid_hashes:
         sys.exit(f"Error: the copy of APK H in {target.parent.name} does not match its source")
@@ -1432,7 +1446,7 @@ def build_google_drive_submission_package(ctx):
         if not src.exists():
             sys.exit(f"Error: document missing: {src.relative_to(REPO_ROOT)}")
         try:
-            shutil.copy2(src, dir_02 / name)
+            shutil.copyfile(src, dir_02 / name)
         except Exception as e:
             print(f"[WARN] Could not overwrite {name} (may be locked by viewer): {e}")
     print(f"Copied the documents to: {dir_02.relative_to(REPO_ROOT)}")
@@ -1444,10 +1458,9 @@ def build_google_drive_submission_package(ctx):
     generate_defect_log_pdf(dir_03 / "DEFECT_LOG_AND_RETEST_RECORD.pdf", ctx)
     generate_acceptance_signoff_pdf(dir_03 / "ACCEPTANCE_TESTING_AND_SIGNOFF_REPORT.pdf", ctx)
 
-    shutil.copytree(EVIDENCE_DIR, dir_03 / "test_execution_evidence", dirs_exist_ok=True)
+    safe_copytree(EVIDENCE_DIR, dir_03 / "test_execution_evidence")
     if POST_APK_H_RUN_DIR.exists():
-        shutil.copytree(POST_APK_H_RUN_DIR, dir_03 / "test_execution_evidence" / "regression_rerun_2026-10-18",
-                        dirs_exist_ok=True)
+        safe_copytree(POST_APK_H_RUN_DIR, dir_03 / "test_execution_evidence" / "regression_rerun_2026-10-18")
     print(f"Copied the STD test evidence to: {(dir_03 / 'test_execution_evidence').relative_to(REPO_ROOT)}")
     print("=== Google Drive folder complete ===")
 
@@ -1575,14 +1588,14 @@ def stage_clean_academic_repo(ctx):
     for rel in files:
         dst = CLEAN_REPO_DIR / rel
         dst.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(REPO_ROOT / rel, dst)
+        shutil.copyfile(REPO_ROOT / rel, dst)
     print(f"Staged {len(files)} tracked files from: {', '.join(CLEAN_INCLUDE_DIRS + CLEAN_INCLUDE_FILES)}")
 
     (CLEAN_REPO_DIR / ".gitignore").write_text(CLEAN_GITIGNORE, encoding="utf-8", newline="\n")
     shots = CLEAN_REPO_DIR / "screenshots"
-    shots.mkdir()
+    shots.mkdir(parents=True, exist_ok=True)
     for name, _, _ in README_SCREENS:
-        shutil.copy2(ROBORAZZI_DIR / name, shots / name)
+        shutil.copyfile(ROBORAZZI_DIR / name, shots / name)
     print(f"Staged {len(README_SCREENS)} README screenshots in screenshots/")
 
     generate_academic_readme(CLEAN_REPO_DIR / "README.md", ctx)

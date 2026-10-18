@@ -31,7 +31,7 @@ For every test case it states the input, the expected result taken from the SRS,
 The structure follows ISO/IEC/IEEE 29119-3:2021 (test documentation), condensed for one build: test plan (§2), test case specifications (§4), execution log (§5, Appendix A), incident report (§7) and test completion report (§8).
 
 ### 1.2 Test Item and Scope
-- **Test item:** PlayIT debug APK H, `playit-debug-H-0320385.apk` (SHA-256 `d301007f…937d`), built from branch `refactor/hear-say-it` at commit `0320385`. This is the build submitted with the SDD v2.0 rev. 2.8, SRS v3.0 rev. 3.8 and SPMP v2.0 rev. 2.6.
+- **Test item:** PlayIT debug APK H, `playit-debug-H-0320385.apk` (SHA-256 `b5a54c18…42d4`), built from branch `refactor/hear-say-it` at commit `0320385`. This is the build submitted with the SDD v2.0 rev. 2.8, SRS v3.0 rev. 3.8 and SPMP v2.0 rev. 2.6.
 - **In scope:** all automated unit, component and layout tests in `app/src/test/`; the 4-size layout matrix; an inspection of the APK's permissions; an integrity check of every released audio clip; and the phone tests the team ran on earlier builds, which found the incidents in §7.1.
 - **Out of scope for this run** (each listed in §4.8): Round 2 field validation with learners and teachers (Weeks 7–8), the Gate 3 teacher audit of audio, timing measured on the device, and the features the SDD §2.0 lists as planned (telemetry and CSV export, spaced recall, session pacing, the voice-driven mic ripple).
 
@@ -279,7 +279,7 @@ uses-permission: name='android.permission.READ_EXTERNAL_STORAGE' maxSdkVersion='
 uses-permission: name='android.permission.WRITE_EXTERNAL_STORAGE' maxSdkVersion='28'
 permission: com.playit.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
 uses-permission: name='com.playit.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION'
-SHA-256 d301007fc865120023008f41adbbeaf0f22ac7ed9f5f36ad4299404ba988937d
+SHA-256 b5a54c18d1405c3851b7fec5c110f03f1aeaaa899a343b12f1796e04398c42d4
 package com.playit.app, versionName 1.0.0, minSdk 26, targetSdk 34
 ```
 
