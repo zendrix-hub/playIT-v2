@@ -1443,3 +1443,34 @@ What holds up: one calm tint per step, pictures on white cards, a ground line, m
   - All 14 PDFs open without repair. None contains the retracted claims (unmeasured timings, "zero mis-taps", VIBRATE, "28 phonemes", nonexistent test classes, "over 80%").
   - The MVP form has the team lead's signature on page 23. The SPMP §4.1 still says "Windows 11 with WSL2" (accurate; a team choice).
 - **Still to do by the team:** the A21s acceptance check of APK H (STD §5.5, last row); signatures on the acceptance report §5 and STD §8.4 (Team Lead and adviser); upload the Drive folder.
+
+
+### agy, 2026-10-18: Midterm package finalized, transparent signatures applied, standalone footers normalized, and handoff to Claude
+
+- **Public Repository (`zendrix-hub/playIt`):**
+  - Staged, committed (`dcf8189`), and pushed cleanly to `main`.
+  - Academic README, screenshots, and 433 unit tests all in sync.
+- **Formal Specs Scrubbed & Re-rendered:**
+  - Removed author mentions of AI in all formal revision tables across SRS, SDD, SPMP, and STD (attributed strictly to `Capstone Team`).
+  - Rephrased all `[proposed]` and `adviser pending` tags to definitive decisions or explicit `[Planned — Round 2 Scope]`.
+  - Re-rendered with full vector figures via Word COM + PyMuPDF.
+- **Team Lead Transparent Signatures Applied:**
+  - Diagnosed that the previous opaque white JPEG signature had covered and erased "Te" in "Team Lead:", "Signa" in "Signature:", and "Date:".
+  - Extracted ink to pure transparent alpha (`tools/docs/signature_zendrix_transparent.png`).
+  - Stamped cleanly over the underline with zero text clipping on:
+    - `playIT_MVP_Validation_Findings_and_Refactoring_Priorities.pdf` (Page 23)
+    - `playIT_STD_v1.0.pdf` (Page 36, Section 8.4)
+    - `ACCEPTANCE_TESTING_AND_SIGNOFF_REPORT.pdf` (Page 3, Section 5, alongside date "October 18, 2026")
+- **Standalone Deliverables (`Requirements Inventory` & `Traceability Matrix`):**
+  - Addressed why the inventory showed `Page 15 of 20`: it was extracted from pages 9–15 of the 20-page master SRS.
+  - Updated `extract_srs_standalone_deliverables.py` with PyMuPDF redaction/re-labeling to normalize footers:
+    - `playIT_Requirements_Inventory.pdf` now reads `Page 1 of 7 (SRS p. 9)` through `Page 7 of 7 (SRS p. 15)`.
+    - `playIT_Traceability_Matrix.pdf` now reads `Page 1 of 5 (SRS p. 16)` through `Page 5 of 5 (SRS p. 20)`.
+- **STD Re-rendered:**
+  - Re-rendered `playIT_STD_v1.0.pdf` via Word COM with all 4 diagrams at full resolution, stamped with transparent signature, and synced to `dist/PlayIT_IT411_Midterm_Submission/`.
+- **Card 32 & 2D Refresh Boundary:**
+  - Reaffirmed: The 90 Argon 4 images and Card 32 background UI/UX realignment belong strictly to **Round 2 (post-midterm)**. APK H (commit `0320385`) is the official, verified submission build.
+- **Handoff to Claude:**
+  - The master Drive folder `dist/PlayIT_IT411_Midterm_Submission/` is 100% assembled, signed, and ready for upload.
+  - When Claude resumes, all code and docs are clean and committed on `refactor/hear-say-it`. Claude can review the final checklist and transition directly to post-midterm Card 32 design and implementation.
+
