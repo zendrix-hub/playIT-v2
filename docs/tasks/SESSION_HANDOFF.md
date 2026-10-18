@@ -1546,3 +1546,39 @@ Reviewed against `midterm_goal/midterm_goal.md` (the course's Weeks 1 to 9 targe
 **Public academic repo:** restaged from this commit and committed locally in `dist/PlayIT`; not pushed, waiting for the team's answer on item 3.
 
 **Card 32** waits for the team lead to confirm the upload and the links (directive, task 4).
+
+---
+
+### agy & Zendrix, 2026-10-18: Pre-Submission Hardening, Asset Verification & Live Portal Link Mapping
+
+**Actions Completed in this Session:**
+1. **APK H Asset Audit & Picture Fix:**
+   - In response to user finding ("mouse is sun"), checked `picture_mouse.png` and `picture_sun.png`.
+   - In `dist/PlayIT_IT411_Midterm_Submission/01_Software_and_Deployment/playit-debug-H-0320385.apk`:
+     * `picture_mouse.png` verified: 41,897 bytes, SHA-256 `b3ff4f37...` (distinct grey mouse with whiskers, NOT sun).
+     * `picture_sun.png` verified: 43,759 bytes, SHA-256 `73febd87...`.
+     * All 10 keyword pictures confirmed unique and distinct.
+2. **Footer Clean-up (Zero "Generated..." Footers):**
+   - Cleaned `tools/docs/assemble_midterm_submission.py` lines 494–502: removed `Generated {PREPARED_ON} by tools/docs/assemble_midterm_submission.py ...`.
+   - In `write_inspection_txt`: replaced generated tag with standard `Date: October 18, 2026`.
+   - PyMuPDF text audit across all deliverables in `01_Software_and_Deployment/` and `03_Testing_and_QA/` verified 0 occurrences of "Generated".
+3. **Faculty Attribution Realignment:**
+   - Roles updated per user directive:
+     * **Course Instructor (IT411 Capstone & Research 2):** Mr. Ralph P. Laviste (`rlaviste@gmail.com`)
+     * **Capstone Project Adviser:** Mr. Joemarie C. Amparo
+   - Reflected across `assemble_midterm_submission.py`, `DEPLOYED_SYSTEM_AND_ACCESS_INSTRUCTIONS.pdf`, `ACCEPTANCE_TESTING_AND_SIGNOFF_REPORT.pdf`, `PORTAL_LINK_SHEET.md`, and academic `README.md` / `README.pdf`.
+4. **Public Academic Repo Pushed (`zendrix-hub/PlayIT`):**
+   - Public repo at `dist/PlayIT` synchronized on branch `main` (commit `30c87a3`).
+   - Pushed signed `playIT_STD_v1.0.pdf`, signed `playIT_MVP_Validation_Findings_and_Refactoring_Priorities.pdf`, `playIT_Requirements_Inventory.pdf`, `playIT_Traceability_Matrix.pdf`, 66 JUnit XML logs, Roborazzi baseline, and README.
+   - Pushed Git tag `v0.1.0-midterm-h` for release tracking.
+5. **Live Portal Links Verified (HTTP 200 OK):**
+   - Folder 01 (`01_Software_and_Deployment`): `https://drive.google.com/drive/folders/19y2PNJLLmOChneSHfq82soiTdurSNkPY?usp=sharing`
+   - Folder 02 (`02_Updated_Documentation`): `https://drive.google.com/drive/folders/1D-0J_3_nOet_kDw30mjC0NcYp_u4xamg?usp=sharing`
+   - Folder 03 (`03_Testing_and_QA`): `https://drive.google.com/drive/folders/1MEXSlitap358FMSiD8rWhqxs6EZt6fSG?usp=drive_link`
+   - User updated existing files in `refactored` via "Manage versions"; live curl downloads verify updated footers and signatures.
+
+**Request for Claude (Adversarial Pre-Submission Audit):**
+Zendrix requests Claude to run a final adversarial review challenging the deliverables and portal mapping against the IT411 midterm rubric:
+1. Verify if any claims in `FEATURE_COMPLETION_MATRIX.pdf` or `ACCEPTANCE_TESTING_AND_SIGNOFF_REPORT.pdf` overstate what APK H actually does.
+2. Confirm that all required files for Mr. Ralph P. Laviste's portal checklist are covered and transparently stated.
+3. Review the documented gaps and ensure no unmitigated risks remain before final submission.

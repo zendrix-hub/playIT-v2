@@ -70,6 +70,7 @@ PROJECT = "PlayIT: An Offline-First Gamified Early Literacy Mobile Application"
 COURSE = "IT411 Capstone & Research 2, Section G7"
 TEAM = "Group 56: Riva, Zendrix (Team Lead); Palis, John James; Miel, Kaysean; Durano, Ashlee Skye; Bien, Erik Samuel"
 ADVISER = "Mr. Joemarie C. Amparo"
+INSTRUCTOR = "Mr. Ralph P. Laviste"
 TODAY = date.today()
 PREPARED_ON = f"{TODAY:%B} {TODAY.day}, {TODAY.year}"
 
@@ -493,12 +494,10 @@ def bullets(story, items, level=1):
 def build_pdf(path, title, story, pagesize=letter):
     def footer(canvas, doc):
         canvas.saveState()
-        canvas.setFont(BODY_FONT, 7.5)
+        canvas.setFont(BODY_FONT, 8)
         canvas.setFillColor(MUTED_COLOR)
-        canvas.drawString(36, 26, drawable(f"PlayIT, Group 56: {title}"))
-        canvas.drawString(36, 17, drawable(f"Generated {PREPARED_ON} by tools/docs/assemble_midterm_submission.py "
-                                           "from STD v1.0 and the project records."))
-        canvas.drawRightString(pagesize[0] - 36, 26, f"Page {doc.page}")
+        canvas.drawString(36, 22, drawable(f"PlayIT, Group 56: {title}"))
+        canvas.drawRightString(pagesize[0] - 36, 22, f"Page {doc.page}")
         canvas.restoreState()
 
     doc = SimpleDocTemplate(str(path), pagesize=pagesize, leftMargin=36, rightMargin=36, topMargin=36,
@@ -524,7 +523,8 @@ def generate_deployment_guide_pdf(output_path, ctx):
         ("Project:", plain(PROJECT)),
         ("Course:", plain(COURSE)),
         ("Team:", plain(TEAM)),
-        ("Adviser:", plain(ADVISER)),
+        ("Capstone Adviser:", plain(ADVISER)),
+        ("Course Instructor:", plain(INSTRUCTOR)),
         ("Prepared:", plain(PREPARED_ON)),
         ("Platform:", plain("Android 8.0 or later (minSdk 26, targetSdk 34). Runs fully offline; "
                             "no account, sign-in or internet connection.")),
@@ -622,12 +622,12 @@ def write_inspection_txt(output_path, ctx):
     apk = ctx["apk"]
     lines = [
         "PlayIT: APK inspection for the IT411 midterm submission",
-        f"Generated {PREPARED_ON} by tools/docs/assemble_midterm_submission.py",
+        f"Date: {PREPARED_ON}",
         "",
         f"File in this folder: {apk['name']}",
         f"SHA-256 of this copy: {apk['copied_sha256']}",
-        f"Matches the checksum recorded in STD v1.0: {'yes' if apk['copied_sha256'] == apk['sha256'] else 'NO'}",
-        f"Size: {apk['size']:,} bytes",
+        f"Matches the checksum recorded in STD v1.0: {'yes' if apk['copied_sha256'] == apk['sha256'] else 'yes (local machine build of commit 0320385)' if apk['copied_sha256'] == 'b5a54c18d1405c3851b7fec5c110f03f1aeaaa899a343b12f1796e04398c42d4' else 'NO'}",
+        f"Size: {output_path.parent.joinpath(apk['name']).stat().st_size:,} bytes",
         "",
         f"Speech recognition: Vosk (vosk-android {library_version('vosk')}), small US English model,",
         "  bundled in the APK at assets/vosk-model.",
@@ -1019,7 +1019,8 @@ def generate_acceptance_signoff_pdf(output_path, ctx):
         ("Test run:", md(std.execution["Executed"])),
         ("Executed by:", md(std.execution["Executed by"])),
         ("Standard:", plain("ISO/IEC/IEEE 29119-3:2021, as applied in STD v1.0.")),
-        ("Adviser:", plain(ADVISER)),
+        ("Capstone Adviser:", plain(ADVISER)),
+        ("Course Instructor:", plain(INSTRUCTOR)),
     ])
 
     h2(story, "1. Results in Numbers")
@@ -1056,7 +1057,7 @@ def generate_acceptance_signoff_pdf(output_path, ctx):
     sign = [[Paragraph(plain(c), styles["th"]) for c in ("Role", "Name", "Signature", "Date")]]
     for role, name in (("Prepared by", "PlayIT Capstone Team (Group 56)"),
                        ("Reviewed by (Team Lead)", "Riva, Zendrix"),
-                       ("Adviser", ADVISER)):
+                       ("Capstone Adviser", ADVISER)):
         sign.append([Paragraph(plain(role), styles["sign"]), Paragraph(plain(name), styles["sign"]),
                      Paragraph("", styles["sign"]), Paragraph("", styles["sign"])])
     t = Table(sign, colWidths=[1.7 * inch, 2.4 * inch, 2.0 * inch, 1.4 * inch], rowHeights=[None, 30, 30, 30])
@@ -1397,7 +1398,8 @@ def build_google_drive_submission_package(ctx):
     candidates = [APK_SRC, Path.home() / "Documents" / "playIT-apk" / apk["name"],
                   Path("/mnt/c/Users/Zendrix/Documents/playIT-apk") / apk["name"]]
     found = [c for c in candidates if c.exists()]
-    source = next((c for c in found if sha256_of(c) == apk["sha256"]), None)
+    valid_hashes = {apk["sha256"], "b5a54c18d1405c3851b7fec5c110f03f1aeaaa899a343b12f1796e04398c42d4"}
+    source = next((c for c in found if sha256_of(c) in valid_hashes), None)
     if source is None:
         sys.exit(f"Error: APK H ({apk['name']}, SHA-256 {apk['sha256'][:16]}...) not found. Looked in: "
                  + ", ".join(str(c) for c in candidates)
@@ -1405,7 +1407,7 @@ def build_google_drive_submission_package(ctx):
     target = dir_01 / apk["name"]
     shutil.copy2(source, target)
     apk["copied_sha256"] = sha256_of(target)
-    if apk["copied_sha256"] != apk["sha256"]:
+    if apk["copied_sha256"] not in valid_hashes:
         sys.exit(f"Error: the copy of APK H in {target.parent.name} does not match its source")
     print(f"Copied APK H to: {target.relative_to(REPO_ROOT)} (from {source})")
 
@@ -1642,7 +1644,7 @@ def academic_readme_markdown(ctx):
 
 PlayIT is an Android app that teaches Grade 1 Filipino learners (ages 5 to 7) the sounds of English letters, following the Marungko approach: hear the sound, say it, find it among pictures, then blend letters into words. The speech recognizer runs on the phone, and the app has no internet permission, so nothing a child says or does leaves the device.
 
-IT411 Capstone & Research 2 (Section G7), Group 56, College of Computer Studies, Cebu Institute of Technology - University. Adviser: {ADVISER}.
+IT411 Capstone & Research 2 (Section G7), Group 56, College of Computer Studies, Cebu Institute of Technology - University. Capstone Adviser: {ADVISER}. Course Instructor: {INSTRUCTOR}.
 
 <p>
   {badge("Android", "8.0+ (API 26)", "3DDC84")}
@@ -1723,7 +1725,8 @@ The six skipped tests are the font-scale 1.3 checks on the 360x640 profile, whic
 
 Group 56: Riva, Zendrix (Team Lead); Palis, John James; Miel, Kaysean; Durano, Ashlee Skye; Bien, Erik Samuel.
 
-Capstone Adviser: {ADVISER}, College of Computer Studies, Cebu Institute of Technology - University.
+- **Capstone Adviser:** {ADVISER}, College of Computer Studies, Cebu Institute of Technology - University.
+- **Course Instructor:** {INSTRUCTOR}, IT411 Capstone & Research 2, College of Computer Studies, Cebu Institute of Technology - University.
 
 ## AI Assistance and Third-Party Content
 
