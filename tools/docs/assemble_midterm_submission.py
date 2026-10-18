@@ -1163,6 +1163,15 @@ def suite_history():
     return sorted(rows), len(ci_runs)
 
 
+def instrumented_tests():
+    """The instrumented tests in app/src/androidTest at APK H: (classes, @Test methods, last change date)."""
+    files = [f for f in git("ls-tree", "-r", "--name-only", APK_H_COMMIT, "--", "app/src/androidTest").splitlines()
+             if f.endswith(".kt")]
+    tests = sum(git("show", f"{APK_H_COMMIT}:{f}").count("@Test") for f in files)
+    last = git("log", "-1", "--format=%ad", "--date=short", APK_H_COMMIT, "--", "app/src/androidTest").strip()
+    return len(files), tests, last
+
+
 def junit_dir_totals(junit_dir):
     t = {"tests": 0, "failed": 0, "skipped": 0, "classes": 0}
     for xml_path in junit_dir.glob("TEST-*.xml"):
@@ -1193,6 +1202,10 @@ def generate_integration_system_regression_pdf(output_path, ctx):
     integ = [c for c, _, _ in INTEGRATION_CLASSES]
     integ_tests = sum(per_class[c][0] for c in integ)
     integ_passed = sum(per_class[c][0] - per_class[c][1] - per_class[c][2] for c in integ)
+    a_classes, a_tests, a_last = instrumented_tests()
+    instrumented = (f"The {a_classes} instrumented UI test classes kept from the MVP (app/src/androidTest, "
+                    f"{a_tests} tests, last changed {a_last}) were not run for APK H, so no automated test ran on "
+                    "a phone or an emulator.")
     add_table(story, [
         [plain("Course test type"), plain("What PlayIT has (STD level)"), plain("Result on APK H"),
          plain("Not covered")],
@@ -1201,7 +1214,7 @@ def generate_integration_system_regression_pdf(output_path, ctx):
         [plain("Integration"), plain(f"{len(integ)} classes that join two real parts of the app (section 2 below)"),
          plain(f"{integ_passed} of {integ_tests} tests passed"),
          plain("ViewModel tests mock their repositories, recognizer and audio; the Vosk recognizer is never run "
-               "on recorded speech; there is no instrumented test on a device.")],
+               f"on recorded speech; the {a_classes} instrumented test classes were not run (section 5).")],
         [plain("System"), plain("L3 screens on 4 screen profiles; L4 inspection of the built APK and of the "
                                 "released audio; L5 play sessions on the Samsung Galaxy A21s (section 3)"),
          plain(f"Layout matrix {junit['layout_passed']} of {junit['layout_runs']} runs passed, "
@@ -1272,9 +1285,9 @@ def generate_integration_system_regression_pdf(output_path, ctx):
 
     h2(story, "5. Not Covered, and the Plan")
     bullets(story, [
-        plain("No instrumented test runs on a phone or an emulator, and the Vosk recognizer is not run on recorded "
-              "speech in any automated test. The speech judge's rules are unit-tested on transcripts "
-              "(TC-ASR-07 to 13); its agreement with teachers is measured in Round 2 (TC-ASR-01 to 06)."),
+        plain(instrumented + " The Vosk recognizer is not run on recorded speech in any automated test: the "
+              "speech judge's rules are unit-tested on transcripts (TC-ASR-07 to 13), and its agreement with "
+              "teachers is measured in Round 2 (TC-ASR-01 to 06)."),
         plain("APK H's own phone check (install, splash, one letter from Hear It to Find It, the map header) is "
               "to be run by the team before turning in (STD section 5.5)."),
         plain("Device timing, latency and force-close tests need the planned telemetry log (STD section 4.8; "
