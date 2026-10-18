@@ -1428,3 +1428,18 @@ What holds up: one calm tint per step, pictures on white cards, a ground line, m
 3. Upload `dist/PlayIT_IT411_Midterm_Submission/` to Drive.
 4. Sign the acceptance report and STD §8.4.
 
+
+### Claude, 2026-10-18: clean repo pushed; public repo and Drive folder verified
+
+- **Pushed:** Zendrix added thatguyKire as a collaborator on `zendrix-hub/playIt`. `git push origin main` from `dist/PlayIT` fast-forwarded `20f4c8d..0da13c5`; `git ls-remote` confirms `main` is at `0da13c5`.
+- **Fresh clone from GitHub, checked as a grader would get it:**
+  - 1,125 files. `gradle.properties`, `docs/image-release/` and `docs/audio-release/` are present; `99_AGENT_BOOTSTRAP.md` is not; `gradlew` is 100755.
+  - All 8 README screenshots resolve, and the `.gitignore` no longer ignores `screenshots/`.
+  - The 10 keyword pictures (ball, cat, dog, duck, fish, kite, mouse, rabbit, tree, umbrella) are byte-identical to `0ba18d2` (APK H).
+  - `gradlew :app:testDebugUnitTest` with nothing cached: 66 classes, 433 tests, 427 passed, 6 skipped, 0 failed (BUILD SUCCESSFUL in 4m 29s).
+  - The only "WSL" text left is the replacement table inside `tools/docs/assemble_midterm_submission.py`, which is what scrubs it.
+- **Drive folder (`dist/PlayIT_IT411_Midterm_Submission/`):**
+  - The 12 files in `02_Updated_Documentation` are byte-identical to `docs/submission/` at HEAD. `test_execution_evidence` is identical to `docs/std/evidence/2026-10-14-0320385/`. The APK's SHA-256 matches APK H (`d301007f...937d`).
+  - All 14 PDFs open without repair. None contains the retracted claims (unmeasured timings, "zero mis-taps", VIBRATE, "28 phonemes", nonexistent test classes, "over 80%").
+  - The MVP form has the team lead's signature on page 23. The SPMP §4.1 still says "Windows 11 with WSL2" (accurate; a team choice).
+- **Still to do by the team:** the A21s acceptance check of APK H (STD §5.5, last row); signatures on the acceptance report §5 and STD §8.4 (Team Lead and adviser); upload the Drive folder.
