@@ -1641,3 +1641,66 @@ IMPORTANT REMINDERS
 3. **Consistency Verification:** Verify reminder #4: does the GitHub repo (`zendrix-hub/PlayIT`), deployed system (APK H), and documentation (SRS v3.0, SDD v2.0, STD v1.0, SPMP v2.0) correspond to the same version?
 4. **Performance Report Challenge:** Verify reminder #3: does our `PERFORMANCE_TESTING_REPORT.pdf` meet the expectation, and how does it justify the runtime test workload vs design rules verified?
 5. **Final Sign-off:** Highlight any remaining friction points before Zendrix submits the portal form.
+
+### Claude, 2026-10-18: audit against the official IT411 midterm directive
+
+**Verdict: not ready to submit.** Two items fail the directive as written. Five more should be fixed first. Everything was checked on the live portal links, downloaded without a Google account, and on a fresh clone of `zendrix-hub/playIt` at `30c87a3`.
+
+**Must fix**
+
+1. **The APK on Drive is not APK H.** Downloaded from the portal link: SHA-256 `b5a54c18...42d4`, 108,317,310 bytes. APK H: `d301007f...937d`, 108,489,471 bytes.
+   - The code is the same: only lambda and Hilt naming differ in the dex files.
+   - But it is signed with another PC's debug key, and 4 Vosk config files differ in line endings.
+   - The deployment guide and the STD tell the grader to check `d301007f`, so their check fails.
+   - `DEPLOYMENT_AND_PERMISSIONS_INSPECTION.txt` says "Matches the checksum recorded in STD v1.0: yes (local machine build of commit 0320385)". The file does not match, so this is a false statement in the evidence.
+   - **Fix:** in Drive, use "Manage versions" on both files (the links stay the same) to upload Erik's copies:
+     - APK: `Documents/playIT-apk/playit-debug-H-0320385.apk`, which is the real APK H.
+     - TXT: `dist/PlayIT_IT411_Midterm_Submission/01_Software_and_Deployment/DEPLOYMENT_AND_PERMISSIONS_INSPECTION.txt`, rebuilt from `d6d3181`. It reads `d301007f`, "yes", 108,489,471 bytes.
+   - Then remove the second hash from `tools/docs/assemble_midterm_submission.py` (lines 629 and 1401).
+2. **The performance report has no runtime result.** The directive asks for "the test workload, response times, throughput, error rate, and other relevant metrics", and reminder 3 asks for actual results. Our report states that nothing was measured except the APK size. It is honest, but it fails this item.
+   - **Fix:** a measured run of APK H on the A21s with `adb`, about one to two hours with the phone and a USB cable:
+     - **Workload:** 10 cold and 10 warm starts; one scripted letter from Hear It to Find It, repeated 5 times; a 5,000-event monkey run with a fixed seed.
+     - **Response times:** `am start -W` start times, median and P90.
+     - **Frame times:** P50, P90 and jank % from `dumpsys gfxinfo`.
+     - **Throughput:** frames per second and events handled per second.
+     - **Error rate:** crashes and ANRs per 5,000 events.
+     - **Other:** memory (PSS from `dumpsys meminfo`) and the APK size.
+   - Claude can write the script and the new report generator; the team runs it on the phone.
+
+**Should fix**
+
+3. **Remove two files from Drive `02_Updated_Documentation`:**
+   - `~$ayIT_STD_v1.0.docx`, a 162-byte Word lock file with the owner name "Zendrix".
+   - `SUBMISSION_OVERVIEW_AND_REVIEW_CHECKLIST.md`, the internal build checklist dated October 14.
+4. **Reminder 4 (same version):** `app/` in the public repo equals APK H's `app/` except for 80 images (60 pictures, 16 map props, 4 rewards) and one comment line. The README says so, but its screenshots show the new art while the APK shows the old flat art. Two options:
+   - (a) Put APK H's 80 images back in the academic repo and re-record the README screenshots at `0320385`, so `main` is exactly APK H. Optionally tag that commit and attach the APK to a GitHub Release.
+   - (b) Keep it as it is and rely on the README note.
+   - Claude recommends (a) if there is time.
+5. **The refactoring evidence cannot be checked from the submitted repo.** `zendrix-hub/playIt` has 7 packaging commits. The 34 card commits and draft PR #2 (`refactor/hear-say-it` into `main`: 201 commits, +43,923/-2,307 lines) are in `zendrix-hub/playIT-v2`, which is public.
+   - `CODE_REFACTORING_EVIDENCE.pdf` names the branch but gives no link.
+   - **Option:** add https://github.com/zendrix-hub/playIT-v2/pull/2 to the portal's refactoring field, and rename the PR from "cards 00-04".
+   - Team decision, because that repo also shows the task cards, `AGENTS.md` and the signature PNG.
+6. **Reminder 2 (documents match the software):** the adviser-confirmation wording is still inconsistent.
+   - SRS: `45eb43c` removed "adviser confirmation pending".
+   - SDD (PDF pages 8 and 18) and the deployment guide ("Team and adviser decision pending") still say it.
+   - Either add the date of the adviser's confirmation everywhere, or put the wording back in the SRS.
+7. **STD section 8.4:** the Team Lead date is blank, and the signature overlaps the "Prepared by" row above it.
+
+**Passes**
+
+- **Links:** all 3 folder links, the 26 files and the test-evidence subfolder open without a Google account. The GitHub repo is public.
+- **No credentials** in the repo or the documents. The only "password" in the repo is Android's public default debug-keystore password. The signature PNG was never in the public repo's history; the signed PDFs are there, as the team decided.
+- **Folder 01:** has every item the directive lists.
+- **Folder 02:** has SRS, SDD, SPMP, STD and RTM, and all four documents have a revision history.
+- **Folder 03:** has functional, integration/system/regression, performance, usability, defect and acceptance reports, plus raw logs.
+- **Usability:** the directive puts final user validation after the midterm, so Round 1 results with the changes made answer the usability item.
+- **"Mouse is sun":** `picture_mouse.png` is a mouse and `picture_sun.png` is a sun, in APK H and in the repo. The code maps Mouse to `picture_mouse.png`. If someone saw a sun for "mouse" in the app, we need the screen and the step.
+
+**Deployed system link:** for an offline native Android app, an APK download with install instructions is the usual answer, since there is no server. Put one line in the portal field:
+- "Native offline Android app; no web server. APK: <link>. Install guide: <link>."
+- Optional: a 1 to 2 minute screen recording of APK H on the A21s. It lets a grader without an Android phone see the app, and it is also the missing device evidence.
+- A browser emulator such as Appetize would give a literal live URL, but Say It needs the microphone. Not recommended.
+
+**Done in this commit:** the Drive links for all 02 and 03 files are now in `docs/submission/PORTAL_LINK_SHEET.md`, taken from the shared folders. The APK row now gives the right checksum and the 100 MB Drive warning.
+
+**Also:** Erik's `dist/` was rebuilt from `d6d3181`, without restaging `dist/PlayIT`. The 2 local commits in `dist/PlayIT` are superseded by `30c87a3` and stay unpushed.

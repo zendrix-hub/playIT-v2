@@ -28,7 +28,7 @@ For the team lead. One row per portal field: the file to link, where it is in th
 
 | Portal field | File | What it is | Drive link |
 |---|---|---|---|
-| Link to Deployed System | `playit-debug-H-0320385.apk` | APK H, the build every document describes (104 MB; Drive cannot preview an APK, the grader downloads it). Install steps are in the deployment guide below. | https://drive.google.com/file/d/1SeIXJS1z2YJwvh5mfNbVmIP9cExbRvkI/view?usp=sharing |
+| Link to Deployed System | `playit-debug-H-0320385.apk` | APK H, the build every document describes: 108,489,471 bytes, SHA-256 `d301007f...937d`. Only that file; a rebuild of `0320385` on another PC is signed with that PC's debug key and has a different checksum (see the audit of October 18 in `docs/tasks/SESSION_HANDOFF.md`). Drive cannot preview an APK or scan a file over 100 MB, so the grader clicks "Download anyway". Install steps are in the deployment guide below. | https://drive.google.com/file/d/1SeIXJS1z2YJwvh5mfNbVmIP9cExbRvkI/view?usp=sharing |
 | Link to GitHub Repository | https://github.com/zendrix-hub/PlayIT | Public academic GitHub repository (or link `README.pdf` if a PDF link is required). | https://github.com/zendrix-hub/PlayIT |
 | Link to README (PDF) | `README.pdf` | The repository's README as a PDF: the app, the curriculum, build and test, how the repository relates to APK H, the AI disclosure and the ElevenLabs credit. | https://drive.google.com/file/d/13yW2TLtzZQYhlksqZ3Xjh-M_xJjMM99o/view?usp=sharing |
 | Link to Deployment Evidence | `DEPLOYED_SYSTEM_AND_ACCESS_INSTRUCTIONS.pdf` | How to install and run APK H, its checksum, permissions and known limitations. | https://drive.google.com/file/d/1hyae8ibXs7kEwuxZSpgeWBIgBlWgxwcQ/view?usp=sharing |
@@ -39,13 +39,13 @@ For the team lead. One row per portal field: the file to link, where it is in th
 
 | Portal field | File | What it is | Drive link |
 |---|---|---|---|
-| Updated Software Requirements Specification | `playIT_SRS_v3.0.pdf` | SRS v3.0, rev. 3.8, with the use case diagram. | |
-| Updated Software Design Description | `playIT_SDD_v2.0.pdf` | SDD v2.0, rev. 2.8, with 13 diagrams (ERD, 6 class, 6 sequence). | |
-| Updated Software Project Management Plan | `playIT_SPMP_v2.0.pdf` | SPMP v2.0, rev. 2.6: WBS 1 to 9, schedule, risks R1 to R8. | |
-| Updated Software Test Document | `playIT_STD_v1.0.pdf` | STD v1.0 (ISO/IEC/IEEE 29119-3): test plan, 83 test cases, execution record of the 433-test run, layout matrix, incidents, summary; team lead signature in section 8.4. | |
-| Updated Requirements Traceability Matrix | `playIT_Traceability_Matrix.pdf` | SRS sections 4 and 5 as a standalone PDF (cover + 5 pages, footers "Page 1 of 5 (SRS p. 16)"). | |
-| Requirements Inventory | `playIT_Requirements_Inventory.pdf` | SRS section 3 as a standalone PDF (cover + 7 pages). | |
-| MVP Validation Findings and Refactoring Priorities | `playIT_MVP_Validation_Findings_and_Refactoring_Priorities.pdf` | The course form, signed by the team lead on page 23. | |
+| Updated Software Requirements Specification | `playIT_SRS_v3.0.pdf` | SRS v3.0, rev. 3.8, with the use case diagram. | https://drive.google.com/file/d/1CES28KKpoirBaTg4QRFfOuFK1JgeNKm9/view?usp=sharing |
+| Updated Software Design Description | `playIT_SDD_v2.0.pdf` | SDD v2.0, rev. 2.8, with 13 diagrams (ERD, 6 class, 6 sequence). | https://drive.google.com/file/d/1YlNbgI8W9HyclNRjA8vaYR9-pQbcOTfr/view?usp=sharing |
+| Updated Software Project Management Plan | `playIT_SPMP_v2.0.pdf` | SPMP v2.0, rev. 2.6: WBS 1 to 9, schedule, risks R1 to R8. | https://drive.google.com/file/d/1uydxU1-p9EPdNh8C8vBqTfWSMBrkihGD/view?usp=sharing |
+| Updated Software Test Document | `playIT_STD_v1.0.pdf` | STD v1.0 (ISO/IEC/IEEE 29119-3): test plan, 83 test cases, execution record of the 433-test run, layout matrix, incidents, summary; team lead signature in section 8.4. | https://drive.google.com/file/d/1iKCt8GnXDOyluabKS3xOUZke3UfY2gq4/view?usp=sharing |
+| Updated Requirements Traceability Matrix | `playIT_Traceability_Matrix.pdf` | SRS sections 4 and 5 as a standalone PDF (cover + 5 pages, footers "Page 1 of 5 (SRS p. 16)"). | https://drive.google.com/file/d/1qgqHXBDeIyfGc61UvS5mxWoS1i8BN2_v/view?usp=sharing |
+| Requirements Inventory | `playIT_Requirements_Inventory.pdf` | SRS section 3 as a standalone PDF (cover + 7 pages). | https://drive.google.com/file/d/1V8iLgULH39656W3kr-ROXQjPtsoVn3bH/view?usp=sharing |
+| MVP Validation Findings and Refactoring Priorities | `playIT_MVP_Validation_Findings_and_Refactoring_Priorities.pdf` | The course form, signed by the team lead on page 23. | https://drive.google.com/file/d/1lyeNBdyaAy86ECDJG5BjV9SClz3YzQbs/view?usp=sharing |
 
 The DOCX copies in this folder are editable sources; link the PDFs.
 
@@ -53,17 +53,18 @@ The DOCX copies in this folder are editable sources; link the PDFs.
 
 | Portal field | File | What it is | Drive link |
 |---|---|---|---|
-| Link to Functional Testing Results | `FUNCTIONAL_TEST_RESULTS.pdf` | All 83 STD test cases with input, expected result, actual result, evidence and status (57 pass, 1 partial, 2 fail, 23 not run, with reasons). | |
-| Link to Integration, System, and Regression Testing Results | `INTEGRATION_SYSTEM_AND_REGRESSION_TEST_RESULTS.pdf` | The course's test types mapped to the STD levels; the 7 integration test classes; the 4-profile layout matrix, APK inspection and A21s sessions; the suite re-run at every card from 298 to 433 tests, a regression test for each closed incident, and a re-run after APK H. States what is not covered. | |
-| Link to Performance Testing Report | `PERFORMANCE_TESTING_REPORT.pdf` | Runtime timing is not measured on this build (Round 2, Instrument D); the design rules that were verified; the APK size. | |
-| Usability Testing Report | `USABILITY_TESTING_AND_IMPROVEMENTS_REPORT.pdf` | Round 1 (25 respondents, SUS 75.5, Smileyometer), findings #1 to #5 and the changes made, the A21s sessions; independent completion (TC-IND-03) is Round 2. | |
-| Defect Log | `DEFECT_LOG_AND_RETEST_RECORD.pdf` | INC-01 to INC-07 (closed, with re-test evidence), DEF-01 and DEF-02 (open), OBS-01 to OBS-04. | |
-| Acceptance testing (if the portal has a field) | `ACCEPTANCE_TESTING_AND_SIGNOFF_REPORT.pdf` | APK H against SRS v3.0: results, assessment, acceptance decision, sign-off. | |
-| Test execution logs (if asked) | `test_execution_evidence/` (folder) | The 66 raw JUnit XML files of the STD run, the APK inspection, the audio release check, and the regression re-run of October 18. | |
+| Link to Functional Testing Results | `FUNCTIONAL_TEST_RESULTS.pdf` | All 83 STD test cases with input, expected result, actual result, evidence and status (57 pass, 1 partial, 2 fail, 23 not run, with reasons). | https://drive.google.com/file/d/1RqPFfm_qMtcvtX89d0msvQoecmBX9aAj/view?usp=sharing |
+| Link to Integration, System, and Regression Testing Results | `INTEGRATION_SYSTEM_AND_REGRESSION_TEST_RESULTS.pdf` | The course's test types mapped to the STD levels; the 7 integration test classes; the 4-profile layout matrix, APK inspection and A21s sessions; the suite re-run at every card from 298 to 433 tests, a regression test for each closed incident, and a re-run after APK H. States what is not covered. | https://drive.google.com/file/d/19lm4eWZqUaLGXIJDXaYI6sU6EpCkO6WA/view?usp=sharing |
+| Link to Performance Testing Report | `PERFORMANCE_TESTING_REPORT.pdf` | Runtime timing is not measured on this build (Round 2, Instrument D); the design rules that were verified; the APK size. | https://drive.google.com/file/d/1MltLK621ffioXTGTpYiJiNnJBVDTkIrQ/view?usp=sharing |
+| Usability Testing Report | `USABILITY_TESTING_AND_IMPROVEMENTS_REPORT.pdf` | Round 1 (25 respondents, SUS 75.5, Smileyometer), findings #1 to #5 and the changes made, the A21s sessions; independent completion (TC-IND-03) is Round 2. | https://drive.google.com/file/d/1cj7rwZ_Y6uhT2ulv5AEJb90PV90XihD1/view?usp=sharing |
+| Defect Log | `DEFECT_LOG_AND_RETEST_RECORD.pdf` | INC-01 to INC-07 (closed, with re-test evidence), DEF-01 and DEF-02 (open), OBS-01 to OBS-04. | https://drive.google.com/file/d/1gQOnsrHzGpF3mFLEWVH9ePRMG7vmk1nR/view?usp=sharing |
+| Acceptance testing (if the portal has a field) | `ACCEPTANCE_TESTING_AND_SIGNOFF_REPORT.pdf` | APK H against SRS v3.0: results, assessment, acceptance decision, sign-off. | https://drive.google.com/file/d/1svNXwBcypMXiwOCmImUo9-0Wl95-BMFR/view?usp=sharing |
+| Test execution logs (if asked) | `test_execution_evidence/` (folder) | The 66 raw JUnit XML files of the STD run, the APK inspection, the audio release check, and the regression re-run of October 18. | https://drive.google.com/drive/folders/13Lul4mIeoaANY1anqPSvkwbSQ46PeRHO?usp=sharing |
 
 ## Gaps a grader can see (not fixable by documents)
 
 - **No evidence yet that APK H runs on a phone.** STD section 5.5's last row ("APK H acceptance") is still open. Install APK H on the A21s, play one letter from Hear It to Find It, and take 3 to 5 photos or a short screen recording. Put them in `01_Software_and_Deployment/DEPLOYMENT_EVIDENCE_A21s/`, and link that folder from the Deployment Evidence field as well. This is also the only device test of the submitted build.
-- **Usability testing of the refactored app has not been done with users.** The report rests on Round 1 (the MVP) and the team's own A21s sessions; Weeks 8 to 9 of the course ask for usability test results. If even a few learners or teachers can try APK H before the deadline, record it honestly as a pilot; otherwise the report already says it is Round 2.
+- **No runtime performance figure.** The course directive asks for the workload, response times, throughput, error rate and other metrics, with actual results; the performance report measures only the APK size. This needs a measured run of APK H on the A21s.
+- **Usability:** the course directive puts final user and stakeholder validation after the midterm, so Round 1 results with the changes made answer this item. The refactored app has not yet been tried by users.
 - **Not feature-complete:** telemetry and CSV export, spaced recall and session pacing are planned, not built (the feature matrix says so).
 - **Integration testing is thin:** 7 classes; the ViewModel tests mock their collaborators, and the 4 instrumented UI test classes left from the MVP (`app/src/androidTest`) were not run, so nothing automated ran on a device (the integration report says so).
