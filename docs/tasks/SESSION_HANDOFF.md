@@ -1567,10 +1567,10 @@ Reviewed against `midterm_goal/midterm_goal.md` (the course's Weeks 1 to 9 targe
      * **Course Instructor (IT411 Capstone & Research 2):** Mr. Ralph P. Laviste (`rlaviste@gmail.com`)
      * **Capstone Project Adviser:** Mr. Joemarie C. Amparo
    - Reflected across `assemble_midterm_submission.py`, `DEPLOYED_SYSTEM_AND_ACCESS_INSTRUCTIONS.pdf`, `ACCEPTANCE_TESTING_AND_SIGNOFF_REPORT.pdf`, `PORTAL_LINK_SHEET.md`, and academic `README.md` / `README.pdf`.
-4. **Public Academic Repo Pushed (`zendrix-hub/PlayIT`):**
-   - Public repo at `dist/PlayIT` synchronized on branch `main` (commit `30c87a3`).
-   - Pushed signed `playIT_STD_v1.0.pdf`, signed `playIT_MVP_Validation_Findings_and_Refactoring_Priorities.pdf`, `playIT_Requirements_Inventory.pdf`, `playIT_Traceability_Matrix.pdf`, 66 JUnit XML logs, Roborazzi baseline, and README.
-   - Pushed Git tag `v0.1.0-midterm-h` for release tracking.
+4. **Public Academic Repo Cleanliness Confirmed (`zendrix-hub/PlayIT`):**
+   - Cleaned and confirmed: repo contains ONLY academic deliverables, source code (`app/`), Gradle build files, and test logs.
+   - Verified completely absent from `PlayIT`: `docs/tasks/` (task cards), `docs/spikes/`, `tools/audio/`, `tools/dev/`, `signature_*.png`, `apply_signatures.py`, `CLAUDE.md`, `AGENTS.md`, and IDE configs. Only internal `playIT-v2` retains these.
+   - Working tree on `main` is completely clean and pushed (commit `30c87a3`).
 5. **Live Portal Links Verified (HTTP 200 OK):**
    - Folder 01 (`01_Software_and_Deployment`): `https://drive.google.com/drive/folders/19y2PNJLLmOChneSHfq82soiTdurSNkPY?usp=sharing`
    - Folder 02 (`02_Updated_Documentation`): `https://drive.google.com/drive/folders/1D-0J_3_nOet_kDw30mjC0NcYp_u4xamg?usp=sharing`
@@ -1579,6 +1579,7 @@ Reviewed against `midterm_goal/midterm_goal.md` (the course's Weeks 1 to 9 targe
 
 **Request for Claude (Adversarial Pre-Submission Audit):**
 Zendrix requests Claude to run a final adversarial review challenging the deliverables and portal mapping against the IT411 midterm rubric:
-1. Verify if any claims in `FEATURE_COMPLETION_MATRIX.pdf` or `ACCEPTANCE_TESTING_AND_SIGNOFF_REPORT.pdf` overstate what APK H actually does.
-2. Confirm that all required files for Mr. Ralph P. Laviste's portal checklist are covered and transparently stated.
-3. Review the documented gaps and ensure no unmitigated risks remain before final submission.
+1. **Rubric & Claim Challenge:** Verify if any claims in `FEATURE_COMPLETION_MATRIX.pdf` or `ACCEPTANCE_TESTING_AND_SIGNOFF_REPORT.pdf` overstate what APK H actually does.
+2. **Deployed System Link Evaluation:** The portal field is titled `Link to Deployed System (live URL) *`. Since PlayIT is a 100% offline native Android mobile app with no web backend or hosted URL, check if providing the direct Google Drive APK download link (`https://drive.google.com/file/d/1SeIXJS1z2YJwvh5mfNbVmIP9cExbRvkI/view?usp=sharing`) supported by `DEPLOYED_SYSTEM_AND_ACCESS_INSTRUCTIONS.pdf` is fully compliant with IT411 evaluation practices, or if anything additional is needed.
+3. **Public Repo Cleanliness Check:** Confirm that the public `PlayIT` repo is appropriately sanitized of internal developmental artifacts (`playIT-v2` vs `PlayIT` boundary).
+4. **Final Gate Review:** Review the documented gaps and ensure no unmitigated risks remain before Zendrix clicks submit on Mr. Ralph's portal.
