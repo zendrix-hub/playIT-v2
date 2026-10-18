@@ -1578,8 +1578,66 @@ Reviewed against `midterm_goal/midterm_goal.md` (the course's Weeks 1 to 9 targe
    - User updated existing files in `refactored` via "Manage versions"; live curl downloads verify updated footers and signatures.
 
 **Request for Claude (Adversarial Pre-Submission Audit):**
-Zendrix requests Claude to run a final adversarial review challenging the deliverables and portal mapping against the IT411 midterm rubric:
-1. **Rubric & Claim Challenge:** Verify if any claims in `FEATURE_COMPLETION_MATRIX.pdf` or `ACCEPTANCE_TESTING_AND_SIGNOFF_REPORT.pdf` overstate what APK H actually does.
-2. **Deployed System Link Evaluation:** The portal field is titled `Link to Deployed System (live URL) *`. Since PlayIT is a 100% offline native Android mobile app with no web backend or hosted URL, check if providing the direct Google Drive APK download link (`https://drive.google.com/file/d/1SeIXJS1z2YJwvh5mfNbVmIP9cExbRvkI/view?usp=sharing`) supported by `DEPLOYED_SYSTEM_AND_ACCESS_INSTRUCTIONS.pdf` is fully compliant with IT411 evaluation practices, or if anything additional is needed.
-3. **Public Repo Cleanliness Check:** Confirm that the public `PlayIT` repo is appropriately sanitized of internal developmental artifacts (`playIT-v2` vs `PlayIT` boundary).
-4. **Final Gate Review:** Review the documented gaps and ensure no unmitigated risks remain before Zendrix clicks submit on Mr. Ralph's portal.
+Zendrix requests Claude to run a final adversarial review challenging the deliverables and portal mapping against the **OFFICIAL IT411 MIDTERM SUBMISSION INSTRUCTIONS** provided directly by the course instructor/department below:
+
+```text
+==================== OFFICIAL IT411 MIDTERM SUBMISSION DIRECTIVE ====================
+This midterm submission must demonstrate that your team has progressed beyond the initial MVP by incorporating the previously submitted MVP validation findings, refining the software requirements and system design, implementing the necessary improvements, and verifying that the system works as intended.
+ 
+The updated documentation and working software must reflect the improvements made based on the initial validation findings.
+ 
+Please note: Final User/Stakeholder Testing or Validation will be conducted after this deliverable has been completed. The current midterm submission focuses on demonstrating a working, refactored, tested, and deployed software system that is ready for final user/stakeholder validation.
+ 
+REQUIRED MIDTERM SUBMISSIONS
+1. Working Software and Deployment
+- Live URL of your deployed system, accessible for evaluation.
+- Demo account or access instructions, if applicable.
+- GitHub repository URL containing the source code.
+- Updated README, setup instructions, and deployment information.
+- Evidence of code refactoring, such as meaningful commits, pull requests, or code changes.
+- Feature completion matrix indicating implemented features and known limitations.
+
+2. Updated Technical Documentation
+Submit the revised versions of the following documents, ensuring that they accurately reflect your current implementation:
+- Software Requirements Specification (SRS)
+- Software Design Description (SDD)
+- Software Project Management Plan (SPMP)
+- Software Test Documentation (STD)
+- Requirements Traceability Matrix (RTM)
+- Revision history documenting the changes made and the reasons for those changes. Must be present in the first four documents.
+
+3. Testing and Quality Assurance Evidence
+- Functional testing results, including actual test outcomes.
+- Integration, system, and regression testing results, as applicable.
+- Performance testing report, including the test workload, response times, throughput, error rate, and other relevant metrics.
+- Usability testing results and corresponding improvements.
+- Defect log showing identified issues, their status, and retest results.
+- Acceptance testing results against your defined requirements.
+
+NOTE:
+Testing and QA evidence: Actual test execution records, screenshots or logs, performance test reports, pass/fail results, defect records, and retest results.
+STD: The test plan, test cases, test procedures, expected results, and documented testing approach.
+ 
+SUBMISSION ORGANIZATION
+Organize your evidence in one master folder in Google Drive using the following structure:
+- 01_Software_and_Deployment: Deployed system URL, GitHub repository, README, deployment evidence, refactoring evidence, and feature completion matrix.
+- 02_Updated_Documentation: Updated SRS, SDD, SPMP, STD, RTM, and revision history.
+- 03_Testing_and_QA: Functional, integration, system, regression, and performance testing.
+ 
+Provide working links to your GitHub repository, deployed system, and supporting evidence. Check all sharing permissions before submission. Do not include passwords, API keys, or other confidential credentials in your repository or submitted documents.
+ 
+IMPORTANT REMINDERS
+1. A running application alone is not sufficient. Your submission must be supported by updated documentation and verifiable testing evidence.
+2. Your SRS, SDD, SPMP, and STD must be consistent with the actual state of your software.
+3. Your performance testing report must present actual results, not merely screenshots showing that a test was executed.
+4. Your GitHub repository, deployed system, and documentation must correspond to the same version of the project.
+5. All required evidence must be accessible for verification and evaluation.
+=====================================================================================
+```
+
+**Adversarial Challenge Directives for Claude:**
+1. **Adversarial Audit against Directive:** Go through each requirement and "IMPORTANT REMINDER" above. Challenge whether our package (`01_Software_and_Deployment`, `02_Updated_Documentation`, `03_Testing_and_QA`) meets every single item to the letter.
+2. **Deployed System Link Evaluation:** The directive asks for "Live URL of your deployed system, accessible for evaluation." Challenge whether providing the direct Google Drive APK download link (`playit-debug-H-0320385.apk`) supported by `DEPLOYED_SYSTEM_AND_ACCESS_INSTRUCTIONS.pdf` is 100% compliant for an offline native Android mobile app, or if any additional link/clarification should be entered.
+3. **Consistency Verification:** Verify reminder #4: does the GitHub repo (`zendrix-hub/PlayIT`), deployed system (APK H), and documentation (SRS v3.0, SDD v2.0, STD v1.0, SPMP v2.0) correspond to the same version?
+4. **Performance Report Challenge:** Verify reminder #3: does our `PERFORMANCE_TESTING_REPORT.pdf` meet the expectation, and how does it justify the runtime test workload vs design rules verified?
+5. **Final Sign-off:** Highlight any remaining friction points before Zendrix submits the portal form.
