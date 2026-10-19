@@ -2,7 +2,7 @@
 **Course:** IT411 — Capstone & Research 2 | Semester 1, AY 2026–2027
 **Degree Program:** Bachelor of Science in Information Technology
 **Institution:** College of Computer Studies, Cebu Institute of Technology – University
-**Submission Date:** October 14, 2026
+**Submission Date:** October 18, 2026
 **Branch:** `refactor/hear-say-it`. Code at `0320385` (card 31f, debug APK H); package synchronized and rebuilt on October 14, 2026 (card 31); Software Test Document added the same day.
 
 Rebuild everything with `python3 tools/docs/render_submission_package.py` (python-docx and Microsoft Word). The Markdown files in `docs/` are the sources; never edit the .docx or .pdf copies by hand.

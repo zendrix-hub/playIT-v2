@@ -3,8 +3,8 @@
 **Course:** IT411 (Section G7) — Capstone & Research 2 | Semester 1, AY 2026–2027  
 **Degree Program:** Bachelor of Science in Information Technology  
 **Department:** College of Computer Studies, Cebu Institute of Technology – University  
-**Document Version:** 2.0 (Post-MVP Architectural Baseline), revision 2.8  
-**Publication Date:** September 26, 2026 (Revised October 14, 2026)  
+**Document Version:** 2.0 (Post-MVP Architectural Baseline), revision 2.9  
+**Publication Date:** September 26, 2026 (Revised October 18, 2026)  
 **Document Status:** Submitted for Adviser Review and Evaluation  
 **Prepared by:** Group 56 — PlayIT Capstone Team: Riva, Zendrix (Team Lead); Palis, John James; Miel, Kaysean; Durano, Ashlee Skye; Bien, Erik Samuel  
 **Adviser:** Mr. Joemarie C. Amparo  
@@ -27,6 +27,7 @@
 | **2.6** | October 11, 2026 | Capstone Team | Issued for adviser review and evaluation: the front matter states the submission status and the members' full names. §2.0 records the 9 mouth-shape pictures now in the app (image release `2026-10-10-mouth`, card 24b) and the Hear It mouth cue beside the play button. No design change. |
 | **2.7** | October 14, 2026 | Capstone Team (card 30) | Synchronized with debug APK G (`89604d7`, 409 unit tests passing) for the October 14 submission. §2.0: the mouth cue is shown in Say It only (card 28c, team decision 2026-10-11); new rows for the phone-test fixes (cards 28b, 28d), the ElevenLabs clips for AM, TUB, YAM and the short /i/ with the Parent Zone credit (cards 15b, 09c), and the redrawn mascot and avatars (card 29b); the map labels below the 16 sp floor are listed. §3.1.1, §3.4, §3.6.2, the new §3.6.3, §3.7.1, §3.7.2, §4.1, §4.2 and §5 follow; Figures 2, 3 and 8 are redrawn for card 28c. |
 | **2.8** | October 14, 2026 | Capstone Team (card 31) | Synchronized with debug APK H (`0320385`, 433 unit tests passing) after card 31 ran before the submission (team directive 2026-10-13). §2.0 adds the Headspace splash matched to Lily (31a), one message at a time on the lesson screens (31d), the map's single header card with its 16 sp text and 64 dp buttons (31e), and Blend It tiles that are never dealt solved (31f). It also corrects rev. 2.7: the map's buttons were below 64 dp, not only its labels below 16 sp. The calmer sound set and Lily's shorter lines (31b, 31c) are listed as planned: they wait for the team lead's listening review and are not in APK H. §3.1.1, §3.6.1, §3.6.3 and §4.4 follow. No diagram changes: APK H still plays the old sounds. |
+| **2.9** | October 18, 2026 | Capstone Team | Final midterm alignment: updated publication date and verified architectural baseline against submitted APK H build for IT411 midterm submission. |
 
 ---
 

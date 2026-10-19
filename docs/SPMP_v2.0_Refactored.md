@@ -3,8 +3,8 @@
 **Course:** IT411 (Section G7) — Capstone & Research 2 | Semester 1, AY 2026–2027  
 **Degree Program:** Bachelor of Science in Information Technology  
 **Institution:** College of Computer Studies, Cebu Institute of Technology – University  
-**Document Version:** 2.0 (Post-MVP Refactored Baseline), revision 2.6  
-**Publication Date:** September 26, 2026 (Revised October 14, 2026)  
+**Document Version:** 2.0 (Post-MVP Refactored Baseline), revision 2.7  
+**Publication Date:** September 26, 2026 (Revised October 18, 2026)  
 **Document Status:** Submitted for Adviser Review and Evaluation  
 **Prepared by:** Group 56 — PlayIT Capstone Team: Riva, Zendrix (Team Lead); Palis, John James; Miel, Kaysean; Durano, Ashlee Skye; Bien, Erik Samuel  
 **Adviser:** Mr. Joemarie C. Amparo  
@@ -23,6 +23,7 @@
 | **2.4** | October 11, 2026 | Capstone Team | Issued for adviser review and evaluation: the front matter states the submission status and the members' full names; Milestone 1 records the resubmission. No schedule change. |
 | **2.5** | October 14, 2026 | Capstone Team (card 30) | Synchronized with debug APK G (`89604d7`) for the October 14 submission: §1.2 records the ElevenLabs clips (AM, TUB, YAM, short /i/), the mouth cue in Say It only and the shipped mouth pictures; §3 adds the Oct 10–13 phone-test sprint (cards 28 to 29b, 409 unit tests) and updates Milestones 1 and 2; R1, R5 and R7 cover the ElevenLabs fallback, its Free-plan license and the short /a/ still to make; §4.1 lists ElevenLabs as a build-time tool. No change to the later milestones. |
 | **2.6** | October 14, 2026 | Capstone Team (card 31) | §3 adds card 31, run before the submission (team directive 2026-10-13); debug APK H (`0320385`, 433 unit tests) replaces APK G as the submission build. The calmer sound set and Lily's shorter lines (cards 31b, 31c) are with the team lead for a listening review. No change to the later milestones. |
+| **2.7** | October 18, 2026 | Capstone Team | Final midterm alignment: updated publication date and verified project milestone baseline for IT411 midterm submission. |
 
 ---
 

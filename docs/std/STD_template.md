@@ -3,8 +3,8 @@
 **Course:** IT411 (Section G7) — Capstone & Research 2 | Semester 1, AY 2026–2027  
 **Degree Program:** Bachelor of Science in Information Technology  
 **Department:** College of Computer Studies, Cebu Institute of Technology – University  
-**Document Version:** 1.0 (test record of debug APK H, commit `0320385`)  
-**Publication Date:** October 14, 2026  
+**Document Version:** 1.0.1 (test record of debug APK H, commit `0320385`)  
+**Publication Date:** October 18, 2026  
 **Document Status:** Submitted for Adviser Review and Evaluation  
 **Prepared by:** Group 56 — PlayIT Capstone Team: Riva, Zendrix (Team Lead); Palis, John James; Miel, Kaysean; Durano, Ashlee Skye; Bien, Erik Samuel  
 **Adviser:** Mr. Joemarie C. Amparo  
@@ -37,10 +37,10 @@ The structure follows ISO/IEC/IEEE 29119-3:2021 (test documentation), condensed 
 - **Out of scope for this run** (each listed in §4.8): Round 2 field validation with learners and teachers (Weeks 7–8), the Gate 3 teacher audit of audio, timing measured on the device, and the features the SDD §2.0 lists as planned (telemetry and CSV export, spaced recall, session pacing, the voice-driven mic ripple).
 
 ### 1.3 References
-1. PlayIT Software Requirements Specification (SRS v3.0, rev. 3.8), October 14, 2026: requirement IDs and the RTM test case IDs (§4).
-2. PlayIT Software Design Description (SDD v2.0, rev. 2.8), October 14, 2026: §2.0 implementation status, §6 verification plan.
+1. PlayIT Software Requirements Specification (SRS v3.0, rev. 3.9), October 18, 2026: requirement IDs and the RTM test case IDs (§4).
+2. PlayIT Software Design Description (SDD v2.0, rev. 2.9), October 18, 2026: §2.0 implementation status, §6 verification plan.
 3. PlayIT Software Project Management Plan (SPMP v2.0, rev. 2.6): WBS 7 (Verification and STD), Milestones 6 and 7.
-4. PlayIT MVP Validation Findings and Refactoring Priorities (course form), October 14, 2026.
+4. PlayIT MVP Validation Findings and Refactoring Priorities (course form), October 18, 2026.
 5. ISO/IEC/IEEE 29119-3:2021, *Software and systems engineering — Software testing — Part 3: Test documentation*.
 6. IEEE Std 829-2008, *IEEE Standard for Software and System Test Documentation* (superseded by 29119-3; used for the incident report fields).
 
@@ -384,7 +384,7 @@ The automated tests prove the logic and the layout, not the experience. The requ
 
 | Role | Name | Signature | Date |
 |---|---|---|---|
-| Prepared by (test execution and write-up) | Capstone Team | | October 14, 2026 |
+| Prepared by (test execution and write-up) | Capstone Team | | October 18, 2026 |
 | Reviewed by (Team Lead) | Riva, Zendrix | ____________________ | October 18, 2026 |
 | Adviser | Mr. Joemarie C. Amparo | ____________________ | |
 

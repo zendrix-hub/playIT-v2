@@ -703,7 +703,7 @@ def generate_refactoring_evidence_pdf(output_path, ctx):
     add_meta_box(story, [
         ("Project:", plain(PROJECT)),
         ("Baseline:", plain("The MVP build used in the Weeks 1 to 2 validation (Round 1).")),
-        ("Refactored build:", plain(f"Debug APK H, commit {APK_H_COMMIT}, October 14, 2026 "
+        ("Refactored build:", plain(f"Debug APK H, commit {APK_H_COMMIT}, October 18, 2026 "
                                     "(branch refactor/hear-say-it).")),
         ("Pull request:", plain(f"{PULL_REQUEST_URL} (draft): the development branch, with every commit in "
                                 "section 4, and the pictures and documents added after APK H.")),

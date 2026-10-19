@@ -3,8 +3,8 @@
 **Course:** IT411 (Section G7) — Capstone & Research 2 | Semester 1, AY 2026–2027  
 **Degree Program:** Bachelor of Science in Information Technology  
 **Department:** College of Computer Studies, Cebu Institute of Technology – University  
-**Document Version:** 3.0 (Post-MVP Validation Baseline), revision 3.8  
-**Publication Date:** September 26, 2026 (Revised October 14, 2026)  
+**Document Version:** 3.0 (Post-MVP Validation Baseline), revision 3.9  
+**Publication Date:** September 26, 2026 (Revised October 18, 2026)  
 **Document Status:** Submitted for Adviser Review and Evaluation  
 **Prepared by:** Group 56 — PlayIT Capstone Team: Riva, Zendrix (Team Lead); Palis, John James; Miel, Kaysean; Durano, Ashlee Skye; Bien, Erik Samuel  
 **Adviser:** Mr. Joemarie C. Amparo  
@@ -26,6 +26,7 @@
 | **3.6** | October 11, 2026 | Capstone Team (sprint synchronization) | Issued for adviser review and evaluation: the front matter states the submission status and the members' full names. §4.1 updated to 386 passing unit tests (0 failures); the NFR-ACC-01 row records the 9 mouth-shape pictures now in the app (image release `2026-10-10-mouth`, card 24b) and the layout checks with unclipped bounds on 4 screen sizes (`LayoutMatrixTest`); the team confirmed that sound captions stay out of the child view (rev. 3.4). |
 | **3.7** | October 14, 2026 | Capstone Team (card 30) | Synchronized with debug APK G (`89604d7`) for the October 14 submission. Amendments from the phone tests of APK E (team decisions 2026-10-11 and 2026-10-12): FR-02 item 4 and NFR-ACC-01 item 1, the mouth-shape cue is shown in Say It from the second miss and not during the Hear It sequence (card 28c); NFR-AUD-01 item 1, ElevenLabs Text to Speech for the Blend It words AM, TUB, YAM and the short /i/, with the credit the Free plan requires (cards 15b, 09c). Figure 1 moves the mouth-cue use case to Say It; RTM rows F-09 and F-13 and §4.1 follow (409 unit tests, 0 failures). |
 | **3.8** | October 14, 2026 | Capstone Team (card 31) | Synchronized with debug APK H (`0320385`) after card 31 ran before the submission (team directive 2026-10-13). No requirement text changed. §4.1 now lists 433 unit tests and the new checks: NFR-ACC-02 on the map (16 sp text, 64 dp buttons) and on the splash; FR-13's tile deal; FR-02 and FR-03 one message at a time. The calmer sound set and Lily's shorter lines (cards 31b, 31c) wait for the team lead's listening review and are not in APK H. |
+| **3.9** | October 18, 2026 | Capstone Team | Final midterm alignment: harmonized adviser-confirmation phrasing with SDD v2.0; updated publication date to October 18, 2026 for IT411 midterm submission. |
 
 ---
 

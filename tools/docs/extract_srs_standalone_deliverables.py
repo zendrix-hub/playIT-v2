@@ -179,7 +179,7 @@ def generate_cover_pdf(
         ),
         (
             Paragraph("Publication Date", cell_label_style),
-            Paragraph("September 26, 2026 (Revised October 14, 2026)", cell_value_style),
+            Paragraph("September 26, 2026 (Revised October 18, 2026)", cell_value_style),
         ),
         (
             Paragraph("Document Status", cell_label_style),

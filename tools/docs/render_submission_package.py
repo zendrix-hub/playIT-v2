@@ -405,7 +405,7 @@ CHECKLIST = """# PlayIT — IT411 Submission Package: Overview and Review Checkl
 **Course:** IT411 — Capstone & Research 2 | Semester 1, AY 2026–2027
 **Degree Program:** Bachelor of Science in Information Technology
 **Institution:** College of Computer Studies, Cebu Institute of Technology – University
-**Submission Date:** October 14, 2026
+**Submission Date:** October 18, 2026
 **Branch:** `refactor/hear-say-it`. Code at `0320385` (card 31f, debug APK H); package synchronized and rebuilt on October 14, 2026 (card 31); Software Test Document added the same day.
 
 Rebuild everything with `python3 tools/docs/render_submission_package.py` (python-docx and Microsoft Word). The Markdown files in `docs/` are the sources; never edit the .docx or .pdf copies by hand.
@@ -493,10 +493,10 @@ def main():
     fill_mvp_validation_form.build_form(MVP_FORM["src"], MVP_FORM["template"], MVP_FORM["filled"])
     add_form_footer(MVP_FORM["filled"])
     form_docx = SUBMISSION_DIR / f"{MVP_FORM['out']}.docx"
-    shutil.copy2(MVP_FORM["filled"], form_docx)
+    shutil.copyfile(MVP_FORM["filled"], form_docx)
     print(f"[OK] DOCX  {form_docx.relative_to(REPO)}")
     export_pdf(form_docx)
-    shutil.copy2(form_docx, MVP_FORM["filled"])
+    shutil.copyfile(form_docx, MVP_FORM["filled"])
 
     print()
     write_checklist()
