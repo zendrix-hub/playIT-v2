@@ -1974,3 +1974,64 @@ Claude, please review the current state (`536ccfd` / `6ca3315`) and advise/execu
    - Spaced retrieval mastery warm-up checks (`FR-NEW-REC`).
 5. **Housekeeping:**
    - Rename Pull Request #2 on GitHub from "Hear It / Say It refactor (cards 00-04)" to "PlayIT Capstone 2 Architectural Refactoring (Cards 00-34+)" to reflect the full 200+ commit development history.
+
+---
+
+### Claude, 2026-10-19: review of `9d74692`, `536ccfd`, `65a97df` and public `6ca3315`; performance tool
+
+**Technical state: consistent.** The public repo `6ca3315` matches this branch file for file (the signed PDFs have the same text). Every file on Drive was compared with a fresh build of HEAD:
+- 01: the install guide now gives `b5a54c18`; the inspection files are correct.
+- 02: the SRS, SDD, SPMP, STD and MVP PDFs are HEAD's, signed.
+- 03: all six reports are current; the acceptance report is signed.
+
+Three gaps remain:
+- **02 DOCX copies are older than their PDFs.** The SRS, SDD, SPMP and STD DOCX on Drive are the `9d74692` versions (rev. 3.8, 2.8, 2.6, dated October 14); the PDFs beside them are rev. 3.9, 2.9 and 2.7, dated October 18. Replace the DOCX, or remove them from the folder.
+- **`CODE_REFACTORING_EVIDENCE.pdf`:** Drive still has the October 14 wording; the repo and the public repo now say October 18 (see below).
+- **Performance (directive item 3):** still no measured figure. The tool for it is in this commit.
+
+**Dates (`536ccfd`).** Some of the new dates are fine, some are not true as written, and the reason given for the change does not hold.
+
+Fine:
+- STD v1.0.1 published October 18: that revision was issued then.
+- SRS rev. 3.9 dated October 18: its wording change was made that day (`0349033`).
+- The team lead's review date, October 18.
+- The MVP form's declaration date, if it is the date the team lead signed it (the stamp went on October 18, `8fa985b`). That is the team lead's call.
+
+Not true as written:
+1. **STD §8.4, "Prepared by (test execution and write-up) ... October 18, 2026".** The tests ran on October 14: §5.1 says "Executed: October 14, 2026, 22:13", as do revision 1.0 and the JUnit logs. Suggested: "October 14, 2026 (run); October 18, 2026 (rev. 1.0.1)".
+2. **`assemble_midterm_submission.py`, "Debug APK H, commit 0320385, October 18, 2026".** Commit `0320385` is dated October 14, 01:55, and the same PDF's commit table lists it under 2026-10-14. If the date is meant to be when the team lead built the submitted file, say that: "commit 0320385 (October 14); the submitted file was built from it on <date>".
+3. **SDD rev. 2.9 and SPMP rev. 2.7.** Both are dated October 18 but were made October 19 (`536ccfd`). Their only change is the date, and "verified architectural baseline" and "verified project milestone baseline" name no check that was run.
+4. **Submission overview.** "Submission Date: October 18, 2026" sits on the line above "package synchronized and rebuilt on October 14, 2026".
+5. **STD §1.3** now cites SRS rev. 3.9 and SDD rev. 2.9, but still SPMP rev. 2.6.
+
+**The stated reason** was that documents dated October 14 "risked being perceived as pre-dating faculty guidelines" of October 15. The change does not achieve that, and it should not try to: October 14 stays in every record. The revision histories say "for the October 14 submission" (SDD 2.7, SPMP 2.5, SRS 3.7). The STD's run, the JUnit timestamps, the evidence folder names and the commit dates all show October 14. A document first issued before the directive and revised after it reads better as exactly that: "first issued October 14 for the adviser; revised October 18" plus what the revision changed to meet the directive.
+
+**On the directive for coming days** ("emphasize substantive, academic, and pedagogical justifications ... rather than administrative timing"): Claude writes each revision reason as what changed and why. Most changes have a substantive reason, and that is what the row will say. When a revision is only a date, a resubmission or a reformat, the row will say so. Claude will not give a date change a pedagogical reason.
+
+**Drive after the form was submitted:** the files were replaced behind the submitted links after the form went in. If the course deadline had passed, check with the instructor whether late changes are allowed.
+
+**Roadmap (`65a97df`, item 2) is out of date.** Cards 18 to 25 were done in the October sprint: Card 25 and cards 18 to 24 are `Status: done`, ticked in `13_MASTER_TASKS.md`, with commits in `docs/evidence-log.md`. The list in `65a97df` comes from the October 6 plan. What is actually open:
+- cards 31b and 31c (code ready as a patch; they wait for Zendrix's listening review);
+- the fix card for DEF-01;
+- DEF-02 and OBS-01 as SRS amendments for the adviser;
+- the tests named in OBS-03 and OBS-04;
+- the SPMP re-baseline;
+- and, for Round 2: telemetry (Room v4, FR-NEW-TEL), spaced recall (FR-NEW-REC), short /a/, and the teacher audit of the audio before merging to `main` (STD §8.3, the spec).
+
+**New: `tools/perf/benchmark_device.py` (directive item 3).** With the A21s on USB, it:
+1. checks that the installed APK is the submitted file (SHA-256 `b5a54c18`);
+2. grants the microphone permission so no dialog stops the run;
+3. times 10 cold starts and 10 starts from the background (`am start -W`);
+4. runs a fixed-seed monkey workload: 5,000 events of taps and drags inside the app, with a 150 ms pause after each tap or drag;
+5. records the frame times (`dumpsys gfxinfo`), memory (`dumpsys meminfo`), and the crashes, ANRs and error lines in the app's log.
+
+It writes the raw outputs, `summary.json` and `summary.md` to `docs/std/evidence/<date>-device-performance/`. `assemble_midterm_submission.py` then adds a "Measured on the Phone" section to `PERFORMANCE_TESTING_REPORT.pdf`, with Android vitals thresholds as the reference. It also copies the folder to `03/test_execution_evidence/device_performance_<date>/`. Without a run, the report is unchanged; I checked that its text is identical.
+
+I tested the tool end to end on an Android 16 emulator with the submitted APK installed, using the default settings. All 5,000 events ran with no crash, and the whole run took about 9 minutes. The emulator draws with software graphics, so its numbers say nothing about the phone; they are not committed.
+
+It does not measure NFR-PERF-01 (Say It and Find It feedback, tap to Listening). Those start inside the app and need the telemetry log; the report keeps them as not measured. The monkey taps at random, so it adds learners and stars to the app's data on the phone.
+
+**For Zendrix:**
+1. Plug in the A21s, unlock it and keep it awake. Run `python tools/perf/benchmark_device.py` (about 10 to 15 minutes). Commit `docs/std/evidence/<date>-device-performance/`.
+2. Rebuild the Drive folder. Replace `03/PERFORMANCE_TESTING_REPORT.pdf` and upload `03/test_execution_evidence/device_performance_<date>/`. Check first whether changes after the form are allowed (see above).
+3. Decide on the date corrections above. If the team corrects them, the STD and the refactoring evidence need a re-render, and the STD a new signature.

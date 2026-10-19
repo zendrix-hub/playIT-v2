@@ -860,28 +860,132 @@ def generate_feature_completion_matrix_pdf(output_path, ctx):
 # 03_Testing_and_QA
 # ==============================================================================
 
+def device_performance():
+    """The latest run of tools/perf/benchmark_device.py in docs/std/evidence/, or None."""
+    runs = sorted((REPO_ROOT / "docs" / "std" / "evidence").glob("*-device-performance/summary.json"))
+    if not runs:
+        return None
+    run = json.loads(runs[-1].read_text(encoding="utf-8"))
+    run["dir"] = runs[-1].parent
+    return run
+
+
+def device_performance_rows(run):
+    """Section 2 of the performance report: the measured results, with Android vitals as the reference."""
+    def ms(st):
+        return (f"median {st['median']:,.0f} ms, 90th percentile {st['p90']:,.0f} ms ({st['n']} runs, "
+                f"{st['min']:,.0f} to {st['max']:,.0f} ms)") if st else "not recorded"
+
+    def mb(kb):
+        return f"{kb / 1024:.0f} MB" if kb else "not recorded"
+
+    def n(x, unit=""):
+        return "not recorded" if x is None else f"{x:,}{unit}"
+    s, w, f, e, mem = (run["run"]["settings"], run["workload"], run["frames"], run["errors"], run["memory"])
+    crashes = max(e["crashes_monkey"], e["crashes_log"])
+    anrs = max(e["anrs_monkey"], e["anrs_log"])
+    states = ", ".join(run["background_start"]["states"]) or "not reported"
+    return [
+        [plain("Measure"), plain("Result"), plain("Reference")],
+        [plain("Workload"),
+         plain(f"{n(w['events_injected'])} of {n(w['events_requested'])} random events inside the app ({s['mix']}, "
+               f"a {s['throttle_ms']} ms pause after each, seed {s['seed']}) in {w['seconds']:,.0f} s"
+               + ("" if w["finished"] else "; the run stopped early")),
+         plain("The same seed and settings repeat the run")],
+        [plain("Cold start (response time)"), plain(ms(run["cold_start"]["total_ms"])),
+         plain("Android vitals: 5 s or more is excessive")],
+        [plain("Start from the background"), plain(f"{ms(run['background_start']['total_ms'])}; launch state {states}"),
+         plain("Android vitals: 2 s or more (warm) or 1.5 s or more (hot) is excessive")],
+        [plain("Throughput"),
+         plain(f"{n(w['events_per_s'])} events handled per second; {n(f['frames_per_s'])} frames rendered per "
+               "second"),
+         plain("A tap is a touch down and up, a drag adds the moves; each counts as an event")],
+        [plain("Frame time"),
+         plain(f"50th percentile {n(f['p50_ms'], ' ms')}, 90th {n(f['p90_ms'], ' ms')}, 95th {n(f['p95_ms'], ' ms')}, "
+               f"99th {n(f['p99_ms'], ' ms')}; {n(f['frames'])} frames, {n(f['janky_pct'], '%')} missed their "
+               "deadline"),
+         plain("A frame is due every 16.7 ms on a 60 Hz screen")],
+        [plain("Slow and frozen frames"),
+         plain(f"{n(f['slow_16ms_pct'], '%')} of frames took 16 ms or longer; {n(f['frozen_700ms'])} took 700 ms "
+               "or longer"),
+         plain("Android vitals: slow when more than half the frames take over 16 ms; a frame over 700 ms is frozen")],
+        [plain("Memory (total PSS)"),
+         plain(f"{mb(mem['after_starts']['total_pss_kb'])} after the starts; "
+               f"{mb(mem['after_workload']['total_pss_kb'])} after the workload"),
+         plain("dumpsys meminfo")],
+        [plain("Error rate"),
+         plain(f"{crashes} crashes and {anrs} ANRs in {n(w['events_injected'])} events "
+               f"({n(e['failures_per_1000_events'])} per 1,000 events); {e['app_error_lines']} error lines in the "
+               "app's log"),
+         plain("None expected")],
+    ]
+
+
 def generate_performance_report_pdf(output_path, ctx):
     std, apk, per_class = ctx["std"], ctx["apk"], ctx["per_class"]
+    run = ctx.get("device_performance")
     story = []
-    add_header_banner(story, "Performance Testing Report",
-                      "Deliverable 03: what was verified on APK H, and what is measured on the phone in Round 2")
-    add_meta_box(story, [
-        ("Build:", plain(f"Debug APK H, commit {APK_H_COMMIT}")),
-        ("Verified on:", plain("The automated suite on the JVM with Robolectric (STD sections 2.5 and 5.1), and an "
-                               "inspection of the APK.")),
-        ("Device:", plain("Samsung Galaxy A21s, the team's test phone (STD section 2.5).")),
-        ("Runtime timing:", md("**Not measured on this build.** Scheduled for Round 2 with the telemetry log on "
-                               "physical hardware (Instrument D, checks D-01 and D-02).")),
-    ])
+    if run:
+        day = run["run"]["started"][:10]
+        phone = f"{run['device']['manufacturer'].title()} {run['device']['model']}"
+        cold, warm = run["cold_start"]["total_ms"], run["background_start"]["total_ms"]
+        add_header_banner(story, "Performance Testing Report",
+                          "Deliverable 03: what was measured on the phone, what was verified on APK H, and what "
+                          "Round 2 measures")
+        add_meta_box(story, [
+            ("Build:", plain(f"Debug APK H, commit {APK_H_COMMIT}; the installed file's SHA-256 begins "
+                             f"{run['build']['sha256'][:8]}: "
+                             + ("the submitted file." if run["build"]["matches_submitted"] else
+                                "NOT the submitted file."))),
+            ("Measured on:", plain(f"{phone}, Android {run['device']['android']}, on {day}, with "
+                                   "tools/perf/benchmark_device.py (raw outputs in test_execution_evidence/"
+                                   f"device_performance_{day}/).")),
+            ("Also verified:", plain("The automated suite on the JVM with Robolectric (STD sections 2.5 and 5.1), "
+                                     "and an inspection of the APK.")),
+            ("Latency targets:", md("**Not measured on this build.** The SRS's Say It and Find It latency needs the "
+                                    "telemetry log (Instrument D, checks D-01 and D-02), planned for Round 2.")),
+        ])
 
-    h2(story, "1. Summary")
-    para(story, plain("No startup time, recognition latency, memory or frame-rate figure was measured on APK H. "
-                      "The SRS's latency targets need timestamps from the planned telemetry log (Room schema v4) "
-                      "on the phone, so their test cases did not run (STD section 4.8). This report lists those "
-                      "targets as not measured, and records the design rules that protect performance which the "
-                      "automated suite and the APK inspection did verify."))
+        h2(story, "1. Summary")
+        para(story, plain(f"The submitted APK was measured on the {phone} on {day}: {cold['n'] if cold else 0} cold "
+                          f"starts and {warm['n'] if warm else 0} starts from the background, then a workload of "
+                          "random taps and drags inside the app (a monkey run with a fixed seed), during which the "
+                          "frame times, memory and errors were recorded. Section 2 gives the results. The SRS's "
+                          "latency targets start inside the app (the end of a child's speech, a tap on a card), so "
+                          "they need timestamps from the planned telemetry log (Room schema v4), and their test "
+                          "cases did not run (STD section 4.8). Section 3 lists them; section 4 records the design "
+                          "rules that protect performance, which the automated suite and the APK inspection "
+                          "verified."))
 
-    h2(story, "2. Performance Targets: Not Measured on This Build")
+        h2(story, "2. Measured on the Phone")
+        add_table(story, device_performance_rows(run), [1.45, 3.65, 2.4])
+        battery = run["battery"]
+        para(story, plain(f"One run on one phone. Battery {battery['before']['level_pct']}% and "
+                          f"{battery['before']['temperature_c']} C at the start, {battery['after']['level_pct']}% and "
+                          f"{battery['after']['temperature_c']} C at the end. The monkey taps at random, so the "
+                          "workload stands for heavy use, not for a lesson as a child plays it."))
+        sections = iter(range(3, 10))
+    else:
+        add_header_banner(story, "Performance Testing Report",
+                          "Deliverable 03: what was verified on APK H, and what is measured on the phone in Round 2")
+        add_meta_box(story, [
+            ("Build:", plain(f"Debug APK H, commit {APK_H_COMMIT}")),
+            ("Verified on:", plain("The automated suite on the JVM with Robolectric (STD sections 2.5 and 5.1), and "
+                                   "an inspection of the APK.")),
+            ("Device:", plain("Samsung Galaxy A21s, the team's test phone (STD section 2.5).")),
+            ("Runtime timing:", md("**Not measured on this build.** Scheduled for Round 2 with the telemetry log on "
+                                   "physical hardware (Instrument D, checks D-01 and D-02).")),
+        ])
+
+        h2(story, "1. Summary")
+        para(story, plain("No startup time, recognition latency, memory or frame-rate figure was measured on APK H. "
+                          "The SRS's latency targets need timestamps from the planned telemetry log (Room schema v4) "
+                          "on the phone, so their test cases did not run (STD section 4.8). This report lists those "
+                          "targets as not measured, and records the design rules that protect performance which the "
+                          "automated suite and the APK inspection did verify."))
+        sections = iter(range(2, 10))
+
+    h2(story, f"{next(sections)}. Performance Targets: Not Measured on This Build")
     rows = [[plain("Test case"), plain("Requirement"), plain("Target"), plain("Result on APK H"),
              plain("Why not run, and when (STD section 4.8)")]]
     for tc in ("TC-AUD-01", "TC-MIC-01", "TC-SCR-01", "TC-PERF-01, 02", "TC-DB-01"):
@@ -889,7 +993,7 @@ def generate_performance_report_pdf(output_path, ctx):
         rows.append([md(row[0]), md(row[1]), md(row[2]), md("**Not measured**"), md(row[3] + ". " + row[4])])
     add_table(story, rows, [0.95, 1.05, 1.9, 0.8, 2.8])
 
-    h2(story, "3. Verified Design Rules That Protect Performance")
+    h2(story, f"{next(sections)}. Verified Design Rules That Protect Performance")
     st = std.status
     rows = [[plain("Rule"), plain("How it works"), plain("Verified by"), plain("Result")]]
     rows.append([plain("No network access"),
@@ -920,12 +1024,12 @@ def generate_performance_report_pdf(output_path, ctx):
                  plain("TC-ASR-10"), md(st("TC-ASR-10"))])
     add_table(story, rows, [1.45, 3.15, 1.45, 1.45])
 
-    h2(story, "4. Package Size (measured)")
+    h2(story, f"{next(sections)}. Package Size (measured)")
     para(story, plain(f"APK H is {apk['size']:,} bytes (about {apk['size'] / 1e6:.0f} MB), measured on the "
                       "submitted file (STD section 5.4). It is a debug build and includes the Vosk "
                       "model, every sound and every picture, so it works with no connection after installation."))
 
-    h2(story, "5. Plan for Round 2")
+    h2(story, f"{next(sections)}. Plan for Round 2")
     bullets(story, [
         plain("Build the telemetry log (TelemetryLogger, Room schema v4), which records monotonic timestamps for "
               "each microphone tap, end of speech, result and feedback."),
@@ -1518,6 +1622,9 @@ def build_google_drive_submission_package(ctx):
     safe_copytree(SUBMITTED_APK_DIR, dir_03 / "test_execution_evidence" / "submitted_apk_inspection_2026-10-18")
     if POST_APK_H_RUN_DIR.exists():
         safe_copytree(POST_APK_H_RUN_DIR, dir_03 / "test_execution_evidence" / "regression_rerun_2026-10-18")
+    if ctx.get("device_performance"):
+        run_dir = ctx["device_performance"]["dir"]
+        safe_copytree(run_dir, dir_03 / "test_execution_evidence" / f"device_performance_{run_dir.name[:10]}")
     print(f"Copied the STD test evidence to: {(dir_03 / 'test_execution_evidence').relative_to(REPO_ROOT)}")
     print("=== Google Drive folder complete ===")
 
@@ -1834,6 +1941,7 @@ def main():
         "domain_android_imports": count_domain_android_imports(),
         "repositories": count_repositories(),
         "card_commits": card_commit_rows(),
+        "device_performance": device_performance(),
     }
     build_google_drive_submission_package(ctx)
     stage_clean_academic_repo(ctx)
