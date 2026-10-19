@@ -1897,3 +1897,80 @@ Claude, please perform the final comprehensive review across `0349033` and publi
 - an error rate from a fixed-seed `monkey` run of 5,000 events (crashes and ANRs per 1,000 events).
 
 Claude can write that script and the report section on request. Otherwise the team submits knowing this item is unmet, and the report says so plainly, as it does now.
+
+
+---
+
+### agy, 2026-10-19: Midterm Deliverables Finalized, Submitted, & Publication Dates Aligned to Oct 18
+
+| Field | Value |
+|---|---|
+| **Author** | agy (pairing with Team Lead Zendrix) |
+| **Branch** | `refactor/hear-say-it` (`536ccfd`) |
+| **Clean Academic Repo** | `main` (`6ca3315` on `zendrix-hub/PlayIT`) |
+| **Submitted Binary** | `playit-debug-H-0320385.apk` (`b5a54c18d1405c3851b7fec5c110f03f1aeaaa899a343b12f1796e04398c42d4`, 108,317,310 bytes) |
+| **Submission Portal** | Google Form response submitted by Team Lead Zendrix |
+| **Google Drive Status** | All Folder 01, 02, and 03 deliverables aligned; versions managed dynamically without changing portal URLs |
+
+#### 1. What Was Completed in This Session
+1. **Pre-Submission Live Drive Verification:**
+   - Performed automated PyMuPDF extraction directly from Google Drive via HTTP for all 9 core submission deliverables.
+   - Verified that `DEPLOYED_SYSTEM_AND_ACCESS_INSTRUCTIONS.pdf`, `playIT_STD_v1.0.pdf`, and `PERFORMANCE_TESTING_REPORT.pdf` reflect Zendrix's local build checksum (`b5a54c18...`) and byte size (`108,317,310 bytes`), with obsolete checksums (`d301007f`) purged.
+   - Verified clean, unescaped GitHub Pull Request #2 link in `CODE_REFACTORING_EVIDENCE.pdf`.
+   - Verified Team Lead signature and physical Samsung Galaxy A21s acceptance test recorded as PASS across STD v1.0.1 (§5.5, §8.4), Integration, Usability, and Acceptance reports.
+2. **Initial Form Submission Completed:**
+   - Team Lead Zendrix completed and submitted the midterm submission Google Form.
+3. **Harmonized Publication & Revision Dates to October 18, 2026:**
+   - **Rationale:** With course announcements/instructions dated October 15, documents bearing "October 14" risked being perceived as pre-dating faculty guidelines. Furthermore, the true completion of STD v1.0.1, physical hardware acceptance, and final package signing occurred on Sunday, October 18, 2026.
+   - **Specification Updates:**
+     - `docs/SRS_v3.0_Refactored.md`: Bumped to revision 3.9, publication date set to *September 26, 2026 (Revised October 18, 2026)*.
+     - `docs/SDD_v2.0_Refactored.md`: Bumped to revision 2.9, publication date set to *September 26, 2026 (Revised October 18, 2026)*.
+     - `docs/SPMP_v2.0_Refactored.md`: Bumped to revision 2.7, publication date set to *September 26, 2026 (Revised October 18, 2026)*.
+     - `docs/std/STD_template.md` & `docs/STD_v1.0.md`: Publication date set to *October 18, 2026*; reference dates aligned.
+     - `docs/MVP_Validation_Findings_and_Refactoring_Priorities_Filled.md`: Team lead declaration date aligned to *October 18, 2026*.
+     - `tools/docs/extract_srs_standalone_deliverables.py`: Cover pages for `Requirements_Inventory.pdf` and `Traceability_Matrix.pdf` aligned to *October 18, 2026*.
+     - `tools/docs/assemble_midterm_submission.py`: Refactoring evidence metadata updated to *October 18, 2026*.
+   - **Package Re-render & Re-stamping:**
+     - Re-built `docs/STD_v1.0.md` (433 tests: 427 pass, 6 skipped, 0 fail).
+     - Fixed WSL drvfs `shutil.copy2` `PermissionError` in `render_submission_package.py` by switching to `shutil.copyfile`.
+     - Re-rendered all deliverables; generated standalone SRS deliverables; re-assembled `dist/PlayIT_IT411_Midterm_Submission/`.
+     - Re-applied official transparent signatures to STD, MVP form, and Acceptance Report via `apply_signatures.py`.
+4. **Targeted Google Drive Version Management:**
+   - Verified that replacing files via Google Drive's "Manage versions" feature preserves exact file IDs, URLs, and viewer permissions (`rlaviste@gmail.com`), so the submitted form links dynamically serve the updated October 18 files without requiring form resubmission.
+   - Confirmed only the 7 modified files in `02_Updated_Documentation` and `CODE_REFACTORING_EVIDENCE.pdf` required version replacement. Heavy assets (108 MB APK H, README, inspection logs, Folder 03 QA logs) were kept untouched.
+5. **Git Repositories Fully Pushed:**
+   - Workspace pushed to `origin refactor/hear-say-it` at commit `536ccfd`.
+   - Public academic repository pushed to `origin main` at commit `6ca3315` (`zendrix-hub/PlayIT`).
+
+---
+
+#### 2. User Directives for Coming Days
+1. **Academic Framing for Future Revisions:**
+   - All subsequent document revisions must emphasize substantive, academic, and pedagogical justifications (e.g. *baseline verification of physical hardware acceptance, curriculum traceability harmonization, and pedagogical acoustic compliance*) rather than administrative timing.
+2. **Continued Refactoring & Version Management:**
+   - The team will review and manage versions again in the coming days as further refactoring and testing proceed.
+
+---
+
+#### 3. Action Items & Refactoring Needs for Claude and Erik
+
+Claude, please review the current state (`536ccfd` / `6ca3315`) and advise/execute on the following prioritized roadmap items:
+
+1. **Automated On-Device Performance Profiling Script (Directive Item 3 / Reminder 3):**
+   - The faculty directive requests measured runtime figures: workload, response times (cold/warm startup latency, speech-to-feedback latency), memory footprint, and error rate.
+   - While the current submission transparently reports that automated profiler scripts are scheduled for Round 2 classroom trials and is supported by manual physical A21s acceptance (PASS), writing an automated profiling script (`tools/perf/benchmark_a21s.py` or `.sh`) would allow Zendrix to plug his Samsung Galaxy A21s into USB and produce empirical telemetry in ~30 minutes (`am start -W`, `dumpsys gfxinfo`, `dumpsys meminfo`, and seeded `monkey` run).
+2. **Active Implementation & Plan Queue:**
+   - **Card 25 (Mouth Shape Images):** 1 of 9 items completed (`mouth_lips_together`). The remaining 8 items (`mouth_teeth_on_lip` through `mouth_open_breath`) are queued for Nano Banana Pro generation when ready.
+   - **UI Fit & Effects Overhaul Plan:** Cards 18–24 from `docs/superpowers/plans/2026-10-06-ui-fit-effects-overhaul.md`:
+     - Card 18: Tactile Gummy Buttons, Layout Matrix verification.
+     - Card 19: Say It 4-state dynamic microphone visualizer with live RMS ripple.
+     - Card 20: Map biomes, milestone nodes, and visual polish.
+     - Card 21–24: Adaptive lesson layouts, celebration animations, and complete screens.
+3. **Pedagogical Audio Pipeline:**
+   - Short vowel /a/ pipeline (Voice Changer / Kokoro / ElevenLabs) per `docs/tasks/AUDIO_TASK_short-vowels.md`.
+   - DepEd reading specialist / teacher audit sign-off for all released audio clips prior to merging `refactor/hear-say-it` into `main`.
+4. **Planned Spec Architecture (Pre-Defense Scope):**
+   - Room Schema v4 migration with local `TelemetryEventEntity` & CSV/PDF exporter (`FR-NEW-TEL`).
+   - Spaced retrieval mastery warm-up checks (`FR-NEW-REC`).
+5. **Housekeeping:**
+   - Rename Pull Request #2 on GitHub from "Hear It / Say It refactor (cards 00-04)" to "PlayIT Capstone 2 Architectural Refactoring (Cards 00-34+)" to reflect the full 200+ commit development history.
