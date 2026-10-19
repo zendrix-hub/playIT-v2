@@ -1,0 +1,24 @@
+{
+  "release": "2026-10-07-m",
+  "approvedBy": "user (listening review page 2026-10-01-compositions-m, picked the 700 ms held /m/ on 2026-10-07)",
+  "teacherAudit": "pending, required before merge to main",
+  "clips": [
+    {
+      "clipId": "ph_m",
+      "file": "phonemes/ph_m.wav",
+      "text": "/m/ held (Mmm)",
+      "voice": "Chatterbox-Turbo voice-cloned from the Kokoro reference (af_heart*0.7+af_bella*0.3)",
+      "speed": null,
+      "sourceBatch": "2026-10-01-compositions-m",
+      "sourceFile": "phoneme/ph_m_stretched_700ms.wav",
+      "reviewCsv": "2026-10-01-compositions-m_review.csv",
+      "userVerdict": "OK",
+      "userNote": "",
+      "teacherAudit": "pending",
+      "license": "MIT (Chatterbox-Turbo)",
+      "sha256": "953f906da0d7e76de50094ce3855045e5018f1fec31e3f277483cb5fb9e627d3",
+      "tool": "tools/audio/chatterbox_lab.py held take, stretched to 700 ms (tools/audio/sustain.py)",
+      "note": "AGENTS.md held-sound decision: /m/ is Chatterbox Mmm (adviser confirmation pending)"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 package com.playit.app.presentation.components
 
+import com.playit.app.presentation.theme.LocalReducedMotion
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.keyframes
 import androidx.compose.runtime.LaunchedEffect
@@ -13,9 +14,13 @@ fun Modifier.shake(
     onShakeComplete: (() -> Unit)? = null
 ): Modifier = composed {
     val offsetX = remember { Animatable(0f) }
+    val reduced = LocalReducedMotion.current
 
     LaunchedEffect(trigger) {
-        if (trigger) {
+        if (trigger && reduced) {
+            // Reduced motion: no shake; the colour and text change still show the answer.
+            onShakeComplete?.invoke()
+        } else if (trigger) {
             offsetX.animateTo(
                 targetValue = 0f,
                 animationSpec = keyframes {

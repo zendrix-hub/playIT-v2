@@ -1,0 +1,103 @@
+diff --git a/app/src/main/java/com/playit/app/presentation/findit/FindItScreen.kt b/app/src/main/java/com/playit/app/presentation/findit/FindItScreen.kt
+index 84394e1..01ea63c 100644
+--- a/app/src/main/java/com/playit/app/presentation/findit/FindItScreen.kt
++++ b/app/src/main/java/com/playit/app/presentation/findit/FindItScreen.kt
+@@ -46,6 +46,12 @@ import com.playit.app.presentation.components.FindItGrid
+ import com.playit.app.presentation.components.LessonScaffold
+ import com.playit.app.presentation.theme.*
+ 
++/**
++ * Lily's Find It line, word for word what she says (clip vo_findit_intro_01, release 2026-10-13-lines).
++ * 8 words or fewer, so the bubble never cuts it off (card 31c; SPMP R3).
++ */
++internal const val FIND_IT_PROMPT = "Find the pictures that start with this sound."
++
+ @Composable
+ fun FindItScreen(
+     viewModel: FindItViewModel,
+@@ -97,7 +103,7 @@ fun FindItScreen(
+                         is FindItState.Completed -> "You did it! I'm so proud of you!"
+                         is FindItState.FoundOne -> "Perfect! Great job! Find ${(3 - foundCount).coerceAtLeast(1)} more!"
+                         is FindItState.Incorrect -> "Good try! Let's listen again."
+-                        else -> "Can you find all three pictures that start with this sound?"
++                        else -> FIND_IT_PROMPT
+                     },
+                     mascotState = when (state) {
+                         is FindItState.Completed -> MascotState.CELEBRATING
+diff --git a/app/src/main/java/com/playit/app/presentation/sayit/SayItScreen.kt b/app/src/main/java/com/playit/app/presentation/sayit/SayItScreen.kt
+index 8aebd78..ea0ad48 100644
+--- a/app/src/main/java/com/playit/app/presentation/sayit/SayItScreen.kt
++++ b/app/src/main/java/com/playit/app/presentation/sayit/SayItScreen.kt
+@@ -71,6 +71,12 @@ import com.playit.app.presentation.components.LessonScaffold
+ import com.playit.app.presentation.sayit.components.MicButton
+ import com.playit.app.presentation.theme.*
+ 
++/**
++ * Lily's Say It line, word for word what she says (clip vo_sayit_word_intro_01, release 2026-10-13-lines).
++ * 8 words or fewer, so the bubble never cuts it off (card 31c; SPMP R3).
++ */
++internal const val SAY_IT_WORD_PROMPT = "Your turn! Say the word."
++
+ @Composable
+ fun SayItScreen(
+     viewModel: SayItViewModel,
+@@ -207,7 +213,7 @@ fun SayItScreen(
+                         currentFeedbackCopy != null -> currentFeedbackCopy.mascot
+                         state is SayItState.Correct -> "Yes! You said it!"
+                         state is SayItState.Incorrect -> "Good try! Listen again."
+-                        wordMode -> "Now it's your turn! Say the whole word clearly into the microphone!"
++                        wordMode -> SAY_IT_WORD_PROMPT
+                         else -> "Now it's your turn. Say the sound clearly into the microphone!"
+                     },
+                     mascotState = when {
+diff --git a/app/src/test/java/com/playit/app/presentation/LessonPromptsTest.kt b/app/src/test/java/com/playit/app/presentation/LessonPromptsTest.kt
+new file mode 100644
+index 0000000..b39b9c9
+--- /dev/null
++++ b/app/src/test/java/com/playit/app/presentation/LessonPromptsTest.kt
+@@ -0,0 +1,29 @@
++package com.playit.app.presentation
++
++import com.playit.app.presentation.findit.FIND_IT_PROMPT
++import com.playit.app.presentation.sayit.SAY_IT_WORD_PROMPT
++import org.junit.Assert.assertEquals
++import org.junit.Assert.assertTrue
++import org.junit.Test
++import java.io.File
++
++/** Lily's Say It and Find It lines fit the bubble and say exactly what her voice says (card 31c). */
++class LessonPromptsTest {
++
++    @Test fun promptsAreShort() {
++        for (prompt in listOf(SAY_IT_WORD_PROMPT, FIND_IT_PROMPT)) {
++            assertTrue("\"$prompt\" is longer than 8 words", prompt.split(" ").size <= 8)
++        }
++    }
++
++    @Test fun promptsMatchTheReleasedVoice() {
++        val manifest = listOf(
++            File("docs/audio-release/2026-10-13-lines/manifest.json"),
++            File("../docs/audio-release/2026-10-13-lines/manifest.json")
++        ).first { it.exists() }.readText()
++        fun textOf(clipId: String) =
++            Regex(""""clipId":\s*"$clipId"[\s\S]*?"text":\s*"([^"]+)"""").find(manifest)!!.groupValues[1]
++        assertEquals(SAY_IT_WORD_PROMPT, textOf("vo_sayit_word_intro_01"))
++        assertEquals(FIND_IT_PROMPT, textOf("vo_findit_intro_01"))
++    }
++}
+diff --git a/tools/audio/tutor_script.py b/tools/audio/tutor_script.py
+index f76feef..1597bf7 100644
+--- a/tools/audio/tutor_script.py
++++ b/tools/audio/tutor_script.py
+@@ -70,9 +70,9 @@ LESSON_VO = {
+     "vo_complete_01":        ("You did it! I'm so proud of you!", 0.95, "letter / blend complete"),
+     "vo_unlock_01":          ("A new letter is ready for you!", 0.95, "letter complete, next node unlocked"),
+     "vo_blendit_intro_01":   ("Let's build some words together!", 0.95, "Blend It intro"),
+-    "vo_findit_intro_01":    ("Can you find all the pictures that start with this sound?", 0.95, "Find It intro. CHANGED: was 'the picture that matches the sound'; Find It has 3 targets"),
++    "vo_findit_intro_01":    ("Find the pictures that start with this sound.", 0.95, "Find It intro. CHANGED (card 31c): 8 words so the bubble shows it whole; was 'Can you find all the pictures that start with this sound?'. The take speed is in release 2026-10-13-lines"),
+     "vo_sayit_intro_01":     ("Your turn! Say it into the microphone.", 0.95, "Say It intro (sound mode). CHANGED: was 'Say the sound'; Say It scores the word (AGENTS.md hybrid decision)"),
+-    "vo_sayit_word_intro_01": ("Now it's your turn! Say the whole word clearly into the microphone!", 0.95, "Say It intro (word mode)"),
++    "vo_sayit_word_intro_01": ("Your turn! Say the word.", 0.95, "Say It intro (word mode). CHANGED (card 31c): 5 words so the bubble shows it whole; was 'Now it's your turn! Say the whole word clearly into the microphone!'. The take speed is in release 2026-10-13-lines"),
+     "vo_quiet_check_01":     ("Let's be as quiet as a mouse before we start listening!", 0.95, "before listening"),
+     "vo_noise_alert_01":     ("It's a little noisy right now. Let's find a quiet spot!", 0.95, "noise alert"),
+     "vo_map_tarana":         ("Let's go! Tap a letter to begin our adventure!", 0.95, "map greeting"),

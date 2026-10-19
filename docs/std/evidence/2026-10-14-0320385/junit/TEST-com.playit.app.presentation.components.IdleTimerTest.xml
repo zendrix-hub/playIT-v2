@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.presentation.components.IdleTimerTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-14T14:14:10" hostname="LAPTOP-REHI7A0K" time="0.211">
+  <properties/>
+  <testcase name="busyPostponesWithoutCounting" classname="com.playit.app.presentation.components.IdleTimerTest" time="0.049"/>
+  <testcase name="firesAfterTimeout" classname="com.playit.app.presentation.components.IdleTimerTest" time="0.037"/>
+  <testcase name="busyForever_givesUp" classname="com.playit.app.presentation.components.IdleTimerTest" time="0.043"/>
+  <testcase name="stopCancels" classname="com.playit.app.presentation.components.IdleTimerTest" time="0.026"/>
+  <testcase name="stopsAfterMaxPrompts" classname="com.playit.app.presentation.components.IdleTimerTest" time="0.026"/>
+  <testcase name="touchResetsTheClock" classname="com.playit.app.presentation.components.IdleTimerTest" time="0.03"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

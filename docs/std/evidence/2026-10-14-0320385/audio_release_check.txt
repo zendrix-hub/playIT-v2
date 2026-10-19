@@ -1,0 +1,83 @@
+# TC-AUD-03: released audio clips against the app's assets
+# Releases: 7 manifests, 76 clips
+
+STATUS      RELEASE             FILE                                        NOTE (sha256 prefix when PASS)
+PASS        2026-09-30          keywords/kw_apple.wav                       50bca0c25c74e4b6
+PASS        2026-09-30          keywords/kw_ball.wav                        d77d56ee666ff430
+PASS        2026-09-30          keywords/kw_box.wav                         f2ee15b7d15037ae
+PASS        2026-09-30          keywords/kw_cat.wav                         a9075f8b776c54ca
+PASS        2026-09-30          keywords/kw_dog.wav                         a88c4e466714f4c2
+PASS        2026-09-30          keywords/kw_elephant.wav                    d7bb8715dd1130c7
+PASS        2026-09-30          keywords/kw_fish.wav                        a425e8ecc796253a
+PASS        2026-09-30          keywords/kw_goat.wav                        bed7279dbd873671
+PASS        2026-09-30          keywords/kw_hat.wav                         5eca48d464127000
+PASS        2026-09-30          keywords/kw_insect.wav                      d093f4012639e383
+PASS        2026-09-30          keywords/kw_jug.wav                         04b6c97584973566
+PASS        2026-09-30          keywords/kw_kite.wav                        a34af5ea1b6c0434
+PASS        2026-09-30          keywords/kw_lion.wav                        1876224ec627b384
+PASS        2026-09-30          keywords/kw_mouse.wav                       ece1eb4b83e696c3
+PASS        2026-09-30          keywords/kw_nest.wav                        1bcbbb4f67e33bd5
+PASS        2026-09-30          keywords/kw_orange.wav                      32070047ba0d671d
+PASS        2026-09-30          keywords/kw_pig.wav                         910e85aa84c5b67b
+PASS        2026-09-30          keywords/kw_queen.wav                       687c70c2e18870fd
+PASS        2026-09-30          keywords/kw_rabbit.wav                      07f17d325b4da000
+PASS        2026-09-30          keywords/kw_sun.wav                         73702f5e6e7d27ca
+PASS        2026-09-30          keywords/kw_tiger.wav                       a927e983a33dce96
+PASS        2026-09-30          keywords/kw_umbrella.wav                    0e191989e4b46544
+PASS        2026-09-30          keywords/kw_van.wav                         0d73709284578b92
+PASS        2026-09-30          keywords/kw_watch.wav                       b01bb044a17e0978
+PASS        2026-09-30          keywords/kw_yoyo.wav                        6d0f21eeabe41fc0
+PASS        2026-09-30          keywords/kw_zebra.wav                       daec81c4dc74e920
+NOT IN APP  2026-10-01          keywords/kwslow_mouse.wav                   released, not used by APK H (no reference in app code)
+PASS        2026-10-07          lesson/vo_blendit_intro_01.wav              fbefedb31a569f42
+PASS        2026-10-07          lesson/vo_complete_01.wav                   181d05b2cca5e648
+PASS        2026-10-07          lesson/vo_correct_01.wav                    1ce812b8742a60bb
+PASS        2026-10-07          lesson/vo_correct_02.wav                    1a5ef1d2898d7eb5
+PASS        2026-10-07          lesson/vo_encourage_01.wav                  f00e3d875cee8983
+PASS        2026-10-07          lesson/vo_encourage_02.wav                  443b5e36d69ed894
+PASS        2026-10-07          lesson/vo_encourage_03.wav                  30a420a06e239522
+PASS        2026-10-07          lesson/vo_findit_intro_01.wav               d049b0a7c1710ea1
+PASS        2026-10-07          lesson/vo_hint_01.wav                       9aab9f175c5c670d
+PASS        2026-10-07          lesson/vo_hint_02.wav                       b2baec0a29c28e6c
+PASS        2026-10-07          lesson/vo_map_tarana.wav                    a60e7d2db6d387b8
+PASS        2026-10-07          lesson/vo_noise_alert_01.wav                ff78b0d36cac302a
+PASS        2026-10-07          lesson/vo_parent_gate.wav                   617e50205303e123
+PASS        2026-10-07          lesson/vo_quiet_check_01.wav                ec9a545f68bcc45e
+PASS        2026-10-07          lesson/vo_sayit_intro_01.wav                f8539a63f0724728
+PASS        2026-10-07          lesson/vo_sayit_word_intro_01.wav           39235826e660de67
+PASS        2026-10-07          lesson/vo_streak_01.wav                     bcbb62d8524c2bdd
+PASS        2026-10-07          lesson/vo_unlock_01.wav                     f90a9f6ec49123b4
+PASS        2026-10-07          lesson/vo_welcome_01.wav                    62a3f6053fb3db6f
+PASS        2026-10-12-i        phonemes/ph_i.wav                           f88b5b0bf14e0a28
+PASS        2026-10-07-m        phonemes/ph_m.wav                           953f906da0d7e76d
+PASS        2026-10-08-s        phonemes/ph_s.wav                           a3c53911618eb4e8
+PASS        2026-09-30          tutor/car_lets_say_together.wav             4ffae2e9ee816914
+PASS        2026-09-30          tutor/car_listen.wav                        becf212a246f2aa6
+PASS        2026-09-30          tutor/car_say_it_with_me.wav                72b6f057e311d0ed
+PASS        2026-09-30          tutor/car_this_letter_says.wav              780ab1fc3ed50639
+PASS        2026-09-30          tutor/car_watch_my_lips.wav                 cf45f82904c81bda
+PASS        2026-09-30          tutor/car_your_turn.wav                     65264afa7c3c9762
+NOT IN APP  2026-10-01          tutor/cue_lips_together.wav                 released, not used by APK H (no reference in app code)
+PASS        2026-10-01          tutor/fb_almost_just.wav                    19e2adb01c02a442
+PASS        2026-10-01          tutor/fb_its_sound_is.wav                   5161aee9c23c045b
+PASS        2026-10-01          tutor/fb_letter_name.wav                    34ea9fb9cd91db8f
+PASS        2026-10-01          tutor/fb_listen.wav                         d3afd0a3ba481c76
+PASS        2026-10-01          tutor/fb_no_ah.wav                          e37c7c2d07fc6aa4
+NOT IN APP  2026-10-01          tutor/fb_starts_with.wav                    released, not used by APK H (no reference in app code)
+PASS        2026-09-30          tutor/fb_try_later.wav                      4f8e6a693ebcb835
+NOT IN APP  2026-10-01          tutor/fb_yes.wav                            released, not used by APK H (no reference in app code)
+NOT IN APP  2026-10-01          tutor/idle_reprompt.wav                     released, not used by APK H (no reference in app code)
+NOT IN APP  2026-10-01          tutor/praise_you_did_it.wav                 released, not used by APK H (no reference in app code)
+NOT IN APP  2026-10-01          tutor/subcue_top_teeth.wav                  released, not used by APK H (no reference in app code)
+PASS        2026-10-01          ui/ui_complete_next.wav                     150caa4588f8f432
+PASS        2026-10-01          ui/ui_findit_next.wav                       bf6d3f897ade01f4
+PASS        2026-10-01          ui/ui_hearit_next.wav                       b98be3571af676fc
+PASS        2026-10-01          ui/ui_node_locked.wav                       107bfc8bcce258a6
+PASS        2026-10-01          ui/ui_node_start.wav                        e7e7659d0c19aa84
+PASS        2026-10-01          ui/ui_pick_avatar.wav                       f9c896d324bab00a
+PASS        2026-10-11-words    words/word_am.wav                           cfa89f5d049eb2f6
+PASS        2026-10-11-words    words/word_tub.wav                          bdcbd0fc49794616
+PASS        2026-10-11-words    words/word_yam.wav                          91b66a1fa36ed20e
+
+Released clips: 76; PASS 69, NOT IN APP 7, FAIL 0
+Shipped audio files: 228; from a release: 69; not in any release (MVP clips, before the gate): 159 (phonemes 29, ui 15, words 115)

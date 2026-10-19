@@ -1,0 +1,58 @@
+{
+  "release": "2026-10-11-words",
+  "approvedBy": "user: marked all four takes of each word OK on review page 2026-10-11-blendwords-card15b-eleven, then picked take e3 of each word in chat (2026-10-11)",
+  "teacherAudit": "pending, required before merge to main",
+  "clips": [
+    {
+      "clipId": "word_am",
+      "file": "words/word_am.wav",
+      "text": "am",
+      "voice": "ElevenLabs library voice 'Lily Wolff - Expressive, Clear, Youthful, Calming' (qBDvhofpxp92JgXJxDjB); the account has no 'PlayIT Lily' clone",
+      "speed": null,
+      "sourceBatch": "2026-10-11-blendwords-card15b-eleven",
+      "sourceFile": "word_am_e3.wav",
+      "reviewCsv": "2026-10-11-blendwords-card15b-eleven_review.csv",
+      "userVerdict": "OK",
+      "userNote": "",
+      "teacherAudit": "pending",
+      "license": "ElevenLabs Free plan (user, 2026-10-11): non-commercial use only; the app credits elevenlabs.io in the Parent Zone (card 15b). Free-plan audio cannot become commercial later, even after an upgrade",
+      "sha256": "cfa89f5d049eb2f69d0751a00897bbe5d3048866748ede90ebeae731b73db6bb",
+      "tool": "ElevenLabs Text to Speech, model eleven_v4, text 'Am.', 4 takes e1-e4 (flow gV4RqcjccbUquQKrPF6C, 2026-10-11); MP3 44.1 kHz decoded, resampled to 24 kHz and cleaned with kokoro_local.clean (trim, RMS -20 dBFS, peak -1 dBFS)",
+      "note": "Blend It word (card 15, FR-13). User decision 2026-10-11: ElevenLabs instead of Kokoro, after the Kokoro TUB takes said 'tahbi'; adviser confirmation pending."
+    },
+    {
+      "clipId": "word_tub",
+      "file": "words/word_tub.wav",
+      "text": "tub",
+      "voice": "ElevenLabs library voice 'Lily Wolff - Expressive, Clear, Youthful, Calming' (qBDvhofpxp92JgXJxDjB); the account has no 'PlayIT Lily' clone",
+      "speed": null,
+      "sourceBatch": "2026-10-11-blendwords-card15b-eleven",
+      "sourceFile": "word_tub_e3.wav",
+      "reviewCsv": "2026-10-11-blendwords-card15b-eleven_review.csv",
+      "userVerdict": "OK",
+      "userNote": "",
+      "teacherAudit": "pending",
+      "license": "ElevenLabs Free plan (user, 2026-10-11): non-commercial use only; the app credits elevenlabs.io in the Parent Zone (card 15b). Free-plan audio cannot become commercial later, even after an upgrade",
+      "sha256": "bdcbd0fc4979461635512a6247e81ec88c74f9d36de3f65e913dde7f16767a3d",
+      "tool": "ElevenLabs Text to Speech, model eleven_v4, text 'Tub.', 4 takes e1-e4 (flow gV4RqcjccbUquQKrPF6C, 2026-10-11); MP3 44.1 kHz decoded, resampled to 24 kHz and cleaned with kokoro_local.clean (trim, RMS -20 dBFS, peak -1 dBFS)",
+      "note": "Blend It word (card 15, FR-13). User decision 2026-10-11: ElevenLabs instead of Kokoro, after the Kokoro TUB takes said 'tahbi'; adviser confirmation pending."
+    },
+    {
+      "clipId": "word_yam",
+      "file": "words/word_yam.wav",
+      "text": "yam",
+      "voice": "ElevenLabs library voice 'Lily Wolff - Expressive, Clear, Youthful, Calming' (qBDvhofpxp92JgXJxDjB); the account has no 'PlayIT Lily' clone",
+      "speed": null,
+      "sourceBatch": "2026-10-11-blendwords-card15b-eleven",
+      "sourceFile": "word_yam_e3.wav",
+      "reviewCsv": "2026-10-11-blendwords-card15b-eleven_review.csv",
+      "userVerdict": "OK",
+      "userNote": "",
+      "teacherAudit": "pending",
+      "license": "ElevenLabs Free plan (user, 2026-10-11): non-commercial use only; the app credits elevenlabs.io in the Parent Zone (card 15b). Free-plan audio cannot become commercial later, even after an upgrade",
+      "sha256": "91b66a1fa36ed20e6f3790af326f211a250a7889885c704df0c30229bc16dfab",
+      "tool": "ElevenLabs Text to Speech, model eleven_v4, text 'Yam.', 4 takes e1-e4 (flow gV4RqcjccbUquQKrPF6C, 2026-10-11); MP3 44.1 kHz decoded, resampled to 24 kHz and cleaned with kokoro_local.clean (trim, RMS -20 dBFS, peak -1 dBFS)",
+      "note": "Blend It word (card 15, FR-13). User decision 2026-10-11: ElevenLabs instead of Kokoro, after the Kokoro TUB takes said 'tahbi'; adviser confirmation pending. Vosk heard 'yum' on all four takes: judge the vowel by ear."
+    }
+  ]
+}

@@ -1,3 +1,5 @@
+Superseded for audio by docs/specs/hear-say-refactor.md §2.3 (Kokoro, Sep 2026).
+
 # 20 — Tools & External Resources Catalog
 
 This document registers external developer catalogs, free developer tiers, public APIs, AI production tools, and Model Context Protocol (MCP) integrations referenced in the root `tools/` folder. It provides direct guidance on how to leverage each resource throughout PlayIT's thesis development lifecycle, asset generation pipeline, and MVP validation.

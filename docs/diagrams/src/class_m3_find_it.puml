@@ -1,0 +1,119 @@
+@startuml class_m3_find_it
+!include _style.iuml
+hide empty members
+
+title Class Diagram, Module 3: Phoneme Discrimination (Find It)\nSDD §2.0 GridGenerator, HeartManager, StarCalculator
+
+package "presentation" {
+  class FindItScreen <<Composable>>
+  class FindItGrid <<Composable>>
+  class FindItViewModel <<HiltViewModel>> {
+    +targetPhoneme : StateFlow<Phoneme?>
+    +pictureGrid : StateFlow<List<FindItPictureItem>>
+    +foundItemIds : StateFlow<Set<String>>
+    +foundCount : StateFlow<Int>
+    +hearts : StateFlow<Int>
+    +state : StateFlow<FindItState>
+    -heartManager : HeartManager
+    -consecutiveCorrect : Int
+    +playTargetSound()
+    +selectPictureItem(item)
+    +restartSession()
+  }
+  abstract class FindItState <<sealed>>
+  class "Idle" as FIdle
+  class FoundOne {
+    +item : FindItPictureItem
+    +foundCount : Int
+  }
+  class Completed {
+    +targetLetter : String
+  }
+  class Incorrect {
+    +selectedItem : FindItPictureItem
+  }
+  class GameOver <<object>>
+}
+
+package "domain" {
+  class GridGenerator <<Singleton>> {
+    -pictureBank : Map<String, List<Pair>>
+    +generate5ItemGrid(letter, phonemes) : List<FindItPictureItem>
+    ~distractorLettersFor(target) : List<String>
+  }
+  class FindItPictureItem <<data>> {
+    +id : String
+    +phonemeLetter : String
+    +word : String
+    +imagePath : String
+    +isCorrect : Boolean
+  }
+  class HeartManager {
+    +currentHearts : Int
+    +heartsLost : Int
+    +sessionHeartsLost : Int
+    +isGameOver : Boolean
+    +deductHeart() : Boolean
+    +checkRecovery(consecutiveCorrect) : Boolean
+    +resetForRestart(newPool = 3)
+  }
+  class GameplayConstants <<object>> {
+    STARTING_HEARTS = 5
+    DEPLETED_RESTART_HEARTS = 3
+    HEART_RECOVERY_STREAK_INTERVAL = 3
+  }
+  class StarCalculator <<object>> {
+    +calculateStars(heartsLost, accuracy) : Int
+  }
+  interface FindItAttemptRepository {
+    +saveAttempt(profileId, phonemeId, selectedPhonemeId, isCorrect)
+    +getAttemptsForProfile(profileId) : List<FindItAttempt>
+  }
+  interface PhonemeRepository
+}
+
+package "data" {
+  class FindItAttemptRepositoryImpl
+  class FindItAttemptDao <<Room DAO>>
+  class AudioPlayer <<Singleton>>
+  class AudioResolver <<Singleton>>
+  class SessionManager <<Singleton>>
+}
+
+FindItScreen --> FindItViewModel
+FindItScreen *-- FindItGrid
+FindItViewModel --> GridGenerator
+FindItViewModel *-- HeartManager
+FindItViewModel --> FindItAttemptRepository
+FindItViewModel --> PhonemeRepository
+FindItViewModel --> AudioPlayer
+FindItViewModel --> AudioResolver
+FindItViewModel --> SessionManager
+FindItViewModel *-- FindItState
+FindItState <|-- FIdle
+FindItState <|-- FoundOne
+FindItState <|-- Completed
+FindItState <|-- Incorrect
+FindItState <|-- GameOver
+GridGenerator ..> FindItPictureItem : creates 5 (3 targets + 2 distractors)
+HeartManager ..> GameplayConstants
+FindItAttemptRepositoryImpl ..|> FindItAttemptRepository
+FindItAttemptRepositoryImpl --> FindItAttemptDao
+
+
+' Layout only: stack classes in columns so the diagram is not one long row.
+FoundOne -[hidden]down- Completed
+Incorrect -[hidden]down- GameOver
+AudioPlayer -[hidden]down- AudioResolver
+AudioResolver -[hidden]down- SessionManager
+StarCalculator -[hidden]down- PhonemeRepository
+FindItAttemptRepository -[hidden]down- FindItPictureItem
+
+note right of StarCalculator
+  Used at letter completion
+  (LetterCompleteViewModel, Module 5):
+  3 stars: 0 hearts lost and 100%
+  2 stars: up to 2 lost and 80% or more
+  1 star: otherwise
+end note
+@enduml

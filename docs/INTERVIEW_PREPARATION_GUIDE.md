@@ -1,3 +1,5 @@
+> **Superseded (2026-10-05).** This guide has about 20 claims that no longer match the code (for example 28 letters, 12 tables, a 75% confidence threshold, latency under 400 ms, NoiseMonitor). Use `docs/defense/DEFENSE_REVIEWER.md` and `docs/defense/NUMBERS.md` instead. This file is kept only for history.
+
 # PlayIT — Capstone Defense & Technical Interview Master Reviewer
 
 > **Project Title:** PlayIT — Gamified Phonics Mobile Learning Application for Grade 1 Filipino Learners  

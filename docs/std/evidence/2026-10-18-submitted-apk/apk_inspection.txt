@@ -1,0 +1,40 @@
+# TC-SEC-01: inspection of the submitted debug APK
+# Run on 2026-10-18 19:24 +0800 with 37.0.0/aapt dump; file: playit-debug-H-0320385.apk
+# Source: the file behind the portal's Deployed System link (Google Drive file 1SeIXJS1z2YJwvh5mfNbVmIP9cExbRvkI), downloaded on 2026-10-18
+
+## sha256sum
+b5a54c18d1405c3851b7fec5c110f03f1aeaaa899a343b12f1796e04398c42d4 *playit-debug-H-0320385.apk
+
+## size (bytes)
+108317310
+
+## aapt dump permissions
+package: com.playit.app
+uses-permission: name='android.permission.RECORD_AUDIO'
+uses-permission: name='android.permission.READ_EXTERNAL_STORAGE' maxSdkVersion='32'
+uses-permission: name='android.permission.WRITE_EXTERNAL_STORAGE' maxSdkVersion='28'
+permission: com.playit.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+uses-permission: name='com.playit.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION'
+
+## aapt dump badging (package and SDK lines)
+package: name='com.playit.app' versionCode='1' versionName='1.0.0' platformBuildVersionName='14' platformBuildVersionCode='34' compileSdkVersion='34' compileSdkVersionCodename='14'
+sdkVersion:'26'
+targetSdkVersion:'34'
+
+## Signer certificate (keytool -printcert -jarfile)
+C=US, O=Android, CN=Android Debug; SHA-256 1C:99:DC:58:80:35:5D:CA:3F:41:6E:9F:CA:52:5D:8B:0C:64:2A:32:97:52:91:91:6C:A7:A2:95:B7:B4:CF:EE
+
+## INTERNET permission present?
+NO (expected: NO)
+
+## Comparison with the build inspected on 2026-10-14 (SHA-256 d301007fc865120023008f41adbbeaf0f22ac7ed9f5f36ad4299404ba988937d, 108489471 bytes)
+Entries: 667 in playit-debug-H-0320385.apk, 667 in the build inspected on 2026-10-14.
+Entries in only one of the two: 0
+Entries with different bytes: 22
+  Signature files: 3 (META-INF/CERT.RSA, META-INF/CERT.SF, META-INF/MANIFEST.MF)
+  Text files that differ only in line endings (CRLF and LF): 8 (assets/vosk-model/README, assets/vosk-model/conf/mfcc.conf, assets/vosk-model/conf/model.conf, assets/vosk-model/graph/disambig_tid.int, assets/vosk-model/graph/phones/word_boundary.int, assets/vosk-model/ivector/global_cmvn.stats, assets/vosk-model/ivector/online_cmvn.conf, assets/vosk-model/ivector/splice.conf)
+  Dex files: 11. D8 class checksums: 26739 classes in playit-debug-H-0320385.apk, 26739 in the build inspected on 2026-10-14; 284 differ, of which 282 are compiler-generated ($$ExternalSynthetic) and 2 are not:
+    Lcom/playit/app/DaggerPlayItApplication_HiltComponents_SingletonC$ActivityCImpl$LazyClassKeyProvider;
+    Lcom/playit/app/DaggerPlayItApplication_HiltComponents_SingletonC$ViewModelCImpl$LazyClassKeyProvider;
+  Other entries: 0
+Signer certificate of the build inspected on 2026-10-14: C=US, O=Android, CN=Android Debug; SHA-256 71:1F:58:EE:5D:C9:FA:66:94:78:3D:B0:E9:88:AE:59:3A:15:D5:76:3E:58:09:B5:FF:32:55:52:56:34:3D:D8

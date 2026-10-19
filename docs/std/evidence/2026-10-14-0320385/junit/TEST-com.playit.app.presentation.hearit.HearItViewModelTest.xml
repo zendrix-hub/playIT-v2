@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.presentation.hearit.HearItViewModelTest" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-10-14T14:14:15" hostname="LAPTOP-REHI7A0K" time="1.37">
+  <properties/>
+  <testcase name="playPhonemeSound_incrementsPlayCount" classname="com.playit.app.presentation.hearit.HearItViewModelTest" time="0.45"/>
+  <testcase name="nextStaysOff_whileFirstSequencePlays" classname="com.playit.app.presentation.hearit.HearItViewModelTest" time="0.09"/>
+  <testcase name="idle_nudgesTheScreen" classname="com.playit.app.presentation.hearit.HearItViewModelTest" time="0.044"/>
+  <testcase name="load_playsFullModelingSequence" classname="com.playit.app.presentation.hearit.HearItViewModelTest" time="0.109"/>
+  <testcase name="caption_followsSequence" classname="com.playit.app.presentation.hearit.HearItViewModelTest" time="0.066"/>
+  <testcase name="replayEnd_alsoUnlocks" classname="com.playit.app.presentation.hearit.HearItViewModelTest" time="0.095"/>
+  <testcase name="load_pendingExampleWord_dropsKeyword" classname="com.playit.app.presentation.hearit.HearItViewModelTest" time="0.091"/>
+  <testcase name="noIdlePrompt_withoutScreenVisible" classname="com.playit.app.presentation.hearit.HearItViewModelTest" time="0.056"/>
+  <testcase name="idle_afterHighlight_playsNextCue" classname="com.playit.app.presentation.hearit.HearItViewModelTest" time="0.064"/>
+  <testcase name="loadPhoneme_nullId_defaultsToId1" classname="com.playit.app.presentation.hearit.HearItViewModelTest" time="0.071"/>
+  <testcase name="loadPhoneme_invalidId_setsLoadError" classname="com.playit.app.presentation.hearit.HearItViewModelTest" time="0.042"/>
+  <testcase name="loadPhoneme_validId_loadsPhoneme" classname="com.playit.app.presentation.hearit.HearItViewModelTest" time="0.046"/>
+  <testcase name="firstSequenceEnd_playsNextCue_andHighlights" classname="com.playit.app.presentation.hearit.HearItViewModelTest" time="0.062"/>
+  <testcase name="playPhonemeSound_playsReplaySegment" classname="com.playit.app.presentation.hearit.HearItViewModelTest" time="0.082"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

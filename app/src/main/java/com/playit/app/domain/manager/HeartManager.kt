@@ -20,6 +20,10 @@ class HeartManager(
     var heartsLost: Int = 0
         private set
 
+    /** Hearts lost in the whole session, including before a restart. Cleared only by reset(). */
+    var sessionHeartsLost: Int = 0
+        private set
+
     /**
      * Whether the player has lost all hearts and triggered a game over condition.
      * Implements 01_REQUIREMENTS_SUMMARY.md §6 FR-04.
@@ -37,6 +41,7 @@ class HeartManager(
         if (currentHearts > 0) {
             currentHearts--
             heartsLost++
+            sessionHeartsLost++
         }
         return isGameOver
     }
@@ -91,5 +96,6 @@ class HeartManager(
     fun reset() {
         currentHearts = initialHearts
         heartsLost = 0
+        sessionHeartsLost = 0
     }
 }

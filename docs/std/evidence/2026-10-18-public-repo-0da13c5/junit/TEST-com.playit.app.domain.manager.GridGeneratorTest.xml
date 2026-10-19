@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.domain.manager.GridGeneratorTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-10-18T01:35:42" hostname="LAPTOP-REHI7A0K" time="0.054">
+  <properties/>
+  <testcase name="generate5ItemGrid_returnsExactly5ItemsWith3CorrectAnd2Distractors" classname="com.playit.app.domain.manager.GridGeneratorTest" time="0.0"/>
+  <testcase name="letterOne_usesFallbackDistractorsWhenNotEnoughMasteredLetters" classname="com.playit.app.domain.manager.GridGeneratorTest" time="0.001"/>
+  <testcase name="standardGrid_containsTargetAndDistractors" classname="com.playit.app.domain.manager.GridGeneratorTest" time="0.0"/>
+  <testcase name="distractors_neverShareTheTargetSound" classname="com.playit.app.domain.manager.GridGeneratorTest" time="0.027"/>
+  <testcase name="distractors_neverFromSpecialBanks" classname="com.playit.app.domain.manager.GridGeneratorTest" time="0.024"/>
+  <testcase name="distractorLettersFor_k_excludesSameSoundGroup" classname="com.playit.app.domain.manager.GridGeneratorTest" time="0.0"/>
+  <testcase name="up_usesItsOwnPicture" classname="com.playit.app.domain.manager.GridGeneratorTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.presentation.map.MapPathGeometryTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-18T01:36:03" hostname="LAPTOP-REHI7A0K" time="0.009">
+  <properties/>
+  <testcase name="generateTerrainProps_createsSeededPropsForNodes" classname="com.playit.app.presentation.map.MapPathGeometryTest" time="0.004"/>
+  <testcase name="getMarungkoLettersForGroup_returnsExpectedLetters" classname="com.playit.app.presentation.map.MapPathGeometryTest" time="0.002"/>
+  <testcase name="calculateNodeXOffsetDp_oscillatesLeftAndRight" classname="com.playit.app.presentation.map.MapPathGeometryTest" time="0.0"/>
+  <testcase name="generateCompanionPlacements_placesExplorerLeaderAndFriends" classname="com.playit.app.presentation.map.MapPathGeometryTest" time="0.003"/>
+  <testcase name="calculateNodeXOffsetDp_isDeterministic" classname="com.playit.app.presentation.map.MapPathGeometryTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

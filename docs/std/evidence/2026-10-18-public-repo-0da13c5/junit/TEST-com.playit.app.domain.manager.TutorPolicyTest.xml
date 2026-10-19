@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.domain.manager.TutorPolicyTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-18T01:35:42" hostname="LAPTOP-REHI7A0K" time="0.0">
+  <properties/>
+  <testcase name="thirdMiss_leadsAndMovesOn" classname="com.playit.app.domain.manager.TutorPolicyTest" time="0.0"/>
+  <testcase name="firstMiss_correctsAtLevel1_withErrorType" classname="com.playit.app.domain.manager.TutorPolicyTest" time="0.0"/>
+  <testcase name="correct_anyAttempt_praises" classname="com.playit.app.domain.manager.TutorPolicyTest" time="0.0"/>
+  <testcase name="secondMiss_correctsAtLevel2" classname="com.playit.app.domain.manager.TutorPolicyTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

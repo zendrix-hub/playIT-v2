@@ -10,7 +10,7 @@ class BlendItWordSelector @Inject constructor() {
     fun selectWordsForSession(groupId: Int, availableWords: List<BlendItWord>): List<BlendItWord> {
         val groupWords = availableWords.filter { it.groupId == groupId }
         return if (groupId == 1) {
-            // Constraint: Group 1 restricted to exactly 3 words (SAM, SIS, AIM)
+            // Constraint: Group 1 restricted to exactly 3 words (SAM, SIS, AM)
             groupWords.take(3)
         } else {
             // Standard session: up to 5 words

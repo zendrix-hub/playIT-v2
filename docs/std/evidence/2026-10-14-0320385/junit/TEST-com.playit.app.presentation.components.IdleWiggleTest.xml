@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.presentation.components.IdleWiggleTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-14T14:14:10" hostname="LAPTOP-REHI7A0K" time="0.002">
+  <properties/>
+  <testcase name="shakesBothWays" classname="com.playit.app.presentation.components.IdleWiggleTest" time="0.001"/>
+  <testcase name="staysWithinEightDegrees" classname="com.playit.app.presentation.components.IdleWiggleTest" time="0.0"/>
+  <testcase name="startsAndEndsLevel" classname="com.playit.app.presentation.components.IdleWiggleTest" time="0.0"/>
+  <testcase name="isShort" classname="com.playit.app.presentation.components.IdleWiggleTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

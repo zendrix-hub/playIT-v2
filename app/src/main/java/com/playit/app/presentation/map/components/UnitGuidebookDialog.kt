@@ -16,6 +16,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -193,7 +194,10 @@ fun UnitGuidebookDialog(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        // The title takes what the 64 dp close button leaves, so a long title wraps
+                        // instead of squeezing the button (card 31e).
                         Row(
+                            modifier = Modifier.weight(1f),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
@@ -214,7 +218,7 @@ fun UnitGuidebookDialog(
                                 Text(
                                     text = "UNIT $unitNumber GUIDEBOOK",
                                     fontFamily = LexendFontFamily,
-                                    fontSize = 11.sp,
+                                    fontSize = 16.sp,
                                     fontWeight = FontWeight.ExtraBold,
                                     color = Color.White.copy(alpha = 0.90f),
                                     letterSpacing = 0.5.sp
@@ -229,18 +233,22 @@ fun UnitGuidebookDialog(
                             }
                         }
 
+                        // 64 dp touch area around a 40 dp circle (it was 36 dp, card 31e).
                         IconButton(
                             onClick = onDismiss,
-                            modifier = Modifier
-                                .size(36.dp)
-                                .background(Color.White.copy(alpha = 0.30f), CircleShape)
+                            modifier = Modifier.size(64.dp).testTag("guidebook_close")
                         ) {
-                            Icon(
-                                imageVector = Icons.Rounded.Close,
-                                contentDescription = "Close",
-                                tint = Color.White,
-                                modifier = Modifier.size(20.dp)
-                            )
+                            Box(
+                                modifier = Modifier.size(40.dp).background(Color.White.copy(alpha = 0.30f), CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Close,
+                                    contentDescription = "Close",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                            }
                         }
                     }
                 }
@@ -257,7 +265,7 @@ fun UnitGuidebookDialog(
                         Text(
                             text = "PHONICS SOUNDS IN THIS UNIT",
                             fontFamily = LexendFontFamily,
-                            fontSize = 12.sp,
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = TextMuted,
                             letterSpacing = 0.5.sp
@@ -302,7 +310,7 @@ fun UnitGuidebookDialog(
                                     Text(
                                         text = "Sound: ${letter.phoneme}",
                                         fontFamily = LexendFontFamily,
-                                        fontSize = 15.sp,
+                                        fontSize = 16.sp,
                                         fontWeight = FontWeight.ExtraBold,
                                         color = TextMidnight
                                     )
@@ -316,7 +324,7 @@ fun UnitGuidebookDialog(
                                 Text(
                                     text = "Example: ${letter.exampleWord}",
                                     fontFamily = LexendFontFamily,
-                                    fontSize = 13.sp,
+                                    fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium,
                                     color = TextMuted
                                 )
@@ -329,7 +337,7 @@ fun UnitGuidebookDialog(
                         Text(
                             text = "BLEND WORDS PRACTICE",
                             fontFamily = LexendFontFamily,
-                            fontSize = 12.sp,
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = TextMuted,
                             letterSpacing = 0.5.sp
@@ -350,7 +358,7 @@ fun UnitGuidebookDialog(
                                     Text(
                                         text = word,
                                         fontFamily = LexendFontFamily,
-                                        fontSize = 13.sp,
+                                        fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = theme.shelfColor
                                     )
@@ -374,7 +382,7 @@ fun UnitGuidebookDialog(
                         contentColor = Color.White,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(54.dp)
+                            .heightIn(min = 64.dp)
                     )
                 }
             }

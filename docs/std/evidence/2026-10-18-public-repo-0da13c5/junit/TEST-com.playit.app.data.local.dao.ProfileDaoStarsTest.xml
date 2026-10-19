@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.data.local.dao.ProfileDaoStarsTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-18T01:35:37" hostname="LAPTOP-REHI7A0K" time="5.215">
+  <properties/>
+  <testcase name="totalStars_sumsLessonAndBlendStars" classname="com.playit.app.data.local.dao.ProfileDaoStarsTest" time="4.795"/>
+  <testcase name="totalStars_isZeroWithoutProgress" classname="com.playit.app.data.local.dao.ProfileDaoStarsTest" time="0.126"/>
+  <testcase name="totalStars_isPerProfile" classname="com.playit.app.data.local.dao.ProfileDaoStarsTest" time="0.158"/>
+  <testcase name="getAllProfiles_reEmitsWhenProgressChanges" classname="com.playit.app.data.local.dao.ProfileDaoStarsTest" time="0.135"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

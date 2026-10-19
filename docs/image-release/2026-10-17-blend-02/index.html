@@ -1,0 +1,25 @@
+<!doctype html><meta charset="utf-8"><title>image-release: final pictures</title>
+<style>body{font-family:sans-serif;margin:16px} td{vertical-align:top;padding:8px;border-bottom:1px solid #ddd}
+.bgs{display:flex;gap:6px;flex-wrap:wrap;max-width:560px} .bg{padding:8px;border-radius:12px;text-align:center}
+.fail{color:#b00;font-weight:bold} .warn{color:#b60} .pass{color:#070} .note{width:180px}
+#bar{position:sticky;top:0;background:#fff;padding:8px 0;border-bottom:2px solid #333}</style>
+<div id="bar"><b>image-release: final check.</b> Each picture after the background cut, on the 4 app backgrounds at
+Find It size, next to today's picture. Mark OK, or FIX with a note. Then
+<button onclick="exportCsv()">Export CSV</button> <span id="count"></span></div>
+<table></table>
+<script>
+function exportCsv(){
+  const lines=[["item","verdict","note"]];
+  let open=0;
+  document.querySelectorAll("tr[data-item]").forEach(tr=>{
+    const it=tr.dataset.item, v=tr.querySelector("input[type=radio]:checked");
+    if(!v) open++;
+    lines.push([it, v?v.value:"", tr.querySelector(".note").value]);
+  });
+  if(open && !confirm(open+" pictures have no mark. Export anyway?")) return;
+  const csv=lines.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(",")).join("\n");
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download="image-release_final_review.csv"; a.click();
+}
+</script>

@@ -47,8 +47,24 @@ google-services.json
 *.env
 voice_*.mp3
 test_*.mp3
+/dist/
 
 # Python cache
 __pycache__/
 *.pyc
+
+# Temporary Office lock files
+~$*.docx
+~$*.xlsx
+
+# Confidential raw survey/evaluation data (RA 10173)
+Master (responses).xlsx
+
+# Local scratch developer and AI tools
+/tools/Fooocus/
+/tools/VoiceStudio/
+/tools/whisper/
+/tools/review_audio/
+/tools/sfx_preview/
+skills-lock.json
 

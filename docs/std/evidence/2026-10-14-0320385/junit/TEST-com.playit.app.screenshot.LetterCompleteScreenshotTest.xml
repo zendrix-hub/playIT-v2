@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.screenshot.LetterCompleteScreenshotTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-14T14:14:42" hostname="LAPTOP-REHI7A0K" time="0.187">
+  <properties/>
+  <testcase name="letterComplete_threeHeartsLost_oneStar" classname="com.playit.app.screenshot.LetterCompleteScreenshotTest" time="0.187"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

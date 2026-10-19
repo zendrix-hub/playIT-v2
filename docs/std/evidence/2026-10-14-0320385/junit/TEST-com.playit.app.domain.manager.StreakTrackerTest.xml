@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.domain.manager.StreakTrackerTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-10-14T14:13:46" hostname="LAPTOP-REHI7A0K" time="0.127">
+  <properties/>
+  <testcase name="resetIfInactive_resetsStreakToZero_withoutAffectingStars" classname="com.playit.app.domain.manager.StreakTrackerTest" time="0.11"/>
+  <testcase name="checkMilestone_returnsFormattedTitleForMilestonesOnly" classname="com.playit.app.domain.manager.StreakTrackerTest" time="0.001"/>
+  <testcase name="sameDayActivity_retainsCurrentStreak" classname="com.playit.app.domain.manager.StreakTrackerTest" time="0.004"/>
+  <testcase name="consecutiveDayActivity_incrementsStreak" classname="com.playit.app.domain.manager.StreakTrackerTest" time="0.003"/>
+  <testcase name="firstActivity_setsStreakToOne" classname="com.playit.app.domain.manager.StreakTrackerTest" time="0.002"/>
+  <testcase name="milestoneBadges_unlockedAt5_10_15_20" classname="com.playit.app.domain.manager.StreakTrackerTest" time="0.004"/>
+  <testcase name="inactivityGap_resetsStreakToOne_onActivity" classname="com.playit.app.domain.manager.StreakTrackerTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

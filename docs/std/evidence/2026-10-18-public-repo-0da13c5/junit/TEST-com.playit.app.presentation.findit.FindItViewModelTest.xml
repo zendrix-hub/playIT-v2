@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.presentation.findit.FindItViewModelTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-10-18T01:36:01" hostname="LAPTOP-REHI7A0K" time="0.255">
+  <properties/>
+  <testcase name="selectPictureItem_allHeartsLost_setsGameOver" classname="com.playit.app.presentation.findit.FindItViewModelTest" time="0.161"/>
+  <testcase name="selectPictureItem_correctItem_incrementsFoundCount" classname="com.playit.app.presentation.findit.FindItViewModelTest" time="0.019"/>
+  <testcase name="loadGrid_validId_loadsTargetAnd5ItemGrid" classname="com.playit.app.presentation.findit.FindItViewModelTest" time="0.005"/>
+  <testcase name="restartSession_resetsHeartsAndState" classname="com.playit.app.presentation.findit.FindItViewModelTest" time="0.006"/>
+  <testcase name="completion_appendsNextCue" classname="com.playit.app.presentation.findit.FindItViewModelTest" time="0.008"/>
+  <testcase name="sessionHeartsLost_survivesRestart" classname="com.playit.app.presentation.findit.FindItViewModelTest" time="0.007"/>
+  <testcase name="threeCorrectInARow_recoversAHeart" classname="com.playit.app.presentation.findit.FindItViewModelTest" time="0.006"/>
+  <testcase name="loadGrid_invalidId_setsLoadError" classname="com.playit.app.presentation.findit.FindItViewModelTest" time="0.006"/>
+  <testcase name="selectPictureItem_incorrectItem_deductsHeart" classname="com.playit.app.presentation.findit.FindItViewModelTest" time="0.014"/>
+  <testcase name="selectPictureItem_allThreeCorrect_completesLesson" classname="com.playit.app.presentation.findit.FindItViewModelTest" time="0.006"/>
+  <testcase name="wrongTaps_countIntoSessionHeartsLost" classname="com.playit.app.presentation.findit.FindItViewModelTest" time="0.005"/>
+  <testcase name="idle_replaysIntro" classname="com.playit.app.presentation.findit.FindItViewModelTest" time="0.012"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

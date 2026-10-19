@@ -72,7 +72,7 @@ class PdfExporter @Inject constructor(
             canvas.drawText("Overall Accuracy: ${reportData.overallAccuracyPercentage}%", 38f, yPos + 38f, paint)
             canvas.drawText("7-Day Retention: ${reportData.retentionScorePercentage}%", 38f, yPos + 54f, paint)
             canvas.drawText("Letters Mastered: ${reportData.completedLettersCount} / ${reportData.totalLettersCount}", 290f, yPos + 38f, paint)
-            canvas.drawText("Total Stars: ${reportData.totalStars} ★   |   Blend-It: ${reportData.blendItCompletedCount}/${reportData.blendItTotalCount}", 290f, yPos + 54f, paint)
+            canvas.drawText("Total Stars: ${reportData.totalStars}   |   Blend-It: ${reportData.blendItCompletedCount}/${reportData.blendItTotalCount}", 290f, yPos + 54f, paint)
 
             yPos += overviewHeight + 12f
 
@@ -86,7 +86,7 @@ class PdfExporter @Inject constructor(
                 paint.color = Color.parseColor("#D63031")
                 paint.textSize = 10f
                 paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-                canvas.drawText("⚠️ At-Risk Phonemes Requiring Practice (${reportData.atRiskLetters.size}):", 38f, yPos + 16f, paint)
+                canvas.drawText("At-Risk Phonemes Requiring Practice (${reportData.atRiskLetters.size}):", 38f, yPos + 16f, paint)
 
                 paint.typeface = Typeface.DEFAULT
                 val symbols = reportData.atRiskLetters.take(8).joinToString(", ") { "${it.symbol} (${it.accuracyPercentage.toInt()}%)" }
@@ -152,7 +152,7 @@ class PdfExporter @Inject constructor(
                 canvas.drawText("${lp.accuracyPercentage.toInt()}%", 220f, yPos + 12f, paint)
                 canvas.drawText("${lp.totalAttempts}", 310f, yPos + 12f, paint)
                 canvas.drawText("${lp.heartsLost}", 400f, yPos + 12f, paint)
-                canvas.drawText("${lp.starsEarned} ★", 490f, yPos + 12f, paint)
+                canvas.drawText("${lp.starsEarned} stars", 490f, yPos + 12f, paint)
 
                 yPos += rowHeight
             }

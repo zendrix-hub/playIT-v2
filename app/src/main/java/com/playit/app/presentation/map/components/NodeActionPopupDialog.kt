@@ -17,6 +17,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -88,18 +89,22 @@ fun NodeActionPopupDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
+                    // 64 dp touch area around a 40 dp circle (it was 32 dp, card 31e).
                     IconButton(
                         onClick = onDismiss,
-                        modifier = Modifier
-                            .size(32.dp)
-                            .background(Color(0xFFF1F5F9), CircleShape)
+                        modifier = Modifier.size(64.dp).testTag("node_popup_close")
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Close,
-                            contentDescription = "Close",
-                            tint = InkSoft,
-                            modifier = Modifier.size(18.dp)
-                        )
+                        Box(
+                            modifier = Modifier.size(40.dp).background(Color(0xFFF1F5F9), CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Close,
+                                contentDescription = "Close",
+                                tint = InkSoft,
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
                     }
                 }
 
@@ -175,7 +180,7 @@ fun NodeActionPopupDialog(
                     Text(
                         text = if (isUnlocked) "Phonics Sound: /${letterNode.symbol.lowercase()}/" else "Unit ${letterNode.groupNumber} Phonics",
                         fontFamily = LexendFontFamily,
-                        fontSize = 14.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = TextMuted
                     )
@@ -192,7 +197,7 @@ fun NodeActionPopupDialog(
                     Text(
                         text = "Word Blending Milestone",
                         fontFamily = LexendFontFamily,
-                        fontSize = 14.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = TextMuted
                     )
@@ -270,7 +275,7 @@ fun NodeActionPopupDialog(
                         contentColor = if (isCompleted) TextMidnight else Color.White,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(56.dp)
+                            .heightIn(min = 64.dp)
                     )
                 } else {
                     // Locked Card Guidance
@@ -284,7 +289,7 @@ fun NodeActionPopupDialog(
                         Text(
                             text = "Complete the previous sounds to unlock this challenge!",
                             fontFamily = LexendFontFamily,
-                            fontSize = 13.sp,
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
                             color = TextMuted,
                             textAlign = TextAlign.Center,
@@ -302,7 +307,7 @@ fun NodeActionPopupDialog(
                         contentColor = Color.White,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(52.dp)
+                            .heightIn(min = 64.dp)
                     )
                 }
             }
@@ -322,7 +327,7 @@ private fun MiniPill(label: String) {
         Text(
             text = label,
             fontFamily = LexendFontFamily,
-            fontSize = 11.sp,
+            fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = TextMidnight
         )

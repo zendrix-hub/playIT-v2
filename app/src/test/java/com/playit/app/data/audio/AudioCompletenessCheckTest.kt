@@ -7,7 +7,11 @@ import java.io.File
 
 class AudioCompletenessCheckTest {
 
-    private val assetsAudioDir = File("src/main/assets/audio")
+    private val assetsAudioDir = if (File("src/main/assets/audio").exists()) {
+        File("src/main/assets/audio")
+    } else {
+        File("app/src/main/assets/audio")
+    }
 
     private val requiredPhonemeLetters = listOf(
         "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
@@ -25,25 +29,30 @@ class AudioCompletenessCheckTest {
     )
 
     private val requiredVoLines = listOf(
-        "vo_welcome_01.mp3",
-        "vo_encourage_01.mp3",
-        "vo_encourage_02.mp3",
-        "vo_encourage_03.mp3",
-        "vo_correct_01.mp3",
-        "vo_correct_02.mp3",
-        "vo_hint_01.mp3",
-        "vo_hint_02.mp3",
+        "vo_welcome_01.wav",
+        "vo_encourage_01.wav",
+        "vo_encourage_02.wav",
+        "vo_encourage_03.wav",
+        "vo_correct_01.wav",
+        "vo_correct_02.wav",
+        "vo_hint_01.wav",
+        "vo_hint_02.wav",
+        "vo_streak_01.wav",
+        "vo_complete_01.wav",
+        "vo_unlock_01.wav",
+        "vo_blendit_intro_01.wav",
+        "vo_findit_intro_01.wav",
+        "vo_sayit_intro_01.wav",
+        "vo_sayit_word_intro_01.wav",
+        "vo_quiet_check_01.wav",
+        "vo_noise_alert_01.wav",
+        "vo_map_tarana.wav",
+        "vo_parent_gate.wav"
+    )
+
+    private val legacyVoLines = listOf(
         "vo_milestone_01.mp3",
-        "vo_streak_01.mp3",
-        "vo_complete_01.mp3",
-        "vo_unlock_01.mp3",
-        "vo_blendit_intro_01.mp3",
-        "vo_findit_intro_01.mp3",
-        "vo_sayit_intro_01.mp3",
-        "vo_sayit_word_intro_01.mp3",
-        "vo_quiet_check_01.mp3",
-        "vo_return_welcome_01.mp3",
-        "vo_noise_alert_01.mp3"
+        "vo_return_welcome_01.mp3"
     )
 
     private val requiredSfxFiles = listOf(
@@ -62,6 +71,7 @@ class AudioCompletenessCheckTest {
         assertEquals(26, requiredPhonemeLetters.size)
         assertEquals(32, requiredWords.size)
         assertEquals(19, requiredVoLines.size)
+        assertEquals(2, legacyVoLines.size)
         assertEquals(8, requiredSfxFiles.size)
     }
 
@@ -70,6 +80,7 @@ class AudioCompletenessCheckTest {
         val phonemesDir = File(assetsAudioDir, "phonemes")
         val wordsDir = File(assetsAudioDir, "words")
         val uiDir = File(assetsAudioDir, "ui")
+        val lessonDir = File(assetsAudioDir, "vo/lesson")
 
         val missing = mutableListOf<String>()
 
@@ -84,6 +95,11 @@ class AudioCompletenessCheckTest {
         }
 
         requiredVoLines.forEach { vo ->
+            val f = File(lessonDir, vo)
+            if (!f.exists()) missing.add(f.path)
+        }
+
+        legacyVoLines.forEach { vo ->
             val f = File(uiDir, vo)
             if (!f.exists()) missing.add(f.path)
         }
@@ -125,5 +141,45 @@ class AudioCompletenessCheckTest {
             }
         }
         assertTrue("Missing Say It word audio: $missing", missing.isEmpty())
+    }
+
+    @Test
+    fun keywordClips_existForAll26SeededWords() {
+        val seededWords = listOf(
+            "apple", "ball", "cat", "dog", "elephant", "fish", "goat", "hat", "insect",
+            "jug", "kite", "lion", "mouse", "nest", "orange", "pig", "queen", "rabbit",
+            "sun", "tiger", "umbrella", "van", "watch", "box", "yoyo", "zebra"
+        )
+        val keywordsDir = File(assetsAudioDir, "keywords")
+        val missingOrEmpty = mutableListOf<String>()
+        seededWords.forEach { word ->
+            val f = File(keywordsDir, "kw_$word.wav")
+            if (!f.exists() || f.length() == 0L) {
+                missingOrEmpty.add(f.path)
+            }
+        }
+        assertTrue("Missing or empty keyword clips: $missingOrEmpty", missingOrEmpty.isEmpty())
+    }
+
+    @Test
+    fun approvedTutorCarriers_exist() {
+        val tutorClips = listOf(
+            "car_listen",
+            "car_this_letter_says",
+            "car_say_it_with_me",
+            "car_your_turn",
+            "car_watch_my_lips",
+            "car_lets_say_together",
+            "fb_try_later"
+        )
+        val tutorDir = File(assetsAudioDir, "vo/tutor")
+        val missingOrEmpty = mutableListOf<String>()
+        tutorClips.forEach { id ->
+            val f = File(tutorDir, "$id.wav")
+            if (!f.exists() || f.length() == 0L) {
+                missingOrEmpty.add(f.path)
+            }
+        }
+        assertTrue("Missing or empty tutor carrier clips: $missingOrEmpty", missingOrEmpty.isEmpty())
     }
 }

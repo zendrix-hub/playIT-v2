@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.presentation.blendit.BlendItCompleteViewModelTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-18T01:35:42" hostname="LAPTOP-REHI7A0K" time="2.849">
+  <properties/>
+  <testcase name="completeSession_calculatesStarsAndSavesProgress" classname="com.playit.app.presentation.blendit.BlendItCompleteViewModelTest" time="2.78"/>
+  <testcase name="completion_appendsNextCue" classname="com.playit.app.presentation.blendit.BlendItCompleteViewModelTest" time="0.018"/>
+  <testcase name="idle_waitsForCompletionSequence" classname="com.playit.app.presentation.blendit.BlendItCompleteViewModelTest" time="0.02"/>
+  <testcase name="starsUseNavResults" classname="com.playit.app.presentation.blendit.BlendItCompleteViewModelTest" time="0.03"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

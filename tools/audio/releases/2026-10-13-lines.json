@@ -1,0 +1,16 @@
+{
+  "release": "2026-10-13-lines",
+  "approvedBy": "TODO: the team's OK marks on review page 2026-10-13-card31-audio",
+  "clips": [
+    {"clipId": "vo_sayit_word_intro_01", "dest": "lesson", "sourceBatch": "2026-10-13-card31-audio", "sourceFile": "vo_sayit_word_intro_01_t*.wav",
+     "text": "Your turn! Say the word.", "voice": "kokoro-82M mix af_heart*0.7+af_bella*0.3", "speed": null,
+     "license": "Apache-2.0 (Kokoro-82M)",
+     "tool": "tools/audio kokoro_local.synth + clean (24 kHz, RMS -20 dBFS); three takes at speeds 0.95, 0.90 and 1.00 (t1-t3)",
+     "note": "Card 31c (team directive 2026-10-13): 5 words instead of 13, so the bubble shows it whole; SPMP R3 asks for 8 words or fewer. Replaces the 2026-10-07 clip."},
+    {"clipId": "vo_findit_intro_01", "dest": "lesson", "sourceBatch": "2026-10-13-card31-audio", "sourceFile": "vo_findit_intro_01_t*.wav",
+     "text": "Find the pictures that start with this sound.", "voice": "kokoro-82M mix af_heart*0.7+af_bella*0.3", "speed": null,
+     "license": "Apache-2.0 (Kokoro-82M)",
+     "tool": "tools/audio kokoro_local.synth + clean (24 kHz, RMS -20 dBFS); three takes at speeds 0.95, 0.90 and 1.00 (t1-t3)",
+     "note": "Card 31c: 8 words instead of 11, and the bubble now says the same words as the voice. Replaces the 2026-10-07 clip."}
+  ]
+}

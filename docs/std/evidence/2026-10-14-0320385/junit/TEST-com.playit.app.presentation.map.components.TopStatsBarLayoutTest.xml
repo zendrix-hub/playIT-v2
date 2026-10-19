@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.presentation.map.components.TopStatsBarLayoutTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-14T14:14:19" hostname="LAPTOP-REHI7A0K" time="1.425">
+  <properties/>
+  <testcase name="guidebookDialog_closeIs64dp" classname="com.playit.app.presentation.map.components.TopStatsBarLayoutTest" time="0.581"/>
+  <testcase name="longName_greetingIsNotCut" classname="com.playit.app.presentation.map.components.TopStatsBarLayoutTest" time="0.16"/>
+  <testcase name="card_isLilysTapTarget" classname="com.playit.app.presentation.map.components.TopStatsBarLayoutTest" time="0.219"/>
+  <testcase name="lettersCount_isNotCut" classname="com.playit.app.presentation.map.components.TopStatsBarLayoutTest" time="0.095"/>
+  <testcase name="nodeDialog_closeIs64dp" classname="com.playit.app.presentation.map.components.TopStatsBarLayoutTest" time="0.193"/>
+  <testcase name="longName_pillsStayVisible" classname="com.playit.app.presentation.map.components.TopStatsBarLayoutTest" time="0.176"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
