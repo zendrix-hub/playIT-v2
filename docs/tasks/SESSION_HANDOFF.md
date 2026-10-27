@@ -2035,3 +2035,23 @@ It does not measure NFR-PERF-01 (Say It and Find It feedback, tap to Listening).
 1. Plug in the A21s, unlock it and keep it awake. Run `python tools/perf/benchmark_device.py` (about 10 to 15 minutes). Commit `docs/std/evidence/<date>-device-performance/`.
 2. Rebuild the Drive folder. Replace `03/PERFORMANCE_TESTING_REPORT.pdf` and upload `03/test_execution_evidence/device_performance_<date>/`. Check first whether changes after the form are allowed (see above).
 3. Decide on the date corrections above. If the team corrects them, the STD and the refactoring evidence need a re-render, and the STD a new signature.
+
+---
+
+## Latest Session Status (2026-10-27) — Card 32 & Post-Midterm Adviser Presentation Package
+
+| Field | Value |
+|---|---|
+| **Author** | agy |
+| **Branch** | `refactor/hear-say-it` |
+| **Active Card** | Card 32 (`docs/tasks/card-32-background-ui-ux-alignment.md` — `Status: done`) |
+| **Post-Midterm Package** | Created `docs/final-validation/` (`SMART_Goal_Matrix.md`, `Approved_Proposal_and_SMART_Goals.md`, `Final_Validation_Plan_and_Framework.md`, `Final_Validation_Instrument.md`, `Final_Validation_Results_and_Recommendations_Templates.md`) and updated `midterm_goal/midterm_goal.md` & `docs/submission/PORTAL_LINK_SHEET.md` |
+
+### What Was Completed in This Session
+1. **Card 32 (`card-32-background-ui-ux-alignment.md`):**
+   - Realigned `HearItScreen` (`#EBF5FB`), `SayItScreen` (`#FEF5E7`), `FindItScreen` (`#EAFAF1`), and `BlendItScreen` (`#F4ECF7`) onto Duolingo ABC functional pastels with grounded 19% bottom horizon baselines.
+   - Aligned `ProfileSelectScreen` and `NamePromptScreen` onto `SoftSky` (`#E6F4FE`) with a grounded meadow floor (`#D1F2EB`).
+   - Anchored all 16 Archipelago map landmark props (`MAP_PATHSIDE_LANDMARKS`) at `Modifier.zIndex(0f)` along the outer margins of `ChocolateHillsBackground` (`MapScreen`), verified by `PictureAssetsTest.everyMapLandmarkPropIsReleased`.
+   - Updated `ParentDashboardScreen` and `ReportPreviewScreen` to subdued adult diagnostic neutrals (`#F8FAFC`–`#F1F5F9`, 1dp `#E2E8F0` border) and refreshed `PdfExporter.kt` to `PrimaryJoy` (`#6C5CE7`), `EmeraldLeaf` (`#00C853`), `SunnyGold` (`#FFB800`), and `ApricotGlow` (`#FF9F43`), eliminating `#D63031` harsh red, verified by `ParentDashboardViewModelTest.pdfExporter_usesAlignedDiagnosticPaletteWithoutHarshRed`.
+2. **Post-Midterm Adviser Presentation & Week 12 Validation Deliverables (`04_Final-User_Validation/`):**
+   - Prepared all 4 mandatory pre-adviser presentation documents in `docs/final-validation/` plus post-testing templates for Week 12 (due October 31, 2026).

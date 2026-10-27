@@ -68,3 +68,35 @@ The DOCX copies in this folder are editable sources; link the PDFs.
 - **Usability:** the course directive puts final user and stakeholder validation after the midterm, so Round 1 results with the changes made answer this item. The refactored app has not yet been tried by users.
 - **Not feature-complete:** telemetry and CSV export, spaced recall and session pacing are planned, not built (the feature matrix says so).
 - **Integration testing is thin:** 7 classes; the ViewModel tests mock their collaborators, and the 4 instrumented UI test classes left from the MVP (`app/src/androidTest`) were not run, so nothing automated ran on a device (the integration report says so).
+
+---
+
+## 04_Final-User_Validation (Adviser Presentation Gate & Week 12 Deliverable — Due October 31, 2026)
+
+Per the official *Requirements Before Adviser Presentation* and *Week 12 Final User/Stakeholder Validation* announcements (`IT411 | G1 - G8 | SEM1 | 2026-27`), the root Google Drive folder is organized under `2627-sem1-it411-56/`:
+
+```text
+2627-sem1-it411-56/
+├── 01_Software_and_Deployment/
+├── 02_Updated_Documentation/
+├── 03_Testing_and_QA/
+└── 04_Final-User_Validation/
+    ├── SMART_Goal_Matrix                                   [Required BEFORE Adviser Presentation]
+    ├── Approved_Proposal_and_SMART_Goals                   [Required BEFORE Adviser Presentation]
+    ├── Final_Validation_Plan_and_Framework                 [Required BEFORE Adviser Presentation]
+    ├── Final_Validation_Instrument                         [Required BEFORE Adviser Presentation]
+    ├── 01_Validation_Plan_and_Framework/                   [Week 12 Deliverable 1 — Due Oct 31, 2026]
+    ├── 02_Instruments_and_Data_Collection/                 [Week 12 Deliverable 2 — Due Oct 31, 2026]
+    ├── 03_Testing_Evidence/                                [Week 12 Deliverable 3 — Due Oct 31, 2026]
+    ├── 04_Results_and_Analysis/                            [Week 12 Deliverable 4 — Due Oct 31, 2026]
+    └── 05_Recommendations_and_Improvements/                [Week 12 Deliverable 5 — Due Oct 31, 2026]
+```
+
+| Folder / Requirement | Repository Markdown Source | Purpose |
+|---|---|---|
+| `SMART_Goal_Matrix` | `docs/final-validation/SMART_Goal_Matrix.md` | Maps every approved SMART goal (`SMART-01`–`SMART-07` & `HI`/`SI`/`O3`–`O6`) to its indicator, non-questionnaire vs. survey method, instrument item, calculation formula, and pass threshold. |
+| `Approved_Proposal_and_SMART_Goals` | `docs/final-validation/Approved_Proposal_and_SMART_Goals.md` | Preserves the verbatim IT332 approved proposal objectives and SRS v2.0 quantitative targets alongside a traceability comparison with the refactored v3.0 system. |
+| `Final_Validation_Plan_and_Framework` | `docs/final-validation/Final_Validation_Plan_and_Framework.md` | Defines `RQ1`–`RQ5`, the 4 respondent cohorts ($N=31\text{–}38$), the UPA + ISO 9241-11 + TAM/SUS framework, silent-observer procedures, and statistical formulas. |
+| `Final_Validation_Instrument` | `docs/final-validation/Final_Validation_Instrument.md` | Complete 5-instrument suite (`Instrument A` Phoneme/CVC Audit, `Instrument B` Child Silent-Observer & Blind Teacher-Rater Log, `Instrument C` SQLite Telemetry, `Instrument D` Hardware/QA Checklist `D-01`–`D-12`, `Instrument E` Child Exit Choice & Adult SUS/TAM Survey). |
+| `03`–`05` Post-Testing Templates | `docs/final-validation/Final_Validation_Results_and_Recommendations_Templates.md` | Structured report templates for `03_Testing_Evidence`, `04_Results_and_Analysis`, and `05_Recommendations_and_Improvements` (to be populated after adviser sign-off and field validation). |
+
