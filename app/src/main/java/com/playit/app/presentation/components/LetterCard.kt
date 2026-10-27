@@ -97,6 +97,7 @@ fun LetterCard(
             .widthIn(max = 320.dp)
             .fillMaxWidth()
             .height(cardHeight)
+            .stickerIn()   // placed like a sticker when the screen opens
             .graphicsLayer { rotationZ = cardRotation }
     ) {
         Box(

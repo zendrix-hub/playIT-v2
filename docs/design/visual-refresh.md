@@ -20,13 +20,12 @@ The design board, with the talking demo, the palette on Hear It and the four app
 | What | Commit | How |
 |---|---|---|
 | **Lily talks** | `ae93752` | `AudioPlayer.voice` reports the speech clip playing. `TalkingLily` swaps to her mouthless frame (`images/mascot/talk/`) and draws the mouth in her colours. For a letter's sound it takes that letter's `ArticulationGroup` shape (m, b, p press the lips together); other speech follows the clip's loudness (`assets/lipsync/voice_envelopes.json`, from `tools/design/build_voice_envelopes.py`). This covers the lesson header, the bubbles, the map header and the splash. |
+| **Lily blinks and hops; pictures arrive** | (this commit) | <ul><li>Lily blinks once as each line begins: a lid in her face colour drawn over her eyes, whose places come from her pictures (`LilyEyes.kt`); celebrating already has her eyes shut.</li><li>She hops once when she starts celebrating, with a small squash as she lands.</li><li>The letter card and the Find It pictures settle in like stickers when a screen opens, the pictures one by one (`stickerIn`). It draws in a layer, so layout and touch targets don't change.</li><li>All three happen once per moment. With reduced motion there is no blink or hop, and the stickers only fade in.</li></ul> |
 | **Lily's island palette** | `2a39faa` | New values on the old token names in `Color.kt`. Each colour and its contrast (normal text needs 4.5:1, large text 3:1): <ul><li>lagoon teal `#0B7F7A` for actions, white text 4.8:1</li><li>sunflower `#FFC53D` for listening and stars, brown text 7.9:1</li><li>leaf `#2E9A3E`, white text 3.6:1, so large text only</li><li>hibiscus `#F2545B`</li><li>apricot `#F7922F`</li><li>Lily brown `#4A2E18` for outlines, the pictures' own line</li><li>text `#3B2416`, 14:1</li><li>ground: morning sky to sand (`GroundColors`)</li><li>locked things: warm stone (`Locked*`)</li></ul> |
 
 ## Next
 1. **New art:** agy runs card D1, three batches (126 pictures). After each batch Claude cuts out, audits and releases it.
-2. **Lily reacts:** she blinks as she starts a line and gives a small hop on a correct answer, once per moment.
-3. **Pictures arrive:** the letter card and the Find It pictures settle in once when a screen opens. With reduced motion they fade instead.
-4. **Check on the A21s:** build an APK from this branch and play section 1, to see the mouth and the colours on the phone.
+2. **Check on the A21s:** build an APK from this branch and play section 1, to see the mouth and the colours on the phone.
 
 ## Rules on this branch
 - Run `./gradlew testDebugUnitTest` before every commit. Behaviour tests must keep passing unchanged.

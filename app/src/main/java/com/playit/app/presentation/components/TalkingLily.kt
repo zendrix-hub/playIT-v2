@@ -2,6 +2,9 @@ package com.playit.app.presentation.components
 
 import android.content.Context
 import android.os.SystemClock
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -12,6 +15,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -23,26 +27,36 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.playit.app.data.audio.VoiceClip
 import com.playit.app.domain.model.articulationFor
+import com.playit.app.presentation.components.lipsync.BLINK_MS
+import com.playit.app.presentation.components.lipsync.HOP_MS
 import com.playit.app.presentation.components.lipsync.Mouth
+import com.playit.app.presentation.components.lipsync.PoseEyes
 import com.playit.app.presentation.components.lipsync.PoseMouth
 import com.playit.app.presentation.components.lipsync.TALKING_WIDE
 import com.playit.app.presentation.components.lipsync.VoiceEnvelopes
 import com.playit.app.presentation.components.lipsync.articulationMouth
+import com.playit.app.presentation.components.lipsync.blinkClosed
+import com.playit.app.presentation.components.lipsync.hopAt
 import com.playit.app.presentation.components.lipsync.phonemeLetter
+import com.playit.app.presentation.components.lipsync.poseEyes
 import com.playit.app.presentation.components.lipsync.poseMouth
 import com.playit.app.presentation.theme.LilyMouthInside
+import com.playit.app.presentation.theme.LilyOrange
 import com.playit.app.presentation.theme.LilyOutline
 import com.playit.app.presentation.theme.LilyTeeth
 import com.playit.app.presentation.theme.LilyTongue
+import com.playit.app.presentation.theme.LocalReducedMotion
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -67,11 +81,14 @@ private object EnvelopeCache {
 
 /**
  * The speech clip playing now, measured each frame: [speaking], its loudness [level] 0..1 (opens fast, closes a little
- * slower) and, for a letter's sound, the [letter]. Drawing code reads [level] in the draw phase, so a frame only redraws.
+ * slower) and, for a letter's sound, the [letter]. [lines] counts the clips started, so Lily can blink as each line
+ * begins. Drawing code reads [level] in the draw phase, so a frame only redraws.
  */
 @Stable
 class VoiceMouth {
     var speaking by mutableStateOf(false)
+        internal set
+    var lines by mutableIntStateOf(0)
         internal set
     var letter by mutableStateOf<String?>(null)
         internal set
@@ -91,6 +108,7 @@ fun rememberVoiceMouth(): VoiceMouth {
         mouth.letter = playing?.let { phonemeLetter(it.assetPath) }
         mouth.level = 0f
         if (playing == null) return@LaunchedEffect
+        mouth.lines++
         val envelopes = EnvelopeCache.get(context)
         while (true) {
             withFrameMillis { }
@@ -112,6 +130,9 @@ fun VoiceMouth.shapeFor(pm: PoseMouth): Mouth {
  * Lily as [pose]. While she speaks (a speech clip plays), her mouth moves with the voice: for a letter's sound it takes
  * that letter's mouth shape (ArticulationGroup), and for other speech it opens with the loudness. When she is quiet
  * the released picture shows unchanged.
+ *
+ * She also blinks once as each line begins, and hops once when she starts celebrating. Both happen once per moment,
+ * never on a loop, and not at all with reduced motion; her mouth still moves, because it carries the speech.
  */
 @Composable
 fun TalkingLily(
@@ -125,16 +146,72 @@ fun TalkingLily(
     val still = rememberAssetPainter(pose.assetPath, maxSize)
     val talking = rememberAssetPainter(pose.talkFramePath(), maxSize)
     val pm = poseMouth(pose)
+    val eyes = poseEyes(pose)
+    val reduced = LocalReducedMotion.current
 
-    Box(modifier) {
+    val blink = remember { Animatable(0f) }   // ms into the blink
+    LaunchedEffect(voice.lines) {
+        if (voice.lines == 0 || reduced || eyes == null) return@LaunchedEffect
+        blink.snapTo(0f)
+        blink.animateTo(BLINK_MS.toFloat(), tween(BLINK_MS, easing = LinearEasing))
+        blink.snapTo(0f)
+    }
+    val hop = remember { Animatable(1f) }     // 0..1 through the hop; 1 is standing
+    LaunchedEffect(pose) {
+        if (pose != MascotState.CELEBRATING || reduced) return@LaunchedEffect
+        hop.snapTo(0f)
+        hop.animateTo(1f, tween(HOP_MS, easing = LinearEasing))
+    }
+
+    Box(
+        modifier.graphicsLayer {
+            val frame = hopAt(hop.value)
+            translationY = -frame.lift * size.height
+            scaleX = 1f + 0.06f * frame.squash
+            scaleY = 1f - 0.08f * frame.squash
+            transformOrigin = TransformOrigin(0.5f, 1f)
+        }
+    ) {
         Image(
             painter = if (voice.speaking) talking else still,
             contentDescription = contentDescription,
             contentScale = ContentScale.Fit,
             modifier = Modifier.fillMaxSize()
         )
-        if (voice.speaking) {
-            Canvas(Modifier.fillMaxSize()) { drawLilyMouth(pm, voice.shapeFor(pm)) }
+        Canvas(Modifier.fillMaxSize()) {
+            if (voice.speaking) drawLilyMouth(pm, voice.shapeFor(pm))
+            val closed = blinkClosed(blink.value)
+            if (eyes != null && closed > 0f) drawLilyBlink(eyes, closed)
+        }
+    }
+}
+
+/**
+ * Draws lids over [eyes], [closed] 0..1: an orange lid coming down with a dark lash edge, and when shut, the closed eye
+ * as a soft curve. The lid is her face colour, so it reads as her own eyelid.
+ */
+fun DrawScope.drawLilyBlink(eyes: PoseEyes, closed: Float) {
+    val side = minOf(size.width, size.height)
+    val scale = side / 512f
+    val origin = Offset((size.width - side) / 2f, (size.height - side) / 2f)
+    val r = eyes.radius * scale
+    for (eyeX in listOf(eyes.leftX, eyes.rightX)) {
+        val c = Offset(origin.x + eyeX * scale, origin.y + eyes.y * scale)
+        val eye = Path().apply { addOval(Rect(c, r + 1.5f * scale)) }
+        val lidTop = c.y - r - 2f * scale
+        val lidBottom = c.y - r + 2f * r * closed
+        clipPath(eye) {
+            drawRect(LilyOrange, Offset(c.x - r - 2f * scale, lidTop), Size(2f * r + 4f * scale, lidBottom - lidTop))
+        }
+        if (closed > 0.85f) {
+            val shut = Path().apply {
+                moveTo(c.x - 0.62f * r, c.y + 0.05f * r)
+                quadraticBezierTo(c.x, c.y + 0.45f * r, c.x + 0.62f * r, c.y + 0.05f * r)
+            }
+            drawPath(shut, LilyOutline, style = Stroke(width = 5f * scale, cap = StrokeCap.Round))
+        } else if (closed > 0.05f) {
+            val half = kotlin.math.sqrt(maxOf(0f, r * r - (lidBottom - c.y) * (lidBottom - c.y)))
+            drawLine(LilyOutline, Offset(c.x - half, lidBottom), Offset(c.x + half, lidBottom), 3.5f * scale, StrokeCap.Round)
         }
     }
 }

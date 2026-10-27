@@ -160,6 +160,7 @@ fun FindItGrid(
                             .weight(1f)
                             .heightIn(min = d.findItCardMinHeight)
                             .aspectRatio(d.findItCardAspect)
+                            .stickerIn(rowIndex * 2 + i)   // placed one by one when the round opens
                     )
                 }
                 if (row.size == 1) Spacer(Modifier.weight(0.5f))

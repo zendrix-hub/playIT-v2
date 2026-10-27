@@ -23,10 +23,12 @@ import com.playit.app.domain.model.ArticulationGroup
 import com.playit.app.presentation.components.AssetImageConfig
 import com.playit.app.presentation.components.MascotState
 import com.playit.app.presentation.components.TalkingLily
+import com.playit.app.presentation.components.drawLilyBlink
 import com.playit.app.presentation.components.drawLilyMouth
 import com.playit.app.presentation.components.lipsync.Mouth
 import com.playit.app.presentation.components.lipsync.TALKING_WIDE
 import com.playit.app.presentation.components.lipsync.articulationMouth
+import com.playit.app.presentation.components.lipsync.poseEyes
 import com.playit.app.presentation.components.lipsync.poseMouth
 import com.playit.app.presentation.components.rememberAssetPainter
 import com.playit.app.presentation.components.talkFramePath
@@ -80,6 +82,30 @@ class TalkingLilyScreenshotTest {
             }
         }
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/talking_lily_poses.png")
+    }
+
+    /** Every pose that can blink, with the lids half down and shut, as they look at the start of a line. */
+    @Test fun blinks() {
+        compose.setContent {
+            Column(Modifier.background(Color.White)) {
+                MascotState.values().filter { poseEyes(it) != null }.chunked(2).forEach { row ->
+                    Row {
+                        row.forEach { pose ->
+                            listOf(0.5f, 1f).forEach { closed ->
+                                Column(Modifier.padding(4.dp)) {
+                                    Box(Modifier.size(150.dp).background(Color(0xFFDDE6F0))) {
+                                        Image(rememberAssetPainter(pose.assetPath), null, Modifier.fillMaxSize(), contentScale = ContentScale.Fit)
+                                        Canvas(Modifier.fillMaxSize()) { drawLilyBlink(poseEyes(pose)!!, closed) }
+                                    }
+                                    Text("${pose.name} ${(closed * 100).toInt()}%", fontSize = 11.sp)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/talking_lily_blinks.png")
     }
 
     @Test fun letterSoundMouths() {
