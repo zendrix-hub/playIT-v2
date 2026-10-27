@@ -91,6 +91,9 @@ FINDIT = {  # picture_<id>: subject (letter words for Find It and Hear It)
     "zip": "a blue fabric zipper, half open, with a gold pull tab",
 }
 
+# The word's letter is its first, except the ñ words of GridGenerator (Piña, Niño, Baño)
+FINDIT_LETTER = {"pina": "ñ", "nino": "ñ", "bano": "ñ"}
+
 BLENDIT = {  # blendword_<id>: subject (Blend It words)
     "am": "a smiling boy pointing at himself with both thumbs (I am)",
     "bat": "a wooden baseball bat leaning on a white baseball",
@@ -161,8 +164,8 @@ WORLD = {  # (app_file, subject)
 }
 
 
-def item(item_id, word, app_file, subject, why):
-    return {
+def item(item_id, word, app_file, subject, why, letter=None):
+    out = {
         "id": item_id,
         "word": word,
         "why": why,
@@ -171,6 +174,9 @@ def item(item_id, word, app_file, subject, why):
         "subject": subject,
         "prompt": subject[0].upper() + subject[1:] + ". " + STYLE,
     }
+    if letter:
+        out["letter"] = letter  # tools/images/review_page.py shows it
+    return out
 
 
 def brief(batch, items, notes):
@@ -182,9 +188,9 @@ NOTES = ("Design refresh (branch design/visual-refresh). Attach the 4 style_refs
          "as the identity reference: keep what it shows, redraw it in the anchors' style. Lily is not in this refresh.")
 
 BATCHES = {
-    "2026-10-27-refresh-findit": [item(f"picture_{k}", k, f"pictures/picture_{k}.png", v, "Find It and Hear It picture")
+    "2026-10-27-refresh-findit": [item(f"picture_{k}", k, f"pictures/picture_{k}.png", v, "Find It and Hear It picture", FINDIT_LETTER.get(k, k[0]))
                                   for k, v in FINDIT.items()],
-    "2026-10-27-refresh-blendit": [item(f"blendword_{k}", k, f"pictures/blendword_{k}.png", v, "Blend It word picture")
+    "2026-10-27-refresh-blendit": [item(f"blendword_{k}", k, f"pictures/blendword_{k}.png", v, "Blend It word picture", k[0])
                                    for k, v in BLENDIT.items()],
     "2026-10-27-refresh-world": [item(k, k.split("_", 1)[1].replace("prop_", "").replace("_", " "), f, v, "map prop, reward or avatar") for k, (f, v) in WORLD.items()],
 }

@@ -94,6 +94,11 @@ def status(batch):
     return result
 
 
+def letter_label(item):
+    """"letter m &middot; " for a picture of a letter's word; empty for items with no letter (mascot, map props)."""
+    return f"letter {html.escape(item['letter'])} &middot; " if item.get("letter") else ""
+
+
 def write_page(batch, n, app_folder=None):
     spec = load_items(batch)
     st = status(batch)
@@ -126,7 +131,7 @@ def write_page(batch, n, app_folder=None):
                 <label class="cl"><input type="checkbox" data-closest="{it['id']}" value="{html.escape(v)}"> closest</label>
                 <figcaption>{html.escape(v)}</figcaption></figure>''' for v in variants)
         cards.append(f'''<section class="item" data-item="{it['id']}">
-          <h2>{html.escape(it['word'])} <span>letter {html.escape(it['letter'])} &middot; {html.escape(it['id'])}</span></h2>
+          <h2>{html.escape(it['word'])} <span>{letter_label(it)}{html.escape(it['id'])}</span></h2>
           <p class="why">{html.escape(it['why'])}</p><p class="subj">Should show: {html.escape(it['subject'])}</p>
           {f'<ul class="notes">{notes}</ul>' if notes else ''}
           <div class="row">{now}{vs}</div>
