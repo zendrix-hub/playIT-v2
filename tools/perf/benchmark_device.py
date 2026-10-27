@@ -55,10 +55,14 @@ LOG_LINE = re.compile(r"^\s*(\d+\.\d+)\s+(\d+)\s+(\d+)\s+([VDIWEFA])\s")
 def find_adb():
     sdk = os.environ.get("ANDROID_HOME") or os.environ.get("ANDROID_SDK_ROOT") \
         or os.path.join(os.environ.get("LOCALAPPDATA", ""), "Android", "Sdk")
-    for name in ("adb.exe", "adb"):
-        if (Path(sdk) / "platform-tools" / name).exists():
-            return str(Path(sdk) / "platform-tools" / name)
-    found = shutil.which("adb")
+    candidates = [Path(sdk) / "platform-tools" / name for name in ("adb.exe", "adb")]
+    if Path("/mnt/c/Users").exists():
+        for user_dir in sorted(Path("/mnt/c/Users").glob("*")):
+            candidates.append(user_dir / "AppData" / "Local" / "Android" / "Sdk" / "platform-tools" / "adb.exe")
+    for candidate in candidates:
+        if candidate.exists():
+            return str(candidate)
+    found = shutil.which("adb") or shutil.which("adb.exe")
     if not found:
         raise SystemExit("adb not found: install the Android SDK platform-tools or set ANDROID_HOME")
     return found
@@ -69,7 +73,8 @@ class Phone:
         self.base = [adb, "-s", serial]
 
     def run(self, *args, check=True, timeout=120):
-        out = subprocess.run(self.base + [str(a) for a in args], capture_output=True, timeout=timeout)
+        out = subprocess.run(self.base + [str(a) for a in args], capture_output=True, timeout=timeout,
+                             stdin=subprocess.DEVNULL)
         text = out.stdout.decode("utf-8", "replace").replace("\r\n", "\n")
         if check and out.returncode != 0:
             raise SystemExit(f"adb {' '.join(map(str, args))} failed:\n{text}{out.stderr.decode('utf-8', 'replace')}")
@@ -80,7 +85,10 @@ class Phone:
 
 
 def pick_serial(adb, wanted):
-    lines = subprocess.run([adb, "devices"], capture_output=True, text=True).stdout.splitlines()[1:]
+    subprocess.run([adb, "start-server"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                   stdin=subprocess.DEVNULL, timeout=30)
+    lines = subprocess.run([adb, "devices"], capture_output=True, text=True,
+                           stdin=subprocess.DEVNULL, timeout=15).stdout.replace("\r\n", "\n").splitlines()[1:]
     serials = [line.split("\t")[0] for line in lines if line.endswith("\tdevice")]
     if wanted:
         if wanted not in serials:

@@ -92,11 +92,20 @@ Per the official *Requirements Before Adviser Presentation* and *Week 12 Final U
     └── 05_Recommendations_and_Improvements/                [Week 12 Deliverable 5 — Due Oct 31, 2026]
 ```
 
-| Folder / Requirement | Repository Markdown Source | Purpose |
+| Folder / Requirement | Repository Source & Rendered Outputs | Purpose |
 |---|---|---|
-| `SMART_Goal_Matrix` | `docs/final-validation/SMART_Goal_Matrix.md` | Maps every approved SMART goal (`SMART-01`–`SMART-07` & `HI`/`SI`/`O3`–`O6`) to its indicator, non-questionnaire vs. survey method, instrument item, calculation formula, and pass threshold. |
-| `Approved_Proposal_and_SMART_Goals` | `docs/final-validation/Approved_Proposal_and_SMART_Goals.md` | Preserves the verbatim IT332 approved proposal objectives and SRS v2.0 quantitative targets alongside a traceability comparison with the refactored v3.0 system. |
-| `Final_Validation_Plan_and_Framework` | `docs/final-validation/Final_Validation_Plan_and_Framework.md` | Defines `RQ1`–`RQ5`, the 4 respondent cohorts ($N=31\text{–}38$), the UPA + ISO 9241-11 + TAM/SUS framework, silent-observer procedures, and statistical formulas. |
-| `Final_Validation_Instrument` | `docs/final-validation/Final_Validation_Instrument.md` | Complete 5-instrument suite (`Instrument A` Phoneme/CVC Audit, `Instrument B` Child Silent-Observer & Blind Teacher-Rater Log, `Instrument C` SQLite Telemetry, `Instrument D` Hardware/QA Checklist `D-01`–`D-12`, `Instrument E` Child Exit Choice & Adult SUS/TAM Survey). |
-| `03`–`05` Post-Testing Templates | `docs/final-validation/Final_Validation_Results_and_Recommendations_Templates.md` | Structured report templates for `03_Testing_Evidence`, `04_Results_and_Analysis`, and `05_Recommendations_and_Improvements` (to be populated after adviser sign-off and field validation). |
+| `SMART_Goal_Matrix` | `docs/final-validation/SMART_Goal_Matrix.md`<br>`docs/final-validation/rendered/SMART_Goal_Matrix.pdf` & `.docx` | Maps every approved SMART goal (`SMART-01`–`SMART-07` & `HI`/`SI`/`O3`–`O6`) to its indicator, non-questionnaire vs. survey method, instrument item, calculation formula, and pass threshold (landscape PDF & DOCX). |
+| `Approved_Proposal_and_SMART_Goals` | `docs/final-validation/Approved_Proposal_and_SMART_Goals.md`<br>`docs/final-validation/rendered/Approved_Proposal_and_SMART_Goals.pdf` & `.docx` | Preserves the verbatim IT332 approved proposal objectives and SRS v2.0 quantitative targets alongside a traceability comparison with the refactored v3.0 system. |
+| `Final_Validation_Plan_and_Framework` | `docs/final-validation/Final_Validation_Plan_and_Framework.md`<br>`docs/final-validation/rendered/Final_Validation_Plan_and_Framework.pdf` & `.docx` | Defines `RQ1`–`RQ5`, the 4 respondent cohorts ($N=31\text{–}38$), the UPA + ISO 9241-11 + TAM/SUS framework, silent-observer procedures, and statistical formulas. |
+| `Final_Validation_Instrument` | `docs/final-validation/Final_Validation_Instrument.md`<br>`docs/final-validation/rendered/Final_Validation_Instrument.pdf` & `.docx` | Complete 5-instrument suite (`Instrument A` Phoneme/CVC Audit, `Instrument B` Child Silent-Observer & Blind Teacher-Rater Log, `Instrument C` SQLite Telemetry, `Instrument D` Hardware/QA Checklist `D-01`–`D-12`, `Instrument E` Child Exit Choice & Adult SUS/TAM Survey). |
+| `03`–`05` Post-Testing Templates | `docs/final-validation/Final_Validation_Results_and_Recommendations_Templates.md`<br>`docs/final-validation/rendered/TESTING_EVIDENCE_INDEX.pdf` & `.docx`<br>`docs/final-validation/rendered/FINAL_VALIDATION_RESULTS_AND_ANALYSIS.pdf` & `.docx`<br>`docs/final-validation/rendered/RECOMMENDATIONS_AND_POST_VALIDATION_IMPROVEMENTS.pdf` & `.docx` | Structured report templates for `03_Testing_Evidence`, `04_Results_and_Analysis`, and `05_Recommendations_and_Improvements` (to be populated after adviser sign-off and field validation). |
+
+Rebuild all `04_Final-User_Validation/` `.docx` and `.pdf` files at any time with:
+```bash
+python3 tools/docs/build_final_validation_package.py
+```
+And extract anonymized on-device Room SQLite CSV logs (**Instrument C**) from a connected test phone via:
+```bash
+python3 tools/perf/export_validation_telemetry.py
+```
 
