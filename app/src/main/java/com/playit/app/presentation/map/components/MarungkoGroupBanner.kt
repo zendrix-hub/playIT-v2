@@ -1,5 +1,6 @@
 package com.playit.app.presentation.map.components
 
+import com.playit.app.presentation.theme.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -79,22 +80,22 @@ fun MarungkoGroupBanner(
     val bannerBg = when (status) {
         GroupBannerStatus.COMPLETED -> theme.primaryColor
         GroupBannerStatus.IN_PROGRESS -> theme.primaryColor
-        GroupBannerStatus.LOCKED -> Color(0xFFE2E8F0)
+        GroupBannerStatus.LOCKED -> LockedShelf
     }
 
     val bannerShelf = when (status) {
         GroupBannerStatus.COMPLETED -> theme.shelfColor
         GroupBannerStatus.IN_PROGRESS -> theme.shelfColor
-        GroupBannerStatus.LOCKED -> Color(0xFFCBD5E1)
+        GroupBannerStatus.LOCKED -> LockedShelf
     }
 
     val headerColor = when (status) {
-        GroupBannerStatus.LOCKED -> Color(0xFF64748B)
+        GroupBannerStatus.LOCKED -> LockedInk
         else -> Color.White.copy(alpha = 0.90f)
     }
 
     val titleColor = when (status) {
-        GroupBannerStatus.LOCKED -> Color(0xFF334155)
+        GroupBannerStatus.LOCKED -> TextMidnight
         else -> Color.White
     }
 
@@ -169,7 +170,7 @@ fun MarungkoGroupBanner(
                         modifier = Modifier
                             .size(64.dp)
                             .clip(RoundedCornerShape(16.dp))
-                            .background(if (status == GroupBannerStatus.LOCKED) Color(0xFFCBD5E1) else theme.shelfColor)
+                            .background(if (status == GroupBannerStatus.LOCKED) LockedShelf else theme.shelfColor)
                             .clickable { onGuidebookClick() }
                             .testTag("unit_guidebook_$groupNumber"),
                         contentAlignment = Alignment.Center
@@ -198,20 +199,20 @@ fun MarungkoGroupBanner(
             HorizontalDivider(
                 modifier = Modifier.weight(1f),
                 thickness = 2.dp,
-                color = Color(0xFFE2E8F0)
+                color = LockedShelf
             )
             Text(
                 text = "  ${theme.lettersSummary}  ",
                 fontFamily = LexendFontFamily,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF64748B),
+                color = LockedInk,
                 maxLines = 1
             )
             HorizontalDivider(
                 modifier = Modifier.weight(1f),
                 thickness = 2.dp,
-                color = Color(0xFFE2E8F0)
+                color = LockedShelf
             )
         }
     }

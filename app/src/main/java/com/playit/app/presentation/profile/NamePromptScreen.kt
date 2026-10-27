@@ -62,11 +62,7 @@ fun NamePromptScreen(
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFE8F0FE), // Airy crisp sky
-                        Color(0xFFF3E8FF), // Soft playful lavender
-                        Color(0xFFFEF3C7)  // Warm sunny cream
-                    )
+                    colors = GroundColors
                 )
             )
     ) {

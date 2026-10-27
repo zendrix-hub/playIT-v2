@@ -170,14 +170,14 @@ fun MascotSpeechHeader(
                         modifier = Modifier
                             .size(34.dp)
                             .clip(CircleShape)
-                            .background(if (isPlayingAudio) PrimaryJoy else PrimaryJoyLight)
+                            .background(if (isPlayingAudio) SunnyGold else SunnyGoldLight)
                             .border(1.5.dp, ModernBorder, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
                             contentDescription = "Listen to Lily",
-                            tint = if (isPlayingAudio) Color.White else PrimaryJoyDark,
+                            tint = TextMidnight,
                             modifier = Modifier.size(20.dp)
                         )
                     }

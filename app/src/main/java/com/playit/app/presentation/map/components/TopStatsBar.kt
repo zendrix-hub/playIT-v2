@@ -188,7 +188,7 @@ fun TopStatsBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(9.dp)
-                .background(Color(0xFFE2E8F0), RoundedCornerShape(999.dp))
+                .background(LockedShelf, RoundedCornerShape(999.dp))
                 .clip(RoundedCornerShape(999.dp))
         ) {
             val progress = (lettersCompleted.toFloat() / 26f).coerceIn(0f, 1f)

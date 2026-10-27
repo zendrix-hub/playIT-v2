@@ -1,5 +1,6 @@
 package com.playit.app.presentation.hearit
 
+import com.playit.app.presentation.theme.*
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
@@ -159,11 +160,7 @@ fun HearItScreen(
             .resetsIdle { viewModel.onUserInteraction() }
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(
-                        androidx.compose.ui.graphics.Color(0xFFE8F0FE),
-                        androidx.compose.ui.graphics.Color(0xFFF3E8FF),
-                        androidx.compose.ui.graphics.Color(0xFFFEF3C7)
-                    )
+                    colors = GroundColors
                 )
             )
     ) {
@@ -216,7 +213,7 @@ fun HearItScreen(
             )
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                // Pulsating PrimaryJoy Speaker Replay Button; clean centered layout (card 28c)
+                // Pulsating sunflower speaker replay button (listening is sunflower in Lily's island); centered (card 28c)
                 Box(contentAlignment = Alignment.Center) {
                     if (isPlaying) {
                         Box(
@@ -224,7 +221,7 @@ fun HearItScreen(
                                 .size(d.primaryCta)
                                 .scale(pulseScale)
                                 .clip(CircleShape)
-                                .background(com.playit.app.presentation.theme.PrimaryJoyLight.copy(alpha = pulseAlpha))
+                                .background(com.playit.app.presentation.theme.SunnyGoldLight.copy(alpha = pulseAlpha))
                         )
                     }
 
@@ -232,8 +229,8 @@ fun HearItScreen(
                     // button looked switched off to a child (card 31d). The pulse ring shows it is playing.
                     GummyContainer(
                         onClick = { if (!isPlaying) viewModel.playPhonemeSound() },
-                        faceColor = com.playit.app.presentation.theme.PrimaryJoy,
-                        shadowColor = com.playit.app.presentation.theme.PrimaryJoyDark,
+                        faceColor = com.playit.app.presentation.theme.SunnyGold,
+                        shadowColor = com.playit.app.presentation.theme.SunnyGoldShadow,
                         shape = CircleShape,
                         strokeWidth = 2.5.dp,
                         strokeColor = com.playit.app.presentation.theme.ModernBorder,
@@ -244,7 +241,7 @@ fun HearItScreen(
                         Icon(
                             imageVector = if (isPlaying) Icons.AutoMirrored.Rounded.VolumeUp else Icons.Rounded.PlayArrow,
                             contentDescription = if (isPlaying) "Playing" else "Play Sound",
-                            tint = androidx.compose.ui.graphics.Color.White,
+                            tint = com.playit.app.presentation.theme.TextMidnight,
                             modifier = Modifier.size(d.primaryCta * 0.5f)
                         )
                     }

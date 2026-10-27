@@ -78,11 +78,7 @@ fun FindItScreen(
             .resetsIdle { viewModel.onUserInteraction() }
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFE8F0FE),
-                        Color(0xFFF3E8FF),
-                        Color(0xFFFEF3C7)
-                    )
+                    colors = GroundColors
                 )
             )
     ) {

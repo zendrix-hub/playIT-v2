@@ -91,7 +91,7 @@ fun ParentDashboardScreen(
                 brush = Brush.verticalGradient(
                     colors = listOf(
                         CanvasSoft,
-                        Color(0xFFF1F5F9),
+                        LockedFace,
                         CanvasLight
                     )
                 )

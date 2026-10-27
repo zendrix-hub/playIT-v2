@@ -1,5 +1,6 @@
 package com.playit.app.presentation.map
 
+import com.playit.app.presentation.theme.*
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
@@ -551,9 +552,9 @@ private val NodeGoldStar = SunnyGoldDark
 private val NodeGreenFace = EmeraldLeaf
 private val NodeGreenShelf = EmeraldLeafDark
 
-private val NodeLockedFace = Color(0xFFF1F5F9)
-private val NodeLockedShelf = Color(0xFFCBD5E1)
-private val NodeLockedIcon = Color(0xFF94A3B8)
+private val NodeLockedFace = LockedFace
+private val NodeLockedShelf = LockedShelf
+private val NodeLockedIcon = LockedIcon
 
 @Composable
 fun LetterMapNodeCard(
@@ -704,7 +705,7 @@ fun LetterMapNodeCard(
                                 fontFamily = LexendFontFamily,
                                 fontSize = 34.sp,
                                 fontWeight = FontWeight.Black,
-                                color = Color(0xFF94A3B8)
+                                color = LockedIcon
                             )
                             // Mini Lock indicator badge at bottom right
                             Box(
@@ -712,7 +713,7 @@ fun LetterMapNodeCard(
                                     .align(Alignment.BottomEnd)
                                     .offset(x = (-4).dp, y = (-4).dp)
                                     .size(20.dp)
-                                    .background(Color(0xFF64748B), CircleShape)
+                                    .background(LockedInk, CircleShape)
                                     .border(1.5.dp, Color.White, CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
@@ -741,7 +742,7 @@ fun LetterMapNodeCard(
                     Icon(
                         imageVector = Icons.Rounded.Star,
                         contentDescription = "Star ${starIdx + 1}",
-                        tint = if (isEarned) Color(0xFFF59E0B) else Color(0xFFCBD5E1),
+                        tint = if (isEarned) Color(0xFFF59E0B) else LockedShelf,
                         modifier = Modifier.size(13.dp)
                     )
                 }
@@ -787,10 +788,10 @@ fun BlendItChallengeNodeCard(
         label = "chestAuraAlpha"
     )
 
-    val chestFace = if (isUnlocked) SunnyGold else Color(0xFFF1F5F9)
-    val chestShelf = if (isUnlocked) SunnyGoldDark else Color(0xFFCBD5E1)
-    val trimGold = if (isUnlocked) SunnyGoldLight else Color(0xFFE2E8F0)
-    val lockBadgeColor = if (isUnlocked) SunnyGold else Color(0xFF94A3B8)
+    val chestFace = if (isUnlocked) SunnyGold else LockedFace
+    val chestShelf = if (isUnlocked) SunnyGoldDark else LockedShelf
+    val trimGold = if (isUnlocked) SunnyGoldLight else LockedShelf
+    val lockBadgeColor = if (isUnlocked) SunnyGold else LockedIcon
 
     val accessibilityLabel = if (isUnlocked) {
         "Blend-It Treasure Chest Milestone, Unit ${node.groupId}, unlocked"
@@ -903,8 +904,8 @@ fun BlendItChallengeNodeCard(
         Box(
             modifier = Modifier
                 .offset(y = (-4).dp)
-                .background(if (isUnlocked) Color(0xFF78350F) else Color(0xFF64748B), RoundedCornerShape(999.dp))
-                .border(1.5.dp, if (isUnlocked) Color(0xFFFFC93C) else Color(0xFF94A3B8), RoundedCornerShape(999.dp))
+                .background(if (isUnlocked) Color(0xFF78350F) else LockedInk, RoundedCornerShape(999.dp))
+                .border(1.5.dp, if (isUnlocked) Color(0xFFFFC93C) else LockedIcon, RoundedCornerShape(999.dp))
                 .padding(horizontal = 10.dp, vertical = 3.dp)
         ) {
             Row(
