@@ -6,10 +6,12 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import com.playit.app.data.audio.AudioPlayer
 import com.playit.app.data.speech.VoskRecognizer
 import com.playit.app.navigation.NavGraph
+import com.playit.app.presentation.components.LocalVoicePlayback
 import com.playit.app.presentation.theme.PlayItTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -27,11 +29,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             PlayItTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    NavGraph()
+                // Lily's mouth follows the speech clip that is playing (TalkingLily)
+                CompositionLocalProvider(LocalVoicePlayback provides audioPlayer.voice) {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        NavGraph()
+                    }
                 }
             }
         }

@@ -6,14 +6,21 @@ import android.media.MediaPlayer
 import android.media.SoundPool
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.util.Log
 import com.playit.app.domain.manager.HearItSequenceBuilder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.ConcurrentHashMap
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
 private const val TAG = "AudioPlayer"
+
+/** A speech clip that is playing, and when it started ([SystemClock.uptimeMillis]). */
+data class VoiceClip(val assetPath: String, val startedAtMs: Long)
 
 @Singleton
 class AudioPlayer @Inject constructor(
@@ -38,6 +45,11 @@ class AudioPlayer @Inject constructor(
     }
 
     private val sfxSoundIdCache = ConcurrentHashMap<String, Int>()
+
+    private val _voice = MutableStateFlow<VoiceClip?>(null)
+
+    /** The speech clip playing now, so Lily's mouth can move with it (TalkingLily); null when none plays. */
+    val voice: StateFlow<VoiceClip?> = _voice.asStateFlow()
 
     init {
         preloadCommonSfx()
@@ -164,6 +176,7 @@ class AudioPlayer @Inject constructor(
             player.setOnPreparedListener { mp ->
                 try {
                     mp.start()
+                    _voice.value = VoiceClip(targetPath, SystemClock.uptimeMillis())
                 } catch (e: Exception) {
                     Log.e(TAG, "Error starting MediaPlayer onPrepared", e)
                     cleanupActiveTempFile()
@@ -172,12 +185,14 @@ class AudioPlayer @Inject constructor(
             }
 
             player.setOnCompletionListener {
+                _voice.value = null
                 cleanupActiveTempFile()
                 onComplete?.invoke()
             }
 
             player.setOnErrorListener { mp, what, extra ->
                 Log.e(TAG, "MediaPlayer error occurred for asset $targetPath: what=$what extra=$extra")
+                _voice.value = null
                 cleanupActiveTempFile()
                 mp.reset()
                 onComplete?.invoke()
@@ -290,6 +305,7 @@ class AudioPlayer @Inject constructor(
     }
 
     private fun stopInternal() {
+        _voice.value = null
         try {
             mediaPlayer?.let {
                 if (it.isPlaying) {

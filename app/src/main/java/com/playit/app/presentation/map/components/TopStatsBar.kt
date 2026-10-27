@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.presentation.components.MascotState
+import com.playit.app.presentation.components.TalkingLily
 import com.playit.app.presentation.components.rememberAssetPainter
 import com.playit.app.presentation.map.greetingFor
 import com.playit.app.presentation.theme.*
@@ -117,9 +118,10 @@ fun TopStatsBar(
                     .border(1.5.dp, ModernBorder, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Image(
-                    painter = rememberAssetPainter(MascotState.WAVING.assetPath),
+                TalkingLily(
+                    pose = MascotState.WAVING,
                     contentDescription = null,
+                    maxSize = 36.dp,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(2.dp)

@@ -96,10 +96,9 @@ fun MascotSpeechHeader(
                 },
             contentAlignment = Alignment.Center
         ) {
-            Image(
-                painter = rememberAssetPainter(mascotState.assetPath, maxSize = d.mascotHeader),
-                contentDescription = "Lily the Tarsier",
-                contentScale = ContentScale.Fit,
+            TalkingLily(
+                pose = mascotState,
+                maxSize = d.mascotHeader,
                 modifier = Modifier.fillMaxSize()
             )
         }

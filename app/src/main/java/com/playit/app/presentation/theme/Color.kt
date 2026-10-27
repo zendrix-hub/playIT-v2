@@ -125,6 +125,10 @@ val LilyCream = Color(0xFFFDEBD3)
 val LilyBlush = Color(0xFFFC9898)
 val LilyPupil = Color(0xFF3B1F0A)
 val LilyOutline = Color(0xFF4A2E18)
+// Her open mouth, sampled from lily_celebrating.png, for the mouth TalkingLily draws
+val LilyMouthInside = Color(0xFF402517)
+val LilyTongue = Color(0xFFDE5147)
+val LilyTeeth = Color(0xFFFFF8EE)
 
 val DestructiveRed = Color(0xFFE53935)
 val DestructiveRedShadow = Color(0xFFB71C1C)

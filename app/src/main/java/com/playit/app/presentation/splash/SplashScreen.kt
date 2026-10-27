@@ -62,6 +62,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.presentation.components.GummyButton
+import com.playit.app.presentation.components.VoiceMouth
+import com.playit.app.presentation.components.rememberVoiceMouth
 import com.playit.app.presentation.theme.Cloud
 import com.playit.app.presentation.theme.Ink
 import com.playit.app.presentation.theme.InkSoft
@@ -72,8 +74,10 @@ import com.playit.app.presentation.theme.LilyCream
 import com.playit.app.presentation.theme.LilyEarInner
 import com.playit.app.presentation.theme.LilyOrange
 import com.playit.app.presentation.theme.LilyOrangeShade
+import com.playit.app.presentation.theme.LilyMouthInside
 import com.playit.app.presentation.theme.LilyOutline
 import com.playit.app.presentation.theme.LilyPupil
+import com.playit.app.presentation.theme.LilyTongue
 import com.playit.app.presentation.theme.LocalReducedMotion
 import com.playit.app.presentation.theme.Sand
 import com.playit.app.presentation.theme.Sky
@@ -172,6 +176,7 @@ fun SplashScreen(
     }
 
     val eyes = remember(reducedMotion) { LilyEyes(instant = reducedMotion) }
+    val voice = rememberVoiceMouth()
     val scope = rememberCoroutineScope()
     LaunchedEffect(eyes, motion.blinks) {
         if (!motion.blinks) return@LaunchedEffect
@@ -227,6 +232,7 @@ fun SplashScreen(
 
             HeadspaceTarsierCanvas(
                 eyes = eyes,
+                voice = voice,
                 modifier = Modifier
                     .size(lilyWidth, lilyHeight)
                     .graphicsLayer {
@@ -309,11 +315,12 @@ private fun DrawScope.drawTopOutline(color: Color, width: Float, radius: Float) 
  * Lily as one soft dome: ears, a squircle head and body (a superellipse, n = 2.6, between a circle and a
  * square), cream eye patches, dark-brown pupils with two catchlights, pink cheeks, a small nose, a smile,
  * and her cream belly. Colours and the dark-brown outline come from her pictures (LilyOrange and friends).
- * The shapes are built once per size; a blink or a wink only redraws.
+ * The shapes are built once per size; a blink, a wink or her mouth moving with the tagline only redraws.
  */
 @Composable
 private fun HeadspaceTarsierCanvas(
     eyes: LilyEyes,
+    voice: VoiceMouth,
     modifier: Modifier = Modifier
 ) {
     Spacer(
@@ -386,10 +393,30 @@ private fun HeadspaceTarsierCanvas(
                         drawOval(LilyBlush.copy(alpha = 0.85f), Offset(cx + side * w * 0.255f - w * 0.055f, h * 0.555f), Size(w * 0.11f, h * 0.045f))
                     }
                     drawOval(LilyPupil, Offset(cx - w * 0.017f, h * 0.545f), Size(w * 0.034f, w * 0.024f))
-                    val smile = Path().apply {
-                        arcTo(Rect(cx - smileW / 2f, smileTop, cx + smileW / 2f, smileTop + smileH), 20f, 140f, true)
+                    // While she says the tagline, the smile opens with her voice (TalkingLily's mouth, drawn here)
+                    val open = if (voice.speaking) voice.level else 0f
+                    if (open < 0.08f) {
+                        val smile = Path().apply {
+                            arcTo(Rect(cx - smileW / 2f, smileTop, cx + smileW / 2f, smileTop + smileH), 20f, 140f, true)
+                        }
+                        drawPath(smile, LilyOutline, style = Stroke(line * 1.2f, cap = StrokeCap.Round))
+                    } else {
+                        val mw = smileW * (1f - 0.25f * open)
+                        val mh = smileH * (0.5f + 2.4f * open)
+                        val top = smileTop + smileH * 0.35f
+                        val mouth = Path().apply {
+                            moveTo(cx - mw / 2f, top)
+                            quadraticBezierTo(cx, top + smileH * 0.35f, cx + mw / 2f, top)
+                            cubicTo(cx + mw / 2f, top + mh * 0.9f, cx + mw * 0.28f, top + mh, cx, top + mh)
+                            cubicTo(cx - mw * 0.28f, top + mh, cx - mw / 2f, top + mh * 0.9f, cx - mw / 2f, top)
+                            close()
+                        }
+                        drawPath(mouth, LilyMouthInside)
+                        clipPath(mouth) {
+                            drawOval(LilyTongue, Offset(cx - mw * 0.31f, top + mh * 0.55f), Size(mw * 0.62f, mh * 0.6f))
+                        }
+                        drawPath(mouth, LilyOutline, style = Stroke(line * 1.2f))
                     }
-                    drawPath(smile, LilyOutline, style = Stroke(line * 1.2f, cap = StrokeCap.Round))
                 }
             }
     )

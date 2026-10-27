@@ -57,10 +57,9 @@ fun MascotBubbleComponent(
                     .background(SoftSky),
                 contentAlignment = Alignment.Center
             ) {
-                GummyMotionAsset(
-                    assetPath = mascotState.assetPath,
+                TalkingLily(
+                    pose = mascotState,
                     contentDescription = "Lily the Tarsier (${mascotState.name})",
-                    floatDistance = 2.dp,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(4.dp)

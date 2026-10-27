@@ -94,10 +94,8 @@ fun MascotBubble(
                 shape = CircleShape,
                 depthHeight = 3.dp
             ) {
-                androidx.compose.foundation.Image(
-                    painter = rememberAssetPainter(mascotState.assetPath),
-                    contentDescription = "Lily the Tarsier",
-                    contentScale = androidx.compose.ui.layout.ContentScale.Fit,
+                TalkingLily(
+                    pose = mascotState,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(4.dp)
@@ -197,10 +195,8 @@ fun DockedMascotWithBubble(
             shape = CircleShape,
             depthHeight = 4.dp
         ) {
-            androidx.compose.foundation.Image(
-                painter = rememberAssetPainter(mascotState.assetPath),
-                contentDescription = "Lily the Tarsier",
-                contentScale = androidx.compose.ui.layout.ContentScale.Fit,
+            TalkingLily(
+                pose = mascotState,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(6.dp)
