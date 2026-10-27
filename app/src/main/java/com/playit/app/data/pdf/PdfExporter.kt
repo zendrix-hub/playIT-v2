@@ -18,7 +18,7 @@ import javax.inject.Singleton
 
 /**
  * Native Android PdfDocument exporter generating offline, thesis-ready academic progress reports.
- * Formats executive summary, 7-day retention, at-risk letter alerts, and full 28-phoneme performance matrices.
+ * Formats executive summary, 7-day retention, at-risk letter alerts, and full 26-letter performance matrices.
  *
  * Implements 01_REQUIREMENTS_SUMMARY.md §1 Module 6 / §6 FR-12, FR-13.
  */
@@ -26,6 +26,17 @@ import javax.inject.Singleton
 class PdfExporter @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
+    companion object {
+        const val HEADER_BANNER_HEX = "#6C5CE7"
+        const val TEXT_NAVY_HEX = "#1E293B"
+        const val TEXT_MUTED_HEX = "#475569"
+        const val SURFACE_SOFT_HEX = "#F8FAFC"
+        const val BORDER_SLATE_HEX = "#E2E8F0"
+        const val AT_RISK_BG_HEX = "#FFF7ED"
+        const val AT_RISK_ACCENT_HEX = "#FF9F43"
+        const val STATUS_MASTERED_HEX = "#00C853"
+        const val STATUS_DEVELOPING_HEX = "#FFB800"
+    }
 
     fun exportReport(reportData: ReportData): Result<File> {
         return try {
@@ -41,8 +52,8 @@ class PdfExporter @Inject constructor(
                 isAntiAlias = true
             }
 
-            // 1. Header Banner (Theme FriendlyPurple / LearningBlue)
-            paint.color = Color.parseColor("#4C68D7")
+            // 1. Header Banner (PrimaryJoy #6C5CE7 matching ParentDashboard)
+            paint.color = Color.parseColor(HEADER_BANNER_HEX)
             canvas.drawRect(0f, 0f, pageWidth.toFloat(), 72f, paint)
 
             paint.color = Color.WHITE
@@ -56,13 +67,18 @@ class PdfExporter @Inject constructor(
 
             var yPos = 86f
 
-            // 2. Executive Summary Card
-            paint.color = Color.parseColor("#F4F7FC")
+            // 2. Executive Summary Card (AdultCanvasSoft #F8FAFC with 1dp slate border #E2E8F0)
+            paint.color = Color.parseColor(SURFACE_SOFT_HEX)
             val overviewHeight = 64f
             val overviewRect = RectF(24f, yPos, (pageWidth - 24).toFloat(), yPos + overviewHeight)
             canvas.drawRoundRect(overviewRect, 10f, 10f, paint)
+            paint.style = Paint.Style.STROKE
+            paint.strokeWidth = 1f
+            paint.color = Color.parseColor(BORDER_SLATE_HEX)
+            canvas.drawRoundRect(overviewRect, 10f, 10f, paint)
+            paint.style = Paint.Style.FILL
 
-            paint.color = Color.parseColor("#2D3436")
+            paint.color = Color.parseColor(TEXT_NAVY_HEX)
             paint.textSize = 11.5f
             paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             canvas.drawText("Executive Summary", 38f, yPos + 20f, paint)
@@ -76,14 +92,14 @@ class PdfExporter @Inject constructor(
 
             yPos += overviewHeight + 12f
 
-            // 3. At-Risk Warning Banner (if any)
+            // 3. At-Risk Warning Banner (ApricotGlow #FF9F43 — zero harsh red)
             if (reportData.atRiskLetters.isNotEmpty()) {
-                paint.color = Color.parseColor("#FFF1F0")
+                paint.color = Color.parseColor(AT_RISK_BG_HEX)
                 val atRiskHeight = 36f
                 val atRiskRect = RectF(24f, yPos, (pageWidth - 24).toFloat(), yPos + atRiskHeight)
                 canvas.drawRoundRect(atRiskRect, 8f, 8f, paint)
 
-                paint.color = Color.parseColor("#D63031")
+                paint.color = Color.parseColor(AT_RISK_ACCENT_HEX)
                 paint.textSize = 10f
                 paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
                 canvas.drawText("At-Risk Phonemes Requiring Practice (${reportData.atRiskLetters.size}):", 38f, yPos + 16f, paint)
@@ -96,16 +112,16 @@ class PdfExporter @Inject constructor(
             }
 
             // 4. Letter Matrix Table Header
-            paint.color = Color.parseColor("#4C68D7")
+            paint.color = Color.parseColor(HEADER_BANNER_HEX)
             paint.textSize = 11.5f
             paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             canvas.drawText("26-Letter Phonics Mastery Matrix", 24f, yPos + 12f, paint)
 
             yPos += 18f
-            paint.color = Color.parseColor("#E4EBF5")
+            paint.color = Color.parseColor(BORDER_SLATE_HEX)
             canvas.drawRect(24f, yPos, (pageWidth - 24).toFloat(), yPos + 18f, paint)
 
-            paint.color = Color.parseColor("#2D3436")
+            paint.color = Color.parseColor(TEXT_NAVY_HEX)
             paint.textSize = 9.5f
             paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             canvas.drawText("Letter", 34f, yPos + 13f, paint)
@@ -125,11 +141,11 @@ class PdfExporter @Inject constructor(
                 if (yPos + rowHeight > pageHeight - 30) return@forEachIndexed
 
                 if (index % 2 == 1) {
-                    paint.color = Color.parseColor("#F9FBFE")
+                    paint.color = Color.parseColor(SURFACE_SOFT_HEX)
                     canvas.drawRect(24f, yPos, (pageWidth - 24).toFloat(), yPos + rowHeight, paint)
                 }
 
-                paint.color = Color.parseColor("#2D3436")
+                paint.color = Color.parseColor(TEXT_NAVY_HEX)
                 paint.textSize = 9.5f
                 paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
                 canvas.drawText(lp.symbol.uppercase(), 34f, yPos + 12f, paint)
@@ -141,14 +157,14 @@ class PdfExporter @Inject constructor(
                     RiskStatus.RED -> "At-Risk"
                 }
                 val statusColor = when (lp.riskStatus) {
-                    RiskStatus.GREEN -> Color.parseColor("#00B894")
-                    RiskStatus.YELLOW -> Color.parseColor("#E67E22")
-                    RiskStatus.RED -> Color.parseColor("#D63031")
+                    RiskStatus.GREEN -> Color.parseColor(STATUS_MASTERED_HEX)
+                    RiskStatus.YELLOW -> Color.parseColor(STATUS_DEVELOPING_HEX)
+                    RiskStatus.RED -> Color.parseColor(AT_RISK_ACCENT_HEX)
                 }
                 paint.color = statusColor
                 canvas.drawText(statusText, 110f, yPos + 12f, paint)
 
-                paint.color = Color.parseColor("#2D3436")
+                paint.color = Color.parseColor(TEXT_NAVY_HEX)
                 canvas.drawText("${lp.accuracyPercentage.toInt()}%", 220f, yPos + 12f, paint)
                 canvas.drawText("${lp.totalAttempts}", 310f, yPos + 12f, paint)
                 canvas.drawText("${lp.heartsLost}", 400f, yPos + 12f, paint)
@@ -158,7 +174,7 @@ class PdfExporter @Inject constructor(
             }
 
             // 6. Footer Note
-            paint.color = Color.parseColor("#8395A7")
+            paint.color = Color.parseColor(TEXT_MUTED_HEX)
             paint.textSize = 8.5f
             paint.typeface = Typeface.DEFAULT
             canvas.drawText("playIT Early Literacy Phonics System — Evaluated via Marungko Phonics Progression", 24f, pageHeight - 16f, paint)

@@ -63,35 +63,24 @@ fun NamePromptScreen(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFFE8F0FE), // Airy crisp sky
-                        Color(0xFFF3E8FF), // Soft playful lavender
-                        Color(0xFFFEF3C7)  // Warm sunny cream
+                        SoftSky,
+                        Cloud,
+                        StageOnboardingMeadow
                     )
                 )
             )
     ) {
-        // Vibrant Emerald rolling playground hills
-        Row(
+        // Grounded pediatric campus meadow floor behind primary onboarding CTA
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 72.dp)
-                .align(Alignment.BottomCenter),
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            val hillWidths = listOf(90.dp, 120.dp, 105.dp, 135.dp, 100.dp, 115.dp)
-            hillWidths.forEachIndexed { index, width ->
-                Box(
-                    modifier = Modifier
-                        .size(width = width, height = width * 0.52f)
-                        .offset(x = if (index == 0) 0.dp else ((-18) * index).dp)
-                        .clip(RoundedCornerShape(topStartPercent = 50, topEndPercent = 50))
-                        .background(
-                            if (index % 2 == 0) EmeraldLeaf.copy(alpha = 0.20f) else EmeraldLeaf.copy(alpha = 0.32f)
-                        )
+                .fillMaxHeight(0.18f)
+                .align(Alignment.BottomCenter)
+                .background(
+                    color = StageOnboardingHorizon,
+                    shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
                 )
-            }
-        }
+        )
 
         // Main Form
         Column(

@@ -241,4 +241,16 @@ class ParentDashboardViewModelTest {
         advanceUntilIdle()
         assertTrue(viewModel.noProfilesLeft.value)
     }
+
+    @Test
+    fun pdfExporter_usesAlignedDiagnosticPaletteWithoutHarshRed() {
+        assertEquals("#6C5CE7", PdfExporter.HEADER_BANNER_HEX)
+        assertEquals("#1E293B", PdfExporter.TEXT_NAVY_HEX)
+        assertEquals("#F8FAFC", PdfExporter.SURFACE_SOFT_HEX)
+        assertEquals("#E2E8F0", PdfExporter.BORDER_SLATE_HEX)
+        assertEquals("#00C853", PdfExporter.STATUS_MASTERED_HEX)
+        assertEquals("#FFB800", PdfExporter.STATUS_DEVELOPING_HEX)
+        assertEquals("#FF9F43", PdfExporter.AT_RISK_ACCENT_HEX)
+        assertNotEquals("#D63031", PdfExporter.AT_RISK_ACCENT_HEX)
+    }
 }

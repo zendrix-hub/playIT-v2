@@ -55,6 +55,23 @@ val CanvasLight = Color(0xFFF7FAFC)
 val CanvasSoft = Color(0xFFEEF5FF)
 val CanvasWarm = Color(0xFFFFF9F0)
 
+// ── 2b. Duolingo ABC Grounded Stage Pastels & Adult Diagnostic Neutrals (Card 32)
+val StageOnboardingMeadow = Color(0xFFE8F8F5)
+val StageOnboardingHorizon = Color(0xFFD1F2EB)
+
+val StageHearItSky = Color(0xFFEBF5FB)
+val StageHearItHorizon = Color(0xFFD6EAF8)
+val StageSayItPeach = Color(0xFFFEF5E7)
+val StageSayItHorizon = Color(0xFFFDEBD0)
+val StageFindItMint = Color(0xFFEAFAF1)
+val StageFindItHorizon = Color(0xFFD5F5E3)
+val StageBlendItLavender = Color(0xFFF4ECF7)
+val StageBlendItHorizon = Color(0xFFE8DAEF)
+
+val AdultCanvasSoft = Color(0xFFF8FAFC)
+val AdultCanvasLight = Color(0xFFF1F5F9)
+val AdultSlateBorder = Color(0xFFE2E8F0)
+
 val SurfaceCard = Color(0xFFFFFFFF)
 val SurfaceCardSubtle = Color(0xFFF8FAFC)
 val SurfaceCardShadow = Color(0xFFCBD5E1)

@@ -55,9 +55,8 @@ fun ReportPreviewScreen(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        CanvasSoft,
-                        Color(0xFFF1F5F9),
-                        CanvasLight
+                        AdultCanvasSoft,
+                        AdultCanvasLight
                     )
                 )
             )
@@ -95,7 +94,7 @@ fun ReportPreviewScreen(
                 shape = CardShape,
                 colors = CardDefaults.cardColors(containerColor = SurfaceCard),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                border = BorderStroke(2.5.dp, ModernBorder)
+                border = BorderStroke(1.dp, AdultSlateBorder)
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),

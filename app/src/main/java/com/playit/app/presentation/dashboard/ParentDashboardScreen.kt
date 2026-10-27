@@ -90,36 +90,12 @@ fun ParentDashboardScreen(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        CanvasSoft,
-                        Color(0xFFF1F5F9),
-                        CanvasLight
+                        AdultCanvasSoft,
+                        AdultCanvasLight
                     )
                 )
             )
     ) {
-        // Soft rolling playground hills silhouette
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(80.dp)
-                .align(Alignment.BottomCenter),
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            val hillWidths = listOf(70.dp, 100.dp, 85.dp, 115.dp, 80.dp, 95.dp)
-            hillWidths.forEachIndexed { index, width ->
-                Box(
-                    modifier = Modifier
-                        .size(width = width, height = width * 0.55f)
-                        .offset(x = if (index == 0) 0.dp else ((-14) * index).dp)
-                        .clip(RoundedCornerShape(topStartPercent = 50, topEndPercent = 50))
-                        .background(
-                            if (index % 2 == 0) EmeraldLeaf.copy(alpha = 0.12f) else EmeraldLeafDark.copy(alpha = 0.18f)
-                        )
-                )
-            }
-        }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()

@@ -102,4 +102,16 @@ class PictureAssetsTest {
             assertTrue("${group.assetPath} is not in assets", File(assetsDir, group.assetPath).exists())
         }
     }
+
+    /** Every pathside landmark prop on the Bohol map is a released asset present on disk (card 32). */
+    @Test
+    fun everyMapLandmarkPropIsReleased() {
+        val released = releasedPictures()
+        val landmarks = com.playit.app.presentation.map.components.MAP_PATHSIDE_LANDMARKS
+        assertEquals("Expected all 16 Archipelago map props", 16, landmarks.size)
+        for (landmark in landmarks) {
+            assertTrue("${landmark.assetPath} is in no image release", landmark.assetPath in released)
+            assertTrue("${landmark.assetPath} is not in assets", File(assetsDir, landmark.assetPath).exists())
+        }
+    }
 }

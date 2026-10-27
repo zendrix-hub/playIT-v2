@@ -67,35 +67,24 @@ fun ProfileSelectScreen(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFFE8F0FE),
-                        Color(0xFFF3E8FF),
-                        Color(0xFFFEF3C7)
+                        SoftSky,
+                        Cloud,
+                        StageOnboardingMeadow
                     )
                 )
             )
     ) {
-        // Modern cheerful rolling playground hills
-        Row(
+        // Grounded pediatric campus meadow floor behind primary onboarding CTA
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 72.dp)
-                .align(Alignment.BottomCenter),
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            val hillWidths = listOf(80.dp, 120.dp, 95.dp, 130.dp, 90.dp, 110.dp)
-            hillWidths.forEachIndexed { index, width ->
-                Box(
-                    modifier = Modifier
-                        .size(width = width, height = width * 0.58f)
-                        .offset(x = if (index == 0) 0.dp else ((-18) * index).dp)
-                        .clip(RoundedCornerShape(topStartPercent = 50, topEndPercent = 50))
-                        .background(
-                            if (index % 2 == 0) EmeraldLeaf.copy(alpha = 0.22f) else EmeraldLeafDark.copy(alpha = 0.15f)
-                        )
+                .fillMaxHeight(0.18f)
+                .align(Alignment.BottomCenter)
+                .background(
+                    color = StageOnboardingHorizon,
+                    shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
                 )
-            }
-        }
+        )
 
         // Screen Content (Header, Mascot prompt, and Profile list)
         Column(

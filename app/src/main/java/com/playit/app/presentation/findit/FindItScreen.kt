@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -76,16 +77,20 @@ fun FindItScreen(
         modifier = Modifier
             .fillMaxSize()
             .resetsIdle { viewModel.onUserInteraction() }
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFE8F0FE),
-                        Color(0xFFF3E8FF),
-                        Color(0xFFFEF3C7)
-                    )
-                )
-            )
+            .background(StageFindItMint)
     ) {
+        // Grounded Duolingo ABC bottom horizon baseline (~19% height behind primary controls)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.19f)
+                .align(Alignment.BottomCenter)
+                .background(
+                    color = StageFindItHorizon,
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
+                )
+        )
+
         LessonScaffold(
             // 3-Segment Capsule Progress Bar + Back Button + Hearts Status
             topBar = { LessonTopBar(currentStep = LessonStep.FIND_IT, onBack = onBack, hearts = hearts) },

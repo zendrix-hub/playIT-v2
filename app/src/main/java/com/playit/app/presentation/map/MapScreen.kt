@@ -125,6 +125,7 @@ import androidx.compose.material.icons.rounded.LockOpen
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.zIndex
 import com.playit.app.presentation.theme.LocalPlayItDimens
 import com.playit.app.presentation.theme.PlayItMotion
 import kotlinx.coroutines.delay
@@ -398,10 +399,12 @@ fun MapScreen(
                     }
                 }
 
-                // Layer 1: Sky-to-sand gradient background with Chocolate Hills
+                // Layer 1: Sky-to-sand gradient background with Chocolate Hills and decorative landmarks
                 ChocolateHillsBackground(
                     totalHeight = totalMapHeightDp,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .zIndex(0f)
                 )
 
                 // Layer 2: Continuous rope-colored dashed trail path

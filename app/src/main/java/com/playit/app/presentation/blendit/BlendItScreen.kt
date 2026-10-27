@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -100,16 +101,20 @@ fun BlendItScreen(
         modifier = Modifier
             .fillMaxSize()
             .resetsIdle { viewModel.onUserInteraction() }
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFE8F0FE),
-                        Color(0xFFF3E8FF),
-                        Color(0xFFFEF3C7)
-                    )
-                )
-            )
+            .background(StageBlendItLavender)
     ) {
+        // Grounded Duolingo ABC bottom horizon baseline (~19% height behind primary controls)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.19f)
+                .align(Alignment.BottomCenter)
+                .background(
+                    color = StageBlendItHorizon,
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
+                )
+        )
+
         LessonScaffold(
             topBar = { LessonTopBar(currentStep = LessonStep.BLEND_IT, onBack = onBack, hearts = hearts) },
             header = {
