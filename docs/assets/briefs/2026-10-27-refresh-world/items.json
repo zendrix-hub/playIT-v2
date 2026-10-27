@@ -1,0 +1,269 @@
+{
+ "batch": "2026-10-27-refresh-world",
+ "size": "1024x1024",
+ "variants_per_round": 2,
+ "app_images": "app/src/main/assets/images",
+ "style_prompt": "Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark.",
+ "style_refs": [
+  "docs/assets/briefs/2026-10-27-refresh-anchors/umbrella.png",
+  "docs/assets/briefs/2026-10-27-refresh-anchors/mouse.png",
+  "docs/assets/briefs/2026-10-27-refresh-anchors/fish.png",
+  "docs/assets/briefs/2026-10-27-refresh-anchors/sun.png"
+ ],
+ "notes": "Design refresh (branch design/visual-refresh). Attach the 4 style_refs and the item's own ref, today's picture, as the identity reference: keep what it shows, redraw it in the anchors' style. Lily is not in this refresh.",
+ "items": [
+  {
+   "id": "map_prop_bush",
+   "word": "bush",
+   "why": "map prop, reward or avatar",
+   "app_file": "backgrounds/map_prop_bush.png",
+   "refs": [
+    "app/src/main/assets/images/backgrounds/map_prop_bush.png"
+   ],
+   "subject": "a round leafy green bush",
+   "prompt": "A round leafy green bush. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "map_prop_rock",
+   "word": "rock",
+   "why": "map prop, reward or avatar",
+   "app_file": "backgrounds/map_prop_rock.png",
+   "refs": [
+    "app/src/main/assets/images/backgrounds/map_prop_rock.png"
+   ],
+   "subject": "two round grey rocks with a little moss",
+   "prompt": "Two round grey rocks with a little moss. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "map_prop_tree_small",
+   "word": "tree small",
+   "why": "map prop, reward or avatar",
+   "app_file": "backgrounds/map_prop_tree_small.png",
+   "refs": [
+    "app/src/main/assets/images/backgrounds/map_prop_tree_small.png"
+   ],
+   "subject": "a small round tree with a brown trunk on a tuft of grass",
+   "prompt": "A small round tree with a brown trunk on a tuft of grass. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "mapprop_backpack",
+   "word": "backpack",
+   "why": "map prop, reward or avatar",
+   "app_file": "backgrounds/mapprop_backpack.png",
+   "refs": [
+    "app/src/main/assets/images/backgrounds/mapprop_backpack.png"
+   ],
+   "subject": "a blue school backpack with a yellow side pocket",
+   "prompt": "A blue school backpack with a yellow side pocket. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "mapprop_book_stack",
+   "word": "book stack",
+   "why": "map prop, reward or avatar",
+   "app_file": "backgrounds/mapprop_book_stack.png",
+   "refs": [
+    "app/src/main/assets/images/backgrounds/mapprop_book_stack.png"
+   ],
+   "subject": "a stack of three closed books, purple, yellow and green",
+   "prompt": "A stack of three closed books, purple, yellow and green. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "mapprop_crayon_bridge",
+   "word": "crayon bridge",
+   "why": "map prop, reward or avatar",
+   "app_file": "backgrounds/mapprop_crayon_bridge.png",
+   "refs": [
+    "app/src/main/assets/images/backgrounds/mapprop_crayon_bridge.png"
+   ],
+   "subject": "a small arched bridge made of colourful crayons",
+   "prompt": "A small arched bridge made of colourful crayons. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "mapprop_flower",
+   "word": "flower",
+   "why": "map prop, reward or avatar",
+   "app_file": "backgrounds/mapprop_flower.png",
+   "refs": [
+    "app/src/main/assets/images/backgrounds/mapprop_flower.png"
+   ],
+   "subject": "one big orange-pink flower with green leaves",
+   "prompt": "One big orange-pink flower with green leaves. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "mapprop_globe",
+   "word": "globe",
+   "why": "map prop, reward or avatar",
+   "app_file": "backgrounds/mapprop_globe.png",
+   "refs": [
+    "app/src/main/assets/images/backgrounds/mapprop_globe.png"
+   ],
+   "subject": "a desk globe on a wooden stand",
+   "prompt": "A desk globe on a wooden stand. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "mapprop_magnifying_glass",
+   "word": "magnifying glass",
+   "why": "map prop, reward or avatar",
+   "app_file": "backgrounds/mapprop_magnifying_glass.png",
+   "refs": [
+    "app/src/main/assets/images/backgrounds/mapprop_magnifying_glass.png"
+   ],
+   "subject": "a magnifying glass with an orange handle",
+   "prompt": "A magnifying glass with an orange handle. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "mapprop_nipa_hut",
+   "word": "nipa hut",
+   "why": "map prop, reward or avatar",
+   "app_file": "backgrounds/mapprop_nipa_hut.png",
+   "refs": [
+    "app/src/main/assets/images/backgrounds/mapprop_nipa_hut.png"
+   ],
+   "subject": "a Filipino nipa hut (bahay kubo) on short stilts with a thatched roof",
+   "prompt": "A Filipino nipa hut (bahay kubo) on short stilts with a thatched roof. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "mapprop_paint_palette",
+   "word": "paint palette",
+   "why": "map prop, reward or avatar",
+   "app_file": "backgrounds/mapprop_paint_palette.png",
+   "refs": [
+    "app/src/main/assets/images/backgrounds/mapprop_paint_palette.png"
+   ],
+   "subject": "a wooden paint palette with dabs of paint and a brush",
+   "prompt": "A wooden paint palette with dabs of paint and a brush. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "mapprop_palm_tree",
+   "word": "palm tree",
+   "why": "map prop, reward or avatar",
+   "app_file": "backgrounds/mapprop_palm_tree.png",
+   "refs": [
+    "app/src/main/assets/images/backgrounds/mapprop_palm_tree.png"
+   ],
+   "subject": "a coconut palm tree on a tuft of grass",
+   "prompt": "A coconut palm tree on a tuft of grass. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "mapprop_paper_airplane",
+   "word": "paper airplane",
+   "why": "map prop, reward or avatar",
+   "app_file": "backgrounds/mapprop_paper_airplane.png",
+   "refs": [
+    "app/src/main/assets/images/backgrounds/mapprop_paper_airplane.png"
+   ],
+   "subject": "a white paper airplane gliding to the right",
+   "prompt": "A white paper airplane gliding to the right. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "mapprop_pencil_tower",
+   "word": "pencil tower",
+   "why": "map prop, reward or avatar",
+   "app_file": "backgrounds/mapprop_pencil_tower.png",
+   "refs": [
+    "app/src/main/assets/images/backgrounds/mapprop_pencil_tower.png"
+   ],
+   "subject": "a tall yellow pencil standing like a tower, a little door and window",
+   "prompt": "A tall yellow pencil standing like a tower, a little door and window. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "reward_heart",
+   "word": "heart",
+   "why": "map prop, reward or avatar",
+   "app_file": "rewards/reward_heart.png",
+   "refs": [
+    "app/src/main/assets/images/rewards/reward_heart.png"
+   ],
+   "subject": "a glossy hibiscus-red heart",
+   "prompt": "A glossy hibiscus-red heart. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "reward_star",
+   "word": "star",
+   "why": "map prop, reward or avatar",
+   "app_file": "rewards/reward_star.png",
+   "refs": [
+    "app/src/main/assets/images/rewards/reward_star.png"
+   ],
+   "subject": "a glossy golden five-point star",
+   "prompt": "A glossy golden five-point star. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "reward_streak",
+   "word": "streak",
+   "why": "map prop, reward or avatar",
+   "app_file": "rewards/reward_streak.png",
+   "refs": [
+    "app/src/main/assets/images/rewards/reward_streak.png"
+   ],
+   "subject": "a curling orange and yellow flame",
+   "prompt": "A curling orange and yellow flame. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "avatar_01_cat",
+   "word": "01 cat",
+   "why": "map prop, reward or avatar",
+   "app_file": "characters/avatar_01_cat.png",
+   "refs": [
+    "app/src/main/assets/images/characters/avatar_01_cat.png"
+   ],
+   "subject": "the head of an orange cat, front view, smiling (keep the animal and its colour)",
+   "prompt": "The head of an orange cat, front view, smiling (keep the animal and its colour). Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "avatar_02_monkey",
+   "word": "02 monkey",
+   "why": "map prop, reward or avatar",
+   "app_file": "characters/avatar_02_monkey.png",
+   "refs": [
+    "app/src/main/assets/images/characters/avatar_02_monkey.png"
+   ],
+   "subject": "the head of a brown monkey, front view, smiling (keep the animal and its colour)",
+   "prompt": "The head of a brown monkey, front view, smiling (keep the animal and its colour). Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "avatar_03_bunny",
+   "word": "03 bunny",
+   "why": "map prop, reward or avatar",
+   "app_file": "characters/avatar_03_bunny.png",
+   "refs": [
+    "app/src/main/assets/images/characters/avatar_03_bunny.png"
+   ],
+   "subject": "the head of a white bunny with pink inner ears, front view, smiling (keep the animal and its colour)",
+   "prompt": "The head of a white bunny with pink inner ears, front view, smiling (keep the animal and its colour). Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "avatar_04_bear",
+   "word": "04 bear",
+   "why": "map prop, reward or avatar",
+   "app_file": "characters/avatar_04_bear.png",
+   "refs": [
+    "app/src/main/assets/images/characters/avatar_04_bear.png"
+   ],
+   "subject": "the head of a brown bear, front view, smiling (keep the animal and its colour)",
+   "prompt": "The head of a brown bear, front view, smiling (keep the animal and its colour). Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "avatar_05_frog",
+   "word": "05 frog",
+   "why": "map prop, reward or avatar",
+   "app_file": "characters/avatar_05_frog.png",
+   "refs": [
+    "app/src/main/assets/images/characters/avatar_05_frog.png"
+   ],
+   "subject": "the head of a green frog, front view, smiling (keep the animal and its colour)",
+   "prompt": "The head of a green frog, front view, smiling (keep the animal and its colour). Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "avatar_06_owl",
+   "word": "06 owl",
+   "why": "map prop, reward or avatar",
+   "app_file": "characters/avatar_06_owl.png",
+   "refs": [
+    "app/src/main/assets/images/characters/avatar_06_owl.png"
+   ],
+   "subject": "the head of a purple owl, front view, smiling (keep the animal and its colour)",
+   "prompt": "The head of a purple owl, front view, smiling (keep the animal and its colour). Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  }
+ ]
+}

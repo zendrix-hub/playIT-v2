@@ -1,0 +1,709 @@
+{
+ "batch": "2026-10-27-refresh-findit",
+ "size": "1024x1024",
+ "variants_per_round": 2,
+ "app_images": "app/src/main/assets/images",
+ "style_prompt": "Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark.",
+ "style_refs": [
+  "docs/assets/briefs/2026-10-27-refresh-anchors/umbrella.png",
+  "docs/assets/briefs/2026-10-27-refresh-anchors/mouse.png",
+  "docs/assets/briefs/2026-10-27-refresh-anchors/fish.png",
+  "docs/assets/briefs/2026-10-27-refresh-anchors/sun.png"
+ ],
+ "notes": "Design refresh (branch design/visual-refresh). Attach the 4 style_refs and the item's own ref, today's picture, as the identity reference: keep what it shows, redraw it in the anchors' style. Lily is not in this refresh.",
+ "items": [
+  {
+   "id": "picture_ant",
+   "word": "ant",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_ant.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_ant.png"
+   ],
+   "subject": "a friendly dark-brown ant standing on six short legs, two antennae, smiling face",
+   "prompt": "A friendly dark-brown ant standing on six short legs, two antennae, smiling face. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_apple",
+   "word": "apple",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_apple.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_apple.png"
+   ],
+   "subject": "a round apple in warm apple red with a short brown stem and one green leaf",
+   "prompt": "A round apple in warm apple red with a short brown stem and one green leaf. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_axe",
+   "word": "axe",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_axe.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_axe.png"
+   ],
+   "subject": "a small wood-chopping axe standing upright, grey metal head, wooden handle",
+   "prompt": "A small wood-chopping axe standing upright, grey metal head, wooden handle. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_ball",
+   "word": "ball",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_ball.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_ball.png"
+   ],
+   "subject": "a round beach ball with blue, yellow and white panels",
+   "prompt": "A round beach ball with blue, yellow and white panels. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_bano",
+   "word": "bano",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_bano.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_bano.png"
+   ],
+   "subject": "a white bathtub with a curved rim and four short feet, a few soap bubbles on top (baño, the bath)",
+   "prompt": "A white bathtub with a curved rim and four short feet, a few soap bubbles on top (baño, the bath). Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_box",
+   "word": "box",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_box.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_box.png"
+   ],
+   "subject": "an empty open cardboard box with its four flaps up",
+   "prompt": "An empty open cardboard box with its four flaps up. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_cat",
+   "word": "cat",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_cat.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_cat.png"
+   ],
+   "subject": "an orange cat sitting, facing the viewer, curled tail, smiling",
+   "prompt": "An orange cat sitting, facing the viewer, curled tail, smiling. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_dog",
+   "word": "dog",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_dog.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_dog.png"
+   ],
+   "subject": "a brown puppy sitting, floppy ears, cream muzzle, smiling",
+   "prompt": "A brown puppy sitting, floppy ears, cream muzzle, smiling. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_duck",
+   "word": "duck",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_duck.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_duck.png"
+   ],
+   "subject": "a yellow duckling standing, side view, orange beak and feet",
+   "prompt": "A yellow duckling standing, side view, orange beak and feet. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_egg",
+   "word": "egg",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_egg.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_egg.png"
+   ],
+   "subject": "a single plain white egg standing upright",
+   "prompt": "A single plain white egg standing upright. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_elephant",
+   "word": "elephant",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_elephant.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_elephant.png"
+   ],
+   "subject": "a lilac-grey baby elephant standing, big ears, trunk curled up, smiling",
+   "prompt": "A lilac-grey baby elephant standing, big ears, trunk curled up, smiling. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_envelope",
+   "word": "envelope",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_envelope.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_envelope.png"
+   ],
+   "subject": "a closed cream envelope with a pointed flap, no stamp, no writing",
+   "prompt": "A closed cream envelope with a pointed flap, no stamp, no writing. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_fish",
+   "word": "fish",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_fish.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_fish.png"
+   ],
+   "subject": "an orange goldfish swimming to the right, side view, one round eye",
+   "prompt": "An orange goldfish swimming to the right, side view, one round eye. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_gift",
+   "word": "gift",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_gift.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_gift.png"
+   ],
+   "subject": "a gift box in yellow wrapping paper with a blue ribbon and bow",
+   "prompt": "A gift box in yellow wrapping paper with a blue ribbon and bow. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_goat",
+   "word": "goat",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_goat.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_goat.png"
+   ],
+   "subject": "a white goat standing on four legs, side view, small horns, little beard, smiling",
+   "prompt": "A white goat standing on four legs, side view, small horns, little beard, smiling. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_hat",
+   "word": "hat",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_hat.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_hat.png"
+   ],
+   "subject": "a cone-shaped party hat with dots and a pom-pom on top",
+   "prompt": "A cone-shaped party hat with dots and a pom-pom on top. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_igloo",
+   "word": "igloo",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_igloo.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_igloo.png"
+   ],
+   "subject": "an igloo of pale-blue ice blocks with a round dark doorway",
+   "prompt": "An igloo of pale-blue ice blocks with a round dark doorway. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_ink",
+   "word": "ink",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_ink.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_ink.png"
+   ],
+   "subject": "a small glass ink bottle full of dark-blue ink, one ink drop beside it",
+   "prompt": "A small glass ink bottle full of dark-blue ink, one ink drop beside it. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_insect",
+   "word": "insect",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_insect.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_insect.png"
+   ],
+   "subject": "a red-orange ladybug standing upright on two legs, black spots, smiling",
+   "prompt": "A red-orange ladybug standing upright on two legs, black spots, smiling. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_jet",
+   "word": "jet",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_jet.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_jet.png"
+   ],
+   "subject": "a small light-blue passenger jet plane flying to the left",
+   "prompt": "A small light-blue passenger jet plane flying to the left. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_jug",
+   "word": "jug",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_jug.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_jug.png"
+   ],
+   "subject": "a teal water jug with a handle and spout, a small white flower painted on it",
+   "prompt": "A teal water jug with a handle and spout, a small white flower painted on it. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_key",
+   "word": "key",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_key.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_key.png"
+   ],
+   "subject": "a golden key with a heart-shaped bow",
+   "prompt": "A golden key with a heart-shaped bow. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_king",
+   "word": "king",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_king.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_king.png"
+   ],
+   "subject": "a smiling king, head and shoulders, gold crown, red-brown robe with a white fur collar",
+   "prompt": "A smiling king, head and shoulders, gold crown, red-brown robe with a white fur collar. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_kite",
+   "word": "kite",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_kite.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_kite.png"
+   ],
+   "subject": "a diamond kite in yellow and blue with a curly tail",
+   "prompt": "A diamond kite in yellow and blue with a curly tail. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_leaf",
+   "word": "leaf",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_leaf.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_leaf.png"
+   ],
+   "subject": "a single green leaf with veins, gently curved",
+   "prompt": "A single green leaf with veins, gently curved. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_lion",
+   "word": "lion",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_lion.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_lion.png"
+   ],
+   "subject": "a lion cub sitting, golden mane, smiling",
+   "prompt": "A lion cub sitting, golden mane, smiling. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_map",
+   "word": "map",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_map.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_map.png"
+   ],
+   "subject": "a folded paper treasure map showing a green island and a dotted path, no letters",
+   "prompt": "A folded paper treasure map showing a green island and a dotted path, no letters. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_mouse",
+   "word": "mouse",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_mouse.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_mouse.png"
+   ],
+   "subject": "a grey mouse sitting upright, round pink ears, cream belly, curly pink tail, smiling",
+   "prompt": "A grey mouse sitting upright, round pink ears, cream belly, curly pink tail, smiling. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_nest",
+   "word": "nest",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_nest.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_nest.png"
+   ],
+   "subject": "a twig bird's nest holding three pale-blue eggs",
+   "prompt": "A twig bird's nest holding three pale-blue eggs. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_net",
+   "word": "net",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_net.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_net.png"
+   ],
+   "subject": "a butterfly net with a round rim, green mesh and a wooden handle",
+   "prompt": "A butterfly net with a round rim, green mesh and a wooden handle. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_nino",
+   "word": "nino",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_nino.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_nino.png"
+   ],
+   "subject": "a smiling Filipino boy (niño), head and shoulders, brown skin, short black hair, blue cap",
+   "prompt": "A smiling Filipino boy (niño), head and shoulders, brown skin, short black hair, blue cap. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_nut",
+   "word": "nut",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_nut.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_nut.png"
+   ],
+   "subject": "an acorn with a textured brown cap",
+   "prompt": "An acorn with a textured brown cap. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_orange",
+   "word": "orange",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_orange.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_orange.png"
+   ],
+   "subject": "a round orange fruit with a small green leaf",
+   "prompt": "A round orange fruit with a small green leaf. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_owl",
+   "word": "owl",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_owl.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_owl.png"
+   ],
+   "subject": "a brown owl sitting on a short branch, big round eyes",
+   "prompt": "A brown owl sitting on a short branch, big round eyes. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_ox",
+   "word": "ox",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_ox.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_ox.png"
+   ],
+   "subject": "a brown ox, front view, curved horns, smiling",
+   "prompt": "A brown ox, front view, curved horns, smiling. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_pig",
+   "word": "pig",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_pig.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_pig.png"
+   ],
+   "subject": "a pink pig standing, side view, curly tail, smiling",
+   "prompt": "A pink pig standing, side view, curly tail, smiling. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_pina",
+   "word": "pina",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_pina.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_pina.png"
+   ],
+   "subject": "a whole pineapple (piña), golden body with a crisscross pattern and a spiky green crown",
+   "prompt": "A whole pineapple (piña), golden body with a crisscross pattern and a spiky green crown. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_queen",
+   "word": "queen",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_queen.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_queen.png"
+   ],
+   "subject": "a smiling queen, head and shoulders, gold crown, purple robe with a white fur collar",
+   "prompt": "A smiling queen, head and shoulders, gold crown, purple robe with a white fur collar. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_quilt",
+   "word": "quilt",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_quilt.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_quilt.png"
+   ],
+   "subject": "a folded patchwork quilt of soft pastel squares",
+   "prompt": "A folded patchwork quilt of soft pastel squares. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_rabbit",
+   "word": "rabbit",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_rabbit.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_rabbit.png"
+   ],
+   "subject": "a white rabbit sitting, long ears with pink insides, smiling",
+   "prompt": "A white rabbit sitting, long ears with pink insides, smiling. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_ring",
+   "word": "ring",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_ring.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_ring.png"
+   ],
+   "subject": "a gold ring with one blue gem",
+   "prompt": "A gold ring with one blue gem. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_rocket",
+   "word": "rocket",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_rocket.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_rocket.png"
+   ],
+   "subject": "a white-and-blue rocket flying up to the right with a small orange flame",
+   "prompt": "A white-and-blue rocket flying up to the right with a small orange flame. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_six",
+   "word": "six",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_six.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_six.png"
+   ],
+   "subject": "the numeral 6 in light blue beside six small dots in two columns",
+   "prompt": "The numeral 6 in light blue beside six small dots in two columns. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_snake",
+   "word": "snake",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_snake.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_snake.png"
+   ],
+   "subject": "a green snake coiled in an S shape, smiling",
+   "prompt": "A green snake coiled in an S shape, smiling. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_star",
+   "word": "star",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_star.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_star.png"
+   ],
+   "subject": "a five-point yellow star",
+   "prompt": "A five-point yellow star. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_sun",
+   "word": "sun",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_sun.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_sun.png"
+   ],
+   "subject": "a bright yellow sun with short rounded rays",
+   "prompt": "A bright yellow sun with short rounded rays. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_tiger",
+   "word": "tiger",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_tiger.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_tiger.png"
+   ],
+   "subject": "an orange tiger cub sitting, black stripes, smiling",
+   "prompt": "An orange tiger cub sitting, black stripes, smiling. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_top",
+   "word": "top",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_top.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_top.png"
+   ],
+   "subject": "a wooden spinning top with colourful stripes",
+   "prompt": "A wooden spinning top with colourful stripes. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_tree",
+   "word": "tree",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_tree.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_tree.png"
+   ],
+   "subject": "a round green tree with a short brown trunk",
+   "prompt": "A round green tree with a short brown trunk. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_umbrella",
+   "word": "umbrella",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_umbrella.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_umbrella.png"
+   ],
+   "subject": "an open umbrella with sunny yellow and sky blue panels and a curved brown handle",
+   "prompt": "An open umbrella with sunny yellow and sky blue panels and a curved brown handle. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_uncle",
+   "word": "uncle",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_uncle.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_uncle.png"
+   ],
+   "subject": "a smiling Filipino man (uncle), waist up, waving, short black hair, teal shirt",
+   "prompt": "A smiling Filipino man (uncle), waist up, waving, short black hair, teal shirt. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_up",
+   "word": "up",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_up.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_up.png"
+   ],
+   "subject": "a blue balloon floating upward with its string trailing below and short motion lines under it",
+   "prompt": "A blue balloon floating upward with its string trailing below and short motion lines under it. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_van",
+   "word": "van",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_van.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_van.png"
+   ],
+   "subject": "a small blue-and-cream van, side view",
+   "prompt": "A small blue-and-cream van, side view. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_vase",
+   "word": "vase",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_vase.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_vase.png"
+   ],
+   "subject": "a teal vase holding three flowers, pink, purple and yellow",
+   "prompt": "A teal vase holding three flowers, pink, purple and yellow. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_vest",
+   "word": "vest",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_vest.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_vest.png"
+   ],
+   "subject": "a light-blue vest with buttons down the front",
+   "prompt": "A light-blue vest with buttons down the front. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_watch",
+   "word": "watch",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_watch.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_watch.png"
+   ],
+   "subject": "a wristwatch with an orange face, two hands and no numbers, and a blue strap",
+   "prompt": "A wristwatch with an orange face, two hands and no numbers, and a blue strap. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_wing",
+   "word": "wing",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_wing.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_wing.png"
+   ],
+   "subject": "a single white feathered bird wing",
+   "prompt": "A single white feathered bird wing. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_worm",
+   "word": "worm",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_worm.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_worm.png"
+   ],
+   "subject": "a pink worm in an S shape, smiling",
+   "prompt": "A pink worm in an S shape, smiling. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_yak",
+   "word": "yak",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_yak.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_yak.png"
+   ],
+   "subject": "a shaggy brown yak, front view, curved horns",
+   "prompt": "A shaggy brown yak, front view, curved horns. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_yarn",
+   "word": "yarn",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_yarn.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_yarn.png"
+   ],
+   "subject": "a ball of pink yarn with one loose strand",
+   "prompt": "A ball of pink yarn with one loose strand. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_yoyo",
+   "word": "yoyo",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_yoyo.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_yoyo.png"
+   ],
+   "subject": "a purple yo-yo with its string",
+   "prompt": "A purple yo-yo with its string. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_zebra",
+   "word": "zebra",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_zebra.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_zebra.png"
+   ],
+   "subject": "a zebra foal standing, black and white stripes, smiling",
+   "prompt": "A zebra foal standing, black and white stripes, smiling. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  },
+  {
+   "id": "picture_zip",
+   "word": "zip",
+   "why": "Find It and Hear It picture",
+   "app_file": "pictures/picture_zip.png",
+   "refs": [
+    "app/src/main/assets/images/pictures/picture_zip.png"
+   ],
+   "subject": "a blue fabric zipper, half open, with a gold pull tab",
+   "prompt": "A blue fabric zipper, half open, with a gold pull tab. Refined flat cartoon sticker illustration for a children's phonics app (ages 5 to 7), in exactly the style of the attached style reference pictures: a bold, even, dark chocolate-brown outline (#4A2E18) around every shape, flat bright colours with one soft darker shade on one side and one small white highlight, rounded friendly proportions, clean simple shapes, no gradients, no texture, no pure red (use a warm tomato or hibiscus red), simple enough to recognise at 64 px. Faces only on animals and people: objects, food, plants and vehicles have no face. One single subject, centered, filling about 70% of the square. Plain pure white background (#FFFFFF), no ground shadow, no frame, no text, no letters, no numbers unless the subject is a number, no watermark."
+  }
+ ]
+}
