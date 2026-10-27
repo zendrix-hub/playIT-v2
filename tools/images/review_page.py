@@ -38,26 +38,36 @@ def round_dir(batch, n):
     return batch / f"round-{n:02d}"
 
 
-def find_csv(batch, n):
-    name = f"{batch.name}_round-{n:02d}_review.csv"
+def find_csvs(batch, n):
+    """Every review CSV of round n, oldest first. A round that is drawn over several sittings is exported after
+    each one, and the browser saves the second export as "<name> (1).csv", so all of them count."""
+    stem = f"{batch.name}_round-{n:02d}_review"
     places = [round_dir(batch, n), batch, pathlib.Path.home() / "Downloads"]
     if os.environ.get("USERPROFILE"):
         places.append(pathlib.Path(os.environ["USERPROFILE"]) / "Downloads")
+    found = {}
     for p in places:
-        f = p / name
-        if f.exists():
-            return f
-    return None
+        if p.is_dir():
+            for f in p.glob(stem + "*.csv"):
+                found[f.resolve()] = f
+    return sorted(found.values(), key=lambda f: f.stat().st_mtime)
+
+
+def find_csv(batch, n):
+    files = find_csvs(batch, n)
+    return files[-1] if files else None
 
 
 def read_rounds(batch):
     """Every round with a review CSV: list of (round, {item: row})."""
     out, n = [], 1
     while round_dir(batch, n).exists():
-        f = find_csv(batch, n)
-        if f:
+        rows = {}
+        for f in find_csvs(batch, n):   # a later export's answer for an item wins
             with open(f, encoding="utf-8-sig", newline="") as fh:
-                out.append((n, {r["item"]: r for r in csv.DictReader(fh)}))
+                rows.update({r["item"]: r for r in csv.DictReader(fh)})
+        if rows:
+            out.append((n, rows))
         n += 1
     return out
 
@@ -83,10 +93,13 @@ def status(batch):
         if it["id"] not in picked:
             open_items.append({"id": it["id"], "word": it["word"], "notes": notes, "closest": closest})
     last = max([n for n, _ in rounds], default=0)
-    # The next round is the first round folder without a review CSV, or a new one.
+    # The next round is the first round folder without a review CSV, or a new one. But a round drawn over several
+    # sittings (the free quota ran out) stays the next round while an open item has no images in it yet.
     n = 1
     while round_dir(batch, n).exists() and find_csv(batch, n):
         n += 1
+    if n > 1 and any(not list(round_dir(batch, n - 1).glob(f"{o['id']}__v*.png")) for o in open_items):
+        n -= 1
     result = {"picked": picked, "open": open_items, "next_round": n, "last_reviewed_round": last}
     if not open_items:
         (batch / "picks.json").write_text(json.dumps(picked, indent=1) + "\n", encoding="utf-8")
