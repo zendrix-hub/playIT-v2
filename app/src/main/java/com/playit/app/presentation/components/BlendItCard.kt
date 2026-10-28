@@ -39,6 +39,8 @@ fun BlendItCard(
     word: String,
     modifier: Modifier = Modifier,
     isCorrect: Boolean = false,
+    // The picture celebrates when the whole word plays (the blend moment), so word and picture go together.
+    celebrate: Boolean = isCorrect,
     onReplayAudio: () -> Unit = {}
 ) {
     val cleanWord = word.lowercase()
@@ -74,7 +76,7 @@ fun BlendItCard(
                         assetPath = assetPath,
                         contentDescription = "Blend word illustration: $cleanWord",
                         floatDistance = 4.dp,
-                        celebrateTrigger = isCorrect,
+                        celebrateTrigger = celebrate,
                         modifier = Modifier.size(pictureBox * 0.95f)
                     )
                 }

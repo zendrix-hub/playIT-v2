@@ -28,7 +28,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.playit.app.presentation.components.resetsIdle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
@@ -47,9 +49,19 @@ import com.playit.app.presentation.components.LessonStep
 import com.playit.app.presentation.components.LessonTopBar
 import com.playit.app.presentation.components.MascotSpeechHeader
 import com.playit.app.presentation.components.MascotState
+import com.playit.app.presentation.components.hop
 import com.playit.app.presentation.components.idleBounce
 import com.playit.app.presentation.theme.*
 import kotlinx.coroutines.delay
+
+/** Space between two slots, which the blend closes. */
+private val SLOT_GAP = 8.dp
+
+/**
+ * At the blend moment the slots slide together into one word: slot [index] of [count] moves this many gaps
+ * toward the middle, so each pair of neighbours closes exactly one gap (design refresh).
+ */
+internal fun blendJoinGaps(index: Int, count: Int): Float = (count - 1) / 2f - index
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -69,6 +81,18 @@ fun BlendItScreen(
     val highlightedSlotIndex by viewModel.highlightedSlotIndex.collectAsStateWithLifecycle()
     val totalWords = words.size.coerceAtLeast(1)
     val d = LocalPlayItDimens.current
+    val reduced = LocalReducedMotion.current
+
+    // The blend moment (every slot lit, then the whole word plays): the slots join into one block and the
+    // word jumps once. Under reduced motion they only light up, as before.
+    val blending = highlightedSlotIndex == BlendItViewModel.ALL_SLOTS
+    var blends by remember { mutableIntStateOf(0) }
+    LaunchedEffect(blending) { if (blending) blends++ }
+    val join by animateFloatAsState(
+        targetValue = if (blending && !reduced) 1f else 0f,
+        animationSpec = spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessMediumLow),
+        label = "blendJoin"
+    )
 
     // Fires onSessionComplete once SessionComplete is emitted
     LaunchedEffect(uiState) {
@@ -181,6 +205,7 @@ fun BlendItScreen(
                 BlendItCard(
                     word = wordItem.word,
                     isCorrect = uiState is BlendItUiState.WordCorrect,
+                    celebrate = blending,
                     onReplayAudio = { viewModel.playTargetWordAudio() },
                     // On 360x640 the card (with its smaller compact picture) gives up 8 dp of its 176 dp
                     // minimum so the tiles clear the bottom bar.
@@ -194,16 +219,17 @@ fun BlendItScreen(
             ) {
                 // Target Letter Slots (Target Drop Area) with gentle wobble on incorrect and sequential sound-out bounce
                 FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                    horizontalArrangement = Arrangement.spacedBy(SLOT_GAP, Alignment.CenterHorizontally),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth().graphicsLayer { rotationZ = wobble.value }
+                    modifier = Modifier.fillMaxWidth().graphicsLayer { rotationZ = wobble.value }.hop(blends)
                 ) {
                     val wordLength = currentWord?.word?.length ?: 3
                     for (i in 0 until wordLength) {
                         val tile = placedTiles.getOrNull(i)
-                        val isHighlighted = highlightedSlotIndex == i || highlightedSlotIndex == BlendItViewModel.ALL_SLOTS
+                        val isHighlighted = highlightedSlotIndex == i || blending
                         val slotScale by animateFloatAsState(
-                            targetValue = if (isHighlighted) 1.14f else 1f,
+                            // Joined slots keep their size, so they meet edge to edge.
+                            targetValue = if (isHighlighted && !(blending && !reduced)) 1.14f else 1f,
                             animationSpec = spring(
                                 dampingRatio = Spring.DampingRatioMediumBouncy,
                                 stiffness = Spring.StiffnessLow
@@ -242,6 +268,7 @@ fun BlendItScreen(
                                 .graphicsLayer {
                                     scaleX = slotScale
                                     scaleY = slotScale
+                                    translationX = blendJoinGaps(i, wordLength) * SLOT_GAP.toPx() * join
                                 }
                         ) {
                             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

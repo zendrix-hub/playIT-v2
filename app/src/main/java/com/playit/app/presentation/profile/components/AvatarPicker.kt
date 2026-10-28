@@ -11,6 +11,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.playit.app.presentation.components.hop
 import com.playit.app.presentation.theme.*
 
 val AVATAR_NAMES = listOf("Cat", "Monkey", "Bunny", "Bear", "Frog", "Owl")
@@ -35,6 +38,8 @@ fun AvatarPicker(
 ) {
 
     // No headings of its own: Lily's bubble above it says "Pick your animal friend!" (card 31d).
+    // Each pick makes that animal hop once, so the child sees their friend come alive (design refresh).
+    val hops = remember { mutableStateMapOf<Int, Int>() }
     Column(modifier = modifier.fillMaxWidth()) {
         // 3x2 Bento Grid
         Column(
@@ -66,7 +71,10 @@ fun AvatarPicker(
                                     scaleX = scale
                                     scaleY = scale
                                 }
-                                .clickable { onAvatarSelect(avatarId) }
+                                .clickable {
+                                    hops[avatarId] = (hops[avatarId] ?: 0) + 1
+                                    onAvatarSelect(avatarId)
+                                }
                                 .semantics {
                                     role = Role.RadioButton
                                     contentDescription = "$avatarName avatar" + if (isSelected) ", selected" else ""
@@ -74,6 +82,7 @@ fun AvatarPicker(
                         ) {
                             Box(
                                 modifier = Modifier
+                                    .hop(hops[avatarId] ?: 0)
                                     .size(76.dp)
                                     .clip(CircleShape)
                                     .background(if (isSelected) Mango.copy(alpha = 0.35f) else Cloud)

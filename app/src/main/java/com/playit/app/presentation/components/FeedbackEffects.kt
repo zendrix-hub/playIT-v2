@@ -7,8 +7,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import com.playit.app.presentation.components.lipsync.HOP_MS
+import com.playit.app.presentation.components.lipsync.hopAt
 import com.playit.app.presentation.theme.LocalReducedMotion
 import com.playit.app.presentation.theme.PlayItMotion
 import kotlinx.coroutines.delay
@@ -87,5 +90,28 @@ fun Modifier.starDrop(index: Int, visible: Boolean = true): Modifier = composed 
         val p = progress.value
         alpha = p.coerceIn(0f, 1f)
         translationY = if (reduced) 0f else -24.dp.toPx() * (1f - p)
+    }
+}
+
+/**
+ * One hop on Lily's curve (up 12 % of its height, down, a small landing squash) each time [count] goes up:
+ * an animal picked, tapped, or arriving at a new stop. The first value never hops, so opening a screen does
+ * not. None under reduced motion. It draws in a layer, so the layout and the touch target never move.
+ */
+fun Modifier.hop(count: Int): Modifier = composed {
+    val reduced = LocalReducedMotion.current
+    val first = remember { count }
+    val progress = remember { Animatable(1f) }
+    LaunchedEffect(count) {
+        if (count == first || reduced) return@LaunchedEffect
+        progress.snapTo(0f)
+        progress.animateTo(1f, tween(HOP_MS, easing = LinearEasing))
+    }
+    graphicsLayer {
+        val frame = hopAt(progress.value)
+        translationY = -frame.lift * size.height
+        scaleX = 1f + 0.06f * frame.squash
+        scaleY = 1f - 0.08f * frame.squash
+        transformOrigin = TransformOrigin(0.5f, 1f)
     }
 }

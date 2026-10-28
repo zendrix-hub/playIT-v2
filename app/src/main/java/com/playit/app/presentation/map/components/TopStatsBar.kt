@@ -1,7 +1,9 @@
 package com.playit.app.presentation.map.components
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,12 +25,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -41,6 +45,10 @@ import com.playit.app.presentation.components.TalkingLily
 import com.playit.app.presentation.components.rememberAssetPainter
 import com.playit.app.presentation.map.greetingFor
 import com.playit.app.presentation.theme.*
+import kotlinx.coroutines.delay
+import kotlin.math.PI
+import kotlin.math.roundToInt
+import kotlin.math.sin
 
 /**
  * The map's one header card (card 31e): Lily waving with the greeting, the letters learned, the streak
@@ -51,6 +59,7 @@ import com.playit.app.presentation.theme.*
 @Composable
 fun TopStatsBar(
     totalStars: Int,
+    starsJustEarned: Int = 0,
     currentStreak: Int,
     @Suppress("UNUSED_PARAMETER") unlockedBadgesCount: Int,
     lettersCompleted: Int = 0,
@@ -179,7 +188,8 @@ fun TopStatsBar(
                     count = totalStars,
                     assetPath = "images/rewards/reward_star.png",
                     backgroundColor = animatedPillBg,
-                    textColor = biomeTheme.textPrimary
+                    textColor = biomeTheme.textPrimary,
+                    gained = starsJustEarned
                 )
             }
         }
@@ -204,15 +214,44 @@ fun TopStatsBar(
     }
 }
 
+/** When the stars just earned start counting up on the map, and how long the count takes. */
+const val COUNT_UP_DELAY_MS = 600L
+const val COUNT_UP_MS = 700
+
+/** The number shown at [progress] 0..1 of a count from [from] up to [to]: one step at a time, [to] at the end. */
+fun countUpAt(progress: Float, from: Int, to: Int): Int =
+    if (to <= from) to else from + ((to - from) * progress.coerceIn(0f, 1f)).roundToInt()
+
+/** The pill swells to 120 % and back while it counts: 1 at the start and at the end. */
+fun countUpScale(progress: Float): Float = 1f + 0.2f * sin(PI.toFloat() * progress.coerceIn(0f, 1f))
+
+/**
+ * A count with its icon. When [gained] is above 0 (stars the child just earned, on the unlock moment) it counts
+ * up from count - gained to count and swells once, so the child sees the new stars land (design refresh).
+ * Under reduced motion it shows the total at once.
+ */
 @Composable
 private fun StatPill(
     count: Int,
     assetPath: String,
     backgroundColor: Color,
-    textColor: Color
+    textColor: Color,
+    gained: Int = 0
 ) {
+    val reduced = LocalReducedMotion.current
+    val counting = remember(gained) { Animatable(if (gained > 0 && !reduced) 0f else 1f) }
+    LaunchedEffect(gained) {
+        if (gained <= 0 || reduced) return@LaunchedEffect
+        delay(COUNT_UP_DELAY_MS)
+        counting.animateTo(1f, tween(COUNT_UP_MS, easing = LinearEasing))
+    }
     Row(
         modifier = Modifier
+            .graphicsLayer {
+                val s = countUpScale(counting.value)
+                scaleX = s
+                scaleY = s
+            }
             .background(backgroundColor, RoundedCornerShape(999.dp))
             .padding(horizontal = 10.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -224,7 +263,7 @@ private fun StatPill(
             modifier = Modifier.size(18.dp)
         )
         Text(
-            text = "$count",
+            text = "${countUpAt(counting.value, (count - gained).coerceAtLeast(0), count)}",
             fontSize = 16.sp,
             fontFamily = LexendFontFamily,
             fontWeight = FontWeight.ExtraBold,

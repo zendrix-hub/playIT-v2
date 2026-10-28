@@ -177,6 +177,13 @@ fun MapScreen(
         if (lastUnlocked != -1) lastUnlocked else 0
     }
 
+    // On the unlock moment the explorer walks to the new stop from the one before it, the stop the child just
+    // finished, and the star counter counts up the stars earned there (design refresh).
+    val arrivalFromIndex = remember(newlyUnlockedNodeId, mapNodes) {
+        newlyUnlockedNodeId?.let { id -> mapNodes.indexOfFirst { it.id == id } - 1 }?.takeIf { it >= 0 }
+    }
+    val starsJustEarned = arrivalFromIndex?.let { (mapNodes[it] as? MapNode.LetterNode)?.starsEarned } ?: 0
+
     // Dialog states for Duolingo Node Action Card & Unit Guidebook
     var selectedNodeForAction by remember { mutableStateOf<MapNode?>(null) }
     var selectedGuidebookUnit by remember { mutableStateOf<Int?>(null) }
@@ -273,6 +280,7 @@ fun MapScreen(
                 // Tapping it, Lily says "Let's go! Tap a letter to begin our adventure!" (card 28).
                 TopStatsBar(
                     totalStars = userStats.totalStars,
+                    starsJustEarned = starsJustEarned,
                     currentStreak = userStats.currentStreak,
                     unlockedBadgesCount = userStats.unlockedBadgesCount,
                     lettersCompleted = mapNodes.count { it is MapNode.LetterNode && it.starsEarned > 0 },
@@ -491,7 +499,8 @@ fun MapScreen(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(totalMapHeightDp)
+                        .height(totalMapHeightDp),
+                    arrivalFromIndex = arrivalFromIndex
                 )
             }
         }
