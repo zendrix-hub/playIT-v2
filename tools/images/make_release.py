@@ -11,6 +11,9 @@ Usage:
       Prepares the same manifest before the user's final OK (every image "pending"); never under
       docs/image-release, because review_card.py treats every manifest there as approved.
 
+A batch drawn by more than one generator (e.g. Nano Banana Pro until its free quota ran out, then Canva) takes
+--generator-from-log: each picture's generator is the model its round's generation_log.jsonl records for the pick.
+
 Stdlib only, so it runs on Windows and in WSL.
 """
 import argparse
@@ -24,6 +27,17 @@ import sys
 
 def sha256(path):
     return hashlib.sha256(pathlib.Path(path).read_bytes()).hexdigest()
+
+
+def logged_models(batch):
+    """{"round-01/<item>__v1.png": model} from every round's generation_log.jsonl; a later line wins."""
+    models = {}
+    for log in sorted(batch.glob("round-*/generation_log.jsonl")):
+        for line in log.read_text(encoding="utf-8").splitlines():
+            if line.strip():
+                e = json.loads(line)
+                models[f"{log.parent.name}/{e['item']}__{e['variant']}.png"] = e["model"]
+    return models
 
 
 def find_csv(batch):
@@ -41,6 +55,8 @@ def main(argv=None):
     ap.add_argument("--dest", default="pictures", help="folder under app/src/main/assets/images/")
     ap.add_argument("--generator", default="Nano Banana Pro (agy, card 08)",
                     help="how the picks were made, recorded per image")
+    ap.add_argument("--generator-from-log", action="store_true",
+                    help="record each image's generator from its round's generation_log.jsonl instead")
     ap.add_argument("--draft", action="store_true",
                     help="prepare the manifest before the user's final OK: no review CSV, every image 'pending'. "
                          "--out must be outside docs/image-release, because review_card.py treats every manifest "
@@ -57,6 +73,7 @@ def main(argv=None):
     audit = json.loads((final / "audit.json").read_text(encoding="utf-8"))
     items = {i["id"]: i for i in json.loads((batch / "items.json").read_text(encoding="utf-8"))["items"]}
     picks = json.loads((batch / "picks.json").read_text(encoding="utf-8"))
+    models = logged_models(batch) if a.generator_from_log else {}
 
     refused, entries = [], []
     for name in sorted(audit):
@@ -66,6 +83,10 @@ def main(argv=None):
         if fails or (verdict != "OK" and not a.draft):
             refused.append(f"{item}: verdict {verdict or 'none'}{', audit FAIL ' + ','.join(fails) if fails else ''}")
             continue
+        generator = models.get(picks.get(item)) if a.generator_from_log else a.generator
+        if not generator:
+            refused.append(f"{item}: its pick {picks.get(item)} is in no generation_log.jsonl")
+            continue
         # An item's "app_file" (e.g. "characters/avatar_01_cat.png") picks its own folder; else --dest.
         rel = items.get(item, {}).get("app_file", f"{a.dest}/{name}")
         (out / rel).parent.mkdir(parents=True, exist_ok=True)
@@ -74,7 +95,7 @@ def main(argv=None):
             "itemId": item, "file": rel, "appPath": f"images/{rel}",
             "word": items.get(item, {}).get("word"), "letter": items.get(item, {}).get("letter"),
             "sourceBatch": batch.name, "pick": picks.get(item), "tool": "tools/images/cutout.py",
-            "generator": a.generator, "audit": audit[name],
+            "generator": generator, "audit": audit[name],
             "reviewCsv": review.name if review else None, "userVerdict": verdict,
             "userNote": rows.get(item, {}).get("note", ""),
             "sha256": sha256(out / rel),

@@ -14,8 +14,14 @@ Method (README of the brief, "After the user's picks"):
    colour becomes F. This removes the white halo that a hard cut leaves on anti-aliased outlines.
 3. Trim to the opaque box, scale so the longer side is --fill of the canvas (the current good pictures use
    about 0.66-0.76 of 512), and centre it.
+
+Holes: white that the outline encloses but that is really background (the inside of a ring, a jug handle,
+a string loop) would stay opaque by rule 1. --holes names a JSON file {"<item>": [[x, y], ...]} with one
+point per hole, as fractions of the picture's width and height; the white region under each point is
+removed like the background, with the same edge treatment.
 """
 import argparse
+import json
 import pathlib
 
 import numpy as np
@@ -23,12 +29,17 @@ from PIL import Image
 from scipy import ndimage
 
 
-def cut(rgb, white=235, band=3):
-    """rgb: HxWx3 uint8. Returns HxWx4 uint8 with the border-connected white removed."""
+def cut(rgb, white=235, band=3, holes=()):
+    """rgb: HxWx3 uint8. Returns HxWx4 uint8 with the border-connected white removed, and the white regions
+    under the (x, y) fractions in holes."""
     px = rgb.astype(np.float32)
     near_white = px.min(axis=2) >= white
     labels, _ = ndimage.label(near_white)
-    border = np.unique(np.concatenate([labels[0], labels[-1], labels[:, 0], labels[:, -1]]))
+    h, w = labels.shape
+    seeds = np.array([labels[min(int(y * h), h - 1), min(int(x * w), w - 1)] for x, y in holes], labels.dtype)
+    if (seeds == 0).any():
+        raise ValueError(f"a hole point is not on white: {holes}")
+    border = np.unique(np.concatenate([labels[0], labels[-1], labels[:, 0], labels[:, -1], seeds]))
     bg = np.isin(labels, border[border > 0])
 
     edge = ndimage.binary_dilation(bg, iterations=band) & ~bg
@@ -73,13 +84,15 @@ def main(argv=None):
     ap.add_argument("--fill", type=float, default=0.70)
     ap.add_argument("--white", type=int, default=235)
     ap.add_argument("--band", type=int, default=3)
+    ap.add_argument("--holes", help='JSON file {"<item>": [[x, y], ...]}: points inside white holes, 0..1')
     a = ap.parse_args(argv)
 
     src, out = pathlib.Path(a.picks_dir), pathlib.Path(a.out_dir)
+    holes = json.loads(pathlib.Path(a.holes).read_text(encoding="utf-8")) if a.holes else {}
     (out / "master").mkdir(parents=True, exist_ok=True)
     files = sorted(src.glob("*.png"))
     for f in files:
-        rgba = cut(np.array(Image.open(f).convert("RGB")), a.white, a.band)
+        rgba = cut(np.array(Image.open(f).convert("RGB")), a.white, a.band, holes.get(f.stem, ()))
         place(rgba, 1024, a.fill).save(out / "master" / f.name, optimize=True)
         place(rgba, a.size, a.fill).save(out / f.name, optimize=True)
         print(f.name)
