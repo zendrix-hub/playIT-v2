@@ -25,10 +25,13 @@ The design board, with the talking demo, the palette on Hear It and the four app
 | **Lily's island palette** | `2a39faa` | New values on the old token names in `Color.kt`. Each colour and its contrast (normal text needs 4.5:1, large text 3:1): <ul><li>lagoon teal `#0B7F7A` for actions, white text 4.8:1</li><li>sunflower `#FFC53D` for listening and stars, brown text 7.9:1</li><li>leaf `#2E9A3E`, white text 3.6:1, so large text only</li><li>hibiscus `#F2545B`</li><li>apricot `#F7922F`</li><li>Lily brown `#4A2E18` for outlines, the pictures' own line</li><li>text `#3B2416`, 14:1</li><li>ground: morning sky to sand (`GroundColors`)</li><li>locked things: warm stone (`Locked*`)</li></ul> |
 
 ## Next
-1. **New art:** agy runs card D1, three batches (126 pictures). After each batch Claude cuts out, audits and releases it. The Find It batch is released (above); Blend It and the world batch are next, when agy's free quota is back.
-2. **Check on the A21s:** build an APK from this branch and play section 1, to see the mouth and the colours on the phone.
+1. **New art:** card D1, three batches (126 pictures). After each batch Claude cuts out, audits and releases it.
+   - Find It: released (above).
+   - Blend It: round 1 drawn on Canva, 2 versions of each of the 40 words (user, 2026-10-29: "for the blend it do that on canva"); waiting for the user's picks.
+   - The world batch (map props, rewards, avatars): not started.
+2. **Check on the A21s:** done on 2026-10-29 with the APK of `a634c27`. The user found the pictures OK, and Lily talked, blinked and hopped.
 
 ## Rules on this branch
 - Run `./gradlew testDebugUnitTest` before every commit. Behaviour tests must keep passing unchanged.
 - **A picture reaches `app/src/main/assets/images/` only from a release manifest** in `docs/image-release/<date>/`, with the user's OK on a review page (AGY_RUNBOOK.md "Image gate").
-- **Lily's talking frames** (`images/mascot/talk/`) are derived from her released poses by `tools/design/make_lily_talk.py`. They go into a release manifest once the user approves how she talks on the phone.
+- **Lily's talking frames** (`images/mascot/talk/`) are derived from her released poses by `tools/design/make_lily_talk.py`. They went into release `2026-10-29-lily-talk` after the phone test; each frame differs from its released pose only inside the mouth box.

@@ -1,0 +1,153 @@
+{
+ "release": "2026-10-29-lily-talk",
+ "approvedBy": "user in chat after the phone test of the design APK (2026-10-29)",
+ "images": [
+  {
+   "itemId": "lily_talk_celebrating",
+   "file": "mascot/talk/lily_celebrating.png",
+   "appPath": "images/mascot/talk/lily_celebrating.png",
+   "word": "Lily celebrating, mouth painted out (TalkingLily draws the mouth)",
+   "letter": "-",
+   "sourceBatch": "release 2026-10-12-mascot",
+   "pick": "images/mascot/lily_celebrating.png",
+   "tool": "tools/design/make_lily_talk.py",
+   "generator": "none: derived from the released pose; only the mouth is painted out",
+   "audit": {
+    "size": "PASS 512x512 RGBA",
+    "source": "PASS pose sha256 a7614805aa65 = release 2026-10-12-mascot",
+    "changed": "PASS 2549 px, all inside the mouth box (218, 230, 290, 277)",
+    "reproducible": "PASS make_lily_talk.py rebuilds it byte for byte"
+   },
+   "reviewCsv": null,
+   "userVerdict": "OK",
+   "userNote": "Phone test of the design APK (a634c27): \"lily did that stuff\" (talking, blinking, hopping)",
+   "sha256": "32dfea4d829041a4033f970abeaa6016e6f0ed522364c3767779205f7f01c77f"
+  },
+  {
+   "itemId": "lily_talk_encouraging",
+   "file": "mascot/talk/lily_encouraging.png",
+   "appPath": "images/mascot/talk/lily_encouraging.png",
+   "word": "Lily encouraging, mouth painted out (TalkingLily draws the mouth)",
+   "letter": "-",
+   "sourceBatch": "release 2026-10-12-mascot",
+   "pick": "images/mascot/lily_encouraging.png",
+   "tool": "tools/design/make_lily_talk.py",
+   "generator": "none: derived from the released pose; only the mouth is painted out",
+   "audit": {
+    "size": "PASS 512x512 RGBA",
+    "source": "PASS pose sha256 c8f16459b9cf = release 2026-10-12-mascot",
+    "changed": "PASS 682 px, all inside the mouth box (221, 226, 290, 245)",
+    "reproducible": "PASS make_lily_talk.py rebuilds it byte for byte"
+   },
+   "reviewCsv": null,
+   "userVerdict": "OK",
+   "userNote": "Phone test of the design APK (a634c27): \"lily did that stuff\" (talking, blinking, hopping)",
+   "sha256": "f89b891df02c70d2439ee7bd19e5c990ff6bc9f8ffdc2406bd11ce59fce27faf"
+  },
+  {
+   "itemId": "lily_talk_idle",
+   "file": "mascot/talk/lily_idle.png",
+   "appPath": "images/mascot/talk/lily_idle.png",
+   "word": "Lily idle, mouth painted out (TalkingLily draws the mouth)",
+   "letter": "-",
+   "sourceBatch": "release 2026-10-12-mascot",
+   "pick": "images/mascot/lily_idle.png",
+   "tool": "tools/design/make_lily_talk.py",
+   "generator": "none: derived from the released pose; only the mouth is painted out",
+   "audit": {
+    "size": "PASS 512x512 RGBA",
+    "source": "PASS pose sha256 15150aaf6c87 = release 2026-10-12-mascot",
+    "changed": "PASS 647 px, all inside the mouth box (215, 224, 283, 245)",
+    "reproducible": "PASS make_lily_talk.py rebuilds it byte for byte"
+   },
+   "reviewCsv": null,
+   "userVerdict": "OK",
+   "userNote": "Phone test of the design APK (a634c27): \"lily did that stuff\" (talking, blinking, hopping)",
+   "sha256": "891d5ddfde22f37791fa9ba1fdcc740975f9bb28b86f347c075d0d36e2b9f068"
+  },
+  {
+   "itemId": "lily_talk_listening",
+   "file": "mascot/talk/lily_listening.png",
+   "appPath": "images/mascot/talk/lily_listening.png",
+   "word": "Lily listening, mouth painted out (TalkingLily draws the mouth)",
+   "letter": "-",
+   "sourceBatch": "release 2026-10-12-mascot",
+   "pick": "images/mascot/lily_listening.png",
+   "tool": "tools/design/make_lily_talk.py",
+   "generator": "none: derived from the released pose; only the mouth is painted out",
+   "audit": {
+    "size": "PASS 512x512 RGBA",
+    "source": "PASS pose sha256 f6435a2d3bc8 = release 2026-10-12-mascot",
+    "changed": "PASS 477 px, all inside the mouth box (224, 229, 274, 244)",
+    "reproducible": "PASS make_lily_talk.py rebuilds it byte for byte"
+   },
+   "reviewCsv": null,
+   "userVerdict": "OK",
+   "userNote": "Phone test of the design APK (a634c27): \"lily did that stuff\" (talking, blinking, hopping)",
+   "sha256": "f8b76a1d5e885c0ba64a2ab544bb1d96fccffd9fcb23a4ee48b98e054dc74a54"
+  },
+  {
+   "itemId": "lily_talk_pointing",
+   "file": "mascot/talk/lily_pointing.png",
+   "appPath": "images/mascot/talk/lily_pointing.png",
+   "word": "Lily pointing, mouth painted out (TalkingLily draws the mouth)",
+   "letter": "-",
+   "sourceBatch": "release 2026-10-12-mascot",
+   "pick": "images/mascot/lily_pointing.png",
+   "tool": "tools/design/make_lily_talk.py",
+   "generator": "none: derived from the released pose; only the mouth is painted out",
+   "audit": {
+    "size": "PASS 512x512 RGBA",
+    "source": "PASS pose sha256 d014f87a0c76 = release 2026-10-12-mascot",
+    "changed": "PASS 847 px, all inside the mouth box (214, 229, 280, 246)",
+    "reproducible": "PASS make_lily_talk.py rebuilds it byte for byte"
+   },
+   "reviewCsv": null,
+   "userVerdict": "OK",
+   "userNote": "Phone test of the design APK (a634c27): \"lily did that stuff\" (talking, blinking, hopping)",
+   "sha256": "b6f83feeec7e77cadaf58fec97045b0b464f72a27c357a71427bf1dcf49871d7"
+  },
+  {
+   "itemId": "lily_talk_thinking",
+   "file": "mascot/talk/lily_thinking.png",
+   "appPath": "images/mascot/talk/lily_thinking.png",
+   "word": "Lily thinking, mouth painted out (TalkingLily draws the mouth)",
+   "letter": "-",
+   "sourceBatch": "release 2026-10-12-mascot",
+   "pick": "images/mascot/lily_thinking.png",
+   "tool": "tools/design/make_lily_talk.py",
+   "generator": "none: derived from the released pose; only the mouth is painted out",
+   "audit": {
+    "size": "PASS 512x512 RGBA",
+    "source": "PASS pose sha256 cf94087dfd42 = release 2026-10-12-mascot",
+    "changed": "PASS 296 px, all inside the mouth box (248, 230, 282, 240)",
+    "reproducible": "PASS make_lily_talk.py rebuilds it byte for byte"
+   },
+   "reviewCsv": null,
+   "userVerdict": "OK",
+   "userNote": "Phone test of the design APK (a634c27): \"lily did that stuff\" (talking, blinking, hopping)",
+   "sha256": "407edc436e39c492936344c45d05962542eb794c116da0ac1d5a8c0bacbc0d4f"
+  },
+  {
+   "itemId": "lily_talk_waving",
+   "file": "mascot/talk/lily_waving.png",
+   "appPath": "images/mascot/talk/lily_waving.png",
+   "word": "Lily waving, mouth painted out (TalkingLily draws the mouth)",
+   "letter": "-",
+   "sourceBatch": "release 2026-10-12-mascot",
+   "pick": "images/mascot/lily_waving.png",
+   "tool": "tools/design/make_lily_talk.py",
+   "generator": "none: derived from the released pose; only the mouth is painted out",
+   "audit": {
+    "size": "PASS 512x512 RGBA",
+    "source": "PASS pose sha256 5ffa52167b5b = release 2026-10-12-mascot",
+    "changed": "PASS 1527 px, all inside the mouth box (221, 224, 283, 258)",
+    "reproducible": "PASS make_lily_talk.py rebuilds it byte for byte"
+   },
+   "reviewCsv": null,
+   "userVerdict": "OK",
+   "userNote": "Phone test of the design APK (a634c27): \"lily did that stuff\" (talking, blinking, hopping)",
+   "sha256": "5902d7f33ace6e932e230f536781f8d232f75905a6e45aedb3fc41c9f29b6953"
+  }
+ ]
+}
