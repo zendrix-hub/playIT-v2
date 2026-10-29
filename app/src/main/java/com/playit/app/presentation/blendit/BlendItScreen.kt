@@ -221,7 +221,7 @@ fun BlendItScreen(
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(SLOT_GAP, Alignment.CenterHorizontally),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth().graphicsLayer { rotationZ = wobble.value }.hop(blends)
+                    modifier = Modifier.fillMaxWidth().graphicsLayer { rotationZ = wobble.value }.hop(blends, squash = false)
                 ) {
                     val wordLength = currentWord?.word?.length ?: 3
                     for (i in 0 until wordLength) {

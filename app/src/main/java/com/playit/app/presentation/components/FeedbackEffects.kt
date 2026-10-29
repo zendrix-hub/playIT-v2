@@ -97,8 +97,9 @@ fun Modifier.starDrop(index: Int, visible: Boolean = true): Modifier = composed 
  * One hop on Lily's curve (up 12 % of its height, down, a small landing squash) each time [count] goes up:
  * an animal picked, tapped, or arriving at a new stop. The first value never hops, so opening a screen does
  * not. None under reduced motion. It draws in a layer, so the layout and the touch target never move.
+ * [squash] false lands without squashing, for a row of letters that must keep its shape.
  */
-fun Modifier.hop(count: Int): Modifier = composed {
+fun Modifier.hop(count: Int, squash: Boolean = true): Modifier = composed {
     val reduced = LocalReducedMotion.current
     val first = remember { count }
     val progress = remember { Animatable(1f) }
@@ -109,9 +110,10 @@ fun Modifier.hop(count: Int): Modifier = composed {
     }
     graphicsLayer {
         val frame = hopAt(progress.value)
+        val landing = if (squash) frame.squash else 0f
         translationY = -frame.lift * size.height
-        scaleX = 1f + 0.06f * frame.squash
-        scaleY = 1f - 0.08f * frame.squash
+        scaleX = 1f + 0.06f * landing
+        scaleY = 1f - 0.08f * landing
         transformOrigin = TransformOrigin(0.5f, 1f)
     }
 }

@@ -1,8 +1,11 @@
 package com.playit.app.presentation.components
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -25,6 +28,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -44,7 +48,21 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Constraints
 import com.playit.app.presentation.theme.*
+import kotlin.math.PI
 import kotlin.math.roundToInt
+import kotlin.math.sin
+
+/** Length of the correct-answer squash. */
+const val SQUASH_MS = 320
+
+/**
+ * The correct-answer squash at [progress] 0..1 as (scaleX, scaleY): out to 108 % wide and 94 % tall and back,
+ * so the box (and any picture in it) has its own shape at both ends.
+ */
+fun squashAt(progress: Float): Pair<Float, Float> {
+    val a = sin(PI.toFloat() * progress.coerceIn(0f, 1f))
+    return (1f + 0.08f * a) to (1f - 0.06f * a)
+}
 
 /**
  * Reusable Duolingo ABC-inspired Gummy Box with 3D depth-band bottom shadow,
@@ -83,23 +101,15 @@ fun GummyContainer(
         label = "gummyOffsetY"
     )
 
-    // Squash effect for correct answer
-    val squashScaleX by animateFloatAsState(
-        targetValue = if (isSquashed && !isReducedMotion) 1.08f else 1.0f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium
-        ),
-        label = "gummySquashX"
-    )
-    val squashScaleY by animateFloatAsState(
-        targetValue = if (isSquashed && !isReducedMotion) 0.94f else 1.0f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium
-        ),
-        label = "gummySquashY"
-    )
+    // Correct answer: one quick squash when isSquashed turns true, then back to the box's own shape. It used to
+    // hold 108 % x 94 % for as long as isSquashed stayed true, which left pictures stretched (user, 2026-10-29).
+    val squash = remember { Animatable(1f) }
+    LaunchedEffect(isSquashed) {
+        if (isSquashed && !isReducedMotion) {
+            squash.snapTo(0f)
+            squash.animateTo(1f, tween(SQUASH_MS, easing = LinearEasing))
+        }
+    }
 
     val clickableModifier = if (onClick != null) {
         Modifier.clickable(
@@ -118,8 +128,9 @@ fun GummyContainer(
     Layout(
         modifier = modifier
             .graphicsLayer {
-                scaleX = squashScaleX
-                scaleY = squashScaleY
+                val (sx, sy) = squashAt(squash.value)
+                scaleX = sx
+                scaleY = sy
             }
             .then(clickableModifier),
         content = {
