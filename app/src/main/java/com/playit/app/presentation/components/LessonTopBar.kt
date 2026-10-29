@@ -103,14 +103,18 @@ fun LessonTopBar(
         // Hearts Status Indicator. When the count drops, the heart just lost wobbles once.
         var lossCount by remember { mutableIntStateOf(0) }
         var previousHearts by remember { mutableStateOf(hearts) }
+        // A heart won back pops and sparkles (user, 2026-10-29); a lost one keeps its gentle wobble.
+        var gainCount by remember { mutableStateOf(0) }
         LaunchedEffect(hearts) {
             val before = previousHearts
             if (before != null && hearts != null && hearts < before) lossCount++
+            if (before != null && hearts != null && hearts > before) gainCount++
             previousHearts = hearts
         }
         if (hearts != null) {
             Row(
                 modifier = Modifier
+                    .confettiPop(gainCount)   // outside the clip, so the sparkle flies past the pill
                     .clip(PillShape)
                     .background(SurfaceCard)
                     .border(1.dp, ModernBorderSoft, PillShape)
@@ -126,6 +130,7 @@ fun LessonTopBar(
                         modifier = Modifier
                             .size(20.dp)
                             .then(if (i == hearts + 1) Modifier.heartLossWobble(lossCount) else Modifier)
+                            .then(if (i == hearts) Modifier.gainPop(gainCount) else Modifier)
                             .graphicsLayer { alpha = if (isAlive) 1f else 0.22f }
                     )
                 }

@@ -63,8 +63,11 @@ import com.playit.app.presentation.components.LetterCard
 import com.playit.app.presentation.components.LessonTopBar
 import com.playit.app.presentation.components.MascotSpeechHeader
 import com.playit.app.presentation.components.MascotState
+import com.playit.app.presentation.components.GENTLE_SHAKE_DP
 import com.playit.app.presentation.components.GENTLE_SHAKE_MS
+import com.playit.app.presentation.components.LESSON_BUTTON_POP_MS
 import com.playit.app.presentation.components.confettiPop
+import com.playit.app.presentation.components.popIn
 import com.playit.app.presentation.components.shake
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -200,6 +203,7 @@ fun SayItScreen(
             topBar = { LessonTopBar(currentStep = LessonStep.SAY_IT, onBack = onBack, hearts = null) },
             header = {
                 MascotSpeechHeader(
+                    greet = true,
                     message = when {
                         permissionDeniedMessage -> "Please allow microphone access so Lily can hear you."
                         isModelInitializing -> "Lily is getting ready..."
@@ -272,7 +276,7 @@ fun SayItScreen(
                     isPlaying = isPlayingPhoneme,
                     // Shorter than in Hear It: the mic, its label and the attempt dots sit below it.
                     modifier = Modifier.heightIn(max = cardMaxHeight)
-                        .shake(trigger = state is SayItState.Incorrect, durationMs = GENTLE_SHAKE_MS)
+                        .shake(trigger = state is SayItState.Incorrect, durationMs = GENTLE_SHAKE_MS, swingDp = GENTLE_SHAKE_DP)
                         .confettiPop(corrects),
                     onTapReplay = { viewModel.playWordAudio() }
                 )
@@ -289,7 +293,7 @@ fun SayItScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(max = cardMaxHeight)
-                        .shake(trigger = state is SayItState.Incorrect, durationMs = GENTLE_SHAKE_MS)
+                        .shake(trigger = state is SayItState.Incorrect, durationMs = GENTLE_SHAKE_MS, swingDp = GENTLE_SHAKE_DP)
                         .confettiPop(corrects)
                 ) {
                     Column(
@@ -339,6 +343,7 @@ fun SayItScreen(
                     // After an attempt the line under the mic is the short feedback ("Watch my lips"), as
                     // plain text: it used to be a separate banner that looked like a second button (card 31d).
                     MicButton(
+                        modifier = Modifier.popIn(delayMillis = LESSON_BUTTON_POP_MS),   // pops in after the card lands
                         status = micStatus,
                         onTap = startAttempt,
                         enabled = !isPlayingPhoneme && !isModelInitializing,

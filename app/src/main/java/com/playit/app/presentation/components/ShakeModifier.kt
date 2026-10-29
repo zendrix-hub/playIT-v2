@@ -17,12 +17,16 @@ const val SHAKE_MS = 200
 /** Say It keeps its gentler, slower shake: a sound said wrong must never feel like a punishment. */
 const val GENTLE_SHAKE_MS = 400
 
-/** (share of the shake, offset as a share of the 6 dp swing): left, right, smaller each time, back to 0. */
+/** How far a shake swings: 12 dp for a wrong match (user, 2026-10-29: clearly stronger), 6 dp for Say It. */
+const val SHAKE_DP = 12f
+const val GENTLE_SHAKE_DP = 6f
+
+/** (share of the shake, offset as a share of its swing): left, right, smaller each time, back to 0. */
 private val SHAKE_KEYS = listOf(
     0f to 0f, 0.125f to -1f, 0.25f to 1f, 0.375f to -0.67f, 0.5f to 0.67f, 0.625f to -0.33f, 0.75f to 0.33f, 1f to 0f
 )
 
-/** The shake's offset at [t] 0..1, as a share of its 6 dp swing; straight lines between the keys, 0 at both ends. */
+/** The shake's offset at [t] 0..1, as a share of its swing; straight lines between the keys, 0 at both ends. */
 fun shakeOffsetAt(t: Float): Float {
     if (t <= 0f || t >= 1f) return 0f
     val i = SHAKE_KEYS.indexOfFirst { it.first >= t }
@@ -39,6 +43,7 @@ fun shakeOffsetAt(t: Float): Float {
 fun Modifier.shake(
     trigger: Boolean,
     durationMs: Int = SHAKE_MS,
+    swingDp: Float = SHAKE_DP,
     key: Any? = trigger,
     onShakeComplete: (() -> Unit)? = null
 ): Modifier = composed {
@@ -56,6 +61,6 @@ fun Modifier.shake(
     }
 
     this.graphicsLayer {
-        translationX = shakeOffsetAt(progress.value) * 6.dp.toPx()
+        translationX = shakeOffsetAt(progress.value) * swingDp.dp.toPx()
     }
 }

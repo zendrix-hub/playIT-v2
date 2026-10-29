@@ -1,8 +1,11 @@
 package com.playit.app.presentation.components
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,6 +25,7 @@ import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +43,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.presentation.theme.*
+import kotlinx.coroutines.delay
 
 /**
  * Compact Mascot Prompt Speech Bubble header matching playit-mockup.html.
@@ -51,9 +56,23 @@ fun MascotSpeechHeader(
     mascotState: MascotState = MascotState.IDLE,
     isPlayingAudio: Boolean = false,
     amplitude: Float = 0f,
-    onMascotTap: (() -> Unit)? = null
+    onMascotTap: (() -> Unit)? = null,
+    greet: Boolean = false
 ) {
     var tapTrigger by remember { mutableStateOf(0) }
+
+    // Lesson start (user, 2026-10-29): Lily waves hello for GREET_MS, her waving pose with one wiggle, then takes the
+    // pose the screen asks for. Reduced motion: the pose only, no wiggle.
+    var greeting by remember { mutableStateOf(greet) }
+    val greetStill = LocalReducedMotion.current
+    val wave = remember { Animatable(if (greet && !greetStill) 0f else WIGGLE_MS.toFloat()) }
+    LaunchedEffect(Unit) {
+        if (!greeting) return@LaunchedEffect
+        if (!greetStill) wave.animateTo(WIGGLE_MS.toFloat(), tween(WIGGLE_MS, easing = LinearEasing))
+        delay(GREET_MS - (if (greetStill) 0 else WIGGLE_MS))
+        greeting = false
+    }
+    val pose = if (greeting) MascotState.WAVING else mascotState
 
     val tapBounceScale by animateFloatAsState(
         targetValue = if (tapTrigger % 2 == 1) 1.18f else 1.0f,
@@ -88,6 +107,7 @@ fun MascotSpeechHeader(
                     val scaleYCombined: Float = if (isReducedMotion) tapBounceScale else (tapBounceScale * ampSquashY)
                     scaleX = scaleXCombined
                     scaleY = scaleYCombined
+                    rotationZ = wiggleAngleAt(wave.value)
                     transformOrigin = TransformOrigin(0.5f, 1f)
                 }
                 .bounceClick {
@@ -97,7 +117,7 @@ fun MascotSpeechHeader(
             contentAlignment = Alignment.Center
         ) {
             TalkingLily(
-                pose = mascotState,
+                pose = pose,
                 maxSize = d.mascotHeader,
                 modifier = Modifier.fillMaxSize()
             )

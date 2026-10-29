@@ -21,7 +21,12 @@ class AnswerMotionTest {
 
     @Test fun pressRelease_fitsTheRequested200To300Ms() {
         assertTrue(PRESS_OUT_MS in 200..300)
-        assertEquals(0.92f, PRESS_SCALE, 0f)   // 03 §4 tap feedback: 100 -> 92 -> 100 %
+    }
+
+    @Test fun press_isClearlyStronger_90PercentDownAndA106PercentPop() {
+        assertEquals(0.90f, PRESS_SCALE, 0f)
+        val peak = (0..200).maxOf { PRESS_SCALE + (1f - PRESS_SCALE) * overshoot(it / 200f, PRESS_TENSION) }
+        assertEquals(1.06f, peak, 0.002f)
     }
 
     @Test fun shake_isRapidAndEndsWhereItStarted() {
@@ -33,8 +38,10 @@ class AnswerMotionTest {
         assertTrue((0..100).all { abs(shakeOffsetAt(it / 100f)) <= 1f })
     }
 
-    @Test fun shake_sayItKeepsItsGentleLength() {
+    @Test fun shake_sayItKeepsItsGentleLengthAndSwing() {
         assertEquals(400, GENTLE_SHAKE_MS)
+        assertEquals(6f, GENTLE_SHAKE_DP, 0f)
+        assertEquals(12f, SHAKE_DP, 0f)
     }
 
     @Test fun confettiPop_startsAtTheCentreAndFadesAway() {
@@ -45,6 +52,12 @@ class AnswerMotionTest {
             assertEquals(1f, start.alpha, 0f)
             assertEquals(0f, popPieceAt(i, 1f).alpha, 0f)
         }
+    }
+
+    @Test fun confettiPop_isClearlyStronger() {
+        assertEquals(20, POP_PIECES)
+        val far = (0 until POP_PIECES).maxOf { val f = popPieceAt(it, 1f); kotlin.math.hypot(f.dx, f.dy) }
+        assertTrue("flies past the element's edge: $far", far > 1.0f)
     }
 
     @Test fun confettiPop_fliesOutAllRound() {

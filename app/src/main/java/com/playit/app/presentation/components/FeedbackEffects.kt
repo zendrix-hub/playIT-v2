@@ -2,6 +2,8 @@ package com.playit.app.presentation.components
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -85,17 +87,27 @@ fun Modifier.heartLossWobble(lossCount: Int): Modifier = composed {
     }
 }
 
+/** Stars on a reward screen: how far apart they start, how far they fall, and when one has landed after it starts. */
+const val STAR_STAGGER_MS = 300
+const val STAR_FALL_DP = 72f
+const val STAR_LAND_MS = 150
+
 /**
- * A star drops into place: it falls 24 dp and fades in over STANDARD_MS, one after another
- * (MICRO_MS apart by [index]). Under reduced motion it only fades in.
+ * A star drops into place (user, 2026-10-29: a bigger bounce for rewards): it falls STAR_FALL_DP, growing from half
+ * size, and lands with a springy bounce, one after another (STAR_STAGGER_MS apart by [index]). Under reduced motion it
+ * only fades in.
  */
 fun Modifier.starDrop(index: Int, visible: Boolean = true): Modifier = composed {
     val reduced = LocalReducedMotion.current
     val progress = remember { Animatable(0f) }
     LaunchedEffect(visible) {
         if (visible) {
-            delay(index * PlayItMotion.MICRO_MS.toLong())
-            progress.animateTo(1f, if (reduced) tween(PlayItMotion.STANDARD_MS) else PlayItMotion.settle(reduced = false))
+            delay(index * STAR_STAGGER_MS.toLong())
+            progress.animateTo(
+                1f,
+                if (reduced) tween(PlayItMotion.STANDARD_MS)
+                else spring(dampingRatio = 0.4f, stiffness = Spring.StiffnessMediumLow)
+            )
         } else {
             progress.snapTo(0f)
         }
@@ -103,7 +115,34 @@ fun Modifier.starDrop(index: Int, visible: Boolean = true): Modifier = composed 
     graphicsLayer {
         val p = progress.value
         alpha = p.coerceIn(0f, 1f)
-        translationY = if (reduced) 0f else -24.dp.toPx() * (1f - p)
+        translationY = if (reduced) 0f else -STAR_FALL_DP.dp.toPx() * (1f - p)
+        val s = if (reduced) 1f else 0.5f + 0.5f * p
+        scaleX = s
+        scaleY = s
+    }
+}
+
+/** A heart won back: how long its pop takes. */
+const val GAIN_POP_MS = 450
+
+/** The won-back heart's size [ms] into its pop: up to 150 % halfway and back to 100 %. */
+fun gainPopScale(ms: Float): Float =
+    if (ms <= 0f || ms >= GAIN_POP_MS) 1f else 1f + 0.5f * sin(PI.toFloat() * ms / GAIN_POP_MS)
+
+/** A heart won back (user, 2026-10-29): it swells to 150 % and back, once each time [count] goes up. None under reduced motion. */
+fun Modifier.gainPop(count: Int): Modifier = composed {
+    val reduced = LocalReducedMotion.current
+    val first = remember { count }
+    val elapsed = remember { Animatable(GAIN_POP_MS.toFloat()) }
+    LaunchedEffect(count) {
+        if (count == first || reduced) return@LaunchedEffect
+        elapsed.snapTo(0f)
+        elapsed.animateTo(GAIN_POP_MS.toFloat(), tween(GAIN_POP_MS, easing = LinearEasing))
+    }
+    graphicsLayer {
+        val s = gainPopScale(elapsed.value)
+        scaleX = s
+        scaleY = s
     }
 }
 
@@ -132,9 +171,9 @@ fun Modifier.hop(count: Int, squash: Boolean = true): Modifier = composed {
     }
 }
 
-/** A right answer's confetti pop: how long it lasts and how many pieces it throws. */
-const val POP_MS = 700
-const val POP_PIECES = 12
+/** A right answer's confetti pop: how long it lasts and how many pieces it throws (user, 2026-10-29: clearly stronger). */
+const val POP_MS = 900
+const val POP_PIECES = 20
 
 private val POP_COLORS = listOf(Mango, Leaf, Guava, Ube)
 
@@ -148,7 +187,7 @@ data class PopPiece(val dx: Float, val dy: Float, val alpha: Float, val rotation
 fun popPieceAt(index: Int, progress: Float): PopPiece {
     val p = progress.coerceIn(0f, 1f)
     val angle = 2f * PI.toFloat() * index / POP_PIECES + 0.25f * ((index * 7) % 3 - 1)
-    val reach = 0.55f + 0.15f * ((index * 5) % 3)
+    val reach = 1.1f + 0.3f * ((index * 5) % 3)
     val thrown = 1f - (1f - p) * (1f - p)
     return PopPiece(
         dx = cos(angle) * reach * thrown,
@@ -178,7 +217,7 @@ fun Modifier.confettiPop(count: Int): Modifier = composed {
         val p = progress.value
         if (p >= 1f) return@drawWithContent
         val side = size.minDimension
-        val piece = 8.dp.toPx()
+        val piece = 10.dp.toPx()
         for (i in 0 until POP_PIECES) {
             val f = popPieceAt(i, p)
             val color = POP_COLORS[i % POP_COLORS.size].copy(alpha = f.alpha)

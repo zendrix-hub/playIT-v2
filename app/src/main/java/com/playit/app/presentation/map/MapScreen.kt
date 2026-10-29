@@ -74,6 +74,8 @@ import com.playit.app.presentation.components.GummyDialog
 import com.playit.app.presentation.components.MascotState
 import com.playit.app.presentation.components.breathingPulse
 import com.playit.app.presentation.components.idleBounce
+import com.playit.app.presentation.components.mapPopDelayMs
+import com.playit.app.presentation.components.popIn
 import com.playit.app.presentation.components.rememberAssetPainter
 import com.playit.app.presentation.map.components.BiomeThemes
 import com.playit.app.presentation.map.components.ChocolateHillsBackground
@@ -466,7 +468,10 @@ fun MapScreen(
                                         x = boundsInCol.center.x,
                                         y = boundsInCol.center.y + topPaddingPx
                                     )
-                                },
+                                }
+                                // Map opening (user, 2026-10-29): the stops pop onto the trail in a wave that
+                                // ends at the child's current stop. Inside the measuring, so centres never move.
+                                .popIn(delayMillis = mapPopDelayMs(index, activeNodeIndex)),
                             contentAlignment = Alignment.Center
                         ) {
                             when (node) {

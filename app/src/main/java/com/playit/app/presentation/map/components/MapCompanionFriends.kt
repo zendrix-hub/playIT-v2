@@ -25,6 +25,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import com.playit.app.presentation.components.MAP_OPEN_HOP_MS
 import com.playit.app.presentation.components.hop
 import com.playit.app.presentation.components.rememberAssetPainter
 import com.playit.app.presentation.theme.LocalReducedMotion
@@ -192,6 +193,12 @@ fun MapCompanionFriends(
             if (from == null) return@LaunchedEffect
             delay(WALK_DELAY_MS)
             walk.animateTo(1f, tween(WALK_MS, easing = LinearEasing))
+            hops++
+        }
+        // Map opening: when the wave of stops reaches the current one, the explorer hops there (a walk hops on its own).
+        LaunchedEffect(Unit) {
+            if (from != null) return@LaunchedEffect
+            delay(MAP_OPEN_HOP_MS.toLong())
             hops++
         }
         val step = walkAt(walk.value)

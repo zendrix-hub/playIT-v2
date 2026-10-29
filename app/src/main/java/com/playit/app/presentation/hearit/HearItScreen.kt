@@ -35,7 +35,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.playit.app.presentation.components.breathingPulse
+import com.playit.app.presentation.components.LESSON_BUTTON_POP_MS
 import com.playit.app.presentation.components.idleWiggle
+import com.playit.app.presentation.components.popIn
 import com.playit.app.presentation.components.resetsIdle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -170,6 +172,7 @@ fun HearItScreen(
                 // Mascot speech bubble prompt (Tapping Lily replays the lesson intro voiceover)
                 // While the sound plays the card already shows "Sound: /m/", so the bubble only says "Listen!" (card 31d).
                 MascotSpeechHeader(
+                    greet = true,
                     message = if (isPlaying) "Listen!" else "Listen closely to the sound of the letter, then tap play.",
                     mascotState = if (isPlaying) MascotState.LISTENING else if (playCount > 0) MascotState.POINTING else MascotState.IDLE,
                     isPlayingAudio = isPlayingPrompt,
@@ -236,6 +239,7 @@ fun HearItScreen(
                         strokeColor = com.playit.app.presentation.theme.ModernBorder,
                         depthHeight = 6.dp,
                         modifier = Modifier.size(d.primaryCta).testTag("hearit_play")
+                            .popIn(delayMillis = LESSON_BUTTON_POP_MS)   // pops in after the card lands
                             .idleWiggle(idleNudge, enabled = !nextHighlighted && !isPlaying)
                     ) {
                         Icon(

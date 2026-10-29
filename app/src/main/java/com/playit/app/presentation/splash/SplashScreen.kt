@@ -4,9 +4,11 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,6 +16,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,9 +33,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -54,6 +60,7 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -62,6 +69,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.presentation.components.GummyButton
+import com.playit.app.presentation.components.confettiPop
+import com.playit.app.presentation.components.dropIn
+import com.playit.app.presentation.components.idleWiggle
+import com.playit.app.presentation.components.popIn
 import com.playit.app.presentation.components.VoiceMouth
 import com.playit.app.presentation.components.rememberVoiceMouth
 import com.playit.app.presentation.theme.Cloud
@@ -110,6 +121,21 @@ internal fun splashMotion(reducedMotion: Boolean): SplashMotion =
 
 /** How long a wink holds before the eye opens again. */
 internal const val WINK_HOLD_MS = 450L
+
+/**
+ * The opening (user, 2026-10-29: more motion when the app starts), once when the splash appears, about 1.5 s: the
+ * title's letters drop in one by one and sparkle when the last lands; Lily rises from behind the panel with a bounce and
+ * her paws pop onto its edge; the tagline drops in; then the Start button pops in and wiggles once. With reduced motion
+ * everything is simply there. It ends exactly in the resting layout (card 31a's positions; LayoutMatrixTest).
+ */
+internal const val TITLE = "PlayIT"
+internal const val TITLE_STAGGER_MS = 90
+internal const val TITLE_SPARKLE_MS = TITLE_STAGGER_MS * 5 + 350
+internal const val TAGLINE_DROP_MS = 550
+internal const val LILY_RISE_MS = 200L
+internal const val PAWS_POP_MS = 800
+internal const val START_POP_MS = 1000
+internal const val START_WIGGLE_MS = 1500L
 
 /**
  * Lily's eyes, 0 = open and 1 = closed. Both eyes blink on their own; a tap winks only her right eye.
@@ -187,6 +213,19 @@ fun SplashScreen(
     }
     val onLilyTap: () -> Unit = { scope.launch { eyes.winkOnce() } }
 
+    // Opening: Lily rises from behind the panel (1 = in place) and the title sparkles once its letters have landed.
+    val rise = remember { Animatable(if (reducedMotion) 1f else 0f) }
+    var titleSparkle by remember { mutableIntStateOf(0) }
+    LaunchedEffect(Unit) {
+        if (reducedMotion) return@LaunchedEffect
+        launch {
+            delay(LILY_RISE_MS)
+            rise.animateTo(1f, spring(dampingRatio = 0.5f, stiffness = Spring.StiffnessLow))
+        }
+        delay(TITLE_SPARKLE_MS.toLong())
+        titleSparkle++
+    }
+
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
@@ -211,21 +250,32 @@ fun SplashScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "PlayIT",
-                        style = MaterialTheme.typography.displayLarge,
-                        maxLines = 1,
-                        color = Ink,
-                        letterSpacing = 0.5.sp,
-                        textAlign = TextAlign.Center
-                    )
+                    // One Text per letter so each can drop in; read out as one word.
+                    Row(
+                        modifier = Modifier
+                            .confettiPop(titleSparkle)
+                            .clearAndSetSemantics { contentDescription = TITLE }
+                    ) {
+                        TITLE.forEachIndexed { i, letter ->
+                            Text(
+                                text = letter.toString(),
+                                style = MaterialTheme.typography.displayLarge,
+                                maxLines = 1,
+                                color = Ink,
+                                letterSpacing = 0.5.sp,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.dropIn(delayMs = i * TITLE_STAGGER_MS)
+                            )
+                        }
+                    }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Mabuhay! Ready to learn to read?",
                         style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
                         maxLines = 2,
                         color = InkSoft,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.dropIn(delayMs = TAGLINE_DROP_MS, distanceDp = -24f)   // rises, never through the title
                     )
                 }
             }
@@ -238,6 +288,8 @@ fun SplashScreen(
                     .graphicsLayer {
                         scaleX = breatheX.value
                         scaleY = breatheY.value
+                        // Opening: from fully behind the panel up to her place, passing it a little and settling.
+                        translationY = (1f - rise.value) * size.height
                         transformOrigin = TransformOrigin(0.5f, 1f)
                     }
                     .clickable(
@@ -269,6 +321,12 @@ fun SplashScreen(
 /** The white panel Lily peeks over: the Start button inside, her paws on its top edge. */
 @Composable
 private fun StartPanel(lilyWidth: Dp, onStartClick: () -> Unit, modifier: Modifier = Modifier) {
+    // Opening: once the Start button has popped in, it wiggles once to say: tap me.
+    var startNudge by remember { mutableIntStateOf(0) }
+    LaunchedEffect(Unit) {
+        delay(START_WIGGLE_MS)
+        startNudge++
+    }
     Box(modifier = modifier.fillMaxWidth()) {
         Box(
             modifier = Modifier
@@ -287,6 +345,8 @@ private fun StartPanel(lilyWidth: Dp, onStartClick: () -> Unit, modifier: Modifi
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 64.dp)
+                    .popIn(delayMillis = START_POP_MS)
+                    .idleWiggle(startNudge)
                     .testTag("splash_start")
             )
         }
@@ -295,6 +355,7 @@ private fun StartPanel(lilyWidth: Dp, onStartClick: () -> Unit, modifier: Modifi
                 .align(Alignment.TopCenter)
                 .offset(y = (-14).dp)
                 .size(width = lilyWidth * 0.62f, height = 30.dp)
+                .popIn(delayMillis = PAWS_POP_MS)   // her paws land on the edge as she arrives
         )
     }
 }
