@@ -4,11 +4,9 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,17 +31,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -56,6 +52,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
@@ -69,10 +66,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.presentation.components.GummyButton
-import com.playit.app.presentation.components.confettiPop
-import com.playit.app.presentation.components.dropIn
-import com.playit.app.presentation.components.idleWiggle
-import com.playit.app.presentation.components.popIn
 import com.playit.app.presentation.components.VoiceMouth
 import com.playit.app.presentation.components.rememberVoiceMouth
 import com.playit.app.presentation.theme.Cloud
@@ -90,6 +83,7 @@ import com.playit.app.presentation.theme.LilyOutline
 import com.playit.app.presentation.theme.LilyPupil
 import com.playit.app.presentation.theme.LilyTongue
 import com.playit.app.presentation.theme.LocalReducedMotion
+import com.playit.app.presentation.theme.Mango
 import com.playit.app.presentation.theme.Sand
 import com.playit.app.presentation.theme.Sky
 import kotlin.math.PI
@@ -121,21 +115,6 @@ internal fun splashMotion(reducedMotion: Boolean): SplashMotion =
 
 /** How long a wink holds before the eye opens again. */
 internal const val WINK_HOLD_MS = 450L
-
-/**
- * The opening (user, 2026-10-29: more motion when the app starts), once when the splash appears, about 1.5 s: the
- * title's letters drop in one by one and sparkle when the last lands; Lily rises from behind the panel with a bounce and
- * her paws pop onto its edge; the tagline drops in; then the Start button pops in and wiggles once. With reduced motion
- * everything is simply there. It ends exactly in the resting layout (card 31a's positions; LayoutMatrixTest).
- */
-internal const val TITLE = "PlayIT"
-internal const val TITLE_STAGGER_MS = 90
-internal const val TITLE_SPARKLE_MS = TITLE_STAGGER_MS * 5 + 350
-internal const val TAGLINE_DROP_MS = 550
-internal const val LILY_RISE_MS = 200L
-internal const val PAWS_POP_MS = 800
-internal const val START_POP_MS = 1000
-internal const val START_WIGGLE_MS = 1500L
 
 /**
  * Lily's eyes, 0 = open and 1 = closed. Both eyes blink on their own; a tap winks only her right eye.
@@ -213,24 +192,32 @@ fun SplashScreen(
     }
     val onLilyTap: () -> Unit = { scope.launch { eyes.winkOnce() } }
 
-    // Opening: Lily rises from behind the panel (1 = in place) and the title sparkles once its letters have landed.
-    val rise = remember { Animatable(if (reducedMotion) 1f else 0f) }
-    var titleSparkle by remember { mutableIntStateOf(0) }
+    // The opening (SplashOpening.kt): one clock, in ms, started once the screen draws smoothly. Every part reads it
+    // only while drawing, so the opening redraws layers but never recomposes the screen.
+    val opening = remember { Animatable(if (reducedMotion) OPENING_END_MS.toFloat() else 0f) }
     LaunchedEffect(Unit) {
         if (reducedMotion) return@LaunchedEffect
-        launch {
-            delay(LILY_RISE_MS)
-            rise.animateTo(1f, spring(dampingRatio = 0.5f, stiffness = Spring.StiffnessLow))
-        }
-        delay(TITLE_SPARKLE_MS.toLong())
-        titleSparkle++
+        awaitSmoothFrames()
+        launch { delay(LILY_BLINK_MS); eyes.blinkOnce() }   // as she peeks
+        launch { delay(LILY_WINK_MS); eyes.winkOnce() }     // the last beat: hello
+        opening.animateTo(OPENING_END_MS.toFloat(), tween(OPENING_END_MS, easing = LinearEasing))
     }
+    val clock: () -> Float = { opening.value }
 
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .background(Brush.verticalGradient(listOf(Sky, Sand)))
     ) {
+        // The clouds, in their own layer so their drift redraws only them.
+        Spacer(
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer()
+                .drawBehind { drawOpeningClouds(clock()) }
+        )
+
+
         // As big as the screen allows: at most 55% of its height, 400 dp tall, and its width less a margin.
         val lilyHeight = minOf(maxHeight * 0.55f, 400.dp, (maxWidth - 24.dp) / LILY_ASPECT)
         val lilyWidth = lilyHeight * LILY_ASPECT
@@ -250,10 +237,14 @@ fun SplashScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    // One Text per letter so each can drop in; read out as one word.
+                    // One Text per letter so each can fall in; read out as one word. The sparkles draw round it.
                     Row(
                         modifier = Modifier
-                            .confettiPop(titleSparkle)
+                            .graphicsLayer()
+                            .drawWithContent {
+                                drawContent()
+                                drawTitleSparkles(clock(), Mango, LilyOutline, 2.dp.toPx())
+                            }
                             .clearAndSetSemantics { contentDescription = TITLE }
                     ) {
                         TITLE.forEachIndexed { i, letter ->
@@ -264,7 +255,14 @@ fun SplashScreen(
                                 color = Ink,
                                 letterSpacing = 0.5.sp,
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier.dropIn(delayMs = i * TITLE_STAGGER_MS)
+                                modifier = Modifier.graphicsLayer {
+                                    val f = letterAt(i, clock())
+                                    translationY = -f.lift * LETTER_DROP_DP.dp.toPx()
+                                    scaleX = f.scaleX
+                                    scaleY = f.scaleY
+                                    alpha = f.alpha
+                                    transformOrigin = TransformOrigin(0.5f, 1f)   // it squashes on the line it lands on
+                                }
                             )
                         }
                     }
@@ -275,7 +273,17 @@ fun SplashScreen(
                         maxLines = 2,
                         color = InkSoft,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.dropIn(delayMs = TAGLINE_DROP_MS, distanceDp = -24f)   // rises, never through the title
+                        // Wiped in from the left as it rises a little; never through the title. A plain clip: a soft
+                        // edge drawn with a blend mode showed as a black box where the text was still hidden.
+                        modifier = Modifier
+                            .graphicsLayer {
+                                translationY = taglineRiseAt(clock()) * TAGLINE_RISE_DP.dp.toPx()
+                            }
+                            .drawWithContent {
+                                val shown = taglineAt(clock())
+                                if (shown >= 1f) drawContent()
+                                else if (shown > 0f) clipRect(right = shown * size.width) { this@drawWithContent.drawContent() }
+                            }
                     )
                 }
             }
@@ -286,10 +294,11 @@ fun SplashScreen(
                 modifier = Modifier
                     .size(lilyWidth, lilyHeight)
                     .graphicsLayer {
-                        scaleX = breatheX.value
-                        scaleY = breatheY.value
-                        // Opening: from fully behind the panel up to her place, passing it a little and settling.
-                        translationY = (1f - rise.value) * size.height
+                        // Opening: she peeks over the panel, crouches, jumps above her place and lands (lilyAt).
+                        val f = lilyAt(clock())
+                        scaleX = breatheX.value * f.scaleX
+                        scaleY = breatheY.value * f.scaleY
+                        translationY = (1f - f.shown) * size.height
                         transformOrigin = TransformOrigin(0.5f, 1f)
                     }
                     .clickable(
@@ -313,20 +322,18 @@ fun SplashScreen(
         StartPanel(
             lilyWidth = lilyWidth,
             onStartClick = onStartClick,
+            clock = clock,
             modifier = Modifier.align(Alignment.BottomCenter)
         )
     }
 }
 
+/** The Start button face's corner: GummyButton's 32 dp, a pill at 64 dp tall. */
+private val StartCorner = 32.dp
+
 /** The white panel Lily peeks over: the Start button inside, her paws on its top edge. */
 @Composable
-private fun StartPanel(lilyWidth: Dp, onStartClick: () -> Unit, modifier: Modifier = Modifier) {
-    // Opening: once the Start button has popped in, it wiggles once to say: tap me.
-    var startNudge by remember { mutableIntStateOf(0) }
-    LaunchedEffect(Unit) {
-        delay(START_WIGGLE_MS)
-        startNudge++
-    }
+private fun StartPanel(lilyWidth: Dp, onStartClick: () -> Unit, clock: () -> Float, modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxWidth()) {
         Box(
             modifier = Modifier
@@ -345,8 +352,17 @@ private fun StartPanel(lilyWidth: Dp, onStartClick: () -> Unit, modifier: Modifi
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 64.dp)
-                    .popIn(delayMillis = START_POP_MS)
-                    .idleWiggle(startNudge)
+                    // Opening: it pops in, then a shine crosses it once to say: tap me.
+                    .graphicsLayer {
+                        val pop = startPopAt(clock())
+                        scaleX = pop.scale
+                        scaleY = pop.scale
+                        alpha = pop.alpha
+                    }
+                    .drawWithContent {
+                        drawContent()
+                        shineAt(clock())?.let { drawShine(it, StartCorner.toPx()) }
+                    }
                     .testTag("splash_start")
             )
         }
@@ -355,7 +371,15 @@ private fun StartPanel(lilyWidth: Dp, onStartClick: () -> Unit, modifier: Modifi
                 .align(Alignment.TopCenter)
                 .offset(y = (-14).dp)
                 .size(width = lilyWidth * 0.62f, height = 30.dp)
-                .popIn(delayMillis = PAWS_POP_MS)   // her paws land on the edge as she arrives
+                // Her paws drop onto the edge and grab it as she lands.
+                .graphicsLayer {
+                    val f = pawsAt(clock())
+                    translationY = -f.lift * PAWS_DROP_DP.dp.toPx()
+                    scaleX = f.scaleX
+                    scaleY = f.scaleY
+                    alpha = f.alpha
+                    transformOrigin = TransformOrigin(0.5f, 1f)
+                }
         )
     }
 }

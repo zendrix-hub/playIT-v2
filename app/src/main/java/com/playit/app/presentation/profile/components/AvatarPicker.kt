@@ -5,7 +5,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
@@ -25,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.playit.app.presentation.components.bounceClick
 import com.playit.app.presentation.components.hop
 import com.playit.app.presentation.theme.*
 
@@ -82,7 +82,9 @@ fun AvatarPicker(
                                     scaleX = scale
                                     scaleY = scale
                                 }
-                                .clickable {
+                                // No ripple: the default one drew a dark box over the whole tile (user, 2026-10-29).
+                                // The tile presses down like the app's other buttons, then the animal hops.
+                                .bounceClick {
                                     hops[avatarId] = (hops[avatarId] ?: 0) + 1
                                     onAvatarSelect(avatarId)
                                 }
