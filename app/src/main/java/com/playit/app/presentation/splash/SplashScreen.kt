@@ -47,6 +47,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -56,11 +57,14 @@ import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -68,9 +72,11 @@ import androidx.compose.ui.unit.sp
 import com.playit.app.presentation.components.GummyButton
 import com.playit.app.presentation.components.VoiceMouth
 import com.playit.app.presentation.components.rememberVoiceMouth
+import com.playit.app.presentation.theme.ApricotGlow
 import com.playit.app.presentation.theme.Cloud
+import com.playit.app.presentation.theme.CoralBerry
+import com.playit.app.presentation.theme.EmeraldLeaf
 import com.playit.app.presentation.theme.Ink
-import com.playit.app.presentation.theme.InkSoft
 import com.playit.app.presentation.theme.Leaf
 import com.playit.app.presentation.theme.LeafShadow
 import com.playit.app.presentation.theme.LilyBlush
@@ -84,8 +90,11 @@ import com.playit.app.presentation.theme.LilyPupil
 import com.playit.app.presentation.theme.LilyTongue
 import com.playit.app.presentation.theme.LocalReducedMotion
 import com.playit.app.presentation.theme.Mango
+import com.playit.app.presentation.theme.PrimaryJoy
 import com.playit.app.presentation.theme.Sand
 import com.playit.app.presentation.theme.Sky
+import com.playit.app.presentation.theme.SnigletFontFamily
+import com.playit.app.presentation.theme.SunnyGold
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
@@ -248,13 +257,9 @@ fun SplashScreen(
                             .clearAndSetSemantics { contentDescription = TITLE }
                     ) {
                         TITLE.forEachIndexed { i, letter ->
-                            Text(
-                                text = letter.toString(),
-                                style = MaterialTheme.typography.displayLarge,
-                                maxLines = 1,
-                                color = Ink,
-                                letterSpacing = 0.5.sp,
-                                textAlign = TextAlign.Center,
+                            LogoLetter(
+                                letter = letter,
+                                color = LogoColors[i % LogoColors.size],
                                 modifier = Modifier.graphicsLayer {
                                     val f = letterAt(i, clock())
                                     translationY = -f.lift * LETTER_DROP_DP.dp.toPx()
@@ -269,9 +274,10 @@ fun SplashScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Mabuhay! Ready to learn to read?",
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+                        // Balanced lines, so a word is never left alone on the second.
+                        style = MaterialTheme.typography.bodyLarge.copy(fontFamily = SnigletFontFamily, fontWeight = FontWeight.Normal, lineBreak = LineBreak.Heading),
                         maxLines = 2,
-                        color = InkSoft,
+                        color = Ink,
                         textAlign = TextAlign.Center,
                         // Wiped in from the left as it rises a little; never through the title. A plain clip: a soft
                         // edge drawn with a blend mode showed as a black box where the text was still hidden.
@@ -325,6 +331,30 @@ fun SplashScreen(
             clock = clock,
             modifier = Modifier.align(Alignment.BottomCenter)
         )
+    }
+}
+
+/**
+ * The logo (user, 2026-10-29: the opening's fonts "same as the pictures, cartoonish"): Sniglet, each letter in one of
+ * the island colours in turn, in the pictures' dark-brown outline, with a little depth below like their shadow side.
+ */
+private val LogoColors = listOf(PrimaryJoy, ApricotGlow, EmeraldLeaf, CoralBerry, SunnyGold)
+private val LogoSize = 56.sp
+private val LogoOutline = 4.dp
+private val LogoDepth = 4.dp
+
+/** One letter of the logo: its depth, its outline and its colour, drawn in that order. */
+@Composable
+private fun LogoLetter(letter: Char, color: Color, modifier: Modifier = Modifier) {
+    val base = TextStyle(fontFamily = SnigletFontFamily, fontWeight = FontWeight.ExtraBold, fontSize = LogoSize, lineHeight = LogoSize * 1.15f)
+    // A stroke is centred on the letter's edge, and the colour covers its inner half.
+    val outline = Stroke(width = with(LocalDensity.current) { (LogoOutline * 2).toPx() }, join = StrokeJoin.Round)
+    val text = letter.toString()
+    Box(modifier = modifier) {
+        Text(text, style = base.copy(color = LilyOutline), maxLines = 1, modifier = Modifier.offset(y = LogoDepth))
+        Text(text, style = base.copy(color = LilyOutline, drawStyle = outline), maxLines = 1, modifier = Modifier.offset(y = LogoDepth))
+        Text(text, style = base.copy(color = LilyOutline, drawStyle = outline), maxLines = 1)
+        Text(text, style = base.copy(color = color), maxLines = 1)
     }
 }
 

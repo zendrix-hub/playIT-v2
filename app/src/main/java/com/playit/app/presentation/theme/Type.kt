@@ -36,6 +36,14 @@ val AndikaFontFamily = FontFamily(
     Font(R.font.andika_regular, FontWeight.Normal),
 )
 
+// Sniglet (SIL Open Font License 1.1; licence in assets/licenses/Sniglet-OFL.txt): a rounded cartoon face for the
+// opening's logo and tagline only (user, 2026-10-29: fonts "same as the pictures, cartoonish"). It keeps the one-story
+// a and g, but all reading content stays Lexend.
+val SnigletFontFamily = FontFamily(
+    Font(R.font.sniglet_regular, FontWeight.Normal),
+    Font(R.font.sniglet_extrabold, FontWeight.ExtraBold),
+)
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Type Scale
 //

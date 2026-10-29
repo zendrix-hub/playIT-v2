@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
@@ -16,20 +17,27 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.playit.app.presentation.components.MAP_OPEN_HOP_MS
-import com.playit.app.presentation.components.hop
 import com.playit.app.presentation.components.rememberAssetPainter
+import com.playit.app.presentation.theme.LilyOutline
 import com.playit.app.presentation.theme.LocalReducedMotion
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.sin
@@ -152,11 +160,10 @@ fun generateCompanionPlacements(
 /**
  * Draws the child's own avatar beside the current node. It stands still while nothing happens (card 22:
  * no endless motion on the map; the current node's pulse ring is the one moving thing), and moves only on
- * a meaningful moment (design refresh):
- * - when a stop has just opened, it walks there from [arrivalFromIndex] (the stop the child just finished)
- *   and hops on arrival;
- * - when the child taps it, it hops.
- * Under reduced motion it stands at the current node and does not hop. The other animal friends are no
+ * a meaningful moment (design refresh), in its own way (MapGaits.kt: the cat trots, the owl flies...):
+ * - when a stop has just opened, it travels there from [arrivalFromIndex] (the stop the child just finished);
+ * - when the map opens, and when the child taps it, it does the same move on the spot.
+ * Under reduced motion it stands at the current node and does not move. The other animal friends are no
  * longer drawn; generateCompanionPlacements still lists them for anyone who needs them.
  */
 @Composable
@@ -186,53 +193,111 @@ fun MapCompanionFriends(
         val from = arrivalFromIndex
             ?.takeIf { it != activeNodeIndex && it in nodeCenters.indices && !reduced }
             ?.let { explorerOffsetDp(nodeCenters[it], maxWidth.value, density) }
-        // Starts at the old stop in the very first frame, so the explorer never flashes at the new one.
-        val walk = remember(from != null, arrivalFromIndex) { Animatable(if (from != null) 0f else 1f) }
-        var hops by remember { mutableIntStateOf(0) }
+        val to = leader.offsetDp
+        val gait = leader.animal.gait
+        val direction = if (from != null && from.x > to.x) -1f else 1f
+        // The animal's move (MapGaits.kt), in ms; its end is at rest. A walk starts at the old stop in the very first
+        // frame, so the explorer never flashes at the new one.
+        val move = remember(from != null, arrivalFromIndex) { Animatable(if (from != null) 0f else gait.totalMs.toFloat()) }
+        var travelling by remember(from != null, arrivalFromIndex) { mutableStateOf(from != null) }
+        val scope = rememberCoroutineScope()
+        val playOnTheSpot: () -> Unit = {
+            if (!reduced && !travelling && !move.isRunning) scope.launch {
+                move.snapTo(0f)
+                move.animateTo(gait.totalMs.toFloat(), tween(gait.totalMs, easing = LinearEasing))
+            }
+        }
         LaunchedEffect(from != null, arrivalFromIndex) {
             if (from == null) return@LaunchedEffect
             delay(WALK_DELAY_MS)
-            walk.animateTo(1f, tween(WALK_MS, easing = LinearEasing))
-            hops++
+            move.animateTo(gait.totalMs.toFloat(), tween(gait.totalMs, easing = LinearEasing))
+            travelling = false
         }
-        // Map opening: when the wave of stops reaches the current one, the explorer hops there (a walk hops on its own).
+        // Map opening: when the wave of stops reaches the current one, the explorer does its move there.
         LaunchedEffect(Unit) {
             if (from != null) return@LaunchedEffect
             delay(MAP_OPEN_HOP_MS.toLong())
-            hops++
+            playOnTheSpot()
         }
-        val step = walkAt(walk.value)
-        val x = if (from != null) from.x + (leader.offsetDp.x - from.x) * step.along else leader.offsetDp.x
-        val y = if (from != null) from.y + (leader.offsetDp.y - from.y) * step.along - step.liftDp else leader.offsetDp.y
+        val frame: () -> GaitFrame = { gaitAt(gait, move.value, direction) }
 
         val charSize = 78.dp
+        // The avatar pictures are heads cut out at 62 % of their square, so the chin sits this far above its bottom;
+        // the shadow and the dust go there, under the head.
+        val chinGap = charSize * (1f - 0.62f) / 2f
         Box(
             modifier = Modifier
-                .offset(x = x.dp, y = y.dp)
+                // Along the ground from the old stop to the new one; the lift is drawn in the picture's layer.
+                .offset {
+                    val along = if (from != null && travelling) frame().along else 1f
+                    val start = from ?: to
+                    IntOffset(
+                        (start.x + (to.x - start.x) * along).dp.roundToPx(),
+                        (start.y + (to.y - start.y) * along).dp.roundToPx()
+                    )
+                }
                 .size(charSize)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
                 ) {
-                    hops++
+                    playOnTheSpot()
                     onCompanionTap?.invoke(leader.animal)
                 },
             contentAlignment = Alignment.Center
         ) {
-            // Ambient Ground Contact Shadow
+            // The shadow stays on the ground and shrinks and fades as the animal rises; a landing kicks up dust.
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .offset(y = 2.dp)
+                    .offset(y = -chinGap + 4.dp)
                     .size(width = charSize * 0.65f, height = 8.dp)
+                    .graphicsLayer {
+                        val away = (frame().liftDp / 90f).coerceIn(0f, 0.6f)
+                        scaleX = 1f - away
+                        scaleY = 1f - away
+                        alpha = 1f - away
+                    }
                     .background(Color(0x2E1F3A3D), CircleShape)
+            )
+            Spacer(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .offset(y = -chinGap + 6.dp)
+                    .size(width = charSize * 1.4f, height = 24.dp)
+                    .drawBehind { drawLandingDust(frame().dust) }
             )
             Image(
                 painter = rememberAssetPainter(leader.animal.assetPath),
                 contentDescription = "${leader.animal.displayName}, your explorer",
                 contentScale = ContentScale.Fit,
-                modifier = Modifier.fillMaxSize().hop(hops)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer {
+                        val f = frame()
+                        // Squash and stretch about its centre (so a somersault turns in place), shifted so it stays
+                        // standing on the ground.
+                        translationY = -f.liftDp.dp.toPx() + size.height * (1f - f.scaleY) / 2f
+                        scaleX = f.scaleX
+                        scaleY = f.scaleY
+                        rotationZ = f.rotation
+                    }
             )
+        }
+    }
+}
+
+/** A landing's dust at [dust] 0..1: a puff either side of the feet, spreading out and up as it fades. */
+private fun DrawScope.drawLandingDust(dust: Float) {
+    if (dust <= 0f) return
+    val alpha = 0.9f * (1f - dust)
+    val r = (4f + 6f * dust).dp.toPx()
+    val line = 1.5.dp.toPx()
+    for (side in listOf(-1f, 1f)) {
+        val c = Offset(size.width / 2f + side * (24f + 22f * dust).dp.toPx(), size.height * 0.7f - (5f * dust).dp.toPx())
+        for ((at, radius) in listOf(c to r, c + Offset(side * r * 0.95f, r * 0.25f) to r * 0.65f)) {
+            drawCircle(Color.White.copy(alpha = alpha), radius, at)
+            drawCircle(LilyOutline.copy(alpha = alpha * 0.5f), radius, at, style = Stroke(line))
         }
     }
 }
