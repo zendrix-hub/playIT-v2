@@ -129,38 +129,42 @@ fun NamePromptScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                AvatarPicker(
-                    selectedAvatarId = selectedAvatarId,
-                    onAvatarSelect = {
-                        hasSelectedAvatar.value = true
-                        viewModel.onAvatarSelected(it)
-                    }
-                )
+            // The animals sit in the middle of the space between Lily and Let's Play (user, 2026-10-29); it still
+            // scrolls when a large font makes them taller than the space.
+            BoxWithConstraints(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                        .heightIn(min = maxHeight),
+                    verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
+                ) {
+                    AvatarPicker(
+                        selectedAvatarId = selectedAvatarId,
+                        onAvatarSelect = {
+                            hasSelectedAvatar.value = true
+                            viewModel.onAvatarSelected(it)
+                        }
+                    )
 
-                if (uiState is ProfileUiState.Error) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                color = CoralBerry.copy(alpha = 0.12f),
-                                shape = Squircle12
+                    if (uiState is ProfileUiState.Error) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    color = CoralBerry.copy(alpha = 0.12f),
+                                    shape = Squircle12
+                                )
+                                .padding(horizontal = 16.dp, vertical = 10.dp)
+                        ) {
+                            Text(
+                                text = (uiState as ProfileUiState.Error).message,
+                                color = CoralBerry,
+                                fontFamily = LexendFontFamily,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
                             )
-                            .padding(horizontal = 16.dp, vertical = 10.dp)
-                    ) {
-                        Text(
-                            text = (uiState as ProfileUiState.Error).message,
-                            color = CoralBerry,
-                            fontFamily = LexendFontFamily,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        }
                     }
                 }
             }
