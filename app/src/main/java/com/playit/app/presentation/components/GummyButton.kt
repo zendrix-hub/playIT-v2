@@ -1,6 +1,8 @@
 package com.playit.app.presentation.components
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -54,6 +56,22 @@ import kotlin.math.sin
 
 /** Length of the correct-answer squash. */
 const val SQUASH_MS = 320
+
+/** Press: shrink to 92 % while held (03 §4 tap feedback) in PRESS_IN_MS; release: back in PRESS_OUT_MS with an overshoot. */
+const val PRESS_SCALE = 0.92f
+const val PRESS_IN_MS = 100
+const val PRESS_OUT_MS = 250
+
+/**
+ * Android's OvershootInterpolator curve: 0 at 0 and 1 at 1, passing beyond 1 on the way and settling back,
+ * which makes a release feel elastic. Tension 3 overshoots by 25 % of the move: from 92 % a release peaks at 102 %.
+ */
+fun overshoot(t: Float, tension: Float = 3f): Float {
+    val x = t.coerceIn(0f, 1f) - 1f
+    return x * x * ((tension + 1f) * x + tension) + 1f
+}
+
+private val OvershootEasing = Easing { overshoot(it) }
 
 /**
  * The correct-answer squash at [progress] 0..1 as (scaleX, scaleY): out to 108 % wide and 94 % tall and back,
@@ -111,6 +129,18 @@ fun GummyContainer(
         }
     }
 
+    // Press bounce (user, 2026-10-29: bouncy, elastic buttons): the box shrinks to 92 % while held and springs back
+    // past 100 % on release. It draws in a layer, so the touch target never changes; none under reduced motion.
+    val pressScale = remember { Animatable(1f) }
+    val bouncy = enabled && onClick != null && !isReducedMotion
+    LaunchedEffect(isPressed, bouncy) {
+        when {
+            !bouncy -> pressScale.snapTo(1f)
+            isPressed -> pressScale.animateTo(PRESS_SCALE, tween(PRESS_IN_MS, easing = FastOutSlowInEasing))
+            pressScale.value != 1f -> pressScale.animateTo(1f, tween(PRESS_OUT_MS, easing = OvershootEasing))
+        }
+    }
+
     val clickableModifier = if (onClick != null) {
         Modifier.clickable(
             interactionSource = interactionSource,
@@ -129,8 +159,8 @@ fun GummyContainer(
         modifier = modifier
             .graphicsLayer {
                 val (sx, sy) = squashAt(squash.value)
-                scaleX = sx
-                scaleY = sy
+                scaleX = sx * pressScale.value
+                scaleY = sy * pressScale.value
             }
             .then(clickableModifier),
         content = {

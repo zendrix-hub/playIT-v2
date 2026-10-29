@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -62,6 +63,8 @@ import com.playit.app.presentation.components.LetterCard
 import com.playit.app.presentation.components.LessonTopBar
 import com.playit.app.presentation.components.MascotSpeechHeader
 import com.playit.app.presentation.components.MascotState
+import com.playit.app.presentation.components.GENTLE_SHAKE_MS
+import com.playit.app.presentation.components.confettiPop
 import com.playit.app.presentation.components.shake
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -161,6 +164,9 @@ fun SayItScreen(
     val micStatus by viewModel.micStatus.collectAsStateWithLifecycle()
     val showMouthCue by viewModel.showMouthCue.collectAsStateWithLifecycle()
     val showFeedback = state is SayItState.Correct || state is SayItState.Incorrect
+    // Each right attempt pops confetti from the prompt card (user, 2026-10-29).
+    var corrects by remember { mutableIntStateOf(0) }
+    LaunchedEffect(state is SayItState.Correct) { if (state is SayItState.Correct) corrects++ }
 
     // MainActivity.onStop stops Vosk; drop the attempt here too so the mic is never stuck
     // in Listening when the child comes back (Review Focus 2).
@@ -265,7 +271,9 @@ fun SayItScreen(
                     showSpeakerIcon = true,
                     isPlaying = isPlayingPhoneme,
                     // Shorter than in Hear It: the mic, its label and the attempt dots sit below it.
-                    modifier = Modifier.heightIn(max = cardMaxHeight).shake(trigger = state is SayItState.Incorrect),
+                    modifier = Modifier.heightIn(max = cardMaxHeight)
+                        .shake(trigger = state is SayItState.Incorrect, durationMs = GENTLE_SHAKE_MS)
+                        .confettiPop(corrects),
                     onTapReplay = { viewModel.playWordAudio() }
                 )
             } else {
@@ -281,7 +289,8 @@ fun SayItScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(max = cardMaxHeight)
-                        .shake(trigger = state is SayItState.Incorrect)
+                        .shake(trigger = state is SayItState.Incorrect, durationMs = GENTLE_SHAKE_MS)
+                        .confettiPop(corrects)
                 ) {
                     Column(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp, horizontal = 16.dp),

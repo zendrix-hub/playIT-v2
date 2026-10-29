@@ -4,11 +4,9 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.ui.platform.testTag
 import com.playit.app.presentation.components.LessonScaffold
-import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -49,7 +47,10 @@ import com.playit.app.presentation.components.LessonStep
 import com.playit.app.presentation.components.LessonTopBar
 import com.playit.app.presentation.components.MascotSpeechHeader
 import com.playit.app.presentation.components.MascotState
+import com.playit.app.presentation.components.confettiPop
+import com.playit.app.presentation.components.correctionGlow
 import com.playit.app.presentation.components.hop
+import com.playit.app.presentation.components.shake
 import com.playit.app.presentation.components.idleBounce
 import com.playit.app.presentation.theme.*
 import kotlinx.coroutines.delay
@@ -102,16 +103,8 @@ fun BlendItScreen(
         }
     }
 
-    // Headspace: gentle non-punitive tile wobble on incorrect attempt
-    val wobble = remember { Animatable(0f) }
-    LaunchedEffect(uiState) {
-        if (uiState is BlendItUiState.WordIncorrect) {
-            wobble.animateTo(-6f, tween(60))
-            wobble.animateTo(6f, tween(120))
-            wobble.animateTo(-4f, tween(120))
-            wobble.animateTo(0f, tween(80))
-        }
-    }
+    // A wrong word: the slots shake quickly side to side and glow Gentle Correction Orange (user, 2026-10-29).
+    val isWordIncorrect = uiState is BlendItUiState.WordIncorrect
 
     DisposableEffect(Unit) {
         viewModel.onScreenVisible()
@@ -205,11 +198,13 @@ fun BlendItScreen(
                 BlendItCard(
                     word = wordItem.word,
                     isCorrect = uiState is BlendItUiState.WordCorrect,
+                    // The picture celebrates, and the card pops confetti, as the whole word plays.
                     celebrate = blending,
                     onReplayAudio = { viewModel.playTargetWordAudio() },
                     // On 360x640 the card (with its smaller compact picture) gives up 8 dp of its 176 dp
                     // minimum so the tiles clear the bottom bar.
-                    modifier = if (d.profile == WindowProfile.COMPACT) Modifier.heightIn(max = 168.dp) else Modifier
+                    modifier = (if (d.profile == WindowProfile.COMPACT) Modifier.heightIn(max = 168.dp) else Modifier)
+                        .confettiPop(blends)
                 )
             }
 
@@ -221,7 +216,7 @@ fun BlendItScreen(
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(SLOT_GAP, Alignment.CenterHorizontally),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth().graphicsLayer { rotationZ = wobble.value }.hop(blends, squash = false)
+                    modifier = Modifier.fillMaxWidth().shake(trigger = isWordIncorrect, key = uiState).hop(blends, squash = false)
                 ) {
                     val wordLength = currentWord?.word?.length ?: 3
                     for (i in 0 until wordLength) {
@@ -271,7 +266,10 @@ fun BlendItScreen(
                                     translationX = blendJoinGaps(i, wordLength) * SLOT_GAP.toPx() * join
                                 }
                         ) {
-                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Box(
+                                modifier = Modifier.fillMaxSize().correctionGlow(isWordIncorrect, Squircle16, key = uiState),
+                                contentAlignment = Alignment.Center
+                            ) {
                                 Text(
                                     text = tile?.uppercase() ?: "_",
                                     fontFamily = LexendFontFamily,

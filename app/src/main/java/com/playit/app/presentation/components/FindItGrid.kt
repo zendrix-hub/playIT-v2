@@ -60,9 +60,10 @@ fun FindItCard(
         modifier = modifier
             .graphicsLayer { rotationZ = rotationAngle }
             .shake(trigger = isIncorrect)
+            .confettiPop(if (isCorrect) 1 else 0)
     ) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().correctionGlow(isIncorrect, Squircle20),
             contentAlignment = Alignment.Center
         ) {
             Column(

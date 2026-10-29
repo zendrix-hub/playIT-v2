@@ -7,15 +7,29 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.drawOutline
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.playit.app.presentation.components.lipsync.HOP_MS
 import com.playit.app.presentation.components.lipsync.hopAt
+import com.playit.app.presentation.theme.GentleCorrectionOrange
+import com.playit.app.presentation.theme.Guava
+import com.playit.app.presentation.theme.Leaf
 import com.playit.app.presentation.theme.LocalReducedMotion
+import com.playit.app.presentation.theme.Mango
 import com.playit.app.presentation.theme.PlayItMotion
+import com.playit.app.presentation.theme.Ube
 import kotlinx.coroutines.delay
 import kotlin.math.PI
+import kotlin.math.cos
 import kotlin.math.sin
 
 // Feedback effects for meaningful moments only (user decision 2026-10-06). The curves are pure
@@ -115,5 +129,95 @@ fun Modifier.hop(count: Int, squash: Boolean = true): Modifier = composed {
         scaleX = 1f + 0.06f * landing
         scaleY = 1f - 0.08f * landing
         transformOrigin = TransformOrigin(0.5f, 1f)
+    }
+}
+
+/** A right answer's confetti pop: how long it lasts and how many pieces it throws. */
+const val POP_MS = 700
+const val POP_PIECES = 12
+
+private val POP_COLORS = listOf(Mango, Leaf, Guava, Ube)
+
+/**
+ * One piece of a right-answer pop at [progress] 0..1: where it is, as a share of the element's smaller side from its
+ * centre ([dx], [dy]; down is positive), how opaque it is and how far it has turned. The pieces fly out evenly all
+ * round, fast at first, then fall a little and fade over the last 40 %.
+ */
+data class PopPiece(val dx: Float, val dy: Float, val alpha: Float, val rotation: Float)
+
+fun popPieceAt(index: Int, progress: Float): PopPiece {
+    val p = progress.coerceIn(0f, 1f)
+    val angle = 2f * PI.toFloat() * index / POP_PIECES + 0.25f * ((index * 7) % 3 - 1)
+    val reach = 0.55f + 0.15f * ((index * 5) % 3)
+    val thrown = 1f - (1f - p) * (1f - p)
+    return PopPiece(
+        dx = cos(angle) * reach * thrown,
+        dy = sin(angle) * reach * thrown + 0.25f * p * p,
+        alpha = if (p < 0.6f) 1f else ((1f - p) / 0.4f).coerceIn(0f, 1f),
+        rotation = 360f * p * (if (index % 2 == 0) 1f else -1f)
+    )
+}
+
+/**
+ * A right answer (user, 2026-10-29: confetti on correct answers): a small burst of confetti flies out of the element's
+ * centre and fades, once each time [count] goes up. The first value never pops, so opening a screen does not. None
+ * under reduced motion; the check mark, the colour and the chime still show the answer. Drawn over the element, so the
+ * layout and the touch targets never change.
+ */
+fun Modifier.confettiPop(count: Int): Modifier = composed {
+    val reduced = LocalReducedMotion.current
+    val first = remember { count }
+    val progress = remember { Animatable(1f) }
+    LaunchedEffect(count) {
+        if (count == first || reduced) return@LaunchedEffect
+        progress.snapTo(0f)
+        progress.animateTo(1f, tween(POP_MS, easing = LinearEasing))
+    }
+    drawWithContent {
+        drawContent()
+        val p = progress.value
+        if (p >= 1f) return@drawWithContent
+        val side = size.minDimension
+        val piece = 8.dp.toPx()
+        for (i in 0 until POP_PIECES) {
+            val f = popPieceAt(i, p)
+            val color = POP_COLORS[i % POP_COLORS.size].copy(alpha = f.alpha)
+            translate(center.x + f.dx * side, center.y + f.dy * side) {
+                rotate(f.rotation, pivot = Offset.Zero) {
+                    if (i % 3 == 0) drawCircle(color, radius = piece / 2f, center = Offset.Zero)
+                    else drawRect(color, topLeft = Offset(-piece / 2f, -piece * 0.3f), size = Size(piece, piece * 0.6f))
+                }
+            }
+        }
+    }
+}
+
+/** A wrong match's glow: how long it lasts, and how strong it gets at its peak. */
+const val GLOW_MS = 400
+const val GLOW_PEAK = 0.45f
+
+/** The glow's opacity [ms] after a wrong match: up to GLOW_PEAK in the first quarter, then fading to 0 at GLOW_MS. */
+fun glowAlphaAt(ms: Float): Float = when {
+    ms <= 0f || ms >= GLOW_MS -> 0f
+    ms < GLOW_MS / 4f -> GLOW_PEAK * ms / (GLOW_MS / 4f)
+    else -> GLOW_PEAK * (GLOW_MS - ms) / (GLOW_MS * 3f / 4f)
+}
+
+/**
+ * A wrong match (user, 2026-10-29: a gentle flash): the element glows Gentle Correction Orange once, behind its content,
+ * each time [trigger] becomes true ([key] restarts it, as for shake). Orange, never red, and never the whole screen (03 §4: no flashing red, no
+ * punishment visuals). Under reduced motion it still glows: a colour change, not motion.
+ */
+fun Modifier.correctionGlow(trigger: Boolean, shape: Shape, key: Any? = trigger): Modifier = composed {
+    val elapsed = remember { Animatable(GLOW_MS.toFloat()) }
+    LaunchedEffect(key) {
+        if (trigger) {
+            elapsed.snapTo(0f)
+            elapsed.animateTo(GLOW_MS.toFloat(), tween(GLOW_MS, easing = LinearEasing))
+        }
+    }
+    drawBehind {
+        val a = glowAlphaAt(elapsed.value)
+        if (a > 0f) drawOutline(shape.createOutline(size, layoutDirection, this), GentleCorrectionOrange.copy(alpha = a))
     }
 }
