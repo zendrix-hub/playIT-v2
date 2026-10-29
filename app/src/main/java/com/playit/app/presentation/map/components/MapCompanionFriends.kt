@@ -26,6 +26,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
@@ -267,10 +271,7 @@ fun MapCompanionFriends(
                     .size(width = charSize * 1.4f, height = 24.dp)
                     .drawBehind { drawLandingDust(frame().dust) }
             )
-            Image(
-                painter = rememberAssetPainter(leader.animal.assetPath),
-                contentDescription = "${leader.animal.displayName}, your explorer",
-                contentScale = ContentScale.Fit,
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .graphicsLayer {
@@ -282,7 +283,60 @@ fun MapCompanionFriends(
                         scaleY = f.scaleY
                         rotationZ = f.rotation
                     }
-            )
+                    // The owl's wings, behind its head, so they come out from behind it and move with it.
+                    .drawBehind { frame().let { if (it.wings > 0f) drawOwlWings(it.wings, it.flap) } }
+            ) {
+                Image(
+                    painter = rememberAssetPainter(leader.animal.assetPath),
+                    contentDescription = "${leader.animal.displayName}, your explorer",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+        }
+    }
+}
+
+/** The owl's colours, from its picture, and the pictures' dark-brown line. */
+private val OwlPurple = Color(0xFF8A55A0)
+private val OwlPurpleShade = Color(0xFF704080)
+
+/**
+ * The owl's two wings at the sides of its head, [open] 0..1 out from behind it, at [flap] in their beat (-1 raised,
+ * 1 pushed down). Each is a flat rounded wing with three feather tips, in the owl's purple and the pictures' outline,
+ * hinged where it meets the head.
+ */
+private fun DrawScope.drawOwlWings(open: Float, flap: Float) {
+    val w = size.width
+    val length = w * 0.40f * open
+    val depth = w * 0.24f * open
+    if (length <= 0f) return
+    val line = 2.dp.toPx()
+    // Pointing out from the hinge (0, 0) along +x: a rounded leading edge to the tip, three feather tips back.
+    val wing = Path().apply {
+        moveTo(0f, -depth * 0.45f)
+        cubicTo(length * 0.40f, -depth * 1.05f, length * 0.92f, -depth * 0.70f, length, -depth * 0.10f)
+        quadraticBezierTo(length * 0.93f, depth * 0.38f, length * 0.74f, depth * 0.22f)
+        quadraticBezierTo(length * 0.66f, depth * 0.62f, length * 0.47f, depth * 0.36f)
+        quadraticBezierTo(length * 0.36f, depth * 0.72f, length * 0.18f, depth * 0.42f)
+        quadraticBezierTo(length * 0.06f, depth * 0.50f, 0f, depth * 0.30f)
+        close()
+    }
+    val feather = Path().apply {
+        moveTo(length * 0.16f, -depth * 0.10f)
+        quadraticBezierTo(length * 0.50f, -depth * 0.30f, length * 0.82f, -depth * 0.12f)
+    }
+    // Raised to 50 degrees, pushed down to 25 degrees below level.
+    val angle = -12.5f + 37.5f * flap
+    for (side in listOf(-1f, 1f)) {
+        withTransform({
+            translate(left = w / 2f + side * w * 0.26f, top = size.height * 0.58f)
+            scale(scaleX = side, scaleY = 1f, pivot = Offset.Zero)
+            rotate(degrees = angle, pivot = Offset.Zero)
+        }) {
+            drawPath(wing, OwlPurple)
+            drawPath(feather, OwlPurpleShade, style = Stroke(line, cap = StrokeCap.Round))
+            drawPath(wing, LilyOutline, style = Stroke(line, join = StrokeJoin.Round))
         }
     }
 }

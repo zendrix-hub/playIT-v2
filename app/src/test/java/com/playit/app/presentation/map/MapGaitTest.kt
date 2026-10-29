@@ -73,6 +73,17 @@ class MapGaitTest {
         assertEquals(1, landings(Gait.FLIP))
     }
 
+    @Test fun theOwl_spreadsItsWingsToFlyBeatsThemAndFoldsThemAway() {
+        val f = frames(Gait.FLY)
+        assertEquals("folded on the ground", 0f, gaitAt(Gait.FLY, 0f).wings, 0f)
+        assertEquals("folded at the end", 0f, gaitAt(Gait.FLY, Gait.FLY.totalMs.toFloat()).wings, 0f)
+        assertTrue("spread while high", f.filter { it.liftDp > 30f }.all { it.wings == 1f })
+        val beats = f.zipWithNext().count { (a, b) -> a.flap < 0.9f && b.flap >= 0.9f }
+        assertTrue("several beats: $beats", beats >= 4)
+        assertTrue(f.all { it.flap in -1f..1f })
+        Gait.values().filter { it != Gait.FLY }.forEach { g -> assertTrue("$g has no wings", frames(g).all { it.wings == 0f }) }
+    }
+
     @Test fun walkers_tipFromSideToSide() {
         listOf(Gait.TROT, Gait.LUMBER).forEach { g ->
             val f = frames(g)

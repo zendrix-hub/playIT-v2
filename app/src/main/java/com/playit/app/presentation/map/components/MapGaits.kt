@@ -38,8 +38,9 @@ val CompanionAnimal.gait: Gait
 
 /**
  * One frame of a gait: how far along the way it is (0 at the old stop, 1 at the new), how high above the ground (dp),
- * its tilt (degrees, clockwise), its squash and stretch (kept standing on the ground), and the dust of a landing
- * (0..1 while it spreads, 0 when there is none).
+ * its tilt (degrees, clockwise), its squash and stretch (kept standing on the ground), the dust of a landing (0..1
+ * while it spreads, 0 when there is none), and the owl's wings: how far out they are (0 folded away, 1 spread) and
+ * where they are in a beat (-1 up, 1 down).
  */
 data class GaitFrame(
     val along: Float,
@@ -47,7 +48,9 @@ data class GaitFrame(
     val rotation: Float = 0f,
     val scaleX: Float = 1f,
     val scaleY: Float = 1f,
-    val dust: Float = 0f
+    val dust: Float = 0f,
+    val wings: Float = 0f,
+    val flap: Float = 0f
 ) {
     companion object {
         val REST = GaitFrame(1f, 0f)
@@ -102,7 +105,10 @@ private fun lumber(p: Float): GaitFrame {
     )
 }
 
-/** The owl takes off from a crouch, flies up and across with its wings beating, glides down and lands. */
+/**
+ * The owl takes off from a crouch, its wings opening and pushing down; flies up and across with them beating; glides
+ * down with them held out, and folds them away as it lands (user, 2026-10-29: wings, as its picture is a head).
+ */
 private const val OWL_TAKEOFF = 0.12f
 private const val OWL_LANDS = 0.88f
 private const val OWL_HEIGHT_DP = 64f
@@ -110,8 +116,10 @@ private const val OWL_FLAPS = 6f
 
 private fun fly(p: Float, direction: Float): GaitFrame = when {
     p < OWL_TAKEOFF -> {
-        val q = bump(seg(p, 0f, OWL_TAKEOFF))
-        GaitFrame(0f, 0f, scaleX = 1f + 0.06f * q, scaleY = 1f - 0.10f * q)
+        val t = seg(p, 0f, OWL_TAKEOFF)
+        val q = bump(t)
+        // The wings open and come up for the first beat.
+        GaitFrame(0f, 0f, scaleX = 1f + 0.06f * q, scaleY = 1f - 0.10f * q, wings = smooth(t), flap = -smooth(t))
     }
     p < OWL_LANDS -> {
         val f = seg(p, OWL_TAKEOFF, OWL_LANDS)
@@ -123,13 +131,27 @@ private fun fly(p: Float, direction: Float): GaitFrame = when {
             liftDp = OWL_HEIGHT_DP * high + 6f * beat * high,
             rotation = direction * 8f * high + 3f * wave(f, 1.5f),
             scaleX = 1f + 0.07f * beat * high,
-            scaleY = 1f - 0.04f * beat * high
+            scaleY = 1f - 0.04f * beat * high,
+            wings = 1f,
+            // From the raised first beat into the flight's beats; held still and out in the glide down.
+            flap = (1f - seg(f, 0.75f, 0.9f)) * wingBeat(f)
         )
     }
     else -> {
-        val q = bump(seg(p, OWL_LANDS, 1f))
-        GaitFrame(1f, 0f, scaleX = 1f + 0.06f * q, scaleY = 1f - 0.10f * q)
+        val t = seg(p, OWL_LANDS, 1f)
+        val q = bump(t)
+        GaitFrame(1f, 0f, scaleX = 1f + 0.06f * q, scaleY = 1f - 0.10f * q, wings = 1f - smooth(t))
     }
+}
+
+/**
+ * Where the wings are in their beat during the flight [f] 0..1: they start raised (-1), as the take-off left them, and
+ * beat [OWL_FLAPS] times, each a quick push down and a slower lift.
+ */
+private fun wingBeat(f: Float): Float {
+    val phase = (f * OWL_FLAPS) % 1f
+    // Down (-1 to 1) over the first 40 % of a beat, back up over the rest.
+    return if (phase < 0.4f) -1f + 2f * smooth(phase / 0.4f) else 1f - 2f * smooth((phase - 0.4f) / 0.6f)
 }
 
 // ---- The jumpers ------------------------------------------------------------------------------------------------
