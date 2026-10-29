@@ -1,0 +1,166 @@
+@startuml class_m2_say_it
+!include _style.iuml
+hide empty members
+
+title Class Diagram, Module 2: Speech Production and Formative Tutoring (Say It)\nSDD §3.2 Speech Recognition, §3.3 Tutoring Layer, §3.6.2 Articulation Cue, §4.2 Say It Workflow
+
+package "presentation" {
+  class SayItScreen <<Composable>>
+  class MicButton <<Composable>> {
+    +MicButton(status, onTap, enabled)
+  }
+  class ArticulationCue <<Composable>> {
+    +ArticulationCue(group, size)
+    <i>96 dp beside the mic, from miss 2</i>
+  }
+  enum MicStatus {
+    IDLE
+    LISTENING
+    HEARD
+    RESULT_CORRECT
+    RESULT_TRY_AGAIN
+    DONE
+  }
+  class SayItViewModel <<HiltViewModel>> {
+    +state : StateFlow<SayItState>
+    +micStatus : StateFlow<MicStatus>
+    +tutorAction : StateFlow<TutorAction?>
+    +attempts : StateFlow<List<Boolean>>
+    +showMouthCue : StateFlow<Boolean>
+    +canContinue : StateFlow<Boolean>
+    -attemptNumber : Int
+    +startListening()
+    +stopListening()
+    +evaluateSpeech(transcript)
+    +playWordAudio()
+    -judgeTranscript(transcript, word, letter) : SpeechJudgement
+    -levelOneCorrection(errorType, letter, word) : List<String>
+  }
+  abstract class SayItState <<sealed>>
+  class "Idle" as SIdle
+  class "Listening" as SListening
+  class "Correct" as SCorrect {
+    +transcript : String
+  }
+  class "Incorrect" as SIncorrect {
+    +transcript : String
+    +errorType : SpeechErrorType
+  }
+}
+
+package "domain (tutoring layer)" {
+  class SpeechValidator {
+    +grammarFor(letter, targetWord) : List<String>
+    +judgeWord(transcript, targetWord, letter) : SpeechJudgement
+    +judgeSound(transcript, letter, word) : SpeechJudgement
+    +validate(text, phoneme) : Boolean
+    <i>plays the role of the planned SayItJudge</i>
+  }
+  class TutorPolicy {
+    -maxScoredAttempts : Int = 3
+    +next(attempt, judgement) : TutorAction
+  }
+  interface TutorAction <<sealed>>
+  class Praise {
+    +attempt : Int
+  }
+  class "Correct" as TCorrect {
+    +errorType : SpeechErrorType
+    +supportLevel : Int
+  }
+  class LeadAndMoveOn <<object>>
+  class SpeechJudgement <<data>> {
+    +isCorrect : Boolean
+    +errorType : SpeechErrorType
+    +heard : String
+  }
+  enum SpeechErrorType {
+    NONE
+    LETTER_NAME
+    ADDED_VOWEL
+    SUBSTITUTION
+    OTHER_WORD
+    NO_SPEECH
+    UNCONFIRMED
+  }
+  class ArticulationGroup <<enum>> {
+    +assetPath : String
+    <i>9 mouth-shape groups</i>
+  }
+  class SayItFeedbackCopy <<object>> {
+    +forResult(...) : FeedbackCopy
+  }
+  interface SayItAttemptRepository {
+    +saveAttempt(profileId, phonemeId, isCorrect)
+    +getAttemptsForProfile(profileId) : List<SayItAttempt>
+  }
+}
+
+package "data" {
+  class VoskRecognizer <<Singleton>> {
+    +initModel() : Boolean
+    +isModelReady() : Boolean
+    +setGrammar(tokens)
+    +startListening(onResult, onError)
+    +stopListening() : String
+  }
+  class AudioCapture {
+    <i>exists, not wired in (SDD §2.0)</i>
+  }
+  class SayItAttemptRepositoryImpl
+  class SayItAttemptDao <<Room DAO>>
+  class SessionManager <<Singleton>> {
+    +activeProfileId : StateFlow<Long?>
+  }
+}
+
+package "planned (SDD 3.2, 3.3)" {
+  class SayItJudge <<planned>>
+  class "TutorPolicy FSM" as TutorFsm <<planned>> {
+    We Do, You Do, Correct, Lead
+  }
+  class MicStateVisualizer <<planned>> {
+    RMS-driven ripple
+  }
+  class LearnerModel <<planned>> {
+    NEEDS_PRACTICE queue (FR-NEW-REC)
+  }
+}
+
+SayItScreen --> SayItViewModel
+SayItScreen *-- MicButton
+SayItScreen *-- ArticulationCue : when showMouthCue
+ArticulationCue ..> ArticulationGroup : reads assetPath
+MicButton ..> MicStatus
+SayItViewModel --> SpeechValidator
+SayItViewModel *-- TutorPolicy
+SayItViewModel --> VoskRecognizer
+SayItViewModel --> SayItAttemptRepository
+SayItViewModel --> SessionManager
+SayItViewModel ..> SayItFeedbackCopy
+SayItViewModel *-- SayItState
+SayItState <|-- SIdle
+SayItState <|-- SListening
+SayItState <|-- SCorrect
+SayItState <|-- SIncorrect
+TutorAction <|.. Praise
+TutorAction <|.. TCorrect
+TutorAction <|.. LeadAndMoveOn
+TutorPolicy ..> TutorAction : returns
+TutorPolicy ..> SpeechJudgement : reads
+SpeechValidator ..> SpeechJudgement : creates
+SpeechJudgement --> SpeechErrorType
+SayItAttemptRepositoryImpl ..|> SayItAttemptRepository
+SayItAttemptRepositoryImpl --> SayItAttemptDao
+SayItJudge ..> SpeechValidator : would replace
+TutorFsm ..> TutorPolicy : would replace
+MicStateVisualizer ..> AudioCapture : would read RMS
+LearnerModel ..> TutorPolicy : would receive LeadAndMoveOn
+
+note bottom of TutorPolicy
+  correct -> Praise
+  attempt 3 missed -> LeadAndMoveOn
+  else -> Correct(supportLevel = attempt)
+  Say It never removes hearts (FR-03.5)
+end note
+@enduml

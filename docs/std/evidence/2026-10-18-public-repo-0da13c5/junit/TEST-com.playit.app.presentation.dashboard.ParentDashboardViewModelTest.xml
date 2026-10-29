@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.presentation.dashboard.ParentDashboardViewModelTest" tests="13" skipped="0" failures="0" errors="0" timestamp="2026-10-18T01:36:00" hostname="LAPTOP-REHI7A0K" time="0.508">
+  <properties/>
+  <testcase name="renameProfile_updatesTrimmedName" classname="com.playit.app.presentation.dashboard.ParentDashboardViewModelTest" time="0.168"/>
+  <testcase name="init_withEmptyProfiles_setsLoadingFalse" classname="com.playit.app.presentation.dashboard.ParentDashboardViewModelTest" time="0.005"/>
+  <testcase name="selectProfile_handlesDashboardDataError" classname="com.playit.app.presentation.dashboard.ParentDashboardViewModelTest" time="0.059"/>
+  <testcase name="selectProfile_loadsDataForSelectedProfile" classname="com.playit.app.presentation.dashboard.ParentDashboardViewModelTest" time="0.019"/>
+  <testcase name="rename_refreshesSelectedProfile" classname="com.playit.app.presentation.dashboard.ParentDashboardViewModelTest" time="0.008"/>
+  <testcase name="renameProfile_blankOrTooLong_isIgnored" classname="com.playit.app.presentation.dashboard.ParentDashboardViewModelTest" time="0.005"/>
+  <testcase name="exportPdfReport_success_updatesExportStatus" classname="com.playit.app.presentation.dashboard.ParentDashboardViewModelTest" time="0.18"/>
+  <testcase name="deleteActiveProfile_clearsSession" classname="com.playit.app.presentation.dashboard.ParentDashboardViewModelTest" time="0.02"/>
+  <testcase name="deleteProfile_callsRepository" classname="com.playit.app.presentation.dashboard.ParentDashboardViewModelTest" time="0.007"/>
+  <testcase name="init_selectsFirstProfileAndLoadsDashboardData" classname="com.playit.app.presentation.dashboard.ParentDashboardViewModelTest" time="0.006"/>
+  <testcase name="deleteLastProfile_setsNoProfilesLeft" classname="com.playit.app.presentation.dashboard.ParentDashboardViewModelTest" time="0.013"/>
+  <testcase name="exportPdfReport_failure_updatesExportStatus" classname="com.playit.app.presentation.dashboard.ParentDashboardViewModelTest" time="0.011"/>
+  <testcase name="deleteOtherProfile_keepsSession" classname="com.playit.app.presentation.dashboard.ParentDashboardViewModelTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,177 @@
+@startuml erd_system
+!include _style.iuml
+hide circle
+hide stereotype
+
+title PlayIT System ERD: Room database "playit_db", schema version 3 (SDD §3.5)
+
+' ---------- Curriculum (seeded on every open by DatabaseModule) ----------
+entity "phonemes" as phonemes {
+  * phonemeId : INTEGER <<PK>>
+  --
+  letter : TEXT
+  audioPath : TEXT
+  imagePath : TEXT
+  exampleWord : TEXT
+}
+
+entity "letter_groups" as letter_groups {
+  * groupId : INTEGER <<PK>>
+  --
+  groupNumber : INTEGER
+}
+
+entity "letter_group_members" as letter_group_members {
+  * memberId : INTEGER <<PK>>
+  --
+  groupId : INTEGER <<FK>>
+  phonemeId : INTEGER <<FK>>
+  position : INTEGER
+}
+
+entity "blend_it_words" as blend_it_words {
+  * wordId : INTEGER <<PK>>
+  --
+  groupId : INTEGER <<FK>>
+  word : TEXT
+  wordPattern : TEXT
+  audioPath : TEXT
+  imagePath : TEXT
+}
+
+' ---------- Learners ----------
+entity "profiles" as profiles {
+  * profileId : INTEGER <<PK>>
+  --
+  name : TEXT
+  avatarResId : INTEGER
+  totalStars : INTEGER  (stored; the app shows a live SUM)
+  currentStreak : INTEGER
+  lastPlayedAt : INTEGER (epoch ms)
+  createdAt : INTEGER (epoch ms)
+}
+
+entity "achievements" as achievements {
+  * achievementId : INTEGER <<PK>>
+  --
+  profileId : INTEGER <<FK>>
+  title : TEXT
+  isUnlocked : INTEGER (bool)
+  unlockedAt : INTEGER (nullable)
+}
+
+' ---------- Progress and attempts ----------
+entity "lesson_progress" as lesson_progress {
+  * id : INTEGER <<PK>>
+  --
+  profileId : INTEGER <<FK>>
+  phonemeId : INTEGER <<FK>>
+  starsEarned : INTEGER
+  heartsLost : INTEGER
+  isCompleted : INTEGER (bool)
+  completedAt : INTEGER
+  timeSpentMs : INTEGER
+  ..
+  UNIQUE (profileId, phonemeId)
+}
+
+entity "say_it_attempts" as say_it_attempts {
+  * attemptId : INTEGER <<PK>>
+  --
+  profileId : INTEGER <<FK>>
+  phonemeId : INTEGER <<FK>>
+  isCorrect : INTEGER (bool)
+  attemptedAt : INTEGER
+}
+
+entity "find_it_attempts" as find_it_attempts {
+  * attemptId : INTEGER <<PK>>
+  --
+  profileId : INTEGER <<FK>>
+  phonemeId : INTEGER <<FK>>
+  selectedPhonemeId : INTEGER (no FK)
+  isCorrect : INTEGER (bool)
+  attemptedAt : INTEGER
+}
+
+entity "blend_it_progress" as blend_it_progress {
+  * id : INTEGER <<PK>>
+  --
+  profileId : INTEGER <<FK>>
+  groupId : INTEGER <<FK>>
+  starsEarned : INTEGER
+  heartsLost : INTEGER
+  isCompleted : INTEGER (bool)
+  completedAt : INTEGER
+  ..
+  UNIQUE (profileId, groupId)
+}
+
+entity "blend_it_attempts" as blend_it_attempts {
+  * attemptId : INTEGER <<PK>>
+  --
+  profileId : INTEGER <<FK>>
+  groupId : INTEGER <<FK>>
+  wordId : INTEGER <<FK>>
+  isCorrect : INTEGER (bool)
+  attemptedAt : INTEGER
+}
+
+' ---------- Planned for schema v4 (SDD §3.5.1; not in the app yet) ----------
+entity "letter_progress\n<<planned v4>>" as letter_progress <<planned>> {
+  * id : INTEGER <<PK>>
+  --
+  profileId : INTEGER <<FK>>
+  letter : TEXT
+  masteryState : TEXT
+  echoPassCount : INTEGER
+  recallPassCount : INTEGER
+  lastSeenEpoch : INTEGER
+  nextReviewEpoch : INTEGER
+}
+
+entity "telemetry_events\n<<planned v4>>" as telemetry_events <<planned>> {
+  * id : INTEGER <<PK>>
+  --
+  profileId : INTEGER <<FK>>
+  sessionId : TEXT
+  chapter : INTEGER
+  letter : TEXT
+  module : TEXT
+  eventType : TEXT
+  elapsedRealtimeMs : INTEGER
+  wallClockEpoch : INTEGER
+  resultValue : TEXT
+  asrConfidence : REAL
+  errorType : TEXT
+}
+
+' Every FK is ON DELETE CASCADE: deleting a profile removes all of its rows (FR-14).
+letter_groups ||--o{ letter_group_members : "has"
+phonemes ||--o{ letter_group_members : "placed in"
+letter_groups ||--o{ blend_it_words : "offers"
+
+profiles ||--o{ achievements : "earns"
+profiles ||--o{ lesson_progress : "records"
+phonemes ||--o{ lesson_progress : "tracked by"
+profiles ||--o{ say_it_attempts : "makes"
+phonemes ||--o{ say_it_attempts : "target of"
+profiles ||--o{ find_it_attempts : "makes"
+phonemes ||--o{ find_it_attempts : "target of"
+profiles ||--o{ blend_it_progress : "records"
+letter_groups ||--o{ blend_it_progress : "tracked by"
+profiles ||--o{ blend_it_attempts : "makes"
+letter_groups ||--o{ blend_it_attempts : "in"
+blend_it_words ||--o{ blend_it_attempts : "attempted as"
+
+profiles ||..o{ letter_progress : "planned"
+profiles ||..o{ telemetry_events : "planned"
+
+legend right
+  |= Notation |= Meaning |
+  | crow's foot | one to zero-or-many |
+  | dashed, grey | planned for schema v4 (SDD §2.0) |
+  | all FKs | ON DELETE CASCADE |
+  | profiles.totalStars | the map and profile cards show SUM(lesson_progress.starsEarned) + SUM(blend_it_progress.starsEarned) (ProfileDao, card 28) |
+endlegend
+@enduml

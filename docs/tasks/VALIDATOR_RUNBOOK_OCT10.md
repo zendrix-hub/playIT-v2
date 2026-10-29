@@ -1,0 +1,325 @@
+# agy Validator Runbook: 2-Day Refactoring Sprint (Oct 9–10, 2026)
+
+> This document defines the verification gates that **agy (Antigravity)** executes as **The Validator** after **Claude (The Mind & Implementator)** pushes commits on `refactor/hear-say-it`.
+
+---
+
+## 1. Automated Verification Checklist
+
+Whenever Claude announces a new commit for validation:
+
+1. **Pull Latest Changes:**
+   ```bash
+   git pull origin refactor/hear-say-it
+   ```
+2. **Execute Full Unit Test Suite:**
+   ```bash
+   ./gradlew testDebugUnitTest
+   ```
+   *Requirement: 100% pass rate across all test classes. Zero regressions.*
+3. **Execute 4-Size Device Matrix Screenshot Tests:**
+   ```bash
+   ./gradlew recordRoborazziDebug --tests 'com.playit.app.screenshot.*'
+   ```
+   *Requirement: Verify that all 4 display sizes render without CTA clipping or text overflow:*
+   - `compact`: 360x640 dp (smallest supported)
+   - `a21s`: 360x740 dp (target test device)
+   - `phone`: 411x891 dp (standard modern phone)
+   - `tablet`: 800x1280 dp (classroom portrait tablet)
+   - Font Scale: verify 1.0 and 1.3 font scaling.
+4. **Mechanical Card Check:**
+   ```bash
+   python3 tools/dev/review_card.py <card_number>
+   ```
+   *Requirement: ALL PASS (files, tests, status, body, assets, refs, zero-emoji).*
+
+---
+
+## 2. Card Validation Log
+
+| Card | Commit | Unit Tests (Local) | Screenshot Matrix | APK Status | agy Verdict |
+|---|---|---|---|---|---|
+| Card 13 | `b909329` | 254 passed | Clean | Included in APK A2 | ✅ VALIDATED |
+| Card 26b | `0886ec4` | 254 passed | Clean | Included in APK A2 | ✅ VALIDATED |
+| Card 18 | `5489293` | 274 passed | 4 sizes green | Included in APK A2+ | ✅ VALIDATED |
+| Card 09b | `1df3f56` | 275 passed | Clean | Audio verified | ✅ VALIDATED |
+| Card 19 | `dc6098e` | 294 passed (0 failed, 2 skipped) | `review_card.py 19` ALL PASS; 10 card tests green | Validated | ✅ VALIDATED (Continuous Mode) |
+| Card 03b | `339f309` | 298 passed (0 failed, 2 skipped) | `review_card.py 03b` ALL PASS; 5 card tests green | Validated | ✅ VALIDATED (Continuous Mode) |
+| Card 20 | `9bb8cb7` | 364 (0 failed, 6 skipped) | `findit_*`, `blendit_*` green across 4 sizes | Included in APK B-eaf8634 | ✅ VALIDATED |
+| Card 22 | `3be745b` | 364 (0 failed, 6 skipped) | `map_*` green across 4 sizes | Included in APK B-eaf8634 | ✅ VALIDATED |
+| Card 21 | `9bac8ca` | 364 (0 failed, 6 skipped) | `complete_*`, `splash_*`, `nameprompt_*` green | Included in APK B-eaf8634 | ✅ VALIDATED |
+| Card 23 | `dd42582` | 364 (0 failed, 6 skipped) | Reduced-motion & effects verified | Included in APK B-eaf8634 | ✅ VALIDATED |
+| Card 15 | `299cea2` | 364 (0 failed, 6 skipped) | Decodable Blend It seeds verified | Included in APK B-eaf8634 | ✅ VALIDATED |
+| Card 24 | `20efb22` | 364 (0 failed, 6 skipped) | `hearit_*`, `sayit_*` captions verified | Included in APK B-eaf8634 | VALIDATED |
+| Card 27 | `eaf8634` | Docs verified | SDD v2.2, SRS v3.2, SPMP v2.2 verified | Included in APK B-eaf8634 | VALIDATED |
+| Card 24b | `6933e3e` | 386 (0 failed, 6 skipped) | 9 mouth-shape pictures in assets; cue beside play button | Included in APK D-6933e3e | VALIDATED |
+| Card 28b | `ed997b6` | 403 (0 failed, 6 skipped) | `review_card.py 28b` ALL PASS; truer mouth pairs, idle wiggle, banner fit | Included in APK E-ed997b6 | VALIDATED |
+| Card 28c | `0573906` | 403 (0 failed, 6 skipped) | `review_card.py 28c` ALL PASS; mouth cues reserved for Say It; centered replay | Included in APK F-0573906 | VALIDATED |
+
+> **SPRINT BATCH VALIDATION COMPLETE (2026-10-10):** All 8 cards in the sprint batch (03b, 20, 22, 21, 23, 15, 24, 27) have been fully verified by agy: 364/364 unit tests passed (100% pass rate, 6 skipped by design), Roborazzi 4-device screenshot matrix clean across compact, a21s, phone, and tablet, and release debug APK assembled (`playit-debug-B-eaf8634.apk`, 102 MB).
+> **FOLLOW-UP POLISH VALIDATION (2026-10-11):** Card 24b (`6933e3e`, 386 tests, APK D), Card 28b (`ed997b6`, 403 tests, APK E), and Card 28c (`0573906`, 403 tests, APK F) fully verified. APK F assembled as `playit-debug-F-0573906.apk` (103 MB).
+
+
+---
+
+## 3. Final Sprint APK Build & Verification
+
+At the end of the sprint (Saturday night, Oct 10):
+1. Assemble final debug APK:
+   ```bash
+   ./gradlew assembleDebug
+   ```
+2. Verify output size (~100 MB) and copy to `Documents/playIT-apk/playit-debug-refactor-final.apk`.
+3. Confirm 100% zero network calls under airplane mode.
+
+---
+
+## 4. Ready for agy: Card 19 (`dc6098e`)
+
+Commit: `dc6098e` feat(sayit): Hear It and Say It fit every phone; mic shows listening, heard and result (FR-03).
+Acceptance commit before it: `6608552` (cards 13, 26b, 18, 09b accepted; `review_card.py` path fix for Windows).
+
+### 4.1 Automated
+```bash
+git pull origin refactor/hear-say-it
+./gradlew testDebugUnitTest
+./gradlew testDebugUnitTest --tests '*MicStatusTest' --tests '*SayItViewModelTest' --tests '*LayoutMatrix*'
+python3 tools/dev/review_card.py 19
+```
+Expected:
+- Full suite: 294 tests, 0 failed, 2 skipped (`LayoutMatrixCompactTest` font-scale checks are skipped by design).
+- `MicStatusTest`: 5 of 5 pass. `SayItViewModelTest`: 30 of 30 pass, including `partialSpeech_setsHeard` and `recognizerStoppedExternally_returnsToIdle`.
+- `LayoutMatrix{Compact,A21s,Phone,Tablet}Test`: 6 tests each; `hearIt_playVisible`, `sayIt_micVisible` and `sayIt_micVisible_fontScale13` pass (font scale is skipped on compact).
+- `review_card.py 19`: all PASS. One WARN is expected: there is no evidence-log hash until Claude accepts the card.
+- `ZeroEmojiPolicyTest` passes.
+
+### 4.2 Screenshot matrix (Roborazzi)
+```bash
+./gradlew recordRoborazziDebug --tests 'com.playit.app.screenshot.*'
+```
+Open `app/build/outputs/roborazzi/` and check these 8 images:
+
+| Image | Must be true |
+|---|---|
+| `hearit_compact.png`, `hearit_a21s.png`, `hearit_phone.png`, `hearit_tablet.png` | "M is for Mouse" is on one line and not ellipsized. The play button and the 5 dots are above the "Next: Say It" bar. The card is at most 320 dp wide (centred on tablet). |
+| `sayit_compact.png`, `sayit_a21s.png`, `sayit_phone.png`, `sayit_tablet.png` | "Say the word Mouse" is not cut. The green mic, its label "Tap and say it" and the 3 attempt dots are above the "Next: Find It" bar. No red anywhere. On compact only, the "Tap to listen" pill is hidden; the corner speaker badge stays. |
+
+Known, not a failure: the key-word picture in the Hear It card is small (about 40 dp on compact, 60 dp on phone), because the big "Mm" letter takes most of the card height. Report it in the verdict; Claude decides on a dimens follow-up.
+
+The Hear It play button shows grey in the screenshots, because the mocked player never finishes the intro. That is expected.
+
+### 4.3 Device check (APK on the A21s)
+Build: `./gradlew assembleDebug`, then install. Run lesson M:
+1. Hear It: the play button is visible without scrolling and Next unlocks as before.
+2. Say It, before tapping: the mic is green with "Tap and say it".
+3. Tap the mic and stay silent: the mic is amber, one ring grows from it, and the label reads "I'm listening...".
+4. Start saying "mouse": the mic turns lavender with bouncing dots, "I hear you!".
+5. Correct: a green check with a small pop, "Yes!", and the green banner above Next.
+6. Say "em": an orange ear with a gentle shake, "Let's try again", and the orange banner above Next. Tapping the mic starts a new attempt.
+7. Review Focus 2: tap the mic, press Home within 3 s, then reopen the app. The mic must be green "Tap and say it", not stuck listening, and no attempt dot is added.
+8. Turn on Settings > Accessibility > Remove animations: the listening ring is a still outline, the dots don't move, and there is no pop or shake.
+9. Samsung font size Large: the mic is still visible without scrolling.
+
+Record the verdict in section 2 and in `SESSION_HANDOFF.md`. Then Claude accepts the card (hash and CI run in `docs/evidence-log.md`) and starts card 03b.
+
+---
+
+## 5. Ready for agy: sprint batch (cards 20, 22, 21, 23, 15, 24, 27)
+
+Commits, in order, on `refactor/hear-say-it`:
+
+| Card | Commit | What changed |
+|---|---|---|
+| 03b | `339f309` | Spoken Say It corrections; 5 tutor clips from audio release 2026-10-01 |
+| 20 | `9bb8cb7` | Find It and Blend It in LessonScaffold; FindItGrid; card 16 fix |
+| 22 | `3be745b` | Map: rope trail, Lily chip, MapLayout, static avatar, unlock moment |
+| 21 | `9bac8ca` | Complete, splash and profile screens fit; Type.kt child sizes |
+| tools | `b9ae600` | `review_card.py` reads git output as UTF-8 (Windows) |
+| 23 | `dd42582` | Screen transitions, centre confetti, heart wobble, star drop, reduced motion |
+| 15 | `299cea2` | AM, SUM, TUB, YAM, ZIP; word list written on every open |
+| 24 | `20efb22` | Captions in Hear It; mouth cue (pictures pending) |
+| 27 | `eaf8634` | SDD 2.2, SRS 3.2 (§4.1), SPMP 2.2 |
+
+### 5.1 Automated
+```bash
+git pull origin refactor/hear-say-it
+./gradlew testDebugUnitTest
+for c in 03b 20 22 21 23 15 24 27; do python3 tools/dev/review_card.py $c; done
+```
+Expected:
+- **Full suite:** 364 tests, 0 failed, 6 skipped. The skips are the font-scale checks on the 360x640 profile, by design.
+- **`review_card.py`:** all PASS except these known items:
+  - every card: WARN "no hash yet" (Claude fills hashes at acceptance);
+  - card 24: FAIL `files`. The card at that commit named `HearItViewModelTest`/`SayItViewModelTest` without paths. Both are listed test files; the card text is fixed in the handoff commit.
+- **CI:** green on every commit through `299cea2`. Confirm `20efb22` and `eaf8634` on the Actions page.
+
+### 5.2 Screenshot matrix (all 4 sizes)
+```bash
+./gradlew recordRoborazziDebug --tests 'com.playit.app.screenshot.*'
+```
+Check `app/build/outputs/roborazzi/`. The images Claude already looked at are marked (seen).
+
+| Images | Must be true |
+|---|---|
+| `findit_*` (compact seen, a21s seen) | All 5 cards visible above the bottom edge. The 5th card is centred at the same width. The two cells read "0 / 3" and "/M/". |
+| `blendit_*` (compact, phone, tablet seen) | "Tap to hear word" inside the card. The S-A-M tiles are above "Check Word". Known: on compact, about 2 dp of the tiles' bottom shadow touches the scroll edge. |
+| `map_*` (compact, tablet seen) | The rope trail is visible. The one-line Lily chip is shown. "Maximilianoooooo" is ellipsized and both stat pills are on screen. Known: the unit banner clips its title line (`MarungkoGroupBanner`, not in these cards). |
+| `complete_*`, `splash_*`, `nameprompt_*` (compact, a21s seen) | Continue / Start / Let's Play are visible. On compact the name grid scrolls (AvatarPicker not in card 21). |
+| `hearit_*`, `sayit_*` | As in section 4.2. Hear It now has an empty caption row under the card (the caption shows while audio plays). |
+
+### 5.3 APK and phone checks (A21s)
+- **Build:** `./gradlew assembleDebug`, then copy the APK to `Documents/playIT-apk/playit-debug-B-eaf8634.apk`. Don't overwrite A or A2.
+- **Card 20:** Find It on the A21s shows all 5 cards without scrolling. In Blend It the tiles sit above Check Word.
+- **Card 22:** finish letter M and return to the map. The S node pops in, a chime plays, and "New letter open!" shows for about 2 s. Only your avatar stands by the current node, and it doesn't move.
+- **Card 21:** with Samsung font size Large, the complete screen, splash and new profile still show their main button.
+- **Card 23:** screens fade and rise slightly when they change. Losing a heart in Find It wobbles that heart. Stars drop in on the complete screen. The confetti bursts from the centre.
+  - With Settings > Accessibility > Remove animations: no confetti, no shakes, and fades only.
+- **Card 15:** Blend It group 1 offers SAM, SIS, AM. **Known:** AM, TUB and YAM are silent on tap and have no picture; ZIP has no picture. The assets are pending (see the card's table).
+- **Card 24:** in Hear It a caption follows the audio ("Listen!", "This letter says...", "/m/", "mouse"). No mouth picture appears yet: card 25 has no image release, so this is expected.
+- **Card 03b:** in Say It (M), say "em": you hear "That's the letter's name. Its sound is /m/ ... mouse. Your turn!" Say "ma": you hear "Almost! Just /m/, no 'ah.' ...".
+- **Review Focus 2 (card 19) still holds:** press Home while listening, and the mic comes back as "Tap and say it".
+
+Record each verdict in section 2 and in `SESSION_HANDOFF.md`. Claude then accepts the batch (hashes and CI runs in `docs/evidence-log.md`).
+
+
+## 6. Ready for agy: card 28 (`ac8e8c7`)
+
+Commits on `refactor/hear-say-it`: `88021c5` (Claude's review of cards 28 and 29; docs and tools only), then `ac8e8c7` (card 28).
+
+### 6.1 Automated
+```bash
+git pull origin refactor/hear-say-it
+./gradlew testDebugUnitTest
+python3 tools/dev/review_card.py 28
+```
+Expected:
+- **Full suite:** 376 tests, 0 failed, 6 skipped (the font-scale checks on the 360x640 profile, by design). Claude's local run on Windows gave the same.
+- **`review_card.py 28`:** all PASS. One WARN is expected: "no hash yet" (Claude fills it at acceptance).
+- **CI:** confirm `ac8e8c7` is green on the Actions page.
+
+### 6.2 Screenshot matrix (all 4 sizes)
+```bash
+./gradlew recordRoborazziDebug --tests 'com.playit.app.screenshot.*'
+```
+Claude looked at all four groups below on all 4 sizes.
+
+| Images | Must be true |
+|---|---|
+| `hearit_*` | No caption under the letter card. The card is taller on a21s, phone and tablet (1.2x) and unchanged on compact. The play button and Next are on screen. |
+| `sayit_*` | Unchanged idle screen: green mic, "Tap and say it". |
+| `blendit_*` | One hint line, a speaker icon and "Tap to hear word", inside the card. No Filipino line. |
+| `map_*` | Lily's chip reads "Hi, Maximilianoooooo!" on one line on every size. Known: the unit banner clips its title line (`MarungkoGroupBanner`, follow-up card 28b). |
+
+### 6.3 APK and phone checks (A21s)
+- **Build:** `./gradlew assembleDebug`, then copy the APK to `Documents/playIT-apk/playit-debug-C-ac8e8c7.apk`. Don't overwrite A, A2 or B.
+- **Hear It (M):** the sequence ends "... mouse, mmm", then "Great listening! Tap the big button." No "Say it with me!". No caption text on screen. Next pulses.
+- **Say It (M):** say "cat" three times. After the third:
+  - Lily says "Let's say it together ... Nice try! We'll practice this one again later.", then the map's unlock chime (not the correct-answer chime).
+  - The mic turns white, says "Nice try!" and ignores taps.
+  - The banner is cream and reads "Nice try! Let's keep going!" on one line.
+  - Next pulses and opens Find It.
+  - The debug build shows no "Heard: ..." line.
+- **Blend It (group 1, SAM):** each tile lights while its sound plays to the end (the /s/ hiss is not cut off). Then all three tiles light together for half a second, then "Sam", then the chime. The card only says "Tap to hear word".
+- **Stars:** finish letter M. The map's star pill and the profile card show the same total as the Parent Dashboard. After Blend It 1, the total also counts its stars.
+- **Map:** tap the green (current) node once: the lesson starts with no pop-up. Tap a finished node: the pop-up opens for replay. Tap a locked node: it shakes and explains, as before.
+- **Still expected:** no mouth picture in Hear It or Say It yet. The user approved card 25's pictures; card 24b brings them in (section 7).
+
+Record the verdict in section 2 and in `SESSION_HANDOFF.md`. Claude then accepts card 28 (hash and CI run in `docs/evidence-log.md`).
+
+## 7. Next for agy: card 24b (after section 6)
+
+Card 24b is an implementation card, not a validation: by the image gate, only an agy card brings pictures into the app. Run it as a normal card session (`AGY_RUNBOOK.md`), from `docs/tasks/card-24b-mouth-pictures-into-app.md`. It moves the approved card 25 release into `docs/image-release/2026-10-10-mouth/`, copies the 9 mouth pictures into the app, and moves the Hear It cue beside the play button.
+
+Claude ran the whole card locally before writing it. Expected:
+- **Full suite:** 386 tests, 0 failed, 6 skipped.
+- **`python3 tools/dev/review_card.py 24b`:** all PASS, plus the usual WARN "no hash yet". The `assets` lines show each of the 9 pictures matching `2026-10-10-mouth/mouth/<id>.png`.
+- **Screenshots and phone:** as in the card's "Screenshots" and "Phone checks" sections. Build APK D after the commit and copy it to `Documents/playIT-apk/playit-debug-D-<hash>.apk`; don't overwrite A, A2, B or C.
+
+Push, then report the hash. Claude reviews card 24b.
+
+## 8. Ready for agy: card 28b (`ed997b6`), then card 15b
+
+### 8.1 Validate card 28b (Claude wrote and ran it, 2026-10-11)
+```bash
+git pull origin refactor/hear-say-it
+./gradlew testDebugUnitTest
+python3 tools/dev/review_card.py 28b
+./gradlew recordRoborazziDebug --tests 'com.playit.app.screenshot.*'
+```
+Expected:
+- **Full suite:** 403 tests, 0 failed, 6 skipped (by design). Claude's run on Windows gave the same.
+- **`review_card.py 28b`:** all PASS, plus the usual WARN "no hash yet".
+- **CI:** `ed997b6` green on the Actions page.
+
+| Images | Must be true |
+|---|---|
+| `map_*` | The unit banner shows "SECTION 1, UNIT 1" and the whole title "Chocolate Hills Phonics", with the darker shelf below the card, on all 4 sizes. |
+| `sayit_cue_*` | After two misses: the mouth picture left of the mic, "Let's try again", and all three dots fully visible above the orange "Watch my lips" banner. On compact the mouse card is shorter; on the other sizes nothing moved. |
+| `hearit_*`, `sayit_*` | Unchanged from section 7. |
+
+**APK E and phone checks (A21s).** Build APK E after the validation and copy it to `Documents/playIT-apk/playit-debug-E-ed997b6.apk`; don't overwrite A to D.
+- **Mouth pictures.** Hear It O and U show an open mouth, not round lips. J and Q show round lips. R shows the tongue picture. M still shows lips together.
+- **Idle wiggle.**
+  - Hear It: after the first sequence, touch nothing for 10 s. Next wiggles once while Lily says the re-prompt.
+  - Say It: touch nothing for 10 s. The mic wiggles silently. Tap anywhere and the 10 s start again.
+  - With Android's "Remove animations" on, nothing wiggles.
+- **Map:** every unit banner shows its whole title, including "Tarsier Forest Sanctuary".
+
+Record the verdict here and in `SESSION_HANDOFF.md`.
+
+### 8.2 Card 15b: Blend It word audio and the ElevenLabs credit (`Status: ready`)
+- **Step 0 is done** (Claude, 2026-10-11): release `docs/audio-release/2026-10-11-words/` holds ElevenLabs takes e3 of AM, TUB and YAM, picked by the user. Start at the card's pre-step.
+- **Run the card as a normal session:**
+  - Check the SHA-256 of the 3 WAVs against the manifest, then copy them.
+  - Make the `AudioResolver` and seed changes.
+  - Add the Parent Zone credit line (`VoiceCredit.kt`). The account is on the ElevenLabs Free plan, so the clips must not ship without it.
+- **Expected:** 408 tests, 0 failed, 6 skipped (404 after card 28d, plus 4). `review_card.py 15b` all PASS.
+- **APK G:** not yet. Run card 09c next (8.4), then build APK G. Don't overwrite A to F.
+- **Phone checks (A21s):**
+  - In Blend It, AM, TUB and YAM are each spoken once after the sound-out.
+  - At the bottom of the Parent Zone, the credit line shows under Privacy.
+
+### 8.3 Card 28d: stale picture after "next letter" (`e7f870e`, done by Claude)
+- **Bug from the A21s test of APK E:** after "next letter" the card kept M's mouse picture. The fix is in the shared picture loader (`AssetImage.kt`).
+- **APK F (`0573906`) still has this bug.** Card 28d was first numbered 28c; agy's 28c landed first.
+- **Validate:**
+  - `./gradlew testDebugUnitTest`: 404 tests, 0 failed, 6 skipped. Claude's run on Windows, on top of `0573906`, gave the same.
+  - `python3 tools/dev/review_card.py 28d`: all PASS, plus the hash WARN.
+- **Order:** run card 15b next (8.2), then card 09c (8.4). APK G carries all three.
+- **Phone check:** in section 1, tap through two or three letters in a row. Each card shows its own picture.
+
+### 8.4 Card 09c: the short i (`Status: ready`, run after card 15b)
+- **Bug from the A21s test of APK 28d (2026-10-12):** the I sound in section 1 was wrong. It was the old placeholder `phoneme_i.mp3`.
+- **Release `docs/audio-release/2026-10-12-i/`** (Claude, 2026-10-12): one ElevenLabs clip, `ph_i.wav`, picked by the user. It is Free-plan audio, so it needs card 15b's credit line first.
+- **Run the card as a normal session:** check the SHA-256, copy the WAV, add `"i"` to `releasedPhonemes`, and add one test.
+- **Expected:** 409 tests, 0 failed, 6 skipped. `review_card.py 09c` all PASS.
+- **APK G:** build it after 09c, so it carries 28d, 15b and 09c. Copy it to `Documents/playIT-apk/playit-debug-G-<hash>.apk`.
+- **Phone check:** Hear It for I says the short i of "insect", not "eye" or "ee".
+
+## 9. Submission state (Claude, 2026-10-13): nothing for agy to run tonight
+- **Card 30 is done.** The package in `docs/submission/` matches APK G (`89604d7`); see the card's Outcome.
+- **APK G is the submission build.** Do not build or copy a new APK before the October 14 submission. The faculty bundle is the 4 PDFs, the 4 DOCX files and `playit-debug-G-89604d7.apk`.
+- **Phone check before submitting (team):** install APK G on the A21s and play one letter from Hear It to Find It. Listen for the short i and the AM, TUB and YAM words; look for the credit under Privacy.
+- **After the submission:** card 31 (`card-31-post-midterm-polish.md`) is a blueprint. Its parts 31a to 31f become ready cards one at a time, once the team approves them. 31b and 31c start with Claude's audio step 0.
+
+## 10. Card 31 (Claude, 2026-10-14): APK H is the submission build
+- **Done (Claude, pushed):**
+
+  | Card | Commit | Change |
+  |---|---|---|
+  | 31a | `8f49279` | The Headspace splash matches Lily |
+  | 31d | `cdbbef9` | One message at a time |
+  | 31e | `1420c84` | The map's header card, 16 sp text and 64 dp buttons |
+  | 31f | `0320385` | Tiles never dealt solved |
+
+  - Full suite at `0320385`: 433 tests, 0 failed, 6 skipped.
+  - Claude built `Documents/playIT-apk/playit-debug-H-0320385.apk`. The submission package in `docs/submission/` matches it: SDD rev. 2.8, SRS rev. 3.8, SPMP rev. 2.6.
+- **Validate:** `review_card.py 31a`, `31d`, `31e` and `31f`. Phone check on the A21s:
+  - the splash looks like Lily, Start is easy to reach, and a tap on her winks;
+  - the map's header is one card, and the greeting is not cut;
+  - a Say It miss shows "Watch my lips" once, under the mic.
+- **Cards 31b and 31c wait for Zendrix's listening review** (user decision 2026-10-14):
+  - Erik sends `Documents/playIT-audio-batches/2026-10-13-card31-audio.zip`.
+  - The steps from review to commit are in each card; the code is ready as `docs/tasks/card-31b-code.patch` and `card-31c-code.patch`.
+  - Expected: 436 tests after 31b, 438 after 31c.
+- **If 31b and 31c ship before the submission:** build APK I, then ask Claude to re-render the package. Card 31b also changes two sequence diagrams: the whoosh goes.

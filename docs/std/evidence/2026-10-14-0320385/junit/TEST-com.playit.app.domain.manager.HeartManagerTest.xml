@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.domain.manager.HeartManagerTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-10-14T14:13:46" hostname="LAPTOP-REHI7A0K" time="0.001">
+  <properties/>
+  <testcase name="deductHeart_decrementsCountAndIncrementsHeartsLost" classname="com.playit.app.domain.manager.HeartManagerTest" time="0.0"/>
+  <testcase name="restartAtReducedPoolOnDepletion" classname="com.playit.app.domain.manager.HeartManagerTest" time="0.0"/>
+  <testcase name="deductHeart_signalsGameOverWhenZero" classname="com.playit.app.domain.manager.HeartManagerTest" time="0.0"/>
+  <testcase name="startsAtStartingPool" classname="com.playit.app.domain.manager.HeartManagerTest" time="0.0"/>
+  <testcase name="reset_restoresInitialStartingPool" classname="com.playit.app.domain.manager.HeartManagerTest" time="0.0"/>
+  <testcase name="sessionHeartsLost_survivesRestart" classname="com.playit.app.domain.manager.HeartManagerTest" time="0.0"/>
+  <testcase name="recoveryCapsAtStartingPool_recommendedRule" classname="com.playit.app.domain.manager.HeartManagerTest" time="0.0"/>
+  <testcase name="reset_clearsSessionHeartsLost" classname="com.playit.app.domain.manager.HeartManagerTest" time="0.001"/>
+  <testcase name="checkRecovery_addsHeartEveryThreeConsecutiveCorrect" classname="com.playit.app.domain.manager.HeartManagerTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.domain.manager.CaptionTextTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-14T14:13:46" hostname="LAPTOP-REHI7A0K" time="0.003">
+  <properties/>
+  <testcase name="keywordClip" classname="com.playit.app.domain.manager.CaptionTextTest" time="0.002"/>
+  <testcase name="phonemeClip" classname="com.playit.app.domain.manager.CaptionTextTest" time="0.001"/>
+  <testcase name="carrier" classname="com.playit.app.domain.manager.CaptionTextTest" time="0.0"/>
+  <testcase name="pauseHasNoCaption" classname="com.playit.app.domain.manager.CaptionTextTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

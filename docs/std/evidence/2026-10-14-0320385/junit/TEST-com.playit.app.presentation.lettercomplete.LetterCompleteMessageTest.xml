@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.presentation.lettercomplete.LetterCompleteMessageTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-14T14:14:17" hostname="LAPTOP-REHI7A0K" time="0.003">
+  <properties/>
+  <testcase name="twoOrThreeStars_sayMastered" classname="com.playit.app.presentation.lettercomplete.LetterCompleteMessageTest" time="0.003"/>
+  <testcase name="oneStar_saysFinished" classname="com.playit.app.presentation.lettercomplete.LetterCompleteMessageTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

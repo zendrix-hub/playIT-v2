@@ -1,0 +1,107 @@
+@startuml usecase_srs_modules
+!include _style.iuml
+left to right direction
+skinparam packageStyle rectangle
+
+title PlayIT Use Case Diagram: the six functional modules of SRS v3.0 (§3.2)
+
+' Declaration order steers the Graphviz layout: adults top left, the child beside the lesson modules.
+actor "Parent / Caregiver" as Parent
+actor "Teacher / Facilitator" as Teacher
+actor "Child Learner\n(ages 5-7)" as Child
+
+actor "Vosk ASR\n(on-device)" as Vosk <<system>>
+actor "Android OS\n(PdfDocument,\nShare Sheet)" as Android <<system>>
+
+rectangle "PlayIT (offline Android app)" {
+
+  package "Module 1: Letter-Sound Acquisition (Hear It)" {
+    usecase "Listen to the modeling\nsequence (FR-01, FR-02)" as UC_Hear
+    usecase "Replay the sound\nwith the Ear button (FR-02.6)" as UC_Replay
+  }
+
+  package "Module 2: Speech Production and Tutoring (Say It)" {
+    usecase "Say the key word\n(FR-03)" as UC_Say
+    usecase "Get a spoken correction\n(FR-03.4)" as UC_Correct
+    usecase "See the mouth-shape cue\n(NFR-ACC-01)" as UC_Mouth
+    usecase "Say it together\nand move on (FR-03.4)" as UC_Together
+    usecase "Warm-up and recall\nchecks (FR-NEW-REC)" as UC_Recall <<planned>>
+  }
+
+  package "Module 3: Phoneme Discrimination (Find It)" {
+    usecase "Find the pictures that\nstart with the sound (FR-04)" as UC_Find
+    usecase "Lose a heart on\na wrong tap (FR-05)" as UC_Heart
+    usecase "Restart with\na 3-heart buffer (FR-05)" as UC_Restart
+  }
+
+  package "Module 4: Word Construction (Blend It)" {
+    usecase "Build a CVC word\nwith letter tiles (FR-13)" as UC_Blend
+    usecase "Hear the word\nsounded out and blended" as UC_SoundOut
+    usecase "Use a hint\n(locks a tile)" as UC_Hint
+  }
+
+  package "Module 5: Progression, Gamification and Multi-Profile" {
+    usecase "Pick or create a profile\nwith an avatar (FR-14)" as UC_Profile
+    usecase "Open the next unlocked\nletter on the map (FR-08)" as UC_Map
+    usecase "Earn stars\n(FR-06)" as UC_Stars
+    usecase "Recover a heart after\n3 correct in a row (FR-07)" as UC_Recover
+    usecase "Keep a daily streak\n(FR-09)" as UC_Streak
+  }
+
+  package "Module 6: Parent Dashboard and Diagnostics" {
+    usecase "Pass the arithmetic\ngate (FR-10)" as UC_Gate
+    usecase "View the progress\ndashboard (FR-10)" as UC_Dash
+    usecase "Rename or delete\na child profile (FR-14)" as UC_Manage
+    usecase "Export a PDF\nprogress report (FR-12)" as UC_Pdf
+    usecase "Export telemetry\nas CSV (FR-NEW-TEL)" as UC_Csv <<planned>>
+  }
+}
+
+' ---------- Associations, in module order (Graphviz keeps this order) ----------
+Child --> UC_Hear
+Child --> UC_Replay
+Child --> UC_Say
+Child --> UC_Recall
+Child --> UC_Find
+Child --> UC_Blend
+Child --> UC_Profile
+Child --> UC_Map
+Child --> UC_Recover
+Parent --> UC_Dash
+Parent --> UC_Manage
+Parent --> UC_Pdf
+Teacher --> UC_Profile
+Teacher --> UC_Dash
+Teacher --> UC_Pdf
+Teacher --> UC_Csv
+
+' ---------- Include and extend, inside each module ----------
+UC_Correct ..> UC_Say : <<extend>>\n(miss 1 or 2)
+UC_Together ..> UC_Say : <<extend>>\n(miss 3)
+UC_Mouth ..> UC_Correct : <<extend>>\n(from miss 2)
+UC_Heart ..> UC_Find : <<extend>>\n(wrong tap)
+UC_Restart ..> UC_Heart : <<extend>>\n(0 hearts)
+UC_Hint ..> UC_Blend : <<extend>>
+UC_Blend ..> UC_SoundOut : <<include>>
+UC_Map ..> UC_Stars : <<include>>\n(letter complete)
+UC_Stars ..> UC_Streak : <<include>>
+UC_Dash ..> UC_Gate : <<include>>
+UC_Manage ..> UC_Gate : <<include>>
+UC_Csv ..> UC_Gate : <<include>>
+UC_Pdf ..> UC_Dash : <<extend>>
+
+
+
+' ---------- Secondary (system) actors on the right ----------
+UC_Say --> Vosk
+UC_Recall --> Vosk
+UC_Pdf --> Android
+UC_Csv --> Android
+
+legend right
+  Grey use cases with <<planned>> are in SRS v3.0 but not yet in the app
+  (SDD §2.0: LearnerModel, TelemetryLogger and CsvExportManager are planned).
+  Say It never removes hearts (FR-03.5). Hearts are lost and recovered only
+  in Find It and Blend It.
+endlegend
+@enduml

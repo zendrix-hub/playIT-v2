@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.presentation.lettercomplete.LetterCompleteViewModelTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-10-18T01:36:02" hostname="LAPTOP-REHI7A0K" time="0.198">
+  <properties/>
+  <testcase name="completeLesson_calculates2StarsFor2HeartsLost" classname="com.playit.app.presentation.lettercomplete.LetterCompleteViewModelTest" time="0.093"/>
+  <testcase name="heartsLostArg_threeOrMore_givesOneStar" classname="com.playit.app.presentation.lettercomplete.LetterCompleteViewModelTest" time="0.015"/>
+  <testcase name="retry_reloadsPhonemeSuccessfully" classname="com.playit.app.presentation.lettercomplete.LetterCompleteViewModelTest" time="0.014"/>
+  <testcase name="heartsLostArg_missing_givesThreeStars" classname="com.playit.app.presentation.lettercomplete.LetterCompleteViewModelTest" time="0.012"/>
+  <testcase name="completion_appendsNextCue" classname="com.playit.app.presentation.lettercomplete.LetterCompleteViewModelTest" time="0.009"/>
+  <testcase name="idle_waitsForCompletionSequence" classname="com.playit.app.presentation.lettercomplete.LetterCompleteViewModelTest" time="0.01"/>
+  <testcase name="completeLesson_calculates2StarsFor1HeartLost" classname="com.playit.app.presentation.lettercomplete.LetterCompleteViewModelTest" time="0.013"/>
+  <testcase name="completeLesson_handlesMissingPhoneme_andSetsLoadError" classname="com.playit.app.presentation.lettercomplete.LetterCompleteViewModelTest" time="0.012"/>
+  <testcase name="completeLesson_calculates3StarsFor0HeartsLost_andSavesProgress" classname="com.playit.app.presentation.lettercomplete.LetterCompleteViewModelTest" time="0.02"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,76 @@
+@startuml seq_m6_parent_dashboard
+!include _style.iuml
+autonumber "<b>0."
+hide footbox
+
+title Sequence Diagram, Module 6: Parent Zone gate, dashboard and PDF report (FR-10, FR-12; FR-NEW-TEL planned)
+
+actor "Parent or Teacher" as Adult
+participant "ArithmeticGuardDialog" as Gate
+participant "ArithmeticGateManager" as GateMgr
+participant "ParentDashboardScreen" as Screen
+participant "ParentDashboardViewModel" as VM
+participant "ProfileRepository" as Profiles
+participant "ReportGenerator" as Report
+participant "LetterStatusCalculator\nRetentionCalculator" as Calc
+participant "PdfExporter" as Pdf
+database "Room" as DB
+participant "CsvExportManager\n<<planned>>" as Csv #F2F2F2
+
+== Arithmetic gate (keeps young children out) ==
+Adult -> Gate : taps Parent Zone
+activate Gate
+Gate -> GateMgr : generateProblem()
+GateMgr --> Gate : ArithmeticProblem ("7 + 5 = ?")
+Adult -> Gate : types the answer
+Gate -> GateMgr : validateAnswer(problem, input)
+alt correct
+  GateMgr --> Gate : true
+  Gate -> Screen : onPass(): open the dashboard
+else wrong
+  GateMgr --> Gate : false
+  Gate -> GateMgr : generateProblem() (new problem)
+end
+deactivate Gate
+
+== Dashboard ==
+activate Screen
+Screen -> VM : create
+activate VM
+VM -> Profiles : getAllProfiles() (Flow)
+Profiles -> DB : SELECT profiles (+ live star totals)
+Profiles --> VM : profiles
+VM -> VM : selectProfile(first or current)
+VM -> Report : generateDashboardData(profileId)
+activate Report
+Report -> DB : via its repositories: lesson_progress, say_it_attempts,\nfind_it_attempts, blend_it_progress, phonemes
+Report -> Calc : calculateStatus(accuracy, failedAttempts)\ncalculate7DayRetention(...)
+Calc --> Report : RiskStatus (GREEN, YELLOW, RED), retention
+Report --> VM : ProfileDashboardData
+deactivate Report
+VM --> Screen : uiState (stars, accuracy, letter table, at-risk list)
+
+== PDF report (FR-12) ==
+Adult -> Screen : taps Export PDF
+Screen -> VM : exportPdfReport()
+VM --> Screen : exportStatus = Exporting
+VM -> Report : generateReportData(profileId)
+Report --> VM : ReportData
+VM -> Pdf : exportReport(reportData)
+Pdf -> Pdf : draw pages with Android PdfDocument,\nwrite to app-specific storage (no network)
+Pdf --> VM : Result<File>
+alt success
+  VM --> Screen : exportStatus = Success(file): share or open
+else failure
+  VM --> Screen : exportStatus = Error(message)
+end
+
+== Planned: telemetry CSV export (FR-NEW-TEL, SDD 3.5.2) ==
+Adult -[#9E9E9E]> Screen : taps Export telemetry (CSV)
+Screen -[#9E9E9E]> Csv : exportCsv(profileId)
+Csv -[#9E9E9E]> DB : read telemetry_events (schema v4)
+Csv -[#9E9E9E]> Adult : Android share sheet (ACTION_SEND)
+note over Csv #F2F2F2 : not built yet: needs Room v4\nand a migration (SDD 2.0)
+deactivate VM
+deactivate Screen
+@enduml

@@ -1,0 +1,24 @@
+{
+  "release": "2026-10-12-i",
+  "approvedBy": "user: marked the three phrase takes and their three cut-out sounds OK on review page 2026-10-12-vowel-i-eleven, then picked i_phrase_e1_cut in chat (2026-10-12)",
+  "teacherAudit": "pending, required before merge to main",
+  "clips": [
+    {
+      "clipId": "ph_i",
+      "file": "phonemes/ph_i.wav",
+      "text": "/ɪ/ short i, as at the start of 'insect'",
+      "voice": "ElevenLabs library voice 'Lily Wolff - Expressive, Clear, Youthful, Calming' (qBDvhofpxp92JgXJxDjB); the account has no 'PlayIT Lily' clone",
+      "speed": null,
+      "sourceBatch": "2026-10-12-vowel-i-eleven",
+      "sourceFile": "i_phrase_e1_cut.wav",
+      "reviewCsv": "2026-10-12-vowel-i-eleven_review.csv",
+      "userVerdict": "OK",
+      "userNote": "",
+      "teacherAudit": "pending",
+      "license": "ElevenLabs Free plan (user, 2026-10-11): non-commercial use only; the app credits elevenlabs.io in the Parent Zone (card 15b). Free-plan audio cannot become commercial later, even after an upgrade",
+      "sha256": "f88b5b0bf14e0a28c32bb3f99e61e945d6d7989cce6ced24aa35dc6de3030c14",
+      "tool": "ElevenLabs Text to Speech, model eleven_v4, text '/ɪ/, /ɪ/, insect.' (IPA between slashes), take e1, generation ntg3VyXKHlhj5GEryjDr (flow gV4RqcjccbUquQKrPF6C, 2026-10-12); MP3 44.1 kHz decoded, resampled to 24 kHz, the first sound cut at the first silence of 120 ms or more, then cleaned with kokoro_local.clean (trim, RMS -20 dBFS, peak -1 dBFS)",
+      "note": "Short vowel for Hear It (FR-02). User choice 2026-10-12: ElevenLabs Text to Speech now, instead of waiting for the team member's Voice Changer takes (AUDIO_TASK_short-vowels.md); amends the Kokoro-only source, adviser confirmation pending. 0.28 s. ElevenLabs disabled the account's Free Tier partway through this batch ('unusual activity'), so 5 of 12 takes came back."
+    }
+  ]
+}

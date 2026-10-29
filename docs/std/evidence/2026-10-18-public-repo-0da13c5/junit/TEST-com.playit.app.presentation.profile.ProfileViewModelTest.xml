@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.presentation.profile.ProfileViewModelTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-10-18T01:36:05" hostname="LAPTOP-REHI7A0K" time="0.07">
+  <properties/>
+  <testcase name="namePromptIntro_playsPickAvatar" classname="com.playit.app.presentation.profile.ProfileViewModelTest" time="0.011"/>
+  <testcase name="canAddProfile_returnsTrueWhenUnderLimit_andFalseWhenAtMax" classname="com.playit.app.presentation.profile.ProfileViewModelTest" time="0.007"/>
+  <testcase name="createProfile_success_updatesSessionAndEmitsCreated" classname="com.playit.app.presentation.profile.ProfileViewModelTest" time="0.013"/>
+  <testcase name="createProfile_typedName_isKept" classname="com.playit.app.presentation.profile.ProfileViewModelTest" time="0.01"/>
+  <testcase name="resetForm_restoresDefaultValues" classname="com.playit.app.presentation.profile.ProfileViewModelTest" time="0.001"/>
+  <testcase name="createProfile_failure_emitsError" classname="com.playit.app.presentation.profile.ProfileViewModelTest" time="0.007"/>
+  <testcase name="arithmeticGuard_showAndDismissTransitions" classname="com.playit.app.presentation.profile.ProfileViewModelTest" time="0.001"/>
+  <testcase name="onAvatarSelected_updatesAvatarIdAndPlaysSound" classname="com.playit.app.presentation.profile.ProfileViewModelTest" time="0.004"/>
+  <testcase name="createProfile_blankName_usesAvatarName" classname="com.playit.app.presentation.profile.ProfileViewModelTest" time="0.011"/>
+  <testcase name="selectProfile_stopsAudioAndSetsActiveProfile" classname="com.playit.app.presentation.profile.ProfileViewModelTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

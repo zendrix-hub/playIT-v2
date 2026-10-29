@@ -442,6 +442,172 @@ MVP Validation → Findings & Feedback → Refactored Requirements → Updated S
  
 Your documentation should therefore demonstrate a clear traceable connection between what users said, what you learned from the validation, what requirements changed, and how those changes affected the system design and project plan.
 Please consult your respective adviser if you are uncertain about the appropriate validation framework, instrument, respondent groups, or interpretation of the validation results.
-  
 
-read the 
+---
+
+# Post-Midterm Announcements (IT411 | G1 - G8 | SEM1 | 2026-27)
+
+## 1. Adviser Presentation Gate (Post-Software Completion & Technical Verification)
+
+After completing the Software Completion and Technical Verification deliverable (due October 17, 2026), you must schedule a presentation with your advisers for verification.
+
+During the presentation, your advisers will check whether all software transactions are functioning correctly and whether the system is operating as expected. You must also have your research instrument/questionnaire reviewed and verified, including its underlying framework and whether it appropriately measures the intended outcomes specified in your SMART goals.
+
+You may proceed with the Week 12 deliverable (Final User Validation) only after completing these verification steps and securing your advisers’ approval.
+
+---
+
+## 2. Requirements Before Adviser Presentation
+`IT411 | G1 - G8 | SEM1 | 2026-27 |`
+
+All groups are reminded to prepare the following requirements before scheduling and conducting your presentation with your respective advisers. This presentation aims to verify the completion and technical quality of your software and review your readiness for the Final User/Stakeholder Validation.
+
+Please ensure that your deliverables are complete, updated, properly organized, and accessible before your scheduled presentation.
+
+### A. Software Functionality and Completion
+Prepare the following:
+- **Working and deployed software** – Ensure that your system is accessible and that all major features and transactions are functioning correctly.
+- **Deployment URL and access credentials** – Provide the live system URL and any necessary demo accounts or access instructions.
+- **GitHub repository** – Ensure that your source code is complete, accessible, and properly organized, with an updated README and setup/deployment instructions.
+- **Feature completion matrix** – Identify the implemented features, their current status, and any known limitations.
+- **Code refactoring evidence** – Be prepared to explain significant improvements made to your code, supported by relevant GitHub commits, pull requests, or code comparisons.
+
+Your adviser will check whether the system's major workflows and transactions function correctly and whether the implementation is sufficiently complete and stable.
+
+### B. Updated Technical Documentation
+Prepare the updated versions of the following documents:
+- Software Requirements Specification (SRS)
+- Software Design Description (SDD)
+- Software Project Management Plan (SPMP)
+- Software Test Documentation (STD)
+- Requirements Traceability Matrix (RTM)
+- Revision history documenting significant changes to your system and documentation
+
+Your documentation must accurately reflect your current source code and deployed software.
+
+### C. Testing and Quality Assurance
+Prepare your actual testing results and supporting evidence, including:
+- Functional and integration testing
+- System and regression testing, as applicable
+- Performance testing, including workload, response times, throughput, error rate, and other relevant metrics
+- Defect or issue logs, corrective actions, and retesting results
+- Testing procedures, expected results, actual results, and acceptance criteria
+
+**Important**: Screenshots showing that a test was conducted are not sufficient on their own. Your evidence must demonstrate the actual results and whether the system met the expected criteria.
+
+### D. Final Validation Preparation
+Before your scheduled adviser presentation, prepare the following four files in your group's designated Google Drive folder:
+1. **`SMART_Goal_Matrix`** – Use the provided template to map every measurable outcome in your originally approved SMART goals to its indicator, measurement method, instrument item or test scenario, calculation/scoring method, and success criterion.
+2. **`Approved_Proposal_and_SMART_Goals`** – Include your originally approved proposal and SMART goals. Preserve the approved wording and measurable targets for comparison.
+3. **`Final_Validation_Plan_and_Framework`** – Explain your validation objectives, respondents, methodology, framework, data collection procedures, analysis methods, and success criteria.
+4. **`Final_Validation_Instrument`** – Prepare your questionnaire, usability instrument, user-task scenarios, interview guide, or other appropriate data collection tools.
+
+Your adviser will review whether your proposed validation instrument measures the outcomes specified in your approved SMART goals.
+
+Remember that not all outcomes should be measured through questionnaires. For example, processing time, task completion rates, error rates, and system performance may require direct observation, system logs, or test results.
+You may need to revise your instrument before proceeding to final user/stakeholder validation. Do not proceed with final validation until your adviser has reviewed your instrument and confirmed that it appropriately measures your approved SMART goals.
+
+### E. Required Google Drive Folder Organization
+Each group must organize its deliverables using the following structure:
+```text
+TeamCode/ (e.g., 2627-sem1-it411-56 for Group 56)
+├── 01_Software_and_Deployment/
+├── 02_Updated_Documentation/
+├── 03_Testing_and_QA/
+└── 04_Final-User_Validation/
+    ├── SMART_Goal_Matrix
+    ├── Approved_Proposal_and_SMART_Goals
+    ├── Final_Validation_Plan_and_Framework
+    └── Final_Validation_Instrument
+```
+Ensure that all files and links are accessible to your adviser and instructor.
+
+### F. Presentation Readiness
+During the presentation, your group must be prepared to:
+- Demonstrate the working and deployed system;
+- Explain the completed features and major system transactions;
+- Show the updated documentation and testing results;
+- Present the `SMART_Goal_Matrix` and proposed validation instrument; and
+- Address comments, questions, and required revisions from your adviser.
+
+You may proceed with the Final User/Stakeholder Validation only after completing this presentation and securing your adviser's approval.
+
+---
+
+## 3. Week 12 Deliverable: Final User/Stakeholder Validation & Evaluation (Due October 31, 2026)
+
+After completing the presentation with your respective adviser, each team must proceed with Final User/Stakeholder Validation & Evaluation (Due October 31, 2026).
+
+The purpose of this activity is to evaluate whether your completed software system effectively addresses the identified problem, meets the needs of its intended users, and delivers its intended value. Unlike the initial MVP validation conducted earlier in the semester, this phase focuses on evaluating the actual deployed and improved software system.
+
+### REQUIRED DELIVERABLES
+
+1. **Final User/Stakeholder Validation Plan**
+   Prepare a validation plan that identifies:
+   - The objectives of the validation and the research questions to be answered.
+   - The target respondents and their relevance to the intended users or stakeholders.
+   - The proposed validation model or framework appropriate to your project.
+   - The evaluation instruments, procedures, and activities to be conducted.
+   - The evaluation metrics, success criteria, and methods of analyzing the results.
+   Your chosen validation framework must align with your research objectives, system functionality, and intended outcomes. Consult your respective adviser before finalizing the framework and instruments.
+
+2. **Validation Instruments and Data Collection**
+   Submit the instruments and supporting materials used to evaluate the deployed system, such as:
+   - Survey questionnaires or standardized usability instruments.
+   - User task scenarios and testing procedures.
+   - Interview guides or stakeholder feedback forms, where applicable.
+   - Records of completed testing sessions and collected responses.
+   Ensure that your instruments measure the intended outcomes rather than merely asking whether users like the system.
+
+3. **Actual User/Stakeholder Testing**
+   Conduct the final validation using the completed, deployed software system.
+   The activity should demonstrate that actual intended users or relevant stakeholders have interacted with the system and evaluated its functionality, usability, usefulness, effectiveness, or other outcomes relevant to your research objectives.
+   Depending on your selected framework, appropriate evidence may include:
+   - Task completion rates and task completion times.
+   - Relevant questionnaire results.
+   - Perceived usefulness and ease-of-use ratings.
+   - User satisfaction and qualitative feedback.
+   - Achievement of predefined functional or domain-specific success criteria.
+
+4. **Final Validation Results and Analysis**
+   Prepare a report presenting the actual findings of your validation activity. Include:
+   - The respondent profile and number of participants.
+   - The validation procedure and data collection period.
+   - The evaluation framework and instruments used.
+   - The collected data and analysis of results.
+   - Results for each research question, evaluation metric, and success criterion.
+   - Identified usability issues, functional limitations, and unmet user needs.
+   - A discussion of whether the system achieved its intended objectives, supported by evidence.
+   Do not present conclusions that are unsupported by your collected data.
+
+5. **Recommendations and Post-Validation Improvements**
+   Based on your findings, identify the improvements or corrective actions needed after validation.
+   Document the following:
+   - Issues and concerns raised by users or stakeholders.
+   - Recommended improvements, prioritized according to importance.
+   - Actions taken or planned in response to the findings.
+   - Updates required to the software, technical documentation, or test cases.
+   - Remaining limitations and recommendations for future development.
+   If validation reveals major defects or unmet requirements, these must be documented and addressed according to your adviser's guidance.
+
+### SUBMISSION ORGANIZATION
+Create a dedicated Google Drive folder named `Final_User_Validation` (or `04_Final-User_Validation`) within your team's submission folder.
+
+Organize the evidence as follows:
+- `01_Validation_Plan_and_Framework`
+- `02_Instruments_and_Data_Collection`
+- `03_Testing_Evidence`
+- `04_Results_and_Analysis`
+- `05_Recommendations_and_Improvements`
+
+Provide working links to the relevant documents and evidence. Ensure that evaluators can access the submitted materials and that respondent information is handled appropriately.
+
+### IMPORTANT REMINDERS
+- Validate the completed software, not merely the original MVP concept or prototype.
+- Your final validation must use the deployed version submitted, or a clearly documented subsequent version approved for evaluation.
+- The selected framework, research objectives, instruments, metrics, and analysis must be aligned.
+- Use actual results from your user/stakeholder testing. Do not substitute screenshots of the interface or developers' own assessments for evidence of external user evaluation.
+- The initial MVP validation findings have already been submitted. This validation must focus on the evaluation of the improved, working software system.
+- Consult your adviser regarding the suitability of your validation framework, respondent selection, instruments, and success criteria before conducting the activity.
+- Please coordinate with your team and adviser to ensure that the validation process is properly planned, conducted, and documented.
+- The goal is not simply to demonstrate that your software works, but to provide evidence that it works effectively for its intended users and addresses the problem it was designed to solve.

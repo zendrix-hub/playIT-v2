@@ -1,0 +1,64 @@
+@startuml seq_m5_progression
+!include _style.iuml
+autonumber "<b>0."
+hide footbox
+
+title Sequence Diagram, Module 5: profile, letter completion, stars, streak and unlock (FR-06, FR-08, FR-09, FR-14)
+
+actor "Child" as Child
+participant "ProfileSelectScreen" as PScreen
+participant "ProfileViewModel" as PVM
+participant "SessionManager" as Session
+participant "LetterCompleteViewModel" as LVM
+participant "StarCalculator" as Stars
+participant "LessonProgressRepository" as Progress
+participant "StreakTracker" as Streak
+participant "ProfileRepository" as Profiles
+participant "AchievementRepository" as Badges
+participant "MapViewModel" as Map
+participant "UnlockManager" as Unlock
+database "Room" as DB
+
+== Pick a profile (up to 6, avatar only) ==
+Child -> PScreen : taps an avatar card
+PScreen -> PVM : selectProfile(profileId)
+PVM -> Session : setActiveProfile(profileId)
+note right of Session : every screen reads activeProfileId,\nso each child's data stays separate (FR-14)
+
+== Letter complete (after Find It) ==
+LVM -> LVM : create (phonemeId, heartsLost)
+activate LVM
+LVM -> Stars : calculateStars(heartsLost)
+Stars --> LVM : 3 if no heart lost, 2 if up to 2, else 1
+LVM -> Progress : saveProgress(LessonProgress(profileId, phonemeId,\nstarsEarned, heartsLost, isCompleted = true))
+Progress -> DB : INSERT OR REPLACE INTO lesson_progress
+LVM -> Streak : recordActivity(profileId)
+activate Streak
+Streak -> Profiles : getProfileById(profileId)
+Streak -> Streak : same day: keep; next day: +1; gap of 2+ days: 1
+Streak -> Profiles : updateProfile(currentStreak, lastPlayedAt)
+opt streak is a milestone
+  Streak -> Badges : unlockAchievement(profileId, "N-Day Streak")
+end
+deactivate Streak
+LVM -> LVM : play fanfare, complete line, unlock chime, next cue
+deactivate LVM
+
+== Back on the map ==
+Child -> Map : taps Continue (map opens)
+activate Map
+Map -> DB : observe phonemes, letter_groups, members,\nlesson_progress (Room Flows)
+DB --> Map : lists (re-emitted on every write)
+loop each letter in Marungko order
+  Map -> Unlock : isPhonemeUnlocked(phonemeId, progressList)
+  Unlock --> Map : letter 1 always; else previous letter completed
+end
+Map -> Map : compare with the last unlocked set\n-> newlyUnlockedNodeId (e.g. "S")
+Map -> Profiles : getAllProfiles() (ProfileDao)
+Profiles -> DB : totalStars = SUM(lesson_progress.starsEarned)\n+ SUM(blend_it_progress.starsEarned)
+Map --> Child : unlock moment: scroll to S, pop, chime,\nstar pill and "Hi, {name}!" chip updated
+deactivate Map
+
+Child -> Map : taps the green (active) node once
+Map -> Map : nodeTapAction(...) = LAUNCH -> Hear It starts (no pop-up)
+@enduml

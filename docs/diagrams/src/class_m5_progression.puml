@@ -1,0 +1,168 @@
+@startuml class_m5_progression
+!include _style.iuml
+hide empty members
+
+title Class Diagram, Module 5: Mastery Progression, Gamification and Multi-Profile\nSDD §2.0 (UnlockManager, StreakTracker, SessionManager), §3.5 Database Architecture
+
+package "presentation" {
+  class ProfileViewModel <<HiltViewModel>> {
+    +profiles : StateFlow<List<Profile>>
+    +selectedAvatarId : StateFlow<Int>
+    +selectProfile(profileId)
+    +createProfile(name, avatarResId)
+    +canAddProfile() : Boolean
+  }
+  class MapViewModel <<HiltViewModel>> {
+    +userStats : StateFlow<UserMapStats>
+    +mapNodes : StateFlow<List<MapNode>>
+    +newlyUnlockedNodeId : StateFlow<String?>
+    +onUnlockShown()
+    +playUnlockChime()
+    +onLockedNodeTapped()
+  }
+  class MapTapRules <<file functions>> {
+    +nodeTapAction(isUnlocked, index, activeIndex) : NodeTapAction
+    +greetingFor(name) : String
+  }
+  enum NodeTapAction {
+    LAUNCH
+    POPUP
+    LOCKED
+  }
+  class LetterCompleteViewModel <<HiltViewModel>> {
+    +starsEarned : StateFlow<Int>
+    -saveProgress()
+  }
+  class UserMapStats <<data>> {
+    +profileName : String
+    +totalStars : Int
+    +currentStreak : Int
+    +unlockedBadgesCount : Int
+  }
+}
+
+package "domain" {
+  class UnlockManager <<Singleton>> {
+    +isPhonemeUnlocked(phonemeId, progress) : Boolean
+  }
+  class GroupUnlockManager <<Singleton>> {
+    +isGroupUnlocked(...) : Boolean
+    +isBlendItUnlocked(...) : Boolean
+  }
+  class StreakTracker {
+    +recordActivity(profileId) : Profile?
+    +resetIfInactive(profileId) : Profile?
+    +checkMilestone(streak) : String?
+  }
+  class StarCalculator <<object>> {
+    +calculateStars(heartsLost, accuracy) : Int
+  }
+  abstract class MapNode <<sealed>> {
+    +id : String
+    +orderIndex : Int
+    +isUnlocked : Boolean
+    +groupNumber : Int
+  }
+  class LetterNode {
+    +symbol : String
+    +starsEarned : Int
+  }
+  class Profile <<data>> {
+    +id : Long
+    +name : String
+    +avatarResId : Int
+    +totalStars : Int
+    +currentStreak : Int
+    +lastPlayedAt : Long
+  }
+  class LessonProgress <<data>> {
+    +profileId : Long
+    +phonemeId : Int
+    +starsEarned : Int
+    +heartsLost : Int
+    +isCompleted : Boolean
+  }
+  interface ProfileRepository {
+    +getAllProfiles() : Flow<List<Profile>>
+    +getProfileById(id) : Profile?
+    +createProfile(name, avatar) : Result<Long>
+    +updateProfile(profile)
+    +deleteProfile(profile)
+  }
+  interface LessonProgressRepository {
+    +getProgressForProfile(id) : Flow<List<LessonProgress>>
+    +saveProgress(progress)
+  }
+  interface AchievementRepository
+  interface LetterGroupRepository
+  interface LetterGroupMemberRepository
+}
+
+package "data" {
+  class SessionManager <<Singleton>> {
+    +activeProfileId : StateFlow<Long?>
+    +setActiveProfile(profileId)
+    +clearActiveProfile()
+  }
+  class ProfileDao <<Room DAO>> {
+    +getAllProfiles() : Flow<List<ProfileEntity>>
+    +getProfileById(id) : ProfileEntity?
+    <i>totalStars = SUM(lesson_progress) + SUM(blend_it_progress)</i>
+  }
+  class LessonProgressDao <<Room DAO>>
+  class PlayItDatabase <<Room v3>>
+}
+
+package "planned (SDD 2.1, 3.5)" {
+  class LessonEngine <<planned>>
+  class LetterProgressEntity <<planned>> {
+    masteryState: NEW, INTRODUCED,
+    NEEDS_PRACTICE, SECURE
+  }
+}
+
+ProfileViewModel --> ProfileRepository
+ProfileViewModel --> SessionManager
+MapViewModel --> SessionManager
+MapViewModel --> ProfileRepository
+MapViewModel --> LessonProgressRepository
+MapViewModel --> AchievementRepository
+MapViewModel --> LetterGroupRepository
+MapViewModel --> LetterGroupMemberRepository
+MapViewModel --> UnlockManager
+MapViewModel --> GroupUnlockManager
+MapViewModel --> StreakTracker
+MapViewModel ..> MapNode : builds
+MapViewModel ..> UserMapStats
+MapViewModel ..> MapTapRules : screen uses
+MapTapRules ..> NodeTapAction
+MapNode <|-- LetterNode
+LetterCompleteViewModel ..> StarCalculator
+LetterCompleteViewModel --> LessonProgressRepository
+LetterCompleteViewModel --> StreakTracker
+StreakTracker --> ProfileRepository
+StreakTracker --> AchievementRepository
+UnlockManager ..> LessonProgress
+ProfileRepository ..> Profile
+ProfileRepository ..> ProfileDao : implemented by Impl
+LessonProgressRepository ..> LessonProgressDao : implemented by Impl
+PlayItDatabase *-- ProfileDao
+PlayItDatabase *-- LessonProgressDao
+LessonEngine ..> MapViewModel : would drive lessons
+LetterProgressEntity ..> PlayItDatabase : would need v4 + migration
+
+' Layout only: stack domain classes in columns so the diagram is not one long row.
+LetterGroupRepository -[hidden]down- LetterGroupMemberRepository
+LetterGroupMemberRepository -[hidden]down- AchievementRepository
+GroupUnlockManager -[hidden]down- UnlockManager
+StarCalculator -[hidden]down- StreakTracker
+MapNode -[hidden]down- LessonProgress
+LessonProgressRepository -[hidden]down- ProfileRepository
+UnlockManager -[hidden]down- MapNode
+
+note bottom of UnlockManager
+  FR-08: letter N+1 unlocks when letter N
+  is completed (completion always gives 1 to 3 stars);
+  letter 1 (M) is always open
+end note
+@enduml

@@ -55,6 +55,23 @@ val CanvasLight = Color(0xFFF7FAFC)
 val CanvasSoft = Color(0xFFEEF5FF)
 val CanvasWarm = Color(0xFFFFF9F0)
 
+// ── 2b. Duolingo ABC Grounded Stage Pastels & Adult Diagnostic Neutrals (Card 32)
+val StageOnboardingMeadow = Color(0xFFE8F8F5)
+val StageOnboardingHorizon = Color(0xFFD1F2EB)
+
+val StageHearItSky = Color(0xFFEBF5FB)
+val StageHearItHorizon = Color(0xFFD6EAF8)
+val StageSayItPeach = Color(0xFFFEF5E7)
+val StageSayItHorizon = Color(0xFFFDEBD0)
+val StageFindItMint = Color(0xFFEAFAF1)
+val StageFindItHorizon = Color(0xFFD5F5E3)
+val StageBlendItLavender = Color(0xFFF4ECF7)
+val StageBlendItHorizon = Color(0xFFE8DAEF)
+
+val AdultCanvasSoft = Color(0xFFF8FAFC)
+val AdultCanvasLight = Color(0xFFF1F5F9)
+val AdultSlateBorder = Color(0xFFE2E8F0)
+
 val SurfaceCard = Color(0xFFFFFFFF)
 val SurfaceCardSubtle = Color(0xFFF8FAFC)
 val SurfaceCardShadow = Color(0xFFCBD5E1)
@@ -115,6 +132,16 @@ val CloudShadow = SurfaceCardShadow
 
 // Upgraded crisp border outline
 val DarkBrownOutline = ModernBorder
+
+// Lily the tarsier, sampled from images/mascot/lily_idle.png (image release 2026-10-12-mascot), so the
+// drawn splash tarsier matches her pictures. LilyOutline is the art's dark-brown line (style guide #4A2E18).
+val LilyOrange = Color(0xFFF97B27)
+val LilyOrangeShade = Color(0xFFDD621F)
+val LilyEarInner = Color(0xFFFEAC7A)
+val LilyCream = Color(0xFFFDEBD3)
+val LilyBlush = Color(0xFFFC9898)
+val LilyPupil = Color(0xFF3B1F0A)
+val LilyOutline = Color(0xFF4A2E18)
 
 val DestructiveRed = Color(0xFFE53935)
 val DestructiveRedShadow = Color(0xFFB71C1C)

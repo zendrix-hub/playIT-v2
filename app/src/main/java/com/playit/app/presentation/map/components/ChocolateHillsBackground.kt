@@ -1,25 +1,74 @@
 package com.playit.app.presentation.map.components
 
-import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
+import com.playit.app.presentation.components.rememberAssetPainter
+
+/**
+ * Curated pathside landmark prop positioned at the outer left/right terrain margin
+ * so all 64dp interactive lesson nodes along the center rope path remain 100% unobstructed.
+ */
+data class MapLandmarkProp(
+    val assetPath: String,
+    val yFraction: Float,
+    val isRightMargin: Boolean,
+    val sizeDp: Dp
+)
+
+val MAP_PATHSIDE_LANDMARKS: List<MapLandmarkProp> = listOf(
+    // Zone 1: Chocolate Hills Onset (0% - 17%)
+    MapLandmarkProp("images/backgrounds/mapprop_nipa_hut.png", 0.04f, isRightMargin = false, sizeDp = 64.dp),
+    MapLandmarkProp("images/backgrounds/mapprop_crayon_bridge.png", 0.09f, isRightMargin = true, sizeDp = 60.dp),
+    MapLandmarkProp("images/backgrounds/mapprop_flower.png", 0.14f, isRightMargin = false, sizeDp = 46.dp),
+    // Zone 2: Loboc River Valley (17% - 34%)
+    MapLandmarkProp("images/backgrounds/map_prop_bush.png", 0.19f, isRightMargin = true, sizeDp = 50.dp),
+    MapLandmarkProp("images/backgrounds/mapprop_backpack.png", 0.25f, isRightMargin = false, sizeDp = 54.dp),
+    MapLandmarkProp("images/backgrounds/mapprop_ruler_ramp.png", 0.31f, isRightMargin = true, sizeDp = 58.dp),
+    // Zone 3: Panglao Coral Shore (34% - 50%)
+    MapLandmarkProp("images/backgrounds/mapprop_palm_tree.png", 0.36f, isRightMargin = false, sizeDp = 64.dp),
+    MapLandmarkProp("images/backgrounds/map_prop_rock.png", 0.42f, isRightMargin = true, sizeDp = 48.dp),
+    MapLandmarkProp("images/backgrounds/mapprop_magnifying_glass.png", 0.47f, isRightMargin = false, sizeDp = 52.dp),
+    // Zone 4: Tarsier Rainforest Sanctuary (50% - 67%)
+    MapLandmarkProp("images/backgrounds/map_prop_tree_small.png", 0.53f, isRightMargin = true, sizeDp = 58.dp),
+    MapLandmarkProp("images/backgrounds/mapprop_eraser_shrub.png", 0.59f, isRightMargin = false, sizeDp = 50.dp),
+    MapLandmarkProp("images/backgrounds/mapprop_paint_palette.png", 0.64f, isRightMargin = true, sizeDp = 54.dp),
+    // Zone 5: Bohol Mountain Summit (67% - 84%)
+    MapLandmarkProp("images/backgrounds/mapprop_paper_airplane.png", 0.71f, isRightMargin = false, sizeDp = 52.dp),
+    MapLandmarkProp("images/backgrounds/mapprop_pencil_tower.png", 0.78f, isRightMargin = true, sizeDp = 62.dp),
+    // Zone 6: Baclayon Heritage & Milestone Summit (84% - 100%)
+    MapLandmarkProp("images/backgrounds/mapprop_book_stack.png", 0.86f, isRightMargin = false, sizeDp = 58.dp),
+    MapLandmarkProp("images/backgrounds/mapprop_globe.png", 0.93f, isRightMargin = true, sizeDp = 56.dp)
+)
 
 /**
  * Authentic 6-Biome Bohol Adventure Map Background.
@@ -63,34 +112,65 @@ fun ChocolateHillsBackground(
             .height(totalHeight)
             .background(backgroundBrush)
     ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val w = size.width
-            val h = size.height
+        // The scene is recorded once per size into a Picture (drawWithCache), so redraws while the
+        // map scrolls replay it instead of rebuilding every hill, river and cloud path.
+        Spacer(
+            Modifier
+                .fillMaxSize()
+                .drawWithCache {
+                    val picture = android.graphics.Picture()
+                    val recording = Canvas(picture.beginRecording(size.width.toInt(), size.height.toInt()))
+                    CanvasDrawScope().draw(this, layoutDirection, recording, size) { drawBoholScene() }
+                    picture.endRecording()
+                    onDrawBehind { drawIntoCanvas { it.nativeCanvas.drawPicture(picture) } }
+                }
+        )
 
-            val zoneHeight = h / 6f
-
-            // ── Zone 1: Chocolate Hills & Clear Morning Sun (0% - 17%) ───────
-            drawVisibleSunAndClouds(w)
-            drawChocolateHillsZone(w, baseY = zoneHeight * 0.95f)
-
-            // ── Zone 2: Loboc River Valley (17% - 34%) ───────────────────────
-            drawLobocRiverZone(w, startY = zoneHeight * 1.0f, height = zoneHeight)
-
-            // ── Zone 3: Panglao Coral Shore (34% - 50%) ───────────────────────
-            drawPanglaoCoralZone(w, startY = zoneHeight * 2.0f, height = zoneHeight)
-
-            // ── Zone 4: Tarsier Rainforest Sanctuary (50% - 67%) ─────────────
-            drawTarsierRainforestZone(w, startY = zoneHeight * 3.0f, height = zoneHeight)
-
-            // ── Zone 5: Bohol Mountain Summit (67% - 84%) ─────────────────────
-            drawMountainSummitZone(w, startY = zoneHeight * 4.0f, height = zoneHeight)
-
-            // ── Zone 6: Baclayon Heritage (84% - 100%) ────────────────────────
-            drawBaclayonHeritageZone(w, startY = zoneHeight * 5.0f, height = zoneHeight)
+        // Curated pathside Archipelago landmarks anchored on the background layer (zIndex 0f)
+        MAP_PATHSIDE_LANDMARKS.forEach { landmark ->
+            Image(
+                painter = rememberAssetPainter(landmark.assetPath),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .zIndex(0f)
+                    .align(if (landmark.isRightMargin) Alignment.TopEnd else Alignment.TopStart)
+                    .padding(horizontal = 6.dp)
+                    .offset(y = totalHeight * landmark.yFraction)
+                    .size(landmark.sizeDp)
+            )
         }
 
         content()
     }
+}
+
+
+/** The six Bohol zones, top to bottom, each one sixth of the map height. */
+private fun DrawScope.drawBoholScene() {
+    val w = size.width
+    val h = size.height
+
+    val zoneHeight = h / 6f
+
+    // ── Zone 1: Chocolate Hills & Clear Morning Sun (0% - 17%) ───────
+    drawVisibleSunAndClouds(w)
+    drawChocolateHillsZone(w, baseY = zoneHeight * 0.95f)
+
+    // ── Zone 2: Loboc River Valley (17% - 34%) ───────────────────────
+    drawLobocRiverZone(w, startY = zoneHeight * 1.0f, height = zoneHeight)
+
+    // ── Zone 3: Panglao Coral Shore (34% - 50%) ───────────────────────
+    drawPanglaoCoralZone(w, startY = zoneHeight * 2.0f, height = zoneHeight)
+
+    // ── Zone 4: Tarsier Rainforest Sanctuary (50% - 67%) ─────────────
+    drawTarsierRainforestZone(w, startY = zoneHeight * 3.0f, height = zoneHeight)
+
+    // ── Zone 5: Bohol Mountain Summit (67% - 84%) ─────────────────────
+    drawMountainSummitZone(w, startY = zoneHeight * 4.0f, height = zoneHeight)
+
+    // ── Zone 6: Baclayon Heritage (84% - 100%) ────────────────────────
+    drawBaclayonHeritageZone(w, startY = zoneHeight * 5.0f, height = zoneHeight)
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -430,7 +510,7 @@ private fun DrawScope.drawBaclayonHeritageZone(canvasWidth: Float, startY: Float
         )
         close()
     }
-    drawPath(path = domePath, color = Color(0xFFDC2626).copy(alpha = 0.70f))
+    drawPath(path = domePath, color = Color(0xFFC7764F).copy(alpha = 0.70f)) // muted terracotta, not harsh red (card 31e)
 
     // Arched Church Portals & Windows
     drawRoundRect(
@@ -448,7 +528,7 @@ private fun DrawScope.drawBaclayonHeritageZone(canvasWidth: Float, startY: Float
 
     // Flowering Bougainvillea Gardens & Topiary Cones (tools/baclayon.jpg)
     val gardenGreen = Color(0xFF15803D).copy(alpha = 0.65f)
-    val bougainvilleaPink = Color(0xFFE11D48).copy(alpha = 0.60f)
+    val bougainvilleaPink = Color(0xFFF472B6).copy(alpha = 0.55f)
 
     // Manicured topiary cones
     val cone1 = Path().apply {

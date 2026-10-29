@@ -1,5 +1,8 @@
 package com.playit.app.presentation.profile
 
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.testTag
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -64,35 +67,24 @@ fun ProfileSelectScreen(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFFE8F0FE),
-                        Color(0xFFF3E8FF),
-                        Color(0xFFFEF3C7)
+                        SoftSky,
+                        Cloud,
+                        StageOnboardingMeadow
                     )
                 )
             )
     ) {
-        // Modern cheerful rolling playground hills
-        Row(
+        // Grounded pediatric campus meadow floor behind primary onboarding CTA
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(90.dp)
-                .align(Alignment.BottomCenter),
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            val hillWidths = listOf(80.dp, 120.dp, 95.dp, 130.dp, 90.dp, 110.dp)
-            hillWidths.forEachIndexed { index, width ->
-                Box(
-                    modifier = Modifier
-                        .size(width = width, height = width * 0.58f)
-                        .offset(x = if (index == 0) 0.dp else ((-18) * index).dp)
-                        .clip(RoundedCornerShape(topStartPercent = 50, topEndPercent = 50))
-                        .background(
-                            if (index % 2 == 0) EmeraldLeaf.copy(alpha = 0.22f) else EmeraldLeafDark.copy(alpha = 0.15f)
-                        )
+                .fillMaxHeight(0.18f)
+                .align(Alignment.BottomCenter)
+                .background(
+                    color = StageOnboardingHorizon,
+                    shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
                 )
-            }
-        }
+        )
 
         // Screen Content (Header, Mascot prompt, and Profile list)
         Column(
@@ -110,20 +102,20 @@ fun ProfileSelectScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                     Text(
                         text = "Who is playing?",
-                        fontFamily = LexendFontFamily,
-                        fontSize = 26.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Ink
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = Ink,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = "Choose your profile",
-                        fontFamily = LexendFontFamily,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = InkSoft
+                        style = MaterialTheme.typography.titleSmall,
+                        color = InkSoft,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
@@ -135,7 +127,7 @@ fun ProfileSelectScreen(
                     shadowColor = UbeShadow,
                     contentColor = Cloud,
                     fontSize = 14,
-                    modifier = Modifier.height(52.dp)
+                    modifier = Modifier.heightIn(min = 52.dp)
                 )
             }
 

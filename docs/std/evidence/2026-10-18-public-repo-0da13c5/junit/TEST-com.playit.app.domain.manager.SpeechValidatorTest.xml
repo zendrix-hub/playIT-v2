@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.domain.manager.SpeechValidatorTest" tests="27" skipped="0" failures="0" errors="0" timestamp="2026-10-18T01:35:42" hostname="LAPTOP-REHI7A0K" time="0.015">
+  <properties/>
+  <testcase name="wordMode_nullOrBlankTranscript_returnsFalse" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.002"/>
+  <testcase name="judgeSound_soundModeOn_tooShort_rejected" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.001"/>
+  <testcase name="soundMode_isOffByDefault" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.0"/>
+  <testcase name="judgeSound_addedVowel_rejected" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.003"/>
+  <testcase name="grammarFor_wordMode_hasFoilsNotGenericDecoys" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.001"/>
+  <testcase name="wordMode_rejectsOtherWordsAndMinimalPairs" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.0"/>
+  <testcase name="judgeSound_noDuration_unconfirmed" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.001"/>
+  <testcase name="wordMode_rejectsPartialOrMisspelledWords" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.0"/>
+  <testcase name="wordMode_caseAndWhitespaceInsensitive" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.0"/>
+  <testcase name="distractorRejection_returnsFalse" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.0"/>
+  <testcase name="judgeSound_soundModeOff_sustainedIsUnconfirmed" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.001"/>
+  <testcase name="legacyNgEnye_exactMatch_returnsTrue" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.0"/>
+  <testcase name="wordMode_rejectsLetterSoundOnly" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.0"/>
+  <testcase name="judgeSound_substitution_rejected" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.001"/>
+  <testcase name="wordExactMatch_returnsTrue_forAll26ExampleWords" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.0"/>
+  <testcase name="judgeSound_letterName_rejected" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.001"/>
+  <testcase name="grammarFor_soundMode_hasNoAcceptedTokens" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.0"/>
+  <testcase name="judgeSound_stop_neverAcceptedBySustain" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.0"/>
+  <testcase name="nullOrBlankText_returnsFalse" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.001"/>
+  <testcase name="validate_prefixRuleRemoved" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.0"/>
+  <testcase name="wordMode_hyphenatedYoyoVariant_returnsTrue" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.0"/>
+  <testcase name="phonemeMode_rejectsMisspelledAnchorWords_afterCB1" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.0"/>
+  <testcase name="wordMode_unknownTargetWord_fallsBackToCanonicalOnly" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.0"/>
+  <testcase name="judgeWord_paths" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.001"/>
+  <testcase name="judgeSound_anchorWord_isOtherWord" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.0"/>
+  <testcase name="wordAcceptedVariants_hasEntryForEverySeededExampleWord" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.0"/>
+  <testcase name="judgeSound_soundModeOn_sustainedContinuous_accepted" classname="com.playit.app.domain.manager.SpeechValidatorTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,89 @@
+{
+ "batch": "2026-10-07-mouth-shapes",
+ "size": "1024x1024",
+ "variants_per_round": 2,
+ "style_prompt": "Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red (lips are a soft rosy brown), simple enough to read at 96 px. Front view of the lower half of one friendly Filipino child's face, from the tip of the nose to the chin, warm medium-brown skin, filling about 70% of the square. The same child, skin tone, framing and size in every picture of this set, so only the mouth changes. Plain pure white background (#FFFFFF), no shadow, no frame, no text, no letters, no arrows, no watermark.",
+ "style_refs": [
+  "app/src/main/assets/images/pictures/picture_mouse.png",
+  "app/src/main/assets/images/pictures/picture_cat.png",
+  "app/src/main/assets/images/pictures/picture_duck.png",
+  "app/src/main/assets/images/pictures/picture_pig.png",
+  "app/src/main/assets/images/pictures/picture_gift.png",
+  "app/src/main/assets/images/pictures/picture_sun.png"
+ ],
+ "app_folder": "app/src/main/assets/images/mouth",
+ "items": [
+  {
+   "id": "mouth_lips_together",
+   "word": "lips together",
+   "letter": "m, b, p",
+   "why": "articulation cue for m, b, p (NFR-ACC-01; plan Task 8)",
+   "subject": "lips pressed gently together and closed, cheeks very slightly puffed, as when humming mmm",
+   "prompt": "Lips pressed gently together and closed, cheeks very slightly puffed, as when humming mmm. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red (lips are a soft rosy brown), simple enough to read at 96 px. Front view of the lower half of one friendly Filipino child's face, from the tip of the nose to the chin, warm medium-brown skin, filling about 70% of the square. The same child, skin tone, framing and size in every picture of this set, so only the mouth changes. Plain pure white background (#FFFFFF), no shadow, no frame, no text, no letters, no arrows, no watermark."
+  },
+  {
+   "id": "mouth_teeth_on_lip",
+   "word": "teeth on lip",
+   "letter": "f, v",
+   "why": "articulation cue for f, v (NFR-ACC-01; plan Task 8)",
+   "subject": "the top front teeth resting lightly on the lower lip, lips slightly apart, as when saying fff",
+   "prompt": "The top front teeth resting lightly on the lower lip, lips slightly apart, as when saying fff. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red (lips are a soft rosy brown), simple enough to read at 96 px. Front view of the lower half of one friendly Filipino child's face, from the tip of the nose to the chin, warm medium-brown skin, filling about 70% of the square. The same child, skin tone, framing and size in every picture of this set, so only the mouth changes. Plain pure white background (#FFFFFF), no shadow, no frame, no text, no letters, no arrows, no watermark."
+  },
+  {
+   "id": "mouth_tongue_up",
+   "word": "tongue up",
+   "letter": "t, d, n, l",
+   "why": "articulation cue for t, d, n, l (NFR-ACC-01; plan Task 8)",
+   "subject": "mouth a little open, the tip of a pink tongue touching the ridge just behind the top front teeth",
+   "prompt": "Mouth a little open, the tip of a pink tongue touching the ridge just behind the top front teeth. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red (lips are a soft rosy brown), simple enough to read at 96 px. Front view of the lower half of one friendly Filipino child's face, from the tip of the nose to the chin, warm medium-brown skin, filling about 70% of the square. The same child, skin tone, framing and size in every picture of this set, so only the mouth changes. Plain pure white background (#FFFFFF), no shadow, no frame, no text, no letters, no arrows, no watermark."
+  },
+  {
+   "id": "mouth_teeth_close",
+   "word": "teeth close",
+   "letter": "s, z, x",
+   "why": "articulation cue for s, z, x (NFR-ACC-01; plan Task 8)",
+   "subject": "top and bottom teeth almost touching, lips slightly apart in a small flat smile, as when hissing sss",
+   "prompt": "Top and bottom teeth almost touching, lips slightly apart in a small flat smile, as when hissing sss. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red (lips are a soft rosy brown), simple enough to read at 96 px. Front view of the lower half of one friendly Filipino child's face, from the tip of the nose to the chin, warm medium-brown skin, filling about 70% of the square. The same child, skin tone, framing and size in every picture of this set, so only the mouth changes. Plain pure white background (#FFFFFF), no shadow, no frame, no text, no letters, no arrows, no watermark."
+  },
+  {
+   "id": "mouth_back",
+   "word": "back",
+   "letter": "k, c, g, q",
+   "why": "articulation cue for k, c, g, q (NFR-ACC-01; plan Task 8)",
+   "subject": "mouth open in a relaxed oval, the tongue low and pulled back, the back of the tongue raised",
+   "prompt": "Mouth open in a relaxed oval, the tongue low and pulled back, the back of the tongue raised. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red (lips are a soft rosy brown), simple enough to read at 96 px. Front view of the lower half of one friendly Filipino child's face, from the tip of the nose to the chin, warm medium-brown skin, filling about 70% of the square. The same child, skin tone, framing and size in every picture of this set, so only the mouth changes. Plain pure white background (#FFFFFF), no shadow, no frame, no text, no letters, no arrows, no watermark."
+  },
+  {
+   "id": "mouth_round",
+   "word": "round",
+   "letter": "o, u, w",
+   "why": "articulation cue for o, u, w (NFR-ACC-01; plan Task 8)",
+   "subject": "lips pushed forward into a small round circle, as when saying ooo",
+   "prompt": "Lips pushed forward into a small round circle, as when saying ooo. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red (lips are a soft rosy brown), simple enough to read at 96 px. Front view of the lower half of one friendly Filipino child's face, from the tip of the nose to the chin, warm medium-brown skin, filling about 70% of the square. The same child, skin tone, framing and size in every picture of this set, so only the mouth changes. Plain pure white background (#FFFFFF), no shadow, no frame, no text, no letters, no arrows, no watermark."
+  },
+  {
+   "id": "mouth_wide_open",
+   "word": "wide open",
+   "letter": "a",
+   "why": "articulation cue for a (NFR-ACC-01; plan Task 8)",
+   "subject": "mouth open wide with the jaw dropped, tongue resting low and flat, as when saying the a in apple",
+   "prompt": "Mouth open wide with the jaw dropped, tongue resting low and flat, as when saying the a in apple. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red (lips are a soft rosy brown), simple enough to read at 96 px. Front view of the lower half of one friendly Filipino child's face, from the tip of the nose to the chin, warm medium-brown skin, filling about 70% of the square. The same child, skin tone, framing and size in every picture of this set, so only the mouth changes. Plain pure white background (#FFFFFF), no shadow, no frame, no text, no letters, no arrows, no watermark."
+  },
+  {
+   "id": "mouth_smile",
+   "word": "smile",
+   "letter": "e, i, y",
+   "why": "articulation cue for e, i, y (NFR-ACC-01; plan Task 8)",
+   "subject": "lips spread sideways in a wide smile with the top teeth just showing, as when saying eee",
+   "prompt": "Lips spread sideways in a wide smile with the top teeth just showing, as when saying eee. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red (lips are a soft rosy brown), simple enough to read at 96 px. Front view of the lower half of one friendly Filipino child's face, from the tip of the nose to the chin, warm medium-brown skin, filling about 70% of the square. The same child, skin tone, framing and size in every picture of this set, so only the mouth changes. Plain pure white background (#FFFFFF), no shadow, no frame, no text, no letters, no arrows, no watermark."
+  },
+  {
+   "id": "mouth_open_breath",
+   "word": "open breath",
+   "letter": "h, j, r",
+   "why": "articulation cue for h, j, r (NFR-ACC-01; plan Task 8)",
+   "subject": "mouth relaxed and half open, two small soft curved breath lines coming out, as when breathing out haaa",
+   "prompt": "Mouth relaxed and half open, two small soft curved breath lines coming out, as when breathing out haaa. Flat vector children's illustration in exactly the style of the attached reference pictures: a thick dark-brown outline (#4A2E18) around every shape, chunky rounded shapes, flat colours with one soft shade and a small white highlight, no pure red (lips are a soft rosy brown), simple enough to read at 96 px. Front view of the lower half of one friendly Filipino child's face, from the tip of the nose to the chin, warm medium-brown skin, filling about 70% of the square. The same child, skin tone, framing and size in every picture of this set, so only the mouth changes. Plain pure white background (#FFFFFF), no shadow, no frame, no text, no letters, no arrows, no watermark."
+  }
+ ]
+}

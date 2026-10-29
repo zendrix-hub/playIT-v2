@@ -1,0 +1,70 @@
+@startuml seq_m1_hear_it
+!include _style.iuml
+autonumber "<b>0."
+hide footbox
+
+title Sequence Diagram, Module 1: Hear It modeling sequence (SDD §4.1, FR-01, FR-02)
+
+actor "Child" as Child
+participant "HearItScreen" as Screen
+participant "HearItViewModel" as VM
+participant "PhonemeRepository" as Repo
+participant "HearItSequenceBuilder" as Builder
+participant "AudioResolver" as Resolver
+participant "AudioPlayer" as Player
+database "Room\n(phonemes)" as DB
+
+Child -> Screen : taps an unlocked letter node (map)
+activate Screen
+Screen -> VM : create (phonemeId from nav args)
+activate VM
+VM -> Repo : getPhonemeById(id)
+Repo -> DB : SELECT * FROM phonemes WHERE phonemeId = :id
+DB --> Repo : PhonemeEntity
+Repo --> VM : Phoneme (letter "m", exampleWord "Mouse")
+VM --> Screen : phoneme StateFlow
+Screen -> Screen : LetterCard and the centred play button\n(no mouth cue or caption, card 28c)
+
+Screen -> VM : onScreenVisible() (starts the IdleTimer)
+VM -> VM : playModelingSequence()  (right after the phoneme loads)
+VM -> Player : stop()
+VM -> Resolver : getPhonemePath("m"), getKeyWordPath("mouse"), getTutorPath(id)
+Resolver --> VM : asset paths
+VM -> Builder : build(TEMPLATE, phonemePath, keyWordPath, tutorPath)
+Builder --> VM : [car_listen, car_this_letter_says, ph_m, PAUSE_500, ph_m,\n PAUSE_500, ph_m, kw_mouse, ph_m]
+VM -> Player : playSequence(paths, onItem, onComplete)
+activate Player
+loop each entry of the sequence
+  alt entry is PAUSE_<ms>
+    Player -> Player : wait pauseMillis(entry) (500 ms)
+  else audio clip
+    Player -> Player : play clip (MediaPlayer or SoundPool), wait for its end
+    Player --> VM : onItem(path)
+  end
+end
+Player --> VM : onComplete()
+deactivate Player
+VM -> VM : isPlaying = false, nextHighlighted = true
+VM -> Player : playAssetAudio(ui_hearit_next)\n"Great listening! Tap the big button."
+VM --> Screen : Next button pulses
+
+opt child taps the Ear (play) button or the letter card
+  Child -> Screen : tap
+  Screen -> VM : playPhonemeSound()
+  VM -> Builder : replayTemplate()  (steps 3 to 6 only)
+  VM -> Player : playSequence(...)
+end
+
+opt no tap for 10 s (IdleTimer, NFR-IND-01)
+  alt Next already highlighted
+    VM -> Player : playAssetAudio(ui_hearit_next)
+  else
+    VM -> VM : playModelingSequence() again
+  end
+end
+
+Child -> Screen : taps "Next: Say It"
+Screen -> Screen : navigate to Say It (same phonemeId)
+deactivate VM
+deactivate Screen
+@enduml

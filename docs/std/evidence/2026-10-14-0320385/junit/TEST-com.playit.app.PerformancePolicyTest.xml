@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.PerformancePolicyTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-14T14:13:37" hostname="LAPTOP-REHI7A0K" time="0.364">
+  <properties/>
+  <testcase name="noHapticFeedbackCalls" classname="com.playit.app.PerformancePolicyTest" time="0.219"/>
+  <testcase name="noEndlessIdleAnimationOnLetterCardOrMascotHeader" classname="com.playit.app.PerformancePolicyTest" time="0.002"/>
+  <testcase name="activityIsPortraitOnly" classname="com.playit.app.PerformancePolicyTest" time="0.001"/>
+  <testcase name="noIdleFloatingRequestedByCallers" classname="com.playit.app.PerformancePolicyTest" time="0.142"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.data.PictureAssetsTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-18T01:35:36" hostname="LAPTOP-REHI7A0K" time="0.355">
+  <properties/>
+  <testcase name="everyGridPictureExists" classname="com.playit.app.data.PictureAssetsTest" time="0.111"/>
+  <testcase name="releasedPicturesMatchManifest" classname="com.playit.app.data.PictureAssetsTest" time="0.235"/>
+  <testcase name="everyMouthCueIsReleased" classname="com.playit.app.data.PictureAssetsTest" time="0.009"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

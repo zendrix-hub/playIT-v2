@@ -48,9 +48,12 @@ fun PlayItTheme(
         1.0f
     }
     val isReducedMotion = transitionScale == 0.0f
+    val cfg = androidx.compose.ui.platform.LocalConfiguration.current
+    val dimens = dimensFor(windowProfileFor(cfg.screenWidthDp, cfg.screenHeightDp))
 
     CompositionLocalProvider(
-        LocalReducedMotion provides isReducedMotion
+        LocalReducedMotion provides isReducedMotion,
+        LocalPlayItDimens provides dimens
     ) {
         MaterialTheme(
             colorScheme = LightColorScheme,

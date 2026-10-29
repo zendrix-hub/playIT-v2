@@ -25,31 +25,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.presentation.theme.*
 
+val AVATAR_NAMES = listOf("Cat", "Monkey", "Bunny", "Bear", "Frog", "Owl")
+
 @Composable
 fun AvatarPicker(
     selectedAvatarId: Int,
     onAvatarSelect: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val avatarNames = listOf("Cat", "Monkey", "Bunny", "Bear", "Frog", "Owl")
 
+    // No headings of its own: Lily's bubble above it says "Pick your animal friend!" (card 31d).
     Column(modifier = modifier.fillMaxWidth()) {
-        Text(
-            text = "Choose Your Avatar",
-            fontFamily = LexendFontFamily,
-            fontSize = 26.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = Ink
-        )
-        Text(
-            text = "Pick your animal companion",
-            fontFamily = LexendFontFamily,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Medium,
-            color = InkSoft,
-            modifier = Modifier.padding(bottom = 12.dp)
-        )
-
         // 3x2 Bento Grid
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -62,7 +48,7 @@ fun AvatarPicker(
                 ) {
                     rowRange.forEach { avatarId ->
                         val isSelected = avatarId == selectedAvatarId
-                        val avatarName = avatarNames.getOrElse(avatarId - 1) { "Friend" }
+                        val avatarName = AVATAR_NAMES.getOrElse(avatarId - 1) { "Friend" }
 
                         val scale by animateFloatAsState(
                             targetValue = if (isSelected) 1.12f else 1.0f,

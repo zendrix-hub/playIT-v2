@@ -13,6 +13,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.playit.app.domain.model.MapNode
+import com.playit.app.presentation.theme.DarkBrownOutline
+import com.playit.app.presentation.theme.EmeraldLeaf
 
 /**
  * Calculates a deterministic horizontal offset for a given node index.
@@ -23,11 +25,13 @@ fun calculateNodeXOffsetDp(index: Int, amplitudeDp: Dp = 54.dp): Dp {
     return (factor * amplitudeDp.value).dp
 }
 
+/** Rope colour of the trail ahead; walked segments are solid green. */
+private val RopeTan = Color(0xFFC9A66B)
+
 /**
- * Duolingo-style Clean Map Trail:
- * In modern Duolingo (as in duoling_map_sample.jpg), the map background is ultra-clean and light.
- * The connection between nodes is either clean white space or subtle, elegant stepping-stone dots
- * that let the 3D tactile nodes and mascot characters stand out without heavy visual clutter.
+ * Rope trail between the map nodes: a 10 dp tan rope with a 3 dp dark-brown edge, rounded caps,
+ * dashed 18/12 dp. A segment the child has walked (its end node is unlocked) is solid EmeraldLeaf,
+ * so progress reads by colour and by the dash disappearing.
  */
 @Composable
 fun MapPathCanvas(
@@ -38,7 +42,9 @@ fun MapPathCanvas(
     if (nodeCenters.size < 2) return
 
     Canvas(modifier = modifier) {
-        val subtleDash = PathEffect.dashPathEffect(floatArrayOf(6.dp.toPx(), 10.dp.toPx()), 0f)
+        val rope = 10.dp.toPx()
+        val edge = 3.dp.toPx()
+        val dash = PathEffect.dashPathEffect(floatArrayOf(18.dp.toPx(), 12.dp.toPx()), 0f)
 
         for (i in 0 until nodeCenters.size - 1) {
             val start = nodeCenters[i]
@@ -54,32 +60,19 @@ fun MapPathCanvas(
                 )
             }
 
-            // Subtle, light dashed guide line connecting the nodes
+            val walked = nodes.getOrNull(i + 1)?.isUnlocked == true
+            val effect = if (walked) null else dash
+            // Dark-brown edge under the rope, then the rope itself
             drawPath(
                 path = segmentPath,
-                color = Color(0x22CBD5E1),
-                style = Stroke(
-                    width = 4.dp.toPx(),
-                    cap = StrokeCap.Round,
-                    join = StrokeJoin.Round,
-                    pathEffect = subtleDash
-                )
+                color = DarkBrownOutline,
+                style = Stroke(width = rope + edge * 2, cap = StrokeCap.Round, join = StrokeJoin.Round, pathEffect = effect)
             )
-
-            // Minimalist stepping-stone dots between nodes (at 30%, 50%, 70%)
-            val tPoints = listOf(0.30f, 0.50f, 0.70f)
-            tPoints.forEach { t ->
-                val u = 1f - t
-                val px = u * u * u * start.x + 3 * u * u * t * start.x + 3 * u * t * t * end.x + t * t * t * end.x
-                val py = u * u * u * start.y + 3 * u * u * t * (start.y + dy * 0.52f) + 3 * u * t * t * (end.y - dy * 0.52f) + t * t * t * end.y
-
-                // Clean soft stone dot
-                drawCircle(
-                    color = Color(0xFFE2E8F0),
-                    radius = 3.5.dp.toPx(),
-                    center = Offset(px, py)
-                )
-            }
+            drawPath(
+                path = segmentPath,
+                color = if (walked) EmeraldLeaf else RopeTan,
+                style = Stroke(width = rope, cap = StrokeCap.Round, join = StrokeJoin.Round, pathEffect = effect)
+            )
         }
     }
 }

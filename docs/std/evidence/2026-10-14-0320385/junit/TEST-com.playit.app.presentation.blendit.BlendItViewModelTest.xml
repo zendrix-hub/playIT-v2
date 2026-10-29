@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.playit.app.presentation.blendit.BlendItViewModelTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-10-14T14:13:51" hostname="LAPTOP-REHI7A0K" time="1.377">
+  <properties/>
+  <testcase name="loadSessionWords_initializesFirstWordAndTileBank" classname="com.playit.app.presentation.blendit.BlendItViewModelTest" time="0.843"/>
+  <testcase name="soundOut_lightsAllTilesBeforeWord" classname="com.playit.app.presentation.blendit.BlendItViewModelTest" time="0.103"/>
+  <testcase name="soundOut_waitsForEachSound" classname="com.playit.app.presentation.blendit.BlendItViewModelTest" time="0.096"/>
+  <testcase name="wrongSubmit_playsSoftPop_notBuzz" classname="com.playit.app.presentation.blendit.BlendItViewModelTest" time="0.058"/>
+  <testcase name="placeAndRemoveTiles_updatesBankAndPlacedLists" classname="com.playit.app.presentation.blendit.BlendItViewModelTest" time="0.022"/>
+  <testcase name="heartDepleted_restartsWithThreeHearts" classname="com.playit.app.presentation.blendit.BlendItViewModelTest" time="0.024"/>
+  <testcase name="applyHint_afterTwoMistakes_locksCorrectCharacter" classname="com.playit.app.presentation.blendit.BlendItViewModelTest" time="0.021"/>
+  <testcase name="result_countsFirstTryWords" classname="com.playit.app.presentation.blendit.BlendItViewModelTest" time="0.031"/>
+  <testcase name="submitWord_incorrectWord_deductsHeart" classname="com.playit.app.presentation.blendit.BlendItViewModelTest" time="0.057"/>
+  <testcase name="submitWord_correctWord_transitionsToWordCorrectAndAdvances" classname="com.playit.app.presentation.blendit.BlendItViewModelTest" time="0.047"/>
+  <testcase name="idle_replaysIntro" classname="com.playit.app.presentation.blendit.BlendItViewModelTest" time="0.074"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

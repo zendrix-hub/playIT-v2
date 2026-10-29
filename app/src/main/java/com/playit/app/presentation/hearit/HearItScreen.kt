@@ -15,36 +15,42 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
+import com.playit.app.presentation.theme.StageHearItHorizon
+import com.playit.app.presentation.theme.StageHearItSky
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.playit.app.presentation.components.breathingPulse
+import com.playit.app.presentation.components.idleWiggle
+import com.playit.app.presentation.components.resetsIdle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.playit.app.presentation.components.ErrorStateContent
 import com.playit.app.presentation.components.GummyButton
 import com.playit.app.presentation.components.GummyContainer
+import com.playit.app.presentation.components.LessonScaffold
 import com.playit.app.presentation.components.LessonStep
 import com.playit.app.presentation.components.LessonTopBar
 import com.playit.app.presentation.components.LetterCard
@@ -53,6 +59,8 @@ import com.playit.app.presentation.components.MascotState
 import com.playit.app.presentation.theme.CreamWhite
 import com.playit.app.presentation.theme.DarkBrownOutline
 import com.playit.app.presentation.theme.Ink
+import com.playit.app.presentation.theme.LocalPlayItDimens
+import com.playit.app.presentation.theme.WindowProfile
 import com.playit.app.presentation.theme.Mango
 import com.playit.app.presentation.theme.MangoShadow
 import com.playit.app.presentation.theme.Sand
@@ -60,9 +68,6 @@ import com.playit.app.presentation.theme.Sky
 import com.playit.app.presentation.theme.Ube
 import com.playit.app.presentation.theme.UbeLight
 import com.playit.app.presentation.theme.UbeShadow
-
-private val AUDIO_CTA_SIZE = 88.dp
-private val AUDIO_CTA_RING_BOUNDS = 132.dp
 
 @Composable
 fun HearItScreen(
@@ -74,8 +79,18 @@ fun HearItScreen(
     val isPlaying by viewModel.isPlaying.collectAsStateWithLifecycle()
     val isPlayingPrompt by viewModel.isPlayingPrompt.collectAsStateWithLifecycle()
     val playCount by viewModel.playCount.collectAsStateWithLifecycle()
+    val nextHighlighted by viewModel.nextHighlighted.collectAsStateWithLifecycle()
+    val idleNudge by viewModel.idleNudge.collectAsStateWithLifecycle()
     val loadError by viewModel.loadError.collectAsStateWithLifecycle()
     val targetLetter = phoneme?.letter?.uppercase() ?: "M"
+    val d = LocalPlayItDimens.current
+
+    DisposableEffect(Unit) {
+        viewModel.onScreenVisible()
+        onDispose {
+            viewModel.onScreenHidden()
+        }
+    }
 
     if (loadError) {
         Box(
@@ -118,7 +133,7 @@ fun HearItScreen(
     )
 
     // Unlock-pop on transition from locked -> unlocked state
-    val isUnlocked = playCount > 0
+    val isUnlocked = nextHighlighted
     var wasUnlocked by remember { mutableStateOf(isUnlocked) }
     val unlockScale = remember { Animatable(1f) }
     LaunchedEffect(isUnlocked) {
@@ -144,97 +159,109 @@ fun HearItScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        androidx.compose.ui.graphics.Color(0xFFE8F0FE),
-                        androidx.compose.ui.graphics.Color(0xFFF3E8FF),
-                        androidx.compose.ui.graphics.Color(0xFFFEF3C7)
-                    )
-                )
-            )
+            .resetsIdle { viewModel.onUserInteraction() }
+            .background(StageHearItSky)
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // 3-Segment Capsule Progress Top Bar
-            LessonTopBar(
-                currentStep = LessonStep.HEAR_IT,
-                onBack = onBack
-            )
+        // Grounded Duolingo ABC bottom horizon baseline (~19% height behind primary controls)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.19f)
+                .align(Alignment.BottomCenter)
+                .background(
+                    color = StageHearItHorizon,
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
+                )
+        )
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 20.dp, vertical = 6.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+        LessonScaffold(
+            topBar = { LessonTopBar(currentStep = LessonStep.HEAR_IT, onBack = onBack) },
+            header = {
                 // Mascot speech bubble prompt (Tapping Lily replays the lesson intro voiceover)
+                // While the sound plays the card already shows "Sound: /m/", so the bubble only says "Listen!" (card 31d).
                 MascotSpeechHeader(
-                    message = if (isPlaying) {
-                        "Sound: /${phoneme?.letter ?: "m"}/"
-                    } else {
-                        "Listen closely to the sound of the letter, then tap play."
-                    },
+                    message = if (isPlaying) "Listen!" else "Listen closely to the sound of the letter, then tap play.",
                     mascotState = if (isPlaying) MascotState.LISTENING else if (playCount > 0) MascotState.POINTING else MascotState.IDLE,
                     isPlayingAudio = isPlayingPrompt,
                     onMascotTap = { viewModel.playHearItIntroAudio() }
                 )
-
-                Spacer(modifier = Modifier.height(14.dp))
-
-                // 3D Bento Animated Letter Card with breathing pulse & 24sp floor
-                LetterCard(
-                    letter = targetLetter,
-                    soundText = "Sound: /${phoneme?.letter ?: "m"}/",
-                    cardRotation = cardRotation,
-                    wordOverride = phoneme?.exampleWord,
-                    onTapReplay = { if (!isPlaying) viewModel.playPhonemeSound() }
+            },
+            bottomBar = {
+                GummyButton(
+                    text = "Next: Say It",
+                    onClick = {
+                        if (isUnlocked) {
+                            onNext(phoneme?.id?.toString() ?: "1")
+                        }
+                    },
+                    enabled = isUnlocked,
+                    backgroundColor = com.playit.app.presentation.theme.SunnyGold,
+                    shadowColor = com.playit.app.presentation.theme.SunnyGoldShadow,
+                    contentColor = com.playit.app.presentation.theme.TextMidnight,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 64.dp)
+                        .testTag("hearit_next")
+                        .breathingPulse(enabled = nextHighlighted)
+                        .idleWiggle(idleNudge, enabled = nextHighlighted)
+                        .graphicsLayer {
+                            scaleX = unlockScale.value
+                            scaleY = unlockScale.value
+                        }
                 )
+            }
+        ) {
+            // 3D Bento Animated Letter Card with breathing pulse & 24sp floor. 1.2x tall where the
+            // window has room; on COMPACT the play button would leave the window (card 28).
+            LetterCard(
+                letter = targetLetter,
+                soundText = "Sound: /${phoneme?.letter ?: "m"}/",
+                cardRotation = cardRotation,
+                wordOverride = phoneme?.exampleWord,
+                onTapReplay = { if (!isPlaying) viewModel.playPhonemeSound() },
+                height = if (d.profile == WindowProfile.COMPACT) d.letterCardHeight else d.letterCardHeight * 1.2f
+            )
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Pulsating 88dp PrimaryJoy Speaker Replay Button
-                Box(
-                    modifier = Modifier.size(AUDIO_CTA_RING_BOUNDS),
-                    contentAlignment = Alignment.Center
-                ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                // Pulsating PrimaryJoy Speaker Replay Button; clean centered layout (card 28c)
+                Box(contentAlignment = Alignment.Center) {
                     if (isPlaying) {
                         Box(
                             modifier = Modifier
-                                .size(AUDIO_CTA_SIZE)
+                                .size(d.primaryCta)
                                 .scale(pulseScale)
                                 .clip(CircleShape)
                                 .background(com.playit.app.presentation.theme.PrimaryJoyLight.copy(alpha = pulseAlpha))
                         )
                     }
 
+                    // It keeps its colour while the sound plays and ignores taps until it ends: a grey
+                    // button looked switched off to a child (card 31d). The pulse ring shows it is playing.
                     GummyContainer(
-                        onClick = if (isPlaying) null else ({ viewModel.playPhonemeSound() }),
-                        enabled = !isPlaying,
+                        onClick = { if (!isPlaying) viewModel.playPhonemeSound() },
                         faceColor = com.playit.app.presentation.theme.PrimaryJoy,
                         shadowColor = com.playit.app.presentation.theme.PrimaryJoyDark,
                         shape = CircleShape,
                         strokeWidth = 2.5.dp,
                         strokeColor = com.playit.app.presentation.theme.ModernBorder,
                         depthHeight = 6.dp,
-                        modifier = Modifier.size(AUDIO_CTA_SIZE)
+                        modifier = Modifier.size(d.primaryCta).testTag("hearit_play")
+                            .idleWiggle(idleNudge, enabled = !nextHighlighted && !isPlaying)
                     ) {
                         Icon(
                             imageVector = if (isPlaying) Icons.AutoMirrored.Rounded.VolumeUp else Icons.Rounded.PlayArrow,
                             contentDescription = if (isPlaying) "Playing" else "Play Sound",
                             tint = androidx.compose.ui.graphics.Color.White,
-                            modifier = Modifier.size(44.dp)
+                            modifier = Modifier.size(d.primaryCta * 0.5f)
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 // Gummy Radial Gradient Replay Dots
                 Row(
+                    modifier = Modifier.testTag("hearit_steps"),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -261,36 +288,6 @@ fun HearItScreen(
                         )
                     }
                 }
-
-                Spacer(modifier = Modifier.height(12.dp))
-            }
-
-            // Pinned Clean Bottom Action Bar (Non-overlapping, 64dp floor)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .navigationBarsPadding()
-                    .padding(horizontal = 24.dp, vertical = 12.dp)
-            ) {
-                GummyButton(
-                    text = "Next: Say It",
-                    onClick = {
-                        if (isUnlocked) {
-                            onNext(phoneme?.id?.toString() ?: "1")
-                        }
-                    },
-                    enabled = isUnlocked,
-                    backgroundColor = com.playit.app.presentation.theme.SunnyGold,
-                    shadowColor = com.playit.app.presentation.theme.SunnyGoldShadow,
-                    contentColor = com.playit.app.presentation.theme.TextMidnight,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(64.dp)
-                        .graphicsLayer {
-                            scaleX = unlockScale.value
-                            scaleY = unlockScale.value
-                        }
-                )
             }
         }
     }
