@@ -31,7 +31,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -151,11 +153,15 @@ private val PanelCorner = 32.dp
  * glances about, twitches an ear and tilts her head at odd moments. A tap gets a giggle, an ear wiggle, a
  * wink or a hop, in turn. With reduced motion she stays still and a tap is an instant wink. Only the draw
  * phase reads the animated values, so her life redraws the drawing without recomposing the screen.
+ *
+ * Sound: [onSound] plays each of the opening's sounds as its beat comes (OPENING_CUES); with reduced motion,
+ * one soft chime.
  */
 @Composable
 fun SplashScreen(
     onStartClick: () -> Unit = {},
-    lily: LilyLook = LilyLook.CLASSIC
+    lily: LilyLook = LilyLook.CLASSIC,
+    onSound: (OpeningCue) -> Unit = {}
 ) {
     val reducedMotion = LocalReducedMotion.current
     val motion = splashMotion(reducedMotion)
@@ -182,9 +188,14 @@ fun SplashScreen(
     // The opening (SplashOpening.kt): one clock, in ms, started once the screen draws smoothly. Every part reads it
     // only while drawing, so the opening redraws layers but never recomposes the screen.
     val opening = remember { Animatable(if (reducedMotion) OPENING_END_MS.toFloat() else 0f) }
+    val playSound by rememberUpdatedState(onSound)
     LaunchedEffect(Unit) {
-        if (reducedMotion) return@LaunchedEffect
+        if (reducedMotion) {
+            playSound(STILL_OPENING_CUE)
+            return@LaunchedEffect
+        }
         awaitSmoothFrames()
+        OPENING_CUES.forEach { cue -> launch { delay(cue.atMs.toLong()); playSound(cue) } }
         launch { delay(LILY_BLINK_MS); eyes.blinkOnce() }   // as she peeks
         launch { delay(LILY_WINK_MS); eyes.winkOnce() }     // the last beat: hello
         opening.animateTo(OPENING_END_MS.toFloat(), tween(OPENING_END_MS, easing = LinearEasing))

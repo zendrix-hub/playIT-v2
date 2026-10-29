@@ -1,6 +1,7 @@
 package com.playit.app.presentation.splash
 
 import androidx.compose.runtime.withFrameNanos
+import com.playit.app.data.audio.SfxEvent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.RoundRect
@@ -106,6 +107,30 @@ internal val OPENING_END_MS: Int = maxOf(
     TITLE_WAVE_MS + (TITLE.length - 1) * WAVE_STAGGER_MS + WAVE_LEN_MS,
     LILY_WINK_MS.toInt() + WINK_LEN_MS + 50
 )
+
+// ---- Sounds -----------------------------------------------------------------------------------------------------
+
+/**
+ * A sound of the opening (user, 2026-10-29: "add a sound on the opening of the app too"): which of the app's sounds,
+ * when, how loud (0..1) and at what pitch (SoundPool's rate: 2 is an octave up). Only the app's released, cheerful
+ * sounds, kept quiet like the rest (card 31b: well under Lily's voice); never the wrong-answer pop, buzz or whoosh.
+ */
+data class OpeningCue(val atMs: Int, val sfx: SfxEvent, val volume: Float, val rate: Float = 1f)
+
+/** The letters' notes going up a G major pentatonic, so any of them sound well together: G A B D E G. */
+internal val LETTER_RATES = listOf(0.7492f, 0.8409f, 0.9439f, 1.1225f, 1.2599f, 1.4983f)
+
+internal val OPENING_CUES: List<OpeningCue> = buildList {
+    add(OpeningCue(LILY_PEEK_MS, SfxEvent.NODE_UNLOCK_CHIME, volume = 0.4f))                // Lily appears
+    TITLE.indices.forEach { i ->                                                             // each letter lands
+        add(OpeningCue(TITLE_MS + i * TITLE_STAGGER_MS + LETTER_MS / 2, SfxEvent.CORRECT_CHIME, volume = 0.3f, rate = LETTER_RATES[i]))
+    }
+    add(OpeningCue(START_POP_MS, SfxEvent.NODE_UNLOCK_CHIME, volume = 0.45f, rate = 1.1225f)) // Start pops in
+    add(OpeningCue(SPARKLE_MS, SfxEvent.HEART_RECOVERY_SPARKLE, volume = 0.22f))             // the title twinkles
+}
+
+/** With reduced motion there is no opening: one soft chime as the screen appears. */
+internal val STILL_OPENING_CUE = OpeningCue(0, SfxEvent.NODE_UNLOCK_CHIME, volume = 0.4f)
 
 // ---- Curves -----------------------------------------------------------------------------------------------------
 

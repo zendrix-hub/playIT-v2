@@ -1,8 +1,10 @@
 package com.playit.app.presentation.splash
 
 import androidx.compose.runtime.MonotonicFrameClock
+import com.playit.app.data.audio.SfxEvent
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -73,6 +75,31 @@ class SplashOpeningTest {
         assertEquals(1f, settle(1f), 0f)
         val peak = (0..100).maxOf { settle(it / 100f) }
         assertTrue("$peak", peak in 1.10f..1.16f)
+    }
+
+    @Test fun sounds_followTheBeatsInOrderWithinTheOpening() {
+        val times = OPENING_CUES.map { it.atMs }
+        assertEquals(times.sorted(), times)
+        assertTrue(times.all { it in 0 until OPENING_END_MS })
+        assertEquals("Lily's chime as she appears", LILY_PEEK_MS, times.first())
+        assertTrue(OPENING_CUES.any { it.atMs == START_POP_MS } && OPENING_CUES.any { it.atMs == SPARKLE_MS })
+    }
+
+    @Test fun sounds_aNoteForEachLetterAsItLands_goingUp() {
+        val notes = OPENING_CUES.filter { it.sfx == SfxEvent.CORRECT_CHIME }
+        assertEquals(TITLE.length, notes.size)
+        notes.forEachIndexed { i, n -> assertEquals(TITLE_MS + i * TITLE_STAGGER_MS + LETTER_MS / 2, n.atMs) }
+        notes.zipWithNext().forEach { (a, b) -> assertTrue(b.rate > a.rate) }
+    }
+
+    @Test fun sounds_areCheerfulQuietAndPlayable() {
+        val gloomy = setOf(SfxEvent.INCORRECT_POP, SfxEvent.BLENDIT_BUZZ, SfxEvent.HEART_LOSS_WHOOSH)
+        (OPENING_CUES + STILL_OPENING_CUE).forEach { cue ->
+            assertFalse("${cue.sfx} means a wrong answer", cue.sfx in gloomy)
+            assertTrue("well under Lily's voice", cue.volume in 0.1f..0.5f)
+            assertTrue("SoundPool plays rates 0.5 to 2", cue.rate in 0.5f..2f)
+        }
+        assertEquals("with reduced motion, one chime at once", 0, STILL_OPENING_CUE.atMs)
     }
 
     /** A frame clock that hands out the given frame times, in ms, and counts the frames used. */

@@ -112,6 +112,19 @@ class AudioPlayer @Inject constructor(
         playSfxInternal(path, onComplete)
     }
 
+    /**
+     * Plays an SFX event via SoundPool at [volume] 0..1 and [rate] 0.5..2 (its pitch: 2 is an octave up), as the
+     * opening's notes do. Skipped if the sound is not loaded yet.
+     */
+    @Synchronized
+    fun playSfx(event: SfxEvent, volume: Float, rate: Float) {
+        val path = audioResolver.getSfxPath(event)
+        val soundId = sfxSoundIdCache[path] ?: loadSoundIntoPool(path)
+        if (soundId != null && soundId > 0) {
+            soundPool.play(soundId, volume.coerceIn(0f, 1f), volume.coerceIn(0f, 1f), 1, 0, rate.coerceIn(0.5f, 2f))
+        }
+    }
+
     private fun playSfxInternal(assetPath: String, onComplete: (() -> Unit)? = null) {
         val soundId = sfxSoundIdCache[assetPath] ?: loadSoundIntoPool(assetPath)
         if (soundId != null && soundId > 0) {

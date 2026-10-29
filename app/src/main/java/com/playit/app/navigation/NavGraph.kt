@@ -37,6 +37,7 @@ import com.playit.app.presentation.profile.ProfileViewModel
 import com.playit.app.presentation.sayit.SayItScreen
 import com.playit.app.presentation.sayit.SayItViewModel
 import com.playit.app.presentation.splash.SplashScreen
+import com.playit.app.presentation.splash.SplashViewModel
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 
@@ -59,12 +60,14 @@ fun NavGraph(
         popExitTransition = { exit }
     ) {
         composable(Routes.SPLASH) {
+            val viewModel: SplashViewModel = hiltViewModel()
             SplashScreen(
                 onStartClick = {
                     navController.navigate(Routes.PROFILE_SELECT) {
                         popUpTo(Routes.SPLASH) { inclusive = true }
                     }
-                }
+                },
+                onSound = viewModel::play
             )
         }
 
