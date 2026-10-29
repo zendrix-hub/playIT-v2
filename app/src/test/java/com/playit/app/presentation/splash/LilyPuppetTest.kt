@@ -20,7 +20,7 @@ class LilyPuppetTest {
             assertTrue("$look: the head sits on the body", s.headY + s.headRy > s.bodyY - s.bodyR)
         }
         val redesign = shapeOf(LilyLook.REDESIGN)
-        assertTrue(redesign.brows && redesign.scarf && redesign.irisR > 0f)
+        assertTrue("the redesign has a face plate, brows and irises", redesign.facePlate && redesign.brows && redesign.irisR > 0f)
         assertTrue("the redesign's head is bigger", redesign.headRx > shapeOf(LilyLook.CLASSIC).headRx)
     }
 
