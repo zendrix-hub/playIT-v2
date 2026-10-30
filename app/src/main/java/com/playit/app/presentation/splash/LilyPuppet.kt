@@ -93,6 +93,8 @@ internal fun faceBottom(shape: LilyShape): Float = FIGURE_TOP + (shape.mouthY + 
  */
 internal const val SHADE_SHIFT = 0.045f
 private val Shine = Color.White.copy(alpha = 0.5f)
+/** The front lobe of her tail's tuft: only a little lighter than her orange, as in the pictures. */
+private val TuftLight = Color.White.copy(alpha = 0.25f)
 
 // ---- What she looks at, and how her ears and tail answer the opening ---------------------------------------------
 
@@ -299,13 +301,25 @@ private fun DrawScope.drawTail(s: LilyShape, q: LilyPose, f: Float, line: Float,
     tube(path, w, LilyOrange, line)
     // The light stripe down its length, a little to the left of its middle.
     translate(left = -w * 0.14f) { drawPath(path, Shine, style = Stroke(w * 0.26f, cap = StrokeCap.Round)) }
-    // Her pictures end the tail in a knot of three round bumps, the front ones outlined over the one behind; it leans
+    // Her pictures end the tail in a tuft of three round bumps, one behind on top and two in front: one outline round
+    // them all, her shade on the one behind, and only fine lines inside where the front ones overlap, the left one a
+    // little lighter (user, 2026-10-30: each bump outlined on its own looked "like just a bunch of circles"). It leans
     // away from her head, so it stays clear of it as the tail sways.
-    listOf(Offset(0.1f, -0.45f) to 0.9f, Offset(0.8f, 0f) to 0.75f, Offset(0.25f, 0.5f) to 0.75f).forEach { (o, r) ->
-        val c = tip + o * w
-        drawCircle(LilyOutline, r * w + line, c)
-        drawCircle(LilyOrange, r * w, c)
-    }
+    val back = tip + Offset(0.45f, -0.75f) * w
+    val right = tip + Offset(0.95f, 0.05f) * w
+    val left = tip + Offset(-0.15f, 0.05f) * w
+    val rb = 0.95f * w
+    val rf = 0.7f * w
+    listOf(back to rb, right to rf, left to rf).forEach { (o, r) -> drawCircle(LilyOutline, r + line, o) }
+    shadedOval(Rect(back, rb))
+    // Each fine line runs between the points where its bump's edge meets the outline (169 to 307 degrees on the right
+    // one, 242 to 398 on the left one), and the left bump covers the right one's.
+    val fine = Stroke(line * 0.6f, cap = StrokeCap.Round)
+    drawCircle(LilyOrange, rf, right)
+    drawArc(LilyOutline, 169f, 138f, false, right - Offset(rf, rf), Size(2f * rf, 2f * rf), style = fine)
+    drawCircle(LilyOrange, rf, left)
+    drawCircle(TuftLight, rf, left)
+    drawArc(LilyOutline, 242f, 156f, false, left - Offset(rf, rf), Size(2f * rf, 2f * rf), style = fine)
 }
 
 private fun DrawScope.drawBody(
