@@ -11,17 +11,20 @@ class LilyPuppetTest {
 
     private val end = OPENING_END_MS.toFloat()
 
-    @Test fun bothLooks_keepHerFaceClearOfStartAndHerHeadOnScreen() {
-        LilyLook.values().forEach { look ->
-            val s = shapeOf(look)
-            assertTrue("$look: face ends at ${faceBottom(s)}", faceBottom(s) < LILY_FACE_BOTTOM)
-            // Her drawing is 0.92 of its height wide: her head must fit in it.
-            assertTrue("$look", s.headRx * FIGURE_SCALE <= 0.46f)
-            assertTrue("$look: the head sits on the body", s.headY + s.headRy > s.bodyY - s.bodyR)
-        }
-        val redesign = shapeOf(LilyLook.REDESIGN)
-        assertTrue("the redesign has a face plate, brows and irises", redesign.facePlate && redesign.brows && redesign.irisR > 0f)
-        assertTrue("the redesign's head is bigger", redesign.headRx > shapeOf(LilyLook.CLASSIC).headRx)
+    @Test fun herShape_keepsHerFaceClearOfStartAndHerHeadOnScreen() {
+        val s = LILY_SHAPE
+        assertTrue("face ends at ${faceBottom(s)}", faceBottom(s) < LILY_FACE_BOTTOM)
+        // Her drawing is 0.92 of its height wide: her head must fit in it.
+        assertTrue(s.headRx * FIGURE_SCALE <= 0.46f)
+        assertTrue("the head sits on the body", s.headY + s.headRy > s.bodyY - s.bodyR)
+    }
+
+    @Test fun herEyes_areHerPictures_bigPupilsThatStillMove() {
+        // lily_idle.png: the pupil fills about 0.7 of the cream patch, and leaves room to look about.
+        val s = LILY_SHAPE
+        assertTrue(s.pupilR / s.eyeR in 0.66f..0.74f)
+        assertTrue("room to look about", (s.eyeR - s.pupilR) * 0.9f > 0.02f)
+        assertTrue("the shade is a thin crescent", SHADE_SHIFT in 0.03f..0.06f)
     }
 
     @Test fun herEyes_followTheOpening() {
@@ -38,12 +41,10 @@ class LilyPuppetTest {
         (0..OPENING_END_MS step 10).forEach { val g = openingGazeAt(it.toFloat()); assertTrue(abs(g.x) <= 1f && abs(g.y) <= 1f) }
     }
 
-    @Test fun herEarsAndBrows_perkUpForStartAndRestAtTheEnds() {
+    @Test fun herEars_perkUpForStartAndRestAtTheEnds() {
         assertEquals(0f, earPerkAt(0f), 0f)
         assertEquals(0f, earPerkAt(end), 0f)
         assertTrue(earPerkAt(START_POP_MS + 250f) > 10f)
-        assertEquals(0f, browRaiseAt(end), 0f)
-        assertTrue(browRaiseAt(START_POP_MS + 300f) > 0.9f)
     }
 
     @Test fun herTail_swingsBehindHerJumpAndRestsWhenSheDoes() {

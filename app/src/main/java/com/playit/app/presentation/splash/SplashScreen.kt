@@ -145,7 +145,7 @@ private val PanelOverlap = 28.dp
 private val PanelCorner = 32.dp
 
 /**
- * The first screen: Lily, drawn in parts ([lily]: as in her pictures, or the redesign; LilyPuppet.kt), rises
+ * The first screen: Lily, drawn in parts as in her pictures (LilyPuppet.kt), rises
  * from behind a white panel and rests her hands on its edge. The Start button sits in the panel, in the
  * thumb's reach, and never covers her face (card 31a).
  *
@@ -160,7 +160,6 @@ private val PanelCorner = 32.dp
 @Composable
 fun SplashScreen(
     onStartClick: () -> Unit = {},
-    lily: LilyLook = LilyLook.CLASSIC,
     onSound: (OpeningCue) -> Unit = {}
 ) {
     val reducedMotion = LocalReducedMotion.current
@@ -224,7 +223,6 @@ fun SplashScreen(
             headBob = breathing * 0.004f * sin(b - 0.8f),
             bellyBreath = breathing * sin(b),
             tailBend = breathing * 5f * sin(2f * PI.toFloat() * sway.value) + tailLagAt(ms) + 15f * hop.first / 0.06f,
-            brows = browRaiseAt(ms) + life.brows.value,
             happy = life.happy.value,
             hopLift = hop.first,
             hopSquash = hop.second
@@ -313,7 +311,6 @@ fun SplashScreen(
             }
 
             LilyPuppet(
-                look = lily,
                 eyes = eyes,
                 voice = voice,
                 ledge = PanelOverlap,
@@ -348,7 +345,6 @@ fun SplashScreen(
 
         StartPanel(
             lilyWidth = lilyWidth,
-            look = lily,
             onStartClick = onStartClick,
             clock = clock,
             modifier = Modifier.align(Alignment.BottomCenter)
@@ -385,7 +381,7 @@ private val StartCorner = 32.dp
 
 /** The white panel Lily peeks over: the Start button inside, her hands on its top edge. */
 @Composable
-private fun StartPanel(lilyWidth: Dp, look: LilyLook, onStartClick: () -> Unit, clock: () -> Float, modifier: Modifier = Modifier) {
+private fun StartPanel(lilyWidth: Dp, onStartClick: () -> Unit, clock: () -> Float, modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxWidth()) {
         Box(
             modifier = Modifier
@@ -419,7 +415,6 @@ private fun StartPanel(lilyWidth: Dp, look: LilyLook, onStartClick: () -> Unit, 
             )
         }
         LilyHands(
-            look = look,
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .offset(y = (-14).dp)

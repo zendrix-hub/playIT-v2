@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.unit.Dp
@@ -43,62 +44,36 @@ import kotlin.math.sin
 import kotlin.random.Random
 
 // Lily on the opening, as a puppet (user, 2026-10-29: "for our mascot how we make it better the design how it moves
-// how can it be natural"; the user asked for two versions to compare). She is drawn in parts (head, ears, eyes, body,
-// belly, arms, tail; the redesign has a face plate, brows, irises and a tail tuft), so each part moves on its own: her
-// eyes look at what happens, her ears twitch and perk up, her tail sways and swings behind a jump, she breathes with her
-// belly, tilts her head, blinks at odd moments and answers a tap a different way each time.
+// how can it be natural"). She is drawn in parts (head, ears, eyes, body, belly, arms, tail), so each part moves on its
+// own: her eyes look at what happens, her ears twitch and perk up, her tail sways and swings behind a jump, she breathes
+// with her belly, tilts her head, blinks at odd moments and answers a tap a different way each time.
+// Her finish is her pictures' (user, 2026-10-30: "enhance the character the design"; images/mascot/lily_idle.png):
+// a darker shade along her lower right, a shine on her head, big pupils with the pictures' catchlights, a light
+// stripe down her tail and its knot of a tip.
 
-/** Which Lily: as in her pictures, or the redesign the user asked to compare. */
-enum class LilyLook { CLASSIC, REDESIGN }
-
-/**
- * Her parts, in shares of her figure's height F (ears' top to feet), across from her middle and down from her top.
- * The flags add the redesign's parts.
- */
+/** Her parts, in shares of her figure's height F (ears' top to feet), across from her middle and down from her top. */
 internal data class LilyShape(
     val headY: Float, val headRx: Float, val headRy: Float,
-    val earX: Float, val earY: Float, val earRx: Float, val earRy: Float, val earTilt: Float,
-    val eyeX: Float, val eyeY: Float, val eyeR: Float, val pupilR: Float, val irisR: Float,
+    val earX: Float, val earY: Float, val earRx: Float, val earRy: Float,
+    val eyeX: Float, val eyeY: Float, val eyeR: Float, val pupilR: Float,
     val cheekX: Float, val cheekY: Float, val cheekW: Float, val cheekH: Float,
     val noseY: Float, val mouthY: Float, val mouthW: Float, val mouthH: Float,
     val bodyY: Float, val bodyR: Float, val bellyY: Float, val bellyRx: Float, val bellyRy: Float,
     val shoulderX: Float, val shoulderY: Float, val armW: Float,
-    val tail: List<Offset>, val tailW: Float,
-    val brows: Boolean = false, val facePlate: Boolean = false, val tailTuft: Boolean = false, val shade: Boolean = false
+    val tail: List<Offset>, val tailW: Float
 )
 
-/** As her pictures draw her (images/mascot/lily_encouraging.png): flat colour, no brows. */
-internal val CLASSIC_SHAPE = LilyShape(
+/** As her pictures draw her (images/mascot/lily_idle.png, lily_encouraging.png). */
+internal val LILY_SHAPE = LilyShape(
     headY = 0.33f, headRx = 0.287f, headRy = 0.268f,
-    earX = 0.25f, earY = 0.13f, earRx = 0.125f, earRy = 0.125f, earTilt = 0f,
-    eyeX = 0.112f, eyeY = 0.30f, eyeR = 0.098f, pupilR = 0.062f, irisR = 0f,
+    earX = 0.25f, earY = 0.13f, earRx = 0.125f, earRy = 0.125f,
+    eyeX = 0.112f, eyeY = 0.30f, eyeR = 0.098f, pupilR = 0.069f,
     cheekX = 0.205f, cheekY = 0.405f, cheekW = 0.075f, cheekH = 0.042f,
     noseY = 0.385f, mouthY = 0.425f, mouthW = 0.10f, mouthH = 0.05f,
     bodyY = 0.73f, bodyR = 0.27f, bellyY = 0.77f, bellyRx = 0.17f, bellyRy = 0.16f,
     shoulderX = 0.19f, shoulderY = 0.57f, armW = 0.055f,
     tail = listOf(Offset(0.22f, 0.86f), Offset(0.38f, 0.84f), Offset(0.42f, 0.60f), Offset(0.33f, 0.46f)), tailW = 0.03f
 )
-
-/**
- * The redesign, second round (user, 2026-10-29: the first one's face did not feel attached, and its hands did not
- * work). Drawn like the app's animal avatars: one cream face plate, heart-shaped, from round her eyes down to her chin,
- * part of her head, with her big tarsier eyes (honey irises) on it and short brows on the fur above; a soft shade down
- * her right side; a shine on her ears; nothing round her neck, so her head sits on her body; paws over the panel's
- * edge, each one shape with three fingers; and a fluffy tail tip.
- */
-internal val REDESIGN_SHAPE = LilyShape(
-    headY = 0.34f, headRx = 0.30f, headRy = 0.275f,
-    earX = 0.265f, earY = 0.13f, earRx = 0.13f, earRy = 0.13f, earTilt = 0f,
-    eyeX = 0.115f, eyeY = 0.31f, eyeR = 0.125f, pupilR = 0.05f, irisR = 0.08f,
-    cheekX = 0.17f, cheekY = 0.44f, cheekW = 0.07f, cheekH = 0.04f,
-    noseY = 0.415f, mouthY = 0.455f, mouthW = 0.11f, mouthH = 0.05f,
-    bodyY = 0.76f, bodyR = 0.25f, bellyY = 0.79f, bellyRx = 0.16f, bellyRy = 0.15f,
-    shoulderX = 0.18f, shoulderY = 0.60f, armW = 0.05f,
-    tail = listOf(Offset(0.20f, 0.88f), Offset(0.40f, 0.88f), Offset(0.43f, 0.68f), Offset(0.33f, 0.54f)), tailW = 0.026f,
-    brows = true, facePlate = true, tailTuft = true, shade = true
-)
-
-internal fun shapeOf(look: LilyLook): LilyShape = if (look == LilyLook.CLASSIC) CLASSIC_SHAPE else REDESIGN_SHAPE
 
 /** Her hands' place either side of her middle, as a share of her drawing's width: LilyHands spans 0.62 of it, hands at 0.18 and 0.82. */
 internal const val HAND_SPAN = 0.62f
@@ -111,9 +86,15 @@ internal const val FIGURE_TOP = 0.03f
 /** Where the bottom of her smile is, as a share of her drawing's height: it must stay above LILY_FACE_BOTTOM. */
 internal fun faceBottom(shape: LilyShape): Float = FIGURE_TOP + (shape.mouthY + shape.mouthH) * FIGURE_SCALE
 
-private val IrisHoney = Color(0xFF9A5A22)
+/**
+ * Her finish, from lily_idle.png: the shade is a crescent along her lower right, as wide as this share of the part
+ * (a copy of the part this far up and left covers the rest); the shine on her head and the stripe down her tail are
+ * white over her orange, which gives the pictures' pale peach (#FAB987).
+ */
+internal const val SHADE_SHIFT = 0.045f
+private val Shine = Color.White.copy(alpha = 0.5f)
 
-// ---- What she looks at, and how her ears, brows and tail answer the opening --------------------------------------
+// ---- What she looks at, and how her ears and tail answer the opening ---------------------------------------------
 
 /** Where her eyes look during the opening, -1..1 across and down, as keys in ms: held between, eased from one to the next. */
 private val GAZE_KEYS = listOf(
@@ -150,11 +131,6 @@ internal fun earPerkAt(ms: Float): Float =
     8f * bump(seg(ms, LILY_PEEK_END_MS.toFloat(), LILY_CROUCH_MS.toFloat())) +
         12f * bump(seg(ms, START_POP_MS.toFloat(), START_POP_MS + 500f))
 
-/** How high her brows go, 0..1 (the redesign): curious as she peeks, pleased as Start pops in. */
-internal fun browRaiseAt(ms: Float): Float =
-    bump(seg(ms, LILY_PEEK_END_MS.toFloat(), LILY_CROUCH_MS.toFloat())) +
-        bump(seg(ms, START_POP_MS.toFloat(), START_POP_MS + 600f))
-
 /** Her tail swings behind her as she moves, in degrees (follow-through): it answers her rise a moment late. */
 internal fun tailLagAt(ms: Float): Float {
     val v = (lilyAt(ms - 60f).shown - lilyAt(ms - 110f).shown) / 50f
@@ -174,7 +150,7 @@ internal enum class TapReaction { GIGGLE, EAR_WIGGLE, WINK, HOP }
 
 internal fun tapReaction(tap: Int): TapReaction = TapReaction.values()[tap % TapReaction.values().size]
 
-/** Her moving parts besides the opening's: where she looks, her ears, her head's tilt, a giggle, her brows, a hop. */
+/** Her moving parts besides the opening's: where she looks, her ears, her head's tilt, a giggle, a hop. */
 internal class LilyLife {
     val gazeX = Animatable(0f)
     val gazeY = Animatable(0f)
@@ -182,7 +158,6 @@ internal class LilyLife {
     val earR = Animatable(0f)
     val tilt = Animatable(0f)
     val happy = Animatable(0f)
-    val brows = Animatable(0f)
     val hop = Animatable(0f)
     private var taps = 0
 
@@ -219,13 +194,9 @@ internal class LilyLife {
                 delay(250L)
                 happy.animateTo(0f, tween(160))
             }
-            TapReaction.EAR_WIGGLE -> {
-                brows.animateTo(1f, tween(120))
-                repeat(3) {
-                    earL.animateTo(16f, tween(80)); earL.animateTo(0f, tween(80))
-                    earR.animateTo(16f, tween(80)); earR.animateTo(0f, tween(80))
-                }
-                brows.animateTo(0f, tween(200))
+            TapReaction.EAR_WIGGLE -> repeat(3) {
+                earL.animateTo(16f, tween(80)); earL.animateTo(0f, tween(80))
+                earR.animateTo(16f, tween(80)); earR.animateTo(0f, tween(80))
             }
             TapReaction.WINK -> eyes.winkOnce()
             TapReaction.HOP -> {
@@ -247,7 +218,7 @@ internal fun tapHopAt(p: Float): Pair<Float, Float> = when {
 /** Everything that moves her, read in the draw phase so a frame only redraws. */
 internal class LilyPose(
     val gaze: Offset, val earOut: Float, val earL: Float, val earR: Float, val tilt: Float,
-    val headBob: Float, val bellyBreath: Float, val tailBend: Float, val brows: Float,
+    val headBob: Float, val bellyBreath: Float, val tailBend: Float,
     val happy: Float, val hopLift: Float, val hopSquash: Float
 )
 
@@ -257,14 +228,13 @@ internal class LilyPose(
  */
 @Composable
 internal fun LilyPuppet(
-    look: LilyLook,
     eyes: LilyEyes,
     voice: VoiceMouth,
     ledge: Dp,
     pose: () -> LilyPose,
     modifier: Modifier = Modifier
 ) {
-    val s = shapeOf(look)
+    val s = LILY_SHAPE
     Spacer(
         modifier = modifier.drawWithCache {
             val h = size.height
@@ -303,6 +273,14 @@ private fun DrawScope.tube(path: Path, width: Float, color: Color, line: Float) 
     drawPath(path, color, style = Stroke(width, cap = StrokeCap.Round, join = StrokeJoin.Round))
 }
 
+/** An oval part in her orange with the pictures' shade along its lower right. */
+private fun DrawScope.shadedOval(r: Rect) {
+    drawOval(LilyOrangeShade, r.topLeft, r.size)
+    clipPath(Path().apply { addOval(r) }) {
+        drawOval(LilyOrange, r.topLeft - Offset(r.width * SHADE_SHIFT, r.height * SHADE_SHIFT), r.size)
+    }
+}
+
 private fun Offset.rotatedAbout(pivot: Offset, degrees: Float): Offset {
     val a = degrees * PI.toFloat() / 180f
     val d = this - pivot
@@ -319,17 +297,14 @@ private fun DrawScope.drawTail(s: LilyShape, q: LilyPose, f: Float, line: Float,
     val path = Path().apply { moveTo(root.x, root.y); cubicTo(c1.x, c1.y, c2.x, c2.y, tip.x, tip.y) }
     val w = s.tailW * f
     tube(path, w, LilyOrange, line)
-    if (s.tailTuft) {
-        // A fluffy tip: three soft puffs.
-        val puffs = listOf(Offset(0f, -0.9f), Offset(-0.75f, 0.1f), Offset(0.75f, 0.1f)).map { tip + it * (w * 0.9f) }
-        puffs.forEach { drawCircle(LilyOutline, w * 1.05f + line, it) }
-        puffs.forEach { drawCircle(LilyOrange, w * 1.05f, it) }
-        drawCircle(LilyEarInner, w * 0.55f, tip + Offset(0f, -w * 0.3f))
-    } else {
-        // Her pictures end the tail in a small curl.
-        drawCircle(LilyOutline, w * 0.95f + line, tip)
-        drawCircle(LilyOrange, w * 0.95f, tip)
-        drawArc(LilyOutline, 200f, 220f, false, tip - Offset(w * 0.5f, w * 0.5f), Size(w, w), style = Stroke(line * 0.8f))
+    // The light stripe down its length, a little to the left of its middle.
+    translate(left = -w * 0.14f) { drawPath(path, Shine, style = Stroke(w * 0.26f, cap = StrokeCap.Round)) }
+    // Her pictures end the tail in a knot of three round bumps, the front ones outlined over the one behind; it leans
+    // away from her head, so it stays clear of it as the tail sways.
+    listOf(Offset(0.1f, -0.45f) to 0.9f, Offset(0.8f, 0f) to 0.75f, Offset(0.25f, 0.5f) to 0.75f).forEach { (o, r) ->
+        val c = tip + o * w
+        drawCircle(LilyOutline, r * w + line, c)
+        drawCircle(LilyOrange, r * w, c)
     }
 }
 
@@ -340,10 +315,7 @@ private fun DrawScope.drawBody(
     val r = s.bodyR * f
     // She breathes with her belly: the body swells a little from below.
     withTransform({ scale(1f + 0.01f * q.bellyBreath, 1f + 0.02f * q.bellyBreath, pivot = Offset(body.x, body.y + r)) }) {
-        drawCircle(if (s.shade) LilyOrangeShade else LilyOrange, r, body)
-        if (s.shade) {
-            clipPath(Path().apply { addOval(Rect(body, r)) }) { drawCircle(LilyOrange, r, body - Offset(r * 0.07f, r * 0.03f)) }
-        }
+        shadedOval(Rect(body, r))
         drawCircle(LilyOutline, r, body, style = Stroke(line))
         drawOval(LilyCream, p(-s.bellyRx, s.bellyY - s.bellyRy), Size(s.bellyRx * 2f * f, s.bellyRy * 2f * f))
     }
@@ -366,86 +338,65 @@ private fun DrawScope.drawHead(
     for (side in listOf(-1f, 1f)) {
         val c = p(side * s.earX, s.earY)
         val base = p(side * s.earX * 0.55f, s.earY + s.earRy * 0.9f)
-        val turn = side * (s.earTilt + q.earOut + if (side < 0f) q.earL else q.earR)
+        val turn = side * (q.earOut + if (side < 0f) q.earL else q.earR)
         withTransform({ rotate(turn, pivot = base) }) {
             val outer = Rect(c.x - s.earRx * f, c.y - s.earRy * f, c.x + s.earRx * f, c.y + s.earRy * f)
-            drawOval(LilyOrange, outer.topLeft, outer.size)
+            shadedOval(outer)
             val inner = Rect(c.x - s.earRx * f * 0.62f, c.y - s.earRy * f * 0.62f, c.x + s.earRx * f * 0.62f, c.y + s.earRy * f * 0.62f)
                 .translate(Offset(-side * s.earRx * f * 0.1f, s.earRy * f * 0.1f))
             drawOval(LilyEarInner, inner.topLeft, inner.size)
-            if (s.shade) drawCircle(Color.White.copy(alpha = 0.7f), s.earRx * f * 0.13f, c + Offset(-s.earRx * f * 0.42f, -s.earRy * f * 0.42f))
             drawOval(LilyOutline, outer.topLeft, outer.size, style = Stroke(line))
         }
     }
     val head = Rect(p(-s.headRx, s.headY - s.headRy), p(s.headRx, s.headY + s.headRy))
-    val headPath = Path().apply { addOval(head) }
-    if (s.shade) {
-        drawOval(LilyOrangeShade, head.topLeft, head.size)
-        clipPath(headPath) { drawOval(LilyOrange, head.topLeft - Offset(head.width * 0.035f, head.height * 0.02f), head.size) }
-    } else {
-        drawOval(LilyOrange, head.topLeft, head.size)
+    shadedOval(head)
+    // The shine on her head, as in her pictures: a short bar up on her left, and a dot below it.
+    val rx = head.width / 2f
+    val ry = head.height / 2f
+    val bar = head.center + Offset(-0.54f * rx, -0.66f * ry)
+    rotate(-32f, pivot = bar) {
+        drawRoundRect(Shine, bar - Offset(0.13f * rx, 0.045f * rx), Size(0.26f * rx, 0.09f * rx), CornerRadius(0.045f * rx))
     }
-    if (s.facePlate) {
-        // One cream plate round both eyes and down to her chin, with a dip between the eyes: part of her head, so it
-        // never looks stuck on. No outline of its own; her head's outline closes it at the chin.
-        clipPath(headPath) {
-            for (side in listOf(-1f, 1f)) drawCircle(LilyCream, s.eyeR * f, p(side * s.eyeX, s.eyeY))
-            drawOval(LilyCream, p(-0.21f, s.cheekY - 0.18f), Size(0.42f * f, 0.40f * f))
-        }
-    }
+    drawCircle(Shine, 0.04f * rx, head.center + Offset(-0.71f * rx, -0.47f * ry))
     drawOval(LilyOutline, head.topLeft, head.size, style = Stroke(line))
 
     // Eyes: where she looks, her lids coming down as she blinks, happy arcs when she giggles.
     for (side in listOf(-1f, 1f)) {
         val c = p(side * s.eyeX, s.eyeY)
         val r = s.eyeR * f
-        val ball = max(s.irisR, s.pupilR) * f
-        val look = c + Offset(q.gaze.x, q.gaze.y) * ((r - ball) * 0.8f)
-        if (!s.facePlate) drawCircle(LilyCream, r, c)
-        if (s.irisR > 0f) {
-            drawCircle(IrisHoney, s.irisR * f, look)
-            drawCircle(LilyPupil, s.pupilR * f, look)
-        } else {
-            drawCircle(LilyPupil, s.pupilR * f, look)
-        }
-        drawCircle(Color.White, ball * 0.36f, look + Offset(ball * 0.34f, -ball * 0.36f))
-        drawCircle(Color.White, ball * 0.16f, look + Offset(-ball * 0.36f, ball * 0.32f))
+        val ball = s.pupilR * f
+        val look = c + Offset(q.gaze.x, q.gaze.y) * ((r - ball) * 0.9f)
+        drawCircle(LilyCream, r, c)
+        drawCircle(LilyPupil, ball, look)
+        // Her pictures' catchlights: a big one up on the left, a small one down on the right.
+        drawCircle(Color.White, ball * 0.32f, look + Offset(-ball * 0.3f, -ball * 0.34f))
+        drawCircle(Color.White, ball * 0.15f, look + Offset(ball * 0.38f, ball * 0.36f))
         val closed = max(eyes.closed(side), q.happy)
         if (closed > 0f) {
-            // The lid: her fur over the cream eye patch, or, on a face plate, the plate's cream over the eye itself.
-            val lr = if (s.facePlate) ball * 1.12f else r
-            val lc = if (s.facePlate) look else c
-            val lidColor = if (s.facePlate) LilyCream else LilyOrange
-            val lid = lc.y - lr + 2f * lr * closed
-            val bow = lid + lr * 0.45f * (1f - closed)
-            val edge = Path().apply { moveTo(lc.x - lr - 1f, lid); quadraticBezierTo(lc.x, bow, lc.x + lr + 1f, lid) }
+            // The lid: her fur over the cream eye patch.
+            val lid = c.y - r + 2f * r * closed
+            val bow = lid + r * 0.45f * (1f - closed)
+            val edge = Path().apply { moveTo(c.x - r - 1f, lid); quadraticBezierTo(c.x, bow, c.x + r + 1f, lid) }
             val cover = Path().apply {
-                moveTo(lc.x - lr - 1f, lc.y - lr - 1f)
-                lineTo(lc.x + lr + 1f, lc.y - lr - 1f)
-                lineTo(lc.x + lr + 1f, lid)
-                quadraticBezierTo(lc.x, bow, lc.x - lr - 1f, lid)
+                moveTo(c.x - r - 1f, c.y - r - 1f)
+                lineTo(c.x + r + 1f, c.y - r - 1f)
+                lineTo(c.x + r + 1f, lid)
+                quadraticBezierTo(c.x, bow, c.x - r - 1f, lid)
                 close()
             }
-            clipPath(Path().apply { addOval(Rect(lc, lr)) }) {
-                drawPath(cover, lidColor)
+            // A pixel wider than the eye patch, so no rim of cream shows round a closed eye.
+            clipPath(Path().apply { addOval(Rect(c, r + 1.5f)) }) {
+                drawPath(cover, LilyOrange)
                 if (closed <= 0.92f && q.happy <= 0.5f) drawPath(edge, LilyOutline, style = Stroke(line, cap = StrokeCap.Round))
             }
             if (q.happy > 0.5f) {
                 // Happy eyes: arcs up, like ^ ^.
-                drawArc(LilyPupil, 200f, 140f, false, Offset(lc.x - lr * 0.6f, lc.y - lr * 0.15f), Size(lr * 1.2f, lr * 0.9f),
+                drawArc(LilyPupil, 200f, 140f, false, Offset(c.x - r * 0.6f, c.y - r * 0.15f), Size(r * 1.2f, r * 0.9f),
                     style = Stroke(line * 1.3f, cap = StrokeCap.Round))
             } else if (closed > 0.92f) {
-                drawArc(LilyPupil, 20f, 140f, false, Offset(lc.x - lr * 0.62f, lc.y - lr * 0.45f), Size(lr * 1.24f, lr * 0.6f),
+                drawArc(LilyPupil, 20f, 140f, false, Offset(c.x - r * 0.62f, c.y - r * 0.45f), Size(r * 1.24f, r * 0.6f),
                     style = Stroke(line * 1.3f, cap = StrokeCap.Round))
             }
-        }
-        if (s.brows) {
-            val y = s.eyeY - s.eyeR - (if (s.facePlate) 0.02f else 0.03f) - 0.025f * q.brows.coerceIn(0f, 1.5f)
-            val a = p(side * s.eyeX - 0.04f, y + 0.008f)
-            val b = p(side * s.eyeX + 0.04f, y + 0.008f)
-            val m = p(side * s.eyeX + side * 0.006f, y - 0.012f)
-            drawPath(Path().apply { moveTo(a.x, a.y); quadraticBezierTo(m.x, m.y, b.x, b.y) }, LilyOutline,
-                style = Stroke(0.017f * f, cap = StrokeCap.Round))
         }
     }
 
@@ -461,7 +412,6 @@ private fun DrawScope.drawHead(
     if (open < 0.08f) {
         drawArc(LilyOutline, 20f, 140f, false, Offset(mc.x - mw / 2f, mc.y - mh / 2f), Size(mw, mh),
             style = Stroke(line * 1.2f, cap = StrokeCap.Round))
-        if (s.facePlate) drawLine(LilyOutline, p(0f, s.noseY + 0.008f), p(0f, s.mouthY + s.mouthH / 2f), strokeWidth = line, cap = StrokeCap.Round)
     } else {
         val w = mw * (1f - 0.2f * open)
         val d = mh * (0.6f + 1.8f * open)
@@ -479,12 +429,9 @@ private fun DrawScope.drawHead(
     }
 }
 
-/**
- * Her hands on the panel's edge, in front of it, fingers over it: cream mittens as in her pictures, or, redesigned,
- * long tarsier fingers with round pads.
- */
+/** Her hands on the panel's edge, in front of it, fingers over it: cream mittens, as in her pictures. */
 @Composable
-internal fun LilyHands(look: LilyLook, modifier: Modifier = Modifier) {
+internal fun LilyHands(modifier: Modifier = Modifier) {
     Spacer(
         modifier = modifier.drawWithCache {
             val w = size.width
@@ -493,33 +440,15 @@ internal fun LilyHands(look: LilyLook, modifier: Modifier = Modifier) {
             val handW = minOf(w * 0.26f, 46.dp.toPx())
             val centres = listOf(w * 0.18f, w * 0.82f)
             onDrawBehind {
-                for ((i, x) in centres.withIndex()) {
-                    val side = if (i == 0) -1f else 1f
-                    if (look == LilyLook.CLASSIC) {
-                        val top = h * 0.07f
-                        val hh = h * 0.86f
-                        val r = CornerRadius(hh / 2f)
-                        drawRoundRect(LilyCream, Offset(x - handW / 2f, top), Size(handW, hh), r)
-                        drawRoundRect(LilyOutline, Offset(x - handW / 2f, top), Size(handW, hh), r, style = Stroke(line))
-                        for (k in 1..2) {
-                            val fx = x - handW / 2f + handW * k / 3f
-                            drawLine(LilyOutline, Offset(fx, top + hh * 0.55f), Offset(fx, top + hh * 0.92f), strokeWidth = line * 0.8f, cap = StrokeCap.Round)
-                        }
-                    } else {
-                        // One paw: a palm where her arm ends and three fingers over the edge, all under one outline
-                        // (drawn outline first, then colour), a notch between the fingers and a small pad on each.
-                        val palm = Offset(x, h * 0.36f)
-                        val fingerW = handW * 0.31f
-                        val tips = (-1..1).map { k -> Offset(x + k * fingerW + side * handW * 0.03f, h * 0.76f) }
-                        for ((extra, color) in listOf(line to LilyOutline, 0f to LilyOrange)) {
-                            drawCircle(color, handW * 0.36f + extra, palm)
-                            tips.forEach { drawLine(color, Offset(it.x, palm.y), it, strokeWidth = fingerW + 2f * extra, cap = StrokeCap.Round) }
-                        }
-                        for (k in 0..1) {
-                            val gx = (tips[k].x + tips[k + 1].x) / 2f
-                            drawLine(LilyOutline, Offset(gx, h * 0.6f), Offset(gx, tips[k].y + fingerW * 0.42f), strokeWidth = line * 0.9f, cap = StrokeCap.Round)
-                        }
-                        tips.forEach { drawOval(LilyCream, Offset(it.x - fingerW * 0.26f, it.y + fingerW * 0.02f), Size(fingerW * 0.52f, fingerW * 0.34f)) }
+                for (x in centres) {
+                    val top = h * 0.07f
+                    val hh = h * 0.86f
+                    val r = CornerRadius(hh / 2f)
+                    drawRoundRect(LilyCream, Offset(x - handW / 2f, top), Size(handW, hh), r)
+                    drawRoundRect(LilyOutline, Offset(x - handW / 2f, top), Size(handW, hh), r, style = Stroke(line))
+                    for (k in 1..2) {
+                        val fx = x - handW / 2f + handW * k / 3f
+                        drawLine(LilyOutline, Offset(fx, top + hh * 0.55f), Offset(fx, top + hh * 0.92f), strokeWidth = line * 0.8f, cap = StrokeCap.Round)
                     }
                 }
             }
