@@ -12,3 +12,8 @@ object MapLayout {
         return freeHalf * 0.6f * sin(index * 0.85f)
     }
 }
+
+/** The Bohol section (1..7) on screen when the map is scrolled [scroll] of [maxScroll] px; the header takes its colours. */
+fun mapSectionAt(scroll: Int, maxScroll: Int): Int =
+    if (maxScroll <= 0) 1
+    else ((scroll.toFloat() / maxScroll).coerceIn(0f, 1f) * 6f).toInt().plus(1).coerceIn(1, 7)
