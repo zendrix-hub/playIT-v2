@@ -7,10 +7,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -25,6 +28,13 @@ import com.playit.app.presentation.components.MascotState
 import com.playit.app.presentation.components.TalkingLily
 import com.playit.app.presentation.components.drawLilyBlink
 import com.playit.app.presentation.components.drawLilyMouth
+import com.playit.app.presentation.components.lilyMove
+import com.playit.app.presentation.components.lipsync.LilyMove
+import com.playit.app.presentation.components.lipsync.LilyTap
+import com.playit.app.presentation.components.lipsync.STANDING
+import com.playit.app.presentation.components.lipsync.SWAP_MS
+import com.playit.app.presentation.components.lipsync.poseChangeAt
+import com.playit.app.presentation.components.lipsync.tapMoveAt
 import com.playit.app.presentation.components.lipsync.Mouth
 import com.playit.app.presentation.components.lipsync.TALKING_WIDE
 import com.playit.app.presentation.components.lipsync.articulationMouth
@@ -117,5 +127,43 @@ class TalkingLilyScreenshotTest {
             }
         }
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/talking_lily_letter_sounds.png")
+    }
+
+    /** One row of a filmstrip: a frame every FILM_STEP_MS, [frame] giving the picture shown and her move at that time. */
+    @Composable
+    private fun FilmRow(label: String, frame: (Float) -> Pair<MascotState, LilyMove>) {
+        Row(Modifier.height(90.dp)) {
+            Text(label, fontSize = 11.sp, modifier = Modifier.width(110.dp))
+            repeat(FILM_FRAMES) { i ->
+                val (pose, move) = frame(i * FILM_STEP_MS)
+                Box(Modifier.size(72.dp, 90.dp).background(Color(0xFFDDE6F0)), contentAlignment = Alignment.BottomCenter) {
+                    Image(rememberAssetPainter(pose.assetPath), null, Modifier.size(72.dp).lilyMove { move }, contentScale = ContentScale.Fit)
+                }
+            }
+        }
+    }
+
+    /**
+     * Lily acting out each pose as she changes to it from idle, then her answers to taps (LilyActing.kt): a frame every
+     * 40 ms, for review. Each 72 x 90 frame can be cut out in turn to play the row as a moving picture.
+     */
+    @Config(sdk = [34], qualifiers = "w2600dp-h1000dp-mdpi")
+    @Test fun acting_filmstrips() {
+        compose.setContent {
+            Column(Modifier.background(Color.White)) {
+                MascotState.values().forEach { pose ->
+                    FilmRow(pose.name) { t -> (if (t < SWAP_MS) MascotState.IDLE else pose) to poseChangeAt(pose, t, STANDING) }
+                }
+                LilyTap.values().forEach { tap ->
+                    FilmRow("tap ${tap.name}") { t -> MascotState.IDLE to tapMoveAt(tap, t) }
+                }
+            }
+        }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/talking_lily_acting.png")
+    }
+
+    private companion object {
+        const val FILM_FRAMES = 34
+        const val FILM_STEP_MS = 40f
     }
 }

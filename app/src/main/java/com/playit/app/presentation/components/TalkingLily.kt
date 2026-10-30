@@ -3,6 +3,7 @@ package com.playit.app.presentation.components
 import android.content.Context
 import android.os.SystemClock
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -13,11 +14,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.runtime.withFrameMillis
@@ -25,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.TransformOrigin
@@ -39,16 +43,25 @@ import androidx.compose.ui.unit.dp
 import com.playit.app.data.audio.VoiceClip
 import com.playit.app.domain.model.articulationFor
 import com.playit.app.presentation.components.lipsync.BLINK_MS
-import com.playit.app.presentation.components.lipsync.HOP_MS
+import com.playit.app.presentation.components.lipsync.LILY_FEET_Y
+import com.playit.app.presentation.components.lipsync.LilyMove
+import com.playit.app.presentation.components.lipsync.LilyTap
 import com.playit.app.presentation.components.lipsync.Mouth
 import com.playit.app.presentation.components.lipsync.PoseEyes
 import com.playit.app.presentation.components.lipsync.PoseMouth
+import com.playit.app.presentation.components.lipsync.STANDING
+import com.playit.app.presentation.components.lipsync.SWAP_MS
 import com.playit.app.presentation.components.lipsync.TALKING_WIDE
 import com.playit.app.presentation.components.lipsync.VoiceEnvelopes
 import com.playit.app.presentation.components.lipsync.articulationMouth
 import com.playit.app.presentation.components.lipsync.blinkClosed
-import com.playit.app.presentation.components.lipsync.hopAt
+import com.playit.app.presentation.components.lipsync.lilyTap
 import com.playit.app.presentation.components.lipsync.phonemeLetter
+import com.playit.app.presentation.components.lipsync.poseChangeAt
+import com.playit.app.presentation.components.lipsync.poseChangeMs
+import com.playit.app.presentation.components.lipsync.talkMove
+import com.playit.app.presentation.components.lipsync.tapMoveAt
+import com.playit.app.presentation.components.lipsync.tapMs
 import com.playit.app.presentation.components.lipsync.poseEyes
 import com.playit.app.presentation.components.lipsync.poseMouth
 import com.playit.app.presentation.theme.LilyMouthInside
@@ -59,6 +72,7 @@ import com.playit.app.presentation.theme.LilyTongue
 import com.playit.app.presentation.theme.LocalReducedMotion
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 /** The speech clip playing now (AudioPlayer.voice, provided by MainActivity); previews and tests see none. */
 val LocalVoicePlayback = staticCompositionLocalOf<StateFlow<VoiceClip?>> { MutableStateFlow(null) }
@@ -131,8 +145,10 @@ fun VoiceMouth.shapeFor(pm: PoseMouth): Mouth {
  * that letter's mouth shape (ArticulationGroup), and for other speech it opens with the loudness. When she is quiet
  * the released picture shows unchanged.
  *
- * She also blinks once as each line begins, and hops once when she starts celebrating. Both happen once per moment,
- * never on a loop, and not at all with reduced motion; her mouth still moves, because it carries the speech.
+ * She acts out each pose once as it comes (LilyActing.kt): she crouches, the new picture shows at the bottom of the
+ * crouch and she springs into its gesture. She blinks as she changes pose and as each line begins, her body goes with
+ * her voice while she speaks, and each time [taps] goes up she answers the tap, a different way each time. Nothing
+ * loops, and with reduced motion she does none of it; her mouth still moves, because it carries the speech.
  */
 @Composable
 fun TalkingLily(
@@ -140,40 +156,73 @@ fun TalkingLily(
     modifier: Modifier = Modifier,
     contentDescription: String? = "Lily the Tarsier",
     maxSize: Dp = 160.dp,
+    taps: Int = 0,
 ) {
     val voice = rememberVoiceMouth()
-    // Both pictures are decoded up front, so the switch to the talking frame never shows an empty frame
-    val still = rememberAssetPainter(pose.assetPath, maxSize)
-    val talking = rememberAssetPainter(pose.talkFramePath(), maxSize)
-    val pm = poseMouth(pose)
-    val eyes = poseEyes(pose)
     val reduced = LocalReducedMotion.current
 
+    // A change of pose: [from]'s picture shows while she crouches, [to]'s from the bottom of the crouch. [start] is
+    // where she was when it changed, so a change in the middle of a move carries on from there without a jump.
+    var from by remember { mutableStateOf(pose) }
+    var to by remember { mutableStateOf(pose) }
+    var start by remember { mutableStateOf(STANDING) }
+    val clock = remember { Animatable(0f) }   // ms since the pose changed
+    val swapped by remember { derivedStateOf { clock.value >= SWAP_MS } }
     val blink = remember { Animatable(0f) }   // ms into the blink
-    LaunchedEffect(voice.lines) {
-        if (voice.lines == 0 || reduced || eyes == null) return@LaunchedEffect
-        blink.snapTo(0f)
-        blink.animateTo(BLINK_MS.toFloat(), tween(BLINK_MS, easing = LinearEasing))
-        blink.snapTo(0f)
-    }
-    val hop = remember { Animatable(1f) }     // 0..1 through the hop; 1 is standing
+    val blinks = rememberCoroutineScope()     // not the effects' own: a blink cut off half way would leave her eyes shut
+
     LaunchedEffect(pose) {
-        if (pose != MascotState.CELEBRATING || reduced) return@LaunchedEffect
-        hop.snapTo(0f)
-        hop.animateTo(1f, tween(HOP_MS, easing = LinearEasing))
+        if (reduced) {
+            from = pose
+            to = pose
+            clock.snapTo(poseChangeMs(pose).toFloat())
+            return@LaunchedEffect
+        }
+        val changing = pose != to
+        start = poseChangeAt(to, clock.value, start)
+        if (swapped) from = to
+        to = pose
+        clock.snapTo(0f)
+        // The blink is shut as the pictures swap, so her eyes never jump from one picture's place to the other's
+        if (changing) blinks.launch { blink.blinkOnce() }
+        clock.animateTo(poseChangeMs(pose).toFloat(), tween(poseChangeMs(pose), easing = LinearEasing))
+    }
+    LaunchedEffect(voice.lines) {
+        if (voice.lines > 0 && !reduced) blinks.launch { blink.blinkOnce() }
+    }
+    val firstTaps = remember { taps }
+    val tap = remember { Animatable(0f) }     // ms into the answer to the last tap
+    LaunchedEffect(taps) {
+        if (taps == firstTaps || reduced) return@LaunchedEffect
+        tap.snapTo(0f)
+        if (lilyTap(taps) == LilyTap.GIGGLE) blinks.launch { blink.blinkOnce() }
+        tap.animateTo(tapMs(lilyTap(taps)).toFloat(), tween(tapMs(lilyTap(taps)), easing = LinearEasing))
     }
 
+    // Both poses' pictures, still and talking, are decoded while she crouches; until the new one is ready she keeps
+    // the old one, so neither the swap nor the switch to the talking frame shows an empty frame.
+    val toStill = rememberAssetPainter(to.assetPath, maxSize)
+    val toTalking = rememberAssetPainter(to.talkFramePath(), maxSize)
+    val fromStill = if (from == to) toStill else rememberAssetPainter(from.assetPath, maxSize)
+    val fromTalking = if (from == to) toTalking else rememberAssetPainter(from.talkFramePath(), maxSize)
+    val showTo = swapped && toStill.intrinsicSize.isSpecified && toTalking.intrinsicSize.isSpecified
+    val shown = if (showTo) to else from
+    val pm = poseMouth(shown)
+    val eyes = poseEyes(shown)
+
     Box(
-        modifier.graphicsLayer {
-            val frame = hopAt(hop.value)
-            translationY = -frame.lift * size.height
-            scaleX = 1f + 0.06f * frame.squash
-            scaleY = 1f - 0.08f * frame.squash
-            transformOrigin = TransformOrigin(0.5f, 1f)
+        modifier.lilyMove {
+            if (reduced) STANDING
+            else poseChangeAt(to, clock.value, start) +
+                tapMoveAt(lilyTap(taps), tap.value) +
+                (if (voice.speaking) talkMove(voice.level) else STANDING)
         }
     ) {
         Image(
-            painter = if (voice.speaking) talking else still,
+            painter = when {
+                showTo -> if (voice.speaking) toTalking else toStill
+                else -> if (voice.speaking) fromTalking else fromStill
+            },
             contentDescription = contentDescription,
             contentScale = ContentScale.Fit,
             modifier = Modifier.fillMaxSize()
@@ -184,6 +233,28 @@ fun TalkingLily(
             if (eyes != null && closed > 0f) drawLilyBlink(eyes, closed)
         }
     }
+}
+
+/** One blink, unless one is already under way (a new line often starts as she changes pose). */
+private suspend fun Animatable<Float, AnimationVector1D>.blinkOnce() {
+    if (isRunning) return
+    snapTo(0f)
+    animateTo(BLINK_MS.toFloat(), tween(BLINK_MS, easing = LinearEasing))
+    snapTo(0f)
+}
+
+/**
+ * Moves Lily's picture by [move] (LilyActing.kt), pivoting on her feet. It is read in the draw phase, so a frame of
+ * her motion only redraws, and it draws in a layer, so the layout and the touch target never move.
+ */
+fun Modifier.lilyMove(move: () -> LilyMove): Modifier = graphicsLayer {
+    val m = move()
+    rotationZ = m.rotation
+    translationX = m.x * size.height
+    translationY = -m.lift * size.height
+    scaleX = m.scaleX
+    scaleY = m.scaleY
+    transformOrigin = TransformOrigin(0.5f, LILY_FEET_Y)
 }
 
 /**

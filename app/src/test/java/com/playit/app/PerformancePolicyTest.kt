@@ -32,6 +32,15 @@ class PerformancePolicyTest {
         assertFalse(header.contains("rememberInfiniteTransition("))   // the call, not a leftover import
     }
 
+    @Test fun lilyActsOnlyOnMoments() {
+        // Design refresh: Lily acts out each pose, answers taps and moves with her voice, but never loops while idle.
+        listOf("components/TalkingLily.kt", "components/lipsync/LilyActing.kt", "components/MascotSpeechHeader.kt").forEach {
+            val source = File(main, "java/com/playit/app/presentation/$it").readText()
+            assertFalse(it, source.contains("rememberInfiniteTransition("))
+            assertFalse(it, source.contains("infiniteRepeatable("))
+        }
+    }
+
     @Test fun mapExplorerMovesOnlyOnMoments() {
         // Design refresh: the child's avatar walks to a new stop and hops when tapped, but never loops while idle.
         val explorer = File(main, "java/com/playit/app/presentation/map/components/MapCompanionFriends.kt").readText()
