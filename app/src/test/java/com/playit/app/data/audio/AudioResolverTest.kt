@@ -131,6 +131,8 @@ class AudioResolverTest {
         assertEquals("audio/ui/sfx_level_complete_fanfare.mp3", audioResolver.getSfxPath(SfxEvent.LEVEL_COMPLETE_FANFARE))
         assertEquals("audio/ui/sfx_blendit_buzz.mp3", audioResolver.getSfxPath(SfxEvent.BLENDIT_BUZZ))
         assertEquals("audio/ui/sfx_streak_badge_unlock.mp3", audioResolver.getSfxPath(SfxEvent.STREAK_BADGE_UNLOCK))
+        assertEquals("audio/ui/sfx_opening_pluck.wav", audioResolver.getSfxPath(SfxEvent.OPENING_PLUCK))
+        assertEquals("audio/ui/sfx_opening_playit.wav", audioResolver.getSfxPath(SfxEvent.OPENING_PLAYIT))
     }
 
     @Test
@@ -192,6 +194,23 @@ class AudioResolverTest {
             val wavFile = File(assetsDir, "audio/vo/lesson/$clipId.wav")
             assertTrue("Expected released line to exist on disk: ${wavFile.path}", wavFile.exists())
             assertTrue("Expected non-empty audio file: ${wavFile.path}", wavFile.length() > 0L)
+        }
+    }
+
+    @Test
+    fun sfx_everySoundIsOnDiskAndTheOpeningsAreReleased() {
+        val assetsDir = listOf(File("src/main/assets"), File("app/src/main/assets")).firstOrNull { it.exists() }
+            ?: error("assets not found")
+        SfxEvent.values().forEach { event ->
+            val file = File(assetsDir, audioResolver.getSfxPath(event))
+            assertTrue("Expected ${file.path} on disk", file.exists() && file.length() > 0L)
+        }
+        val manifest = listOf(
+            File("docs/audio-release/2026-10-30-opening/manifest.json"),
+            File("../docs/audio-release/2026-10-30-opening/manifest.json")
+        ).firstOrNull { it.exists() }?.readText() ?: error("manifest.json not found")
+        listOf(SfxEvent.OPENING_PLUCK, SfxEvent.OPENING_PLAYIT).forEach { event ->
+            assertTrue("${event.name} is in release 2026-10-30-opening", manifest.contains("\"clipId\": \"sfx_${event.filenameSuffix}\""))
         }
     }
 

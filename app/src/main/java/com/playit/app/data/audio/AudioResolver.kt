@@ -7,7 +7,8 @@ import java.util.concurrent.atomic.AtomicInteger
 
 private const val TAG = "AudioResolver"
 
-enum class SfxEvent(val filenameSuffix: String) {
+/** A sound effect: its file is audio/ui/sfx_<filenameSuffix>.<extension>. */
+enum class SfxEvent(val filenameSuffix: String, val extension: String = "mp3") {
     CORRECT_CHIME("correct_chime"),
     INCORRECT_POP("incorrect_pop"),
     HEART_LOSS_WHOOSH("heart_loss_whoosh"),
@@ -15,7 +16,11 @@ enum class SfxEvent(val filenameSuffix: String) {
     NODE_UNLOCK_CHIME("node_unlock_chime"),
     LEVEL_COMPLETE_FANFARE("level_complete_fanfare"),
     BLENDIT_BUZZ("blendit_buzz"),
-    STREAK_BADGE_UNLOCK("streak_badge_unlock")
+    STREAK_BADGE_UNLOCK("streak_badge_unlock"),
+    /** The opening's plucked note, one per title letter (release 2026-10-30-opening). */
+    OPENING_PLUCK("opening_pluck", "wav"),
+    /** The opening's voice: a child says "Play it!" (release 2026-10-30-opening). */
+    OPENING_PLAYIT("opening_playit", "wav")
 }
 
 enum class VoContext(val filenameSuffix: String) {
@@ -120,7 +125,7 @@ class AudioResolver @Inject constructor() {
      * Resolves the asset path for an SFX event.
      */
     fun getSfxPath(event: SfxEvent): String {
-        return "audio/ui/sfx_${event.filenameSuffix}.mp3"
+        return "audio/ui/sfx_${event.filenameSuffix}.${event.extension}"
     }
 
     /**

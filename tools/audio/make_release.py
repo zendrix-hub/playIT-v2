@@ -13,6 +13,9 @@ SPEC.json:
       "sourceFile": "ui_hearit_next.wav", "text": "...", "voice": "...", "speed": 0.95,
       "license": "Apache-2.0 (Kokoro-82M)"}, ...]}
 Optional per clip: "tool" (generator and method, for clips not made by plain Kokoro), "note".
+Optional per clip: "approvedIn": {"sourceBatch": ..., "sourceFile": ...}, for a clip cut from audio the user
+approved inside a bigger review file (e.g. one note of a preview video): that file's row must approve it, and the
+manifest records both files.
 A "sourceFile" with a * (e.g. "word_am_t*.wav") picks the one take the user marked OK among the
 matching files; no OK take, or more than one, refuses the release.
 A spec field (or approvedBy) that starts with "TODO" refuses the release, so an unknown fact such as
@@ -93,12 +96,13 @@ def main(argv=None):
                 continue
             c = {**c, "sourceFile": picked}
         src = Path(args.batches) / c["sourceBatch"] / c["sourceFile"]
-        csv_name, row = review_row(args.batches, c["sourceBatch"], c["sourceFile"])
+        reviewed = c.get("approvedIn", {"sourceBatch": c["sourceBatch"], "sourceFile": c["sourceFile"]})
+        csv_name, row = review_row(args.batches, reviewed["sourceBatch"], reviewed["sourceFile"])
         if not src.exists():
             problems.append(f"{c['clipId']}: missing source {src}")
             continue
         if row is None:
-            problems.append(f"{c['clipId']}: no review row for {c['sourceFile']} in {c['sourceBatch']}")
+            problems.append(f"{c['clipId']}: no review row for {reviewed['sourceFile']} in {reviewed['sourceBatch']}")
             continue
         verdict, approved = verdict_of(row)
         if not approved:
@@ -139,7 +143,7 @@ def main(argv=None):
             "license": c["license"],
             "sha256": digest,
         }
-        for key in ("tool", "note"):
+        for key in ("approvedIn", "tool", "note"):
             if key in c:
                 entry[key] = c[key]
         manifest["clips"].append(entry)

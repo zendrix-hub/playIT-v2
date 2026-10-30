@@ -1,0 +1,19 @@
+{
+  "release": "2026-10-30-opening",
+  "approvedBy": "user: scored Boy 2 4/5 on review page 2026-10-30-opening-playit-r4 and said 'ill stick for the boy 2 only'; scored the plucked-strings tune 4/5 on 2026-10-30-opening-playit-r6; scored version B of the opening (a plucked note per letter, then Boy 2) 4/5 on 2026-10-30-opening-playit-r7 ('this one is good'); then asked for every title effect, one per launch (2026-10-30)",
+  "clips": [
+    {"clipId": "sfx_opening_playit", "dest": "ui", "sourceBatch": "2026-10-30-opening-playit-r4", "sourceFile": "playit_boy_play-it_d11_s2.wav",
+     "text": "Play it!", "voice": "OmniVoice voice design 'male, child, american accent' (Boy 2): a designed child's voice, not a clone of anyone",
+     "speed": null,
+     "license": "CC BY-NC (the OmniVoice pre-trained model, k2-fsa; its code is Apache-2.0): non-commercial use only, with credit; the app credits OmniVoice by k2-fsa in the Parent Zone",
+     "tool": "VoiceStudio 0.5.7 on this PC (localhost:3900, GTX 1650), POST /v1/audio/speech with model omnivoice, voice default, input 'Play it!', instruct 'male, child, american accent', language en, seed 2, num_step 32, duration 1.1 (2026-10-30); finished by the batch's prep.py: trimmed with 40 ms kept before the first sample over 2 % of the peak (so the p of Play stays), 8 ms fades, RMS -20 dBFS, peak at most -1 dBFS, 50 ms of silence each end. Its p is 90 ms in",
+     "note": "The opening's voice (design branch only): Boy 2 says 'Play it!' as the title's letters wave, his p on the wave's start. The user asked for children saying PlayIT (2026-10-30) and rejected the Kokoro rounds as robotic and raspy; this amends the Kokoro-only source for this clip (adviser confirmation pending). The user's note on the take: 'pretty good but a litter more tweaking i think'; no tweak was specified, so the take ships as reviewed."},
+    {"clipId": "sfx_opening_pluck", "dest": "ui", "sourceBatch": "2026-10-30-opening-playit-r7", "sourceFile": "pluck_g.wav",
+     "approvedIn": {"sourceBatch": "2026-10-30-opening-playit-r7", "sourceFile": "opening_B.mp4"},
+     "text": "(a plucked string, the note G)", "voice": "none: Kenney Music Jingles, Pizzicato jingles/jingles_PIZZI10.ogg (its last note)",
+     "speed": null,
+     "license": "CC0 1.0 (Kenney Vleugels, kenney.nl): public domain, no credit required",
+     "tool": "make_pluck.py in the batch: the G note of jingles_PIZZI10 decoded at 24 kHz mono, cut from 5 ms before its pluck (365 ms) to the end of its ring, 3 ms fade in and 20 ms fade out (as round 7's make_video.py), peak -1 dBFS. 437 ms. The app plays it through SoundPool at volume 0.132, round 7's level, and at six pitches (rates 0.749 to 1.260: D E F# G A B)",
+     "note": "One plucked note per PlayIT letter as it pops up in the opening (design branch only), going up the scale of the tune the user picked (round 6, 'four notes up'). The user approved it as heard in version B of round 7 (opening_B.mp4), which mixed this note at the same six pitches and level."}
+  ]
+}

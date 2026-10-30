@@ -56,6 +56,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
@@ -73,7 +74,6 @@ import com.playit.app.presentation.theme.Leaf
 import com.playit.app.presentation.theme.LeafShadow
 import com.playit.app.presentation.theme.LilyOutline
 import com.playit.app.presentation.theme.LocalReducedMotion
-import com.playit.app.presentation.theme.Mango
 import com.playit.app.presentation.theme.PrimaryJoy
 import com.playit.app.presentation.theme.Sand
 import com.playit.app.presentation.theme.Sky
@@ -155,12 +155,13 @@ private val PanelCorner = 32.dp
  * phase reads the animated values, so her life redraws the drawing without recomposing the screen.
  *
  * Sound: [onSound] plays each of the opening's sounds as its beat comes (OPENING_CUES); with reduced motion,
- * one soft chime.
+ * the voice once. [titleEffect] plays round the title after its wave: a different one each time the app opens.
  */
 @Composable
 fun SplashScreen(
     onStartClick: () -> Unit = {},
-    onSound: (OpeningCue) -> Unit = {}
+    onSound: (OpeningCue) -> Unit = {},
+    titleEffect: TitleEffect = TitleEffect.TWINKLE
 ) {
     val reducedMotion = LocalReducedMotion.current
     val motion = splashMotion(reducedMotion)
@@ -183,6 +184,8 @@ fun SplashScreen(
     val voice = rememberVoiceMouth()
     val scope = rememberCoroutineScope()
     val onLilyTap: () -> Unit = { scope.launch { if (reducedMotion) eyes.winkOnce() else life.react(eyes) } }
+    // For the little letters of the title's effect, measured once each in the logo's font.
+    val measurer = rememberTextMeasurer()
 
     // The opening (SplashOpening.kt): one clock, in ms, started once the screen draws smoothly. Every part reads it
     // only while drawing, so the opening redraws layers but never recomposes the screen.
@@ -262,13 +265,13 @@ fun SplashScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    // One Text per letter so each can fall in; read out as one word. The sparkles draw round it.
+                    // One Text per letter so each can pop up; read out as one word. The title's effect draws round it.
                     Row(
                         modifier = Modifier
                             .graphicsLayer()
                             .drawWithContent {
                                 drawContent()
-                                drawTitleSparkles(clock(), Mango, LilyOutline, 2.dp.toPx())
+                                drawTitleEffect(titleEffect, clock(), measurer, EffectLetterStyle, LogoColors, LilyOutline, 2.dp.toPx())
                             }
                             .clearAndSetSemantics { contentDescription = TITLE }
                     ) {
@@ -278,11 +281,12 @@ fun SplashScreen(
                                 color = LogoColors[i % LogoColors.size],
                                 modifier = Modifier.graphicsLayer {
                                     val f = letterAt(i, clock())
-                                    translationY = -f.lift * LETTER_DROP_DP.dp.toPx()
+                                    translationY = -f.lift * LETTER_LIFT_DP.dp.toPx()
                                     scaleX = f.scaleX
                                     scaleY = f.scaleY
                                     alpha = f.alpha
-                                    transformOrigin = TransformOrigin(0.5f, 1f)   // it squashes on the line it lands on
+                                    rotationZ = f.rotation
+                                    transformOrigin = TransformOrigin(0.5f, 1f)   // it grows and wobbles from the line it stands on
                                 }
                             )
                         }
@@ -358,6 +362,8 @@ fun SplashScreen(
  */
 private val LogoColors = listOf(PrimaryJoy, ApricotGlow, EmeraldLeaf, CoralBerry, SunnyGold)
 private val LogoSize = 56.sp
+/** The little letters of the title's effect: the logo's font, measured at this size and scaled as they fly. */
+private val EffectLetterStyle = TextStyle(fontFamily = SnigletFontFamily, fontWeight = FontWeight.ExtraBold, fontSize = 32.sp)
 private val LogoOutline = 4.dp
 private val LogoDepth = 4.dp
 

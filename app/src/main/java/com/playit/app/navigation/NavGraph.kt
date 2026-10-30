@@ -67,7 +67,8 @@ fun NavGraph(
                         popUpTo(Routes.SPLASH) { inclusive = true }
                     }
                 },
-                onSound = viewModel::play
+                onSound = viewModel::play,
+                titleEffect = viewModel.titleEffect
             )
         }
 
