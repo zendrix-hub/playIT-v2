@@ -1,6 +1,7 @@
 package com.playit.app.screenshot
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -17,6 +18,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.unit.dp
 import com.github.takahirom.roborazzi.captureRoboImage
 import com.playit.app.presentation.components.AssetImageConfig
@@ -61,6 +63,8 @@ import com.playit.app.domain.repository.LetterGroupRepository
 import com.playit.app.domain.repository.ProfileRepository
 import com.playit.app.presentation.map.MapScreen
 import com.playit.app.presentation.map.MapViewModel
+import com.playit.app.presentation.map.components.GroupBannerStatus
+import com.playit.app.presentation.map.components.MarungkoGroupBanner
 import kotlinx.coroutines.flow.MutableStateFlow
 import com.playit.app.presentation.lettercomplete.LetterCompleteScreen
 import com.playit.app.presentation.lettercomplete.LetterCompleteViewModel
@@ -345,6 +349,26 @@ abstract class LayoutMatrixTest(private val deviceName: String) {
         assertTrue("title bottom ${title.bottom} > face bottom ${banner.bottom - 6.dp} on $deviceName",
             title.bottom <= banner.bottom - 6.dp)
     }
+
+    /** Every unit's "Practice sounds" plate fits on one line: the row keeps room for its side lines, so no text is cut. */
+    @Test fun map_unitLettersFit() {
+        compose.setContent { PlayItTheme { Column { (1..7).forEach { MarungkoGroupBanner(it, GroupBannerStatus.LOCKED) } } } }
+        compose.waitForIdle()
+        val rowWidth = compose.onRoot().getBoundsInRoot().right - 48.dp   // 16 dp banner padding + 8 dp row padding, each side
+        for (unit in 1..7) {
+            val plate = compose.onNodeWithTag("unit_letters_$unit", useUnmergedTree = true).getUnclippedBoundsInRoot()
+            assertTrue("unit $unit's plate is ${plate.right - plate.left} in a $rowWidth row on $deviceName", plate.right - plate.left < rowWidth)
+        }
+    }
+
+    /** The second unit's plate on the real map, where the rope and the river run behind it (user, 2026-10-31). */
+    @Test fun map_unitLettersOnTheMap() {
+        compose.setContent { PlayItTheme { map() } }
+        compose.waitForIdle()
+        compose.onNodeWithTag("unit_letters_2", useUnmergedTree = true).performScrollTo()
+        capture("map_unit_letters")
+    }
+
     /** Built as LetterCompleteScreenshotTest builds it (1 star after 3 hearts lost). */
     @Composable private fun complete() {
         val vm = remember {
