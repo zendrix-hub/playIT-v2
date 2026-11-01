@@ -26,10 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
@@ -225,11 +222,9 @@ fun MapCompanionFriends(
         }
         val frame: () -> GaitFrame = { gaitAt(gait, move.value, direction) }
 
-        val charSize = 78.dp
-        // The avatar pictures are heads cut out at 62 % of their square, so the chin sits this far above its bottom;
-        // the shadow and the dust go there, under the head.
-        val chinGap = charSize * (1f - 0.62f) / 2f
-        Box(
+        ExplorerFigure(
+            animal = leader.animal,
+            frame = frame,
             modifier = Modifier
                 // Along the ground from the old stop to the new one; the lift is drawn in the picture's layer.
                 .offset {
@@ -240,103 +235,75 @@ fun MapCompanionFriends(
                         (start.y + (to.y - start.y) * along).dp.roundToPx()
                     )
                 }
-                .size(charSize)
+                .size(EXPLORER_SIZE)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
                 ) {
                     playOnTheSpot()
                     onCompanionTap?.invoke(leader.animal)
-                },
-            contentAlignment = Alignment.Center
-        ) {
-            // The shadow stays on the ground and shrinks and fades as the animal rises; a landing kicks up dust.
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .offset(y = -chinGap + 4.dp)
-                    .size(width = charSize * 0.65f, height = 8.dp)
-                    .graphicsLayer {
-                        val away = (frame().liftDp / 90f).coerceIn(0f, 0.6f)
-                        scaleX = 1f - away
-                        scaleY = 1f - away
-                        alpha = 1f - away
-                    }
-                    .background(Color(0x2E1F3A3D), CircleShape)
-            )
-            Spacer(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .offset(y = -chinGap + 6.dp)
-                    .size(width = charSize * 1.4f, height = 24.dp)
-                    .drawBehind { drawLandingDust(frame().dust) }
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer {
-                        val f = frame()
-                        // Squash and stretch about its centre (so a somersault turns in place), shifted so it stays
-                        // standing on the ground.
-                        translationY = -f.liftDp.dp.toPx() + size.height * (1f - f.scaleY) / 2f
-                        scaleX = f.scaleX
-                        scaleY = f.scaleY
-                        rotationZ = f.rotation
-                    }
-                    // The owl's wings, behind its head, so they come out from behind it and move with it.
-                    .drawBehind { frame().let { if (it.wings > 0f) drawOwlWings(it.wings, it.flap) } }
-            ) {
-                Image(
-                    painter = rememberAssetPainter(leader.animal.assetPath),
-                    contentDescription = "${leader.animal.displayName}, your explorer",
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-        }
+                }
+        )
     }
 }
 
-/** The owl's colours, from its picture, and the pictures' dark-brown line. */
-private val OwlPurple = Color(0xFF8A55A0)
-private val OwlPurpleShade = Color(0xFF704080)
+val EXPLORER_SIZE = RIG_SIZE.dp
 
 /**
- * The owl's two wings at the sides of its head, [open] 0..1 out from behind it, at [flap] in their beat (-1 raised,
- * 1 pushed down). Each is a flat rounded wing with three feather tips, in the owl's purple and the pictures' outline,
- * hinged where it meets the head.
+ * The explorer in [frame]: its head picture on the body and limbs of MapLimbs.kt, on its shadow. Its feet stand at the
+ * bottom of this square.
  */
-private fun DrawScope.drawOwlWings(open: Float, flap: Float) {
-    val w = size.width
-    val length = w * 0.40f * open
-    val depth = w * 0.24f * open
-    if (length <= 0f) return
-    val line = 2.dp.toPx()
-    // Pointing out from the hinge (0, 0) along +x: a rounded leading edge to the tip, three feather tips back.
-    val wing = Path().apply {
-        moveTo(0f, -depth * 0.45f)
-        cubicTo(length * 0.40f, -depth * 1.05f, length * 0.92f, -depth * 0.70f, length, -depth * 0.10f)
-        quadraticBezierTo(length * 0.93f, depth * 0.38f, length * 0.74f, depth * 0.22f)
-        quadraticBezierTo(length * 0.66f, depth * 0.62f, length * 0.47f, depth * 0.36f)
-        quadraticBezierTo(length * 0.36f, depth * 0.72f, length * 0.18f, depth * 0.42f)
-        quadraticBezierTo(length * 0.06f, depth * 0.50f, 0f, depth * 0.30f)
-        close()
-    }
-    val feather = Path().apply {
-        moveTo(length * 0.16f, -depth * 0.10f)
-        quadraticBezierTo(length * 0.50f, -depth * 0.30f, length * 0.82f, -depth * 0.12f)
-    }
-    // Raised to 50 degrees, pushed down to 25 degrees below level.
-    val angle = -12.5f + 37.5f * flap
-    for (side in listOf(-1f, 1f)) {
-        withTransform({
-            translate(left = w / 2f + side * w * 0.26f, top = size.height * 0.58f)
-            scale(scaleX = side, scaleY = 1f, pivot = Offset.Zero)
-            rotate(degrees = angle, pivot = Offset.Zero)
-        }) {
-            drawPath(wing, OwlPurple)
-            drawPath(feather, OwlPurpleShade, style = Stroke(line, cap = StrokeCap.Round))
-            drawPath(wing, LilyOutline, style = Stroke(line, join = StrokeJoin.Round))
+@Composable
+fun ExplorerFigure(animal: CompanionAnimal, frame: () -> GaitFrame, modifier: Modifier = Modifier) {
+    val walks = animal.gait.walks
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        // The shadow stays on the ground and shrinks and fades as the animal rises; a landing kicks up dust.
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .offset(y = 3.dp)
+                .size(width = EXPLORER_SIZE * 0.55f, height = 8.dp)
+                .graphicsLayer {
+                    val away = (frame().liftDp / 90f).coerceIn(0f, 0.6f)
+                    scaleX = 1f - away
+                    scaleY = 1f - away
+                    alpha = 1f - away
+                }
+                .background(Color(0x2E1F3A3D), CircleShape)
+        )
+        Spacer(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .offset(y = 6.dp)
+                .size(width = EXPLORER_SIZE * 1.4f, height = 24.dp)
+                .drawBehind { drawLandingDust(frame().dust) }
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer {
+                    val f = frame()
+                    // A walker rocks over its feet, which stay on the ground. A jumper squashes and stretches about its
+                    // centre (so a somersault turns in place), shifted so it stays standing on the ground.
+                    transformOrigin = if (walks) TransformOrigin(0.5f, 1f) else TransformOrigin.Center
+                    translationY = -f.liftDp.dp.toPx() + if (walks) 0f else size.height * (1f - f.scaleY) / 2f
+                    scaleX = f.scaleX
+                    scaleY = f.scaleY
+                    rotationZ = f.rotation
+                }
+                // Behind its head, so the body meets its chin and the limbs move with it.
+                .drawBehind { drawExplorerBody(animal, frame()) }
+        ) {
+            Image(
+                painter = rememberAssetPainter(animal.assetPath),
+                contentDescription = "${animal.displayName}, your explorer",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer {
+                        translationY = (frame().limbs.sink - animal.build.headRise) * size.width / RIG_SIZE
+                    }
+            )
         }
     }
 }

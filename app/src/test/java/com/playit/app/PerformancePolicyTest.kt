@@ -43,8 +43,10 @@ class PerformancePolicyTest {
 
     @Test fun mapExplorerMovesOnlyOnMoments() {
         // Design refresh: the child's avatar walks to a new stop and hops when tapped, but never loops while idle.
-        val explorer = File(main, "java/com/playit/app/presentation/map/components/MapCompanionFriends.kt").readText()
-        assertFalse(explorer.contains("rememberInfiniteTransition("))
-        assertFalse(explorer.contains("infiniteRepeatable("))
+        listOf("MapCompanionFriends.kt", "MapGaits.kt", "MapLimbs.kt").forEach {
+            val explorer = File(main, "java/com/playit/app/presentation/map/components/$it").readText()
+            assertFalse(it, explorer.contains("rememberInfiniteTransition("))
+            assertFalse(it, explorer.contains("infiniteRepeatable("))
+        }
     }
 }
