@@ -7,9 +7,11 @@ import kotlin.math.sin
 
 // How the child's animal moves on the map (user, 2026-10-29: "on the map like the animals walk fly etc. depends on
 // the animal that you choose, like when you finish the level"). Each animal goes from the stop it just finished to the
-// new one in its own way: the cat trots, the monkey leaps with a somersault, the bunny hops, the bear lumbers, the frog
-// leaps and the owl flies. A tap, or the map opening, plays the same move on the spot. Each gait is a pure function of
-// time that starts on the ground and ends at rest, and it says where the limbs are too (MapLimbs.kt), so they keep time.
+// new one in its own way, as that animal does, and none walks on two legs (user, 2026-11-01): the cat trots on four legs,
+// the bear ambles on four, the bunny hops front paws first, the frog leaps with its legs flung out behind, the monkey
+// leaps from all fours with a somersault, and the owl flies. A tap, or the map opening, plays the same move on the spot.
+// Each gait is a pure function of time that starts on the ground and ends at rest, and it says where the limbs are too
+// (MapLimbs.kt), so they keep time.
 
 /** How long the dust of a landing takes to spread and fade. */
 const val DUST_MS = 320
@@ -25,7 +27,7 @@ enum class Gait(val moveMs: Int) {
     /** The move, and the dust of its last landing settling. */
     val totalMs: Int get() = moveMs + DUST_MS
 
-    /** It goes on foot, one foot on the ground at a time, rocking over its feet. */
+    /** It goes on foot, a pair of feet on the ground at a time, moving over them. */
     val walks: Boolean get() = this == TROT || this == LUMBER
 }
 
@@ -80,7 +82,6 @@ fun gaitAt(gait: Gait, ms: Float, direction: Float = 1f): GaitFrame {
 
 private fun seg(t: Float, start: Float, end: Float): Float = ((t - start) / (end - start)).coerceIn(0f, 1f)
 private fun smooth(t: Float): Float = t * t * (3f - 2f * t)
-private fun lerp(a: Float, b: Float, t: Float): Float = a + (b - a) * t
 private fun easeInOut(t: Float): Float = if (t < 0.5f) 2f * t * t else 1f - (-2f * t + 2f).let { it * it } / 2f
 
 /** Up and back down: 0 at both ends (exactly, so a move ends at rest), 1 halfway. */
@@ -91,44 +92,67 @@ private fun wave(t: Float, cycles: Float): Float = if (t <= 0f || t >= 1f) 0f el
 
 // ---- The walkers ------------------------------------------------------------------------------------------------
 
+/** A foot at [phase] in its stride, in cycles: on the ground going back from [stride] to -[stride], then up and forward. */
+private fun strideX(phase: Float, stride: Float): Float {
+    val f = phase % 1f
+    return if (f < 0.5f) stride * (1f - 4f * f) else stride * (2f * smooth((f - 0.5f) * 2f) - 1f)
+}
+
+private fun strideUp(phase: Float, stepDp: Float): Float {
+    val f = phase % 1f
+    return if (f < 0.5f) 0f else stepDp * sin(PI.toFloat() * (f - 0.5f) * 2f)
+}
+
 /**
- * A walker's limbs at [p], over four steps. On a [swing] above 0 it tips to its right, onto its right foot, and lifts
- * its left foot [stepDp] off the ground; below 0 the other way. The foot it stands on stays on the ground as the body
- * rises by [lift], the legs bent by [sinkDp] to leave them the reach, and each arm swings against its leg.
+ * A walker's limbs at [p], over two full strides, so four beats: on each, one pair of feet stays on the ground as the
+ * body rises by [lift], and the other pair swings forward [stepDp] off it. The pairs are [diagonal] (near front with far
+ * hind, as in a trot) or on the same side (as in a bear's amble). It walks with its body [sinkDp] lower, to leave the
+ * legs the reach; [roll] tips its chest and rump against each other.
  */
-private fun walking(p: Float, swing: Float, lift: Float, stepDp: Float, armSwing: Float, sinkDp: Float, spread: Float = 0f): LimbPose {
+private fun walking(p: Float, lift: Float, stride: Float, stepDp: Float, diagonal: Boolean, sinkDp: Float, roll: Float = 0f, tail: Float = 0f): LimbPose {
     val walking = smooth(seg(p, 0f, 0.05f)) * (1f - smooth(seg(p, 0.95f, 1f)))
+    val c = 2f * p
+    val hindNear = if (diagonal) 0.5f else 0f
+    val hindFar = if (diagonal) 0f else 0.5f
     return LimbPose(
-        armL = ARM_REST - armSwing * swing,
-        armR = ARM_REST + armSwing * swing,
-        footL = stepDp * swing.coerceAtLeast(0f) - lift,
-        footR = stepDp * (-swing).coerceAtLeast(0f) - lift,
-        spread = spread * walking,
-        sink = sinkDp * walking
+        frontNearX = strideX(c, stride) * walking,
+        frontNearUp = strideUp(c, stepDp) * walking - lift,
+        frontFarX = strideX(c + 0.5f, stride) * walking,
+        frontFarUp = strideUp(c + 0.5f, stepDp) * walking - lift,
+        hindNearX = strideX(c + hindNear, stride) * walking,
+        hindNearUp = strideUp(c + hindNear, stepDp) * walking - lift,
+        hindFarX = strideX(c + hindFar, stride) * walking,
+        hindFarUp = strideUp(c + hindFar, stepDp) * walking - lift,
+        frontSink = sinkDp * walking + roll,
+        rearSink = sinkDp * walking - roll,
+        tail = tail
     )
 }
 
-/** The cat trots: walkAt's four light steps, tipping to one side and the other with each. */
+/** The cat trots, low and light on four legs: diagonal pairs together, its tail swaying. */
 private fun trot(p: Float): GaitFrame {
     val step = walkAt(p)
-    val swing = wave(p, 2f)
-    // Less of a bounce than walkAt's now it has legs: they can only stretch so far from the foot on the ground.
-    val lift = step.liftDp * 0.35f
-    return GaitFrame(step.along, lift, rotation = 6f * swing, limbs = walking(p, swing, lift, stepDp = 8f, armSwing = 22f, sinkDp = 2.5f))
+    val beat = wave(p, 2f)
+    // A little of walkAt's bounce: the feet on the ground stay there, and legs can only stretch so far.
+    val lift = step.liftDp * 0.15f
+    return GaitFrame(
+        step.along, lift, rotation = 1.5f * beat,
+        limbs = walking(p, lift, stride = 7f, stepDp = 6f, diagonal = true, sinkDp = 2f, tail = 14f * wave(p, 1f))
+    )
 }
 
-/** The bear lumbers: slow, heavy, rocking from side to side over four steps and sinking a little on each. */
+/** The bear ambles: slow and heavy on four legs, both legs of a side together, its shoulders and rump rolling. */
 private fun lumber(p: Float): GaitFrame {
     val rock = wave(p, 2f)
     val footfall = (1f - abs(rock)).let { it * it * it * it } * bump(p)
-    val lift = 3f * abs(rock)
+    val lift = abs(rock)
     return GaitFrame(
         along = smooth(p),
         liftDp = lift,
-        rotation = 9f * rock,
+        rotation = 2f * rock,
         scaleX = 1f + 0.04f * footfall,
         scaleY = 1f - 0.06f * footfall,
-        limbs = walking(p, rock, lift, stepDp = 6f, armSwing = 28f, sinkDp = 2.5f, spread = 2.5f)
+        limbs = walking(p, lift, stride = 5f, stepDp = 5f, diagonal = false, sinkDp = 1.5f, roll = rock)
     )
 }
 
@@ -146,7 +170,7 @@ private fun fly(p: Float, direction: Float): GaitFrame = when {
         val t = seg(p, 0f, OWL_TAKEOFF)
         val q = bump(t)
         // The wings open and come up for the first beat.
-        GaitFrame(0f, 0f, scaleX = 1f + 0.06f * q, scaleY = 1f - 0.10f * q, wings = smooth(t), flap = -smooth(t), limbs = LimbPose(sink = 4f * q))
+        GaitFrame(0f, 0f, scaleX = 1f + 0.06f * q, scaleY = 1f - 0.10f * q, wings = smooth(t), flap = -smooth(t), limbs = LimbPose(frontSink = 4f * q))
     }
     p < OWL_LANDS -> {
         val f = seg(p, OWL_TAKEOFF, OWL_LANDS)
@@ -163,13 +187,13 @@ private fun fly(p: Float, direction: Float): GaitFrame = when {
             // From the raised first beat into the flight's beats; held still and out in the glide down.
             flap = (1f - seg(f, 0.75f, 0.9f)) * wingBeat(f),
             // Its feet tuck up while it flies and reach down for the ground.
-            limbs = LimbPose(footL = 6f * high, footR = 6f * high)
+            limbs = LimbPose(hindNearUp = 6f * high, hindFarUp = 6f * high)
         )
     }
     else -> {
         val t = seg(p, OWL_LANDS, 1f)
         val q = bump(t)
-        GaitFrame(1f, 0f, scaleX = 1f + 0.06f * q, scaleY = 1f - 0.10f * q, wings = 1f - smooth(t), limbs = LimbPose(sink = 4f * q))
+        GaitFrame(1f, 0f, scaleX = 1f + 0.06f * q, scaleY = 1f - 0.10f * q, wings = 1f - smooth(t), limbs = LimbPose(frontSink = 4f * q))
     }
 }
 
@@ -189,9 +213,8 @@ private fun wingBeat(f: Float): Float {
  * A run of [count] jumps: each a crouch to [crouchEnd] of its time, a flight to [airEnd] at [heightDp] at its highest,
  * and a landing. [crouch], [stretch] and [land] are how much it squashes in the crouch, stretches leaving and arriving,
  * and squashes on landing. [lean] tips it back as it leaves and forward as it lands; [spin] turns it full circles.
- * Its limbs: [sinkDp] and [spreadDp] are how low its hips go and how far out its feet in the crouch and the landing,
- * [tuckDp] how far it draws its feet up in the air, and [armsCrouch], [armsAir] and [armsLand] where its arms are as it
- * crouches, at the top and as it touches down.
+ * Its body and limbs go through five poses: crouched, pushing off, in the air, reaching for the ground (its feet level
+ * with where they stand, so it touches down on them), and landed, then back to standing.
  */
 private class Jumps(
     val count: Int,
@@ -203,30 +226,50 @@ private class Jumps(
     val land: Float,
     val lean: Float = 0f,
     val spin: Float = 0f,
-    val sinkDp: Float,
-    val spreadDp: Float,
-    val tuckDp: Float,
-    val armsCrouch: Float,
-    val armsAir: Float,
-    val armsLand: Float
+    val crouched: LimbPose,
+    val pushing: LimbPose,
+    val inAir: LimbPose,
+    val reaching: LimbPose,
+    val landed: LimbPose
 )
 
-/** The bunny: three quick hops, feet together and paws up. */
+/** The same x and up for both front feet and both hind feet, as a jumper's feet go in pairs. */
+private fun pairs(
+    frontX: Float = 0f, frontUp: Float = 0f, hindX: Float = 0f, hindUp: Float = 0f,
+    frontSink: Float = 0f, rearSink: Float = 0f, frontOut: Float = 0f, rearOut: Float = 0f, tail: Float = 0f
+) = LimbPose(frontX, frontUp, frontX, frontUp, hindX, hindUp, hindX, hindUp, frontSink, rearSink, frontOut, rearOut, tail)
+
+/**
+ * The bunny: three quick hops. It bunches up, its long hind legs drive it out stretched long, it comes down on its front
+ * paws with its rump still up, and its hind feet swing in behind them.
+ */
 private val HOP = Jumps(
     count = 3, heightDp = 24f, crouchEnd = 0.15f, airEnd = 0.85f, crouch = 0.12f, stretch = 0.10f, land = 0.14f, lean = 6f,
-    sinkDp = 4.5f, spreadDp = 0f, tuckDp = 5f, armsCrouch = 6f, armsAir = 95f, armsLand = 40f
+    crouched = pairs(frontSink = 4f, rearSink = 4f, frontOut = -2f),
+    pushing = pairs(frontX = 8f, frontUp = 2f, hindX = -9f, hindUp = -3f, frontSink = -3f, rearSink = -4f, frontOut = 4f, rearOut = 3f, tail = -20f),
+    inAir = pairs(frontX = 9f, hindX = -10f, hindUp = 3f, frontSink = -1f, rearSink = -3f, frontOut = 4f, rearOut = 3f),
+    reaching = pairs(frontX = 6f, hindX = -4f, frontSink = 1f, rearSink = -3.5f, frontOut = 2f, rearOut = 1f),
+    landed = pairs(frontX = 4f, hindX = 4f, frontSink = 3f, rearSink = 1f)
 )
 
-/** The frog: two big leaps from a deep crouch, knees out, legs flung straight, landing with a splat. */
+/** The frog: two big leaps from a deep crouch, long hind legs flung straight out behind, landing in a splat. */
 private val LEAP = Jumps(
     count = 2, heightDp = 46f, crouchEnd = 0.22f, airEnd = 0.82f, crouch = 0.22f, stretch = 0.18f, land = 0.22f, lean = 10f,
-    sinkDp = 7f, spreadDp = 8f, tuckDp = 0f, armsCrouch = 30f, armsAir = 115f, armsLand = 85f
+    crouched = pairs(hindX = -2f, frontSink = 5f, rearSink = 4f, frontOut = -1f),
+    pushing = pairs(frontX = 8f, frontUp = 4f, hindX = -30f, hindUp = 6f, frontSink = -6f, rearSink = -7f, frontOut = 3f, rearOut = 6f),
+    inAir = pairs(frontX = 10f, frontUp = 2f, hindX = -42f, hindUp = 14f, frontSink = -3f, rearSink = -5f, frontOut = 3f, rearOut = 6f),
+    reaching = pairs(frontX = 9f, hindX = -10f, rearSink = -3f, frontOut = 1f, rearOut = 2f),
+    landed = pairs(frontX = 6f, hindX = -1f, frontSink = 6f, rearSink = 5f, frontOut = -1f)
 )
 
-/** The monkey: one high leap with a somersault, curled up at the top, arms up as it lands. */
+/** The monkey: one high leap off all fours with a somersault, curled up tight at the top, and down on all fours again. */
 private val FLIP = Jumps(
     count = 1, heightDp = 56f, crouchEnd = 0.22f, airEnd = 0.84f, crouch = 0.16f, stretch = 0.08f, land = 0.16f, spin = 1f,
-    sinkDp = 5.5f, spreadDp = 3f, tuckDp = 9f, armsCrouch = 8f, armsAir = 40f, armsLand = 120f
+    crouched = pairs(frontX = -3f, hindX = 3f, frontSink = 4f, rearSink = 6f),
+    pushing = pairs(frontX = 10f, frontUp = 2f, hindX = -6f, hindUp = -3f, frontSink = -4f, rearSink = -4f, frontOut = 2f, rearOut = 2f),
+    inAir = pairs(frontX = -8f, frontUp = 8f, hindX = 10f, hindUp = 10f, frontSink = -1f, rearSink = 1f, tail = 40f),
+    reaching = pairs(frontX = 6f, hindX = -4f),
+    landed = pairs(frontX = 6f, hindX = -4f, frontSink = 4f, rearSink = 5f)
 )
 
 private fun jumps(p: Float, j: Jumps, direction: Float): GaitFrame {
@@ -235,37 +278,35 @@ private fun jumps(p: Float, j: Jumps, direction: Float): GaitFrame {
     return when {
         t < j.crouchEnd -> {
             val q = easeInOut(seg(t, 0f, j.crouchEnd))
-            val arms = lerp(ARM_REST, j.armsCrouch, q)
             GaitFrame(
                 i.toFloat() / j.count, 0f, scaleX = 1f + 0.7f * j.crouch * q, scaleY = 1f - j.crouch * q,
-                limbs = LimbPose(armL = arms, armR = arms, spread = j.spreadDp * q, sink = j.sinkDp * q)
+                limbs = LimbPose.REST.towards(j.crouched, q)
             )
         }
         t < j.airEnd -> {
             // A thrown ball: steady across, a parabola up and down, most stretched where it is fastest.
             val u = seg(t, j.crouchEnd, j.airEnd)
             val fast = abs(1f - 2f * u)
-            // Its legs straighten as it pushes off; its feet are up in the middle, and back down before it lands.
-            val pushing = 1f - smooth(seg(u, 0f, 0.22f))
-            val tuck = j.tuckDp * smooth(seg(u, 0.12f, 0.4f)) * (1f - smooth(seg(u, 0.62f, 0.92f)))
-            val arms = lerp(lerp(j.armsCrouch, j.armsAir, smooth(seg(u, 0f, 0.4f))), j.armsLand, smooth(seg(u, 0.6f, 1f)))
+            val limbs = when {
+                u < 0.2f -> j.crouched.towards(j.pushing, smooth(seg(u, 0f, 0.2f)))
+                u < 0.5f -> j.pushing.towards(j.inAir, smooth(seg(u, 0.2f, 0.5f)))
+                else -> j.inAir.towards(j.reaching, smooth(seg(u, 0.5f, 1f)))
+            }
             GaitFrame(
                 along = (i + u) / j.count,
                 liftDp = j.heightDp * 4f * u * (1f - u),
                 rotation = (-direction * j.lean * wave(u, 1f) + direction * 360f * j.spin * easeInOut(u)) % 360f,
                 scaleX = 1f - 0.6f * j.stretch * fast,
                 scaleY = 1f + j.stretch * fast,
-                limbs = LimbPose(armL = arms, armR = arms, footL = tuck, footR = tuck, spread = j.spreadDp * pushing, sink = j.sinkDp * pushing)
+                limbs = limbs
             )
         }
         else -> {
             val after = seg(t, j.airEnd, 1f)
             val q = bump(after)
-            val arms = lerp(j.armsLand, ARM_REST, smooth(after))
-            GaitFrame(
-                (i + 1f) / j.count, 0f, scaleX = 1f + 0.8f * j.land * q, scaleY = 1f - j.land * q,
-                limbs = LimbPose(armL = arms, armR = arms, spread = j.spreadDp * q, sink = j.sinkDp * q)
-            )
+            val limbs = if (after < 0.5f) j.reaching.towards(j.landed, smooth(after / 0.5f))
+            else j.landed.towards(LimbPose.REST, smooth((after - 0.5f) / 0.5f))
+            GaitFrame((i + 1f) / j.count, 0f, scaleX = 1f + 0.8f * j.land * q, scaleY = 1f - j.land * q, limbs = limbs)
         }
     }
 }

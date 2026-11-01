@@ -41,12 +41,13 @@ class ExplorerFigureScreenshotTest {
 
     @Before fun syncImages() { AssetImageConfig.decodeSynchronously = true }
 
-    @Composable private fun Cell(animal: CompanionAnimal, ms: Float) {
+    @Composable private fun Cell(animal: CompanionAnimal, ms: Float, facing: Float = 1f) {
         // Room above for a jump, and to the sides for the wings.
         Box(Modifier.size(width = 120.dp, height = 170.dp), contentAlignment = Alignment.BottomCenter) {
             ExplorerFigure(
                 animal = animal,
-                frame = { gaitAt(animal.gait, ms) },
+                frame = { gaitAt(animal.gait, ms, facing) },
+                facing = facing,
                 modifier = Modifier.padding(bottom = 8.dp).size(EXPLORER_SIZE)
             )
         }
@@ -78,12 +79,14 @@ class ExplorerFigureScreenshotTest {
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/explorer_gaits.png")
     }
 
-    @Config(sdk = [34], qualifiers = "w720dp-h200dp-xhdpi")
+    @Config(sdk = [34], qualifiers = "w720dp-h340dp-xhdpi")
     @Test fun standing() {
         compose.setContent {
             PlayItTheme {
-                Row(Modifier.background(Color(0xFFB2F1C6))) {
-                    CompanionAnimal.values().forEach { animal -> Cell(animal, animal.gait.totalMs.toFloat()) }
+                Column(Modifier.background(Color(0xFFB2F1C6))) {
+                    for (facing in listOf(1f, -1f)) {
+                        Row { CompanionAnimal.values().forEach { animal -> Cell(animal, animal.gait.totalMs.toFloat(), facing) } }
+                    }
                 }
             }
         }

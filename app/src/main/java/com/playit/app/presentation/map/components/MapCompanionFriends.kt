@@ -196,7 +196,12 @@ fun MapCompanionFriends(
             ?.let { explorerOffsetDp(nodeCenters[it], maxWidth.value, density) }
         val to = leader.offsetDp
         val gait = leader.animal.gait
-        val direction = if (from != null && from.x > to.x) -1f else 1f
+        // It faces the way it travels; standing at a stop, it faces the stop.
+        val direction = when {
+            from != null -> if (from.x > to.x) -1f else 1f
+            nodeCenters[activeNodeIndex].x / density < to.x + EXPLORER_SIZE.value / 2f -> -1f
+            else -> 1f
+        }
         // The animal's move (MapGaits.kt), in ms; its end is at rest. A walk starts at the old stop in the very first
         // frame, so the explorer never flashes at the new one.
         val move = remember(from != null, arrivalFromIndex) { Animatable(if (from != null) 0f else gait.totalMs.toFloat()) }
@@ -225,13 +230,14 @@ fun MapCompanionFriends(
         ExplorerFigure(
             animal = leader.animal,
             frame = frame,
+            facing = direction,
             modifier = Modifier
                 // Along the ground from the old stop to the new one; the lift is drawn in the picture's layer.
                 .offset {
                     val along = if (from != null && travelling) frame().along else 1f
                     val start = from ?: to
                     IntOffset(
-                        (start.x + (to.x - start.x) * along).dp.roundToPx(),
+                        (start.x + (to.x - start.x) * along - direction * leader.animal.build.standBack).dp.roundToPx(),
                         (start.y + (to.y - start.y) * along).dp.roundToPx()
                     )
                 }
@@ -250,19 +256,20 @@ fun MapCompanionFriends(
 val EXPLORER_SIZE = RIG_SIZE.dp
 
 /**
- * The explorer in [frame]: its head picture on the body and limbs of MapLimbs.kt, on its shadow. Its feet stand at the
- * bottom of this square.
+ * The explorer in [frame], facing [facing] (+1 right, -1 left): its head picture on the body and limbs of MapLimbs.kt,
+ * on its shadow. Its feet stand at the bottom of this square.
  */
 @Composable
-fun ExplorerFigure(animal: CompanionAnimal, frame: () -> GaitFrame, modifier: Modifier = Modifier) {
+fun ExplorerFigure(animal: CompanionAnimal, frame: () -> GaitFrame, modifier: Modifier = Modifier, facing: Float = 1f) {
     val walks = animal.gait.walks
+    val build = animal.build
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         // The shadow stays on the ground and shrinks and fades as the animal rises; a landing kicks up dust.
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .offset(y = 3.dp)
-                .size(width = EXPLORER_SIZE * 0.55f, height = 8.dp)
+                .size(width = EXPLORER_SIZE * build.shadowWidth, height = 8.dp)
                 .graphicsLayer {
                     val away = (frame().liftDp / 90f).coerceIn(0f, 0.6f)
                     scaleX = 1f - away
@@ -283,7 +290,7 @@ fun ExplorerFigure(animal: CompanionAnimal, frame: () -> GaitFrame, modifier: Mo
                 .fillMaxSize()
                 .graphicsLayer {
                     val f = frame()
-                    // A walker rocks over its feet, which stay on the ground. A jumper squashes and stretches about its
+                    // A walker moves over its feet, which stay on the ground. A jumper squashes and stretches about its
                     // centre (so a somersault turns in place), shifted so it stays standing on the ground.
                     transformOrigin = if (walks) TransformOrigin(0.5f, 1f) else TransformOrigin.Center
                     translationY = -f.liftDp.dp.toPx() + if (walks) 0f else size.height * (1f - f.scaleY) / 2f
@@ -292,7 +299,7 @@ fun ExplorerFigure(animal: CompanionAnimal, frame: () -> GaitFrame, modifier: Mo
                     rotationZ = f.rotation
                 }
                 // Behind its head, so the body meets its chin and the limbs move with it.
-                .drawBehind { drawExplorerBody(animal, frame()) }
+                .drawBehind { drawExplorerBody(animal, frame(), facing) }
         ) {
             Image(
                 painter = rememberAssetPainter(animal.assetPath),
@@ -301,7 +308,13 @@ fun ExplorerFigure(animal: CompanionAnimal, frame: () -> GaitFrame, modifier: Mo
                 modifier = Modifier
                     .fillMaxSize()
                     .graphicsLayer {
-                        translationY = (frame().limbs.sink - animal.build.headRise) * size.width / RIG_SIZE
+                        // At the front of its body, going with its chest.
+                        val pose = frame().limbs
+                        val u = size.width / RIG_SIZE
+                        scaleX = build.headScale
+                        scaleY = build.headScale
+                        translationX = facing * (build.headX + pose.frontOut) * u
+                        translationY = build.headDrop(pose) * u
                     }
             )
         }
