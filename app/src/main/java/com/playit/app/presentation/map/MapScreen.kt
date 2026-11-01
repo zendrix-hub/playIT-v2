@@ -819,6 +819,7 @@ fun BlendItChallengeNodeCard(
     val chestShelf = if (isUnlocked) SunnyGoldDark else LockedShelf
     val trimGold = if (isUnlocked) SunnyGoldLight else LockedShelf
     val lockBadgeColor = if (isUnlocked) SunnyGold else LockedIcon
+    val chestShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp, bottomStart = 16.dp, bottomEnd = 16.dp)
 
     val accessibilityLabel = if (isUnlocked) {
         "Blend-It Treasure Chest Milestone, Unit ${node.groupId}, unlocked"
@@ -856,7 +857,7 @@ fun BlendItChallengeNodeCard(
                 enabled = true,
                 faceColor = chestFace,
                 shadowColor = chestShelf,
-                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp, bottomStart = 16.dp, bottomEnd = 16.dp),
+                shape = chestShape,
                 strokeWidth = 2.5.dp,
                 strokeColor = ModernBorder,
                 depthHeight = 8.dp,
@@ -866,32 +867,34 @@ fun BlendItChallengeNodeCard(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    // Chest Lid Division & Gold Trim Band
+                    // Chest Lid Division & Gold Trim Band, cut to the box's own corners so that they can't stick out
+                    // past its outline (user, 2026-11-01).
                     Column(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier.fillMaxSize().clip(chestShape),
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
-                        // Top Lid Trim
+                        // Top Lid Trim, with the line where the lid closes
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(14.dp)
-                                .background(
-                                    trimGold,
-                                    RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-                                )
-                                .border(1.5.dp, ModernBorder, RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                        )
+                                .background(trimGold),
+                            contentAlignment = Alignment.BottomCenter
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(1.5.dp)
+                                    .background(ModernBorder)
+                            )
+                        }
                         Spacer(modifier = Modifier.weight(1f))
                         // Lower Base Rim
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(8.dp)
-                                .background(
-                                    trimGold,
-                                    RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
-                                )
+                                .background(trimGold)
                         )
                     }
 
