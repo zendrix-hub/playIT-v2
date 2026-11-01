@@ -41,6 +41,15 @@ class PerformancePolicyTest {
         }
     }
 
+    @Test fun mouthCueMovesOnlyOnMoments() {
+        // It opens as it arrives and moves with the voice while the model plays, and never loops while idle.
+        listOf("ArticulationCue.kt", "lipsync/MouthMotion.kt").forEach {
+            val cue = File(main, "java/com/playit/app/presentation/components/$it").readText()
+            assertFalse(it, cue.contains("rememberInfiniteTransition("))
+            assertFalse(it, cue.contains("infiniteRepeatable("))
+        }
+    }
+
     @Test fun mapExplorerMovesOnlyOnMoments() {
         // Design refresh: the child's avatar walks to a new stop and hops when tapped, but never loops while idle.
         listOf("MapCompanionFriends.kt", "MapGaits.kt", "MapLimbs.kt").forEach {

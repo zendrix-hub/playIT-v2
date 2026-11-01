@@ -57,6 +57,7 @@ import com.playit.app.presentation.components.lipsync.articulationMouth
 import com.playit.app.presentation.components.lipsync.blinkClosed
 import com.playit.app.presentation.components.lipsync.lilyTap
 import com.playit.app.presentation.components.lipsync.phonemeLetter
+import com.playit.app.presentation.components.lipsync.isLetterModel
 import com.playit.app.presentation.components.lipsync.poseChangeAt
 import com.playit.app.presentation.components.lipsync.poseChangeMs
 import com.playit.app.presentation.components.lipsync.talkMove
@@ -106,6 +107,9 @@ class VoiceMouth {
         internal set
     var letter by mutableStateOf<String?>(null)
         internal set
+    /** The clip is the sound or key word being taught, the one the mouth-shape cue says along with. */
+    var model by mutableStateOf(false)
+        internal set
     var level by mutableFloatStateOf(0f)
         internal set
 }
@@ -120,6 +124,7 @@ fun rememberVoiceMouth(): VoiceMouth {
         val playing = clip
         mouth.speaking = playing != null
         mouth.letter = playing?.let { phonemeLetter(it.assetPath) }
+        mouth.model = playing?.let { isLetterModel(it.assetPath) } == true
         mouth.level = 0f
         if (playing == null) return@LaunchedEffect
         mouth.lines++

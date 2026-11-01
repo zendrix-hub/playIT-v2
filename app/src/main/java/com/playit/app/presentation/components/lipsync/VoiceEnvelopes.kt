@@ -36,6 +36,10 @@ class VoiceEnvelopes(val frameMs: Int, private val clips: Map<String, String>) {
     }
 }
 
+/** A clip of the sound or the key word a child is being taught, as opposed to the tutor's other lines and the chimes. */
+fun isLetterModel(assetPath: String): Boolean =
+    assetPath.startsWith("audio/phonemes/") || assetPath.startsWith("audio/keywords/")
+
 /** The letter a phoneme clip sounds ("audio/phonemes/phoneme_m.mp3" and "audio/phonemes/ph_m.wav" give "m"), or null. */
 fun phonemeLetter(assetPath: String): String? {
     if (!assetPath.startsWith("audio/phonemes/")) return null

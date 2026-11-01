@@ -1,5 +1,6 @@
 package com.playit.app.presentation.components
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,7 +49,7 @@ object AssetDecodeTracker {
  * Loads an asset PNG at about [maxSize] (in dp) on a background thread. Shows nothing until
  * it is ready, and nothing if the file is missing (a missing asset never crashes a screen).
  */
-private fun decodeAsset(context: android.content.Context, assetPath: String, reqPx: Int): Painter? =
+private fun decodeBitmap(context: android.content.Context, assetPath: String, reqPx: Int): Bitmap? =
     runCatching {
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         context.assets.open(assetPath).use { BitmapFactory.decodeStream(it, null, bounds) }
@@ -56,10 +57,32 @@ private fun decodeAsset(context: android.content.Context, assetPath: String, req
             inSampleSize = calculateInSampleSize(bounds.outWidth, bounds.outHeight, reqPx, reqPx)
         }
         context.assets.open(assetPath).use { BitmapFactory.decodeStream(it, null, opts) }
-    }.getOrNull()?.let { bmp ->
-        AssetBitmapCache.put("$assetPath@$reqPx", bmp)
-        BitmapPainter(bmp.asImageBitmap())
+    }.getOrNull()?.also { bmp -> AssetBitmapCache.put("$assetPath@$reqPx", bmp) }
+
+private fun decodeAsset(context: android.content.Context, assetPath: String, reqPx: Int): Painter? =
+    decodeBitmap(context, assetPath, reqPx)?.let { BitmapPainter(it.asImageBitmap()) }
+
+/** The same load as [rememberAssetPainter], for drawing that needs the bitmap itself; null until it is ready. */
+@Composable
+fun rememberAssetBitmap(assetPath: String, maxSize: Dp = 160.dp): Bitmap? {
+    val context = LocalContext.current
+    val reqPx = with(LocalDensity.current) { maxSize.roundToPx() }
+    val key = "$assetPath@$reqPx"
+    if (AssetImageConfig.decodeSynchronously) {
+        return remember(key) { AssetBitmapCache.get(key) ?: decodeBitmap(context, assetPath, reqPx) }
     }
+    val bitmap = remember(key) { mutableStateOf(AssetBitmapCache.get(key)) }
+    LaunchedEffect(key) {
+        if (bitmap.value != null) return@LaunchedEffect
+        AssetDecodeTracker.start()
+        try {
+            bitmap.value = withContext(Dispatchers.IO) { decodeBitmap(context, assetPath, reqPx) }
+        } finally {
+            AssetDecodeTracker.done()
+        }
+    }
+    return bitmap.value
+}
 
 @Composable
 fun rememberAssetPainter(assetPath: String, maxSize: Dp = 160.dp): Painter {
