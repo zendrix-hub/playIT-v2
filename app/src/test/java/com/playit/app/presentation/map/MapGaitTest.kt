@@ -84,12 +84,12 @@ class MapGaitTest {
         Gait.values().filter { it != Gait.FLY }.forEach { g -> assertTrue("$g has no wings", frames(g).all { it.wings == 0f }) }
     }
 
-    @Test fun walkers_rockGentlyOverTheirFourLegs() {
+    @Test fun walkers_swayFromSideToSide_theBearMost() {
         listOf(Gait.TROT, Gait.LUMBER).forEach { g ->
             val f = frames(g)
-            assertTrue("$g", f.any { it.rotation > 1f } && f.any { it.rotation < -1f })
-            assertTrue("$g", f.all { abs(it.rotation) <= 3f })
+            assertTrue("$g", f.any { it.rotation > 2f } && f.any { it.rotation < -1f })
+            assertTrue("$g", f.all { abs(it.rotation) <= 10f })
         }
-        assertTrue("the bear rocks more than the cat", frames(Gait.LUMBER).maxOf { it.rotation } > frames(Gait.TROT).maxOf { it.rotation })
+        assertTrue("the bear sways more than the cat", frames(Gait.LUMBER).maxOf { it.rotation } > frames(Gait.TROT).maxOf { it.rotation })
     }
 }

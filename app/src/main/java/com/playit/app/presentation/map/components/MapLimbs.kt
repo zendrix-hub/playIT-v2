@@ -12,56 +12,45 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.unit.dp
 import com.playit.app.presentation.theme.LilyOutline
-import kotlin.math.sqrt
 
-// The child's animal on the map has a body under its head, and moves as that animal does (user, 2026-11-01: "Dont let
-// them walk on two legs, let the cat be cat and bear be bear on how they walk"). The avatar pictures are heads looking at
-// the child, so the rest is drawn here, side on behind the head, in each animal's colours and the pictures' outline: four
-// legs and a tail, or for the owl, which perches and flies, two feet and its wings. Where the limbs are comes from
-// GaitFrame, the same frame that moves the animal, so they keep time with it.
+// The child's animal on the map is a little front-facing plush animal (user, 2026-11-01: "make it front facing ... make
+// it cute", and before that "Dont let them walk on two legs"). The avatar pictures are heads, so the rest is drawn here in
+// each animal's colours and the pictures' outline: a slim body, two front legs, and two hind legs peeking out behind them;
+// for the owl, which perches and flies, two feet and its wings. Legs are plain round stubs, with no joints to look broken.
+// Where they are comes from GaitFrame, the same frame that moves the animal, so they keep time with it.
 
-/** All lengths here are dp in the explorer's 78 dp square, with x forward, the way the animal faces, from the middle. */
+/** All lengths here are dp in the explorer's 78 dp square, with x from its middle. */
 const val RIG_SIZE = 78f
 
-/** Where the feet stand. The far pair stand a little up and back, so they read as further away. */
+/** Where the front feet stand. The hind feet stand a little up, so they read as behind. */
 const val FOOT_Y = 74.5f
-private const val FAR_BACK = 2.5f
-private const val FAR_UP = 1.5f
-private const val FOOT_H = 5.5f
+private const val HIND_UP = 1.5f
+private const val PAW_H = 6.5f
 
 /**
- * Where the limbs and body are, all in dp and 0 when standing. Each foot is [x] forward of where it stands and [up] above
- * it (below it if negative, for a leg still on the ground as the body rises); front and hind, near and far. The chest and
- * the rump sink ([frontSink], [rearSink]; negative is up, so the body can tip) and stretch apart ([frontOut], [rearOut]);
- * the head goes with the chest. [tail] turns the tail, in degrees. The owl stands facing the child: its near and far hind
- * feet are its two feet, and its chest and rump sink together.
+ * Where the legs and body are, all in dp and 0 when standing. Each foot is some way above where it stands (below it if
+ * negative, for a leg still on the ground as the body rises). Left and right are the picture's. Front and hind feet go
+ * [frontSpread] and [hindSpread] further out, the body and head sink by [sink] (negative is up), and [tail] turns the
+ * tail, in degrees. The owl uses its hind feet.
  */
 data class LimbPose(
-    val frontNearX: Float = 0f,
-    val frontNearUp: Float = 0f,
-    val frontFarX: Float = 0f,
-    val frontFarUp: Float = 0f,
-    val hindNearX: Float = 0f,
-    val hindNearUp: Float = 0f,
-    val hindFarX: Float = 0f,
-    val hindFarUp: Float = 0f,
-    val frontSink: Float = 0f,
-    val rearSink: Float = 0f,
-    val frontOut: Float = 0f,
-    val rearOut: Float = 0f,
+    val frontLeftUp: Float = 0f,
+    val frontRightUp: Float = 0f,
+    val hindLeftUp: Float = 0f,
+    val hindRightUp: Float = 0f,
+    val frontSpread: Float = 0f,
+    val hindSpread: Float = 0f,
+    val sink: Float = 0f,
     val tail: Float = 0f
 ) {
     /** This pose, part way ([t] 0..1) to [o]. */
     fun towards(o: LimbPose, t: Float): LimbPose {
         fun at(a: Float, b: Float) = a + (b - a) * t
         return LimbPose(
-            at(frontNearX, o.frontNearX), at(frontNearUp, o.frontNearUp),
-            at(frontFarX, o.frontFarX), at(frontFarUp, o.frontFarUp),
-            at(hindNearX, o.hindNearX), at(hindNearUp, o.hindNearUp),
-            at(hindFarX, o.hindFarX), at(hindFarUp, o.hindFarUp),
-            at(frontSink, o.frontSink), at(rearSink, o.rearSink),
-            at(frontOut, o.frontOut), at(rearOut, o.rearOut),
-            at(tail, o.tail)
+            at(frontLeftUp, o.frontLeftUp), at(frontRightUp, o.frontRightUp),
+            at(hindLeftUp, o.hindLeftUp), at(hindRightUp, o.hindRightUp),
+            at(frontSpread, o.frontSpread), at(hindSpread, o.hindSpread),
+            at(sink, o.sink), at(tail, o.tail)
         )
     }
 
@@ -70,47 +59,24 @@ data class LimbPose(
     }
 }
 
-/** An oval, by its centre and its width and height. */
-data class Oval(val x: Float, val y: Float, val w: Float, val h: Float)
+/** A pair of legs, mirrored: a hip's place, its foot's distance from the middle, and the width of the leg and its paw. */
+data class Leg(val hipX: Float, val hipY: Float, val footX: Float, val width: Float, val pawWidth: Float)
 
-/**
- * A pair of legs: the hip's place, the foot's place on the ground, the two bones' lengths, the width of the leg and of the
- * foot, and which way the joint bends (forward like a front leg or a frog's knee, back like a cat's hock).
- */
-data class Leg(
-    val hipX: Float,
-    val hipY: Float,
-    val footX: Float,
-    val upper: Float,
-    val lower: Float,
-    val width: Float,
-    val footWidth: Float,
-    val bendsForward: Boolean
-)
-
-/** A tail from ([x], [y]): a curve through two controls to its tip, [width] wide, or a puff of radius [puff]. */
-data class Tail(
-    val x: Float,
-    val y: Float,
-    val c1: Offset = Offset.Zero,
-    val c2: Offset = Offset.Zero,
-    val tip: Offset = Offset.Zero,
-    val width: Float = 0f,
-    val puff: Float = 0f
-)
+/** A tail from ([root]), behind the body: a curve through two controls to its [tip], [width] wide, on the side it trails. */
+data class Tail(val root: Offset, val c1: Offset, val c2: Offset, val tip: Offset, val width: Float)
 
 /**
  * How an animal is built. [chin] is the bottom of its head in its picture (a fraction of the square, measured); the
- * picture is drawn at [headScale] with its middle [headX] forward and its chin at [chinY]. The body is two ovals, [chest]
- * and [rump]. [front] and [hind] are its legs; an animal with [front] null stands on two.
+ * picture is drawn at [headScale] with its chin at [chinY]. The body is an oval at [bodyY], [bodyW] by [bodyH]. [front] and
+ * [hind] are its legs; with [front] null it stands on two feet.
  */
 data class AnimalBuild(
     val chin: Float,
     val headScale: Float,
-    val headX: Float,
     val chinY: Float,
-    val chest: Oval,
-    val rump: Oval,
+    val bodyY: Float,
+    val bodyW: Float,
+    val bodyH: Float,
     val front: Leg?,
     val hind: Leg,
     val tail: Tail?,
@@ -121,67 +87,59 @@ data class AnimalBuild(
 )
 
 private val CatBuild = AnimalBuild(
-    chin = 0.787f, headScale = 0.80f, headX = 12f, chinY = 52f,
-    chest = Oval(8f, 54f, 26f, 20f), rump = Oval(-15f, 54f, 28f, 21f),
-    front = Leg(9f, 58f, 9f, 9f, 9f, 5.5f, 8f, bendsForward = true),
-    hind = Leg(-18f, 58f, -17f, 9f, 9f, 6f, 8.5f, bendsForward = false),
-    // A cat's tail, up and curling over at the tip.
-    tail = Tail(-27f, 50f, Offset(-38f, 42f), Offset(-38f, 26f), Offset(-30f, 22f), width = 5f),
-    shadowWidth = 0.85f,
+    chin = 0.787f, headScale = 0.86f, chinY = 54f, bodyY = 60f, bodyW = 25f, bodyH = 22f,
+    front = Leg(6f, 64f, 6f, 6.5f, 9f),
+    hind = Leg(11f, 62f, 13.5f, 6.5f, 9f),
+    tail = Tail(Offset(-9f, 62f), Offset(-22f, 64f), Offset(-29f, 52f), Offset(-24f, 42f), width = 4.5f),
+    shadowWidth = 0.6f,
     fur = Color(0xFFFA9A27), belly = Color(0xFFFDEBCD), paw = Color(0xFFFDEBCD)
 )
 
 private val MonkeyBuild = AnimalBuild(
-    chin = 0.736f, headScale = 0.82f, headX = 13f, chinY = 46f,
-    // Shoulders high and hips low, on its long arms.
-    chest = Oval(6f, 50f, 22f, 20f), rump = Oval(-14f, 58f, 24f, 20f),
-    front = Leg(9f, 52f, 13f, 11.5f, 11.5f, 5f, 8f, bendsForward = true),
-    hind = Leg(-17f, 62f, -15f, 8f, 8f, 5.5f, 9f, bendsForward = true),
-    // A long tail with a curl.
-    tail = Tail(-25f, 58f, Offset(-40f, 58f), Offset(-40f, 34f), Offset(-28f, 34f), width = 4f),
-    shadowWidth = 0.8f,
+    chin = 0.736f, headScale = 0.88f, chinY = 50f, bodyY = 58f, bodyW = 22f, bodyH = 22f,
+    // Long arms, set a little wider than its hips.
+    front = Leg(9f, 56f, 10f, 5.5f, 8.5f),
+    hind = Leg(6f, 64f, 6.5f, 6f, 9f),
+    tail = Tail(Offset(-8f, 64f), Offset(-22f, 70f), Offset(-32f, 56f), Offset(-22f, 48f), width = 3.5f),
+    shadowWidth = 0.55f,
     fur = Color(0xFF995527), belly = Color(0xFFFDE3B9), paw = Color(0xFFFDE3B9)
 )
 
 private val BunnyBuild = AnimalBuild(
-    chin = 0.809f, headScale = 0.78f, headX = 12f, chinY = 50f,
-    // Hunched: a big round rump, a small chest.
-    chest = Oval(8f, 58f, 20f, 22f), rump = Oval(-10f, 57f, 34f, 32f),
-    front = Leg(11f, 64f, 13f, 6f, 6f, 4.5f, 7f, bendsForward = true),
-    hind = Leg(-13f, 62f, -11f, 9f, 9f, 8f, 19f, bendsForward = true),
-    tail = Tail(-27f, 60f, puff = 6f),
-    shadowWidth = 0.8f,
+    // Dainty: narrow front legs, long hind feet to the sides.
+    chin = 0.809f, headScale = 0.84f, chinY = 54f, bodyY = 61f, bodyW = 22f, bodyH = 21f,
+    front = Leg(4.5f, 65f, 4.5f, 5.5f, 8f),
+    hind = Leg(9.5f, 64f, 12f, 6.5f, 12f),
+    tail = null,
+    shadowWidth = 0.55f,
     fur = Color(0xFFFCF8F1), belly = Color(0xFFFFFFFF), paw = Color(0xFFFCF8F1)
 )
 
 private val BearBuild = AnimalBuild(
-    // Big and low: a heavy body and its head carried down in front, on short thick legs.
-    chin = 0.768f, headScale = 0.82f, headX = 14f, chinY = 60f,
-    chest = Oval(8f, 50f, 34f, 32f), rump = Oval(-12f, 48f, 38f, 36f),
-    front = Leg(9f, 62f, 9f, 7f, 7f, 9f, 12f, bendsForward = true),
-    hind = Leg(-20f, 62f, -20f, 7f, 7f, 9.5f, 12f, bendsForward = false),
-    tail = Tail(-31f, 46f, puff = 3.5f),
-    shadowWidth = 0.9f,
+    // Sturdy short legs, not a big body.
+    chin = 0.768f, headScale = 0.88f, chinY = 55f, bodyY = 61f, bodyW = 27f, bodyH = 21f,
+    front = Leg(6.5f, 65f, 6.5f, 8f, 10.5f),
+    hind = Leg(12f, 64f, 14f, 8f, 10.5f),
+    tail = null,
+    shadowWidth = 0.65f,
     fur = Color(0xFFAF6A35), belly = Color(0xFFEDC99C), paw = Color(0xFFEDC99C)
 )
 
 private val FrogBuild = AnimalBuild(
-    // Squat, its head on its body, and long hind legs folded at its side.
-    chin = 0.760f, headScale = 0.86f, headX = 7f, chinY = 58f,
-    chest = Oval(4f, 58f, 26f, 24f), rump = Oval(-10f, 59f, 28f, 24f),
-    front = Leg(10f, 64f, 15f, 6f, 6f, 5f, 9f, bendsForward = true),
-    hind = Leg(-16f, 60f, -7f, 15f, 15f, 7f, 18f, bendsForward = true),
+    // Its head right on its small body, hind legs set out wide with big flat feet.
+    chin = 0.760f, headScale = 0.88f, chinY = 58f, bodyY = 62f, bodyW = 25f, bodyH = 20f,
+    front = Leg(5f, 66f, 5.5f, 5.5f, 8.5f),
+    hind = Leg(13f, 63f, 17f, 8f, 13f),
     tail = null,
-    shadowWidth = 0.9f,
+    shadowWidth = 0.7f,
     fur = Color(0xFF8BC034), belly = Color(0xFFEAE794), paw = Color(0xFF8BC034)
 )
 
 private val OwlBuild = AnimalBuild(
-    // A bird: upright, as it perches, with its wings for arms.
-    chin = 0.809f, headScale = 1f, headX = 0f, chinY = 50f,
-    chest = Oval(0f, 58f, 27f, 24f), rump = Oval(0f, 58f, 27f, 24f),
+    // A bird, on its two feet: a smaller head on a round body, its wings at its sides.
+    chin = 0.809f, headScale = 0.74f, chinY = 46f, bodyY = 55f, bodyW = 30f, bodyH = 32f,
     front = null,
-    hind = Leg(6f, 64f, 8f, 6f, 6f, 5f, 9f, bendsForward = true),
+    hind = Leg(6f, 66f, 6.5f, 4.5f, 9f),
     tail = null,
     shadowWidth = 0.55f,
     fur = Color(0xFF8E58A1), belly = Color(0xFFF9EDD6), paw = Color(0xFFF2A33A)
@@ -198,115 +156,75 @@ val CompanionAnimal.build: AnimalBuild
         CompanionAnimal.OWL -> OwlBuild
     }
 
-/** How far back from its place it stands, in dp: its head is at the front of its body, and must stay clear of the stop it faces. */
-val AnimalBuild.standBack: Float get() = if (front == null) 0f else 12f
-
-/** How far its head reaches forward of the middle of its place, in dp, as it stands there. */
-val AnimalBuild.headReach: Float get() = headX + 0.31f * RIG_SIZE * headScale - standBack
+/** How wide its head is drawn, in dp: the pictures are cut out at 62 % of their square. */
+val AnimalBuild.headWidth: Float get() = 0.62f * RIG_SIZE * headScale
 
 /** How far to move the head picture down, in dp (it is scaled about the square's middle), so its chin is where it goes. */
 fun AnimalBuild.headDrop(pose: LimbPose): Float =
-    chinY + pose.frontSink - (RIG_SIZE / 2f + (chin * RIG_SIZE - RIG_SIZE / 2f) * headScale)
+    chinY + pose.sink - (RIG_SIZE / 2f + (chin * RIG_SIZE - RIG_SIZE / 2f) * headScale)
 
-/**
- * The joint of a leg from [hip] to [foot]: the point [upper] from the hip and [lower] from the foot, on the side given by
- * [side] (+x or -x), so the feet can stay where they are while the body sinks. A foot beyond the leg's reach gets a
- * straight leg.
- */
-fun kneeOf(hip: Offset, foot: Offset, upper: Float, lower: Float, side: Float): Offset {
-    val dx = foot.x - hip.x
-    val dy = foot.y - hip.y
-    val d = sqrt(dx * dx + dy * dy).coerceAtLeast(0.001f)
-    val along = ((upper * upper - lower * lower + d * d) / (2f * d)).coerceIn(-upper, upper)
-    val out = sqrt((upper * upper - along * along).coerceAtLeast(0f))
-    val perpX = -dy / d
-    val perpY = dx / d
-    // Whichever of the two places lies on that side.
-    val sign = if (perpX * side >= 0f) 1f else -1f
-    return Offset(hip.x + dx / d * along + sign * perpX * out, hip.y + dy / d * along + sign * perpY * out)
-}
-
-/** The hip of [leg] in [pose], front or hind. */
-fun hipOf(leg: Leg, isFront: Boolean, pose: LimbPose): Offset =
-    if (isFront) Offset(leg.hipX + pose.frontOut, leg.hipY + pose.frontSink)
-    else Offset(leg.hipX - pose.rearOut, leg.hipY + pose.rearSink)
-
-/** The body and limbs of [animal] in [frame], for drawing behind its head, facing [facing] (+1 right, -1 left). */
+/** The body and legs of [animal] in [frame], for drawing behind its head. Its tail trails away from [facing]. */
 fun DrawScope.drawExplorerBody(animal: CompanionAnimal, frame: GaitFrame, facing: Float) {
-    if (animal.build.front == null) drawPerchedBird(animal.build, frame) else drawFourLegs(animal.build, frame.limbs, facing)
-}
-
-private fun Color.inShade() = Color(red * 0.8f, green * 0.8f, blue * 0.8f, alpha)
-
-private fun DrawScope.drawFourLegs(b: AnimalBuild, pose: LimbPose, facing: Float) {
-    val front = b.front ?: return
+    val b = animal.build
+    val pose = frame.limbs
     val u = size.width / RIG_SIZE
     val line = 1.5.dp.toPx()
     val mid = size.width / 2f
-    fun at(p: Offset) = Offset(mid + facing * p.x * u, p.y * u)
+    fun at(x: Float, y: Float) = Offset(mid + x * u, y * u)
 
-    fun leg(leg: Leg, isFront: Boolean, x: Float, up: Float, far: Boolean) {
-        val shift = if (far) Offset(-FAR_BACK, -FAR_UP) else Offset.Zero
-        val hip = hipOf(leg, isFront, pose) + shift
-        val foot = Offset(leg.footX + x, FOOT_Y - up) + shift
-        val knee = kneeOf(hip, foot, leg.upper, leg.lower, if (leg.bendsForward) 1f else -1f)
-        val fur = if (far) b.fur.inShade() else b.fur
-        val paw = if (far) b.paw.inShade() else b.paw
-        val w = leg.width * u
-        for ((width, color) in listOf((w + 2f * line) to LilyOutline, w to fur)) {
-            drawLine(color, at(hip), at(knee), width, StrokeCap.Round)
-            drawLine(color, at(knee), at(foot), width, StrokeCap.Round)
+    // A round stub of a leg from its hip to its paw. A leg behind the body is a little darker.
+    fun leg(leg: Leg, side: Float, up: Float, spread: Float, behind: Boolean) {
+        val shade = if (behind) 0.86f else 1f
+        val pawShade = if (behind) 0.94f else 1f
+        val fur = Color(b.fur.red * shade, b.fur.green * shade, b.fur.blue * shade)
+        val paw = Color(b.paw.red * pawShade, b.paw.green * pawShade, b.paw.blue * pawShade)
+        val hip = at(side * leg.hipX, leg.hipY + pose.sink)
+        val footY = FOOT_Y - up - if (behind) HIND_UP else 0f
+        val foot = at(side * (leg.footX + spread), footY)
+        drawLine(LilyOutline, hip, foot, leg.width * u + 2f * line, StrokeCap.Round)
+        drawLine(fur, hip, foot, leg.width * u, StrokeCap.Round)
+        val pawSize = Size(leg.pawWidth * u, PAW_H * u)
+        val corner = foot + Offset(-pawSize.width / 2f, -pawSize.height / 2f)
+        drawOval(paw, corner, pawSize)
+        drawOval(LilyOutline, corner, pawSize, style = Stroke(line))
+        // Two little toes.
+        for (toe in listOf(-1f, 1f)) {
+            val x = foot.x + toe * pawSize.width * 0.14f
+            drawLine(LilyOutline, Offset(x, foot.y + pawSize.height * 0.08f), Offset(x, foot.y + pawSize.height * 0.42f), line * 0.7f, StrokeCap.Round)
         }
-        val footSize = Size(leg.footWidth * u, FOOT_H * u)
-        // A foot's toes reach forward of its leg.
-        val center = at(foot + Offset(leg.footWidth * 0.22f, 0f))
-        val corner = center - Offset(footSize.width / 2f, footSize.height / 2f)
-        drawOval(paw, corner, footSize)
-        drawOval(LilyOutline, corner, footSize, style = Stroke(line))
     }
 
     b.tail?.let { drawTail(it, b, pose, facing) }
+    if (b.front == null) drawOwlWings(b, frame.wings, frame.flap, pose.sink)
 
-    leg(b.hind, false, pose.hindFarX, pose.hindFarUp, far = true)
-    leg(front, true, pose.frontFarX, pose.frontFarUp, far = true)
+    leg(b.hind, -1f, pose.hindLeftUp, pose.hindSpread, behind = b.front != null)
+    leg(b.hind, 1f, pose.hindRightUp, pose.hindSpread, behind = b.front != null)
 
-    // The body: both ovals and a band between them in the outline, then again in fur, so it is outlined as one shape
-    // however it tips and stretches.
-    val chest = Offset(b.chest.x + pose.frontOut, b.chest.y + pose.frontSink)
-    val rump = Offset(b.rump.x - pose.rearOut, b.rump.y + pose.rearSink)
-    val band = minOf(b.chest.h, b.rump.h) * 0.8f * u
-    fun body(color: Color, grow: Float) {
-        drawLine(color, at(chest), at(rump), band + 2f * grow, StrokeCap.Round)
-        for ((c, o) in listOf(chest to b.chest, rump to b.rump)) {
-            val s = Size(o.w * u + 2f * grow, o.h * u + 2f * grow)
-            drawOval(color, at(c) - Offset(s.width / 2f, s.height / 2f), s)
-        }
+    // Its body, and its pale front.
+    val bodySize = Size(b.bodyW * u, b.bodyH * u)
+    val center = at(0f, b.bodyY + pose.sink)
+    val corner = center - Offset(bodySize.width / 2f, bodySize.height / 2f)
+    drawOval(b.fur, corner, bodySize)
+    val pale = Size(bodySize.width * 0.62f, bodySize.height * 0.66f)
+    drawOval(b.belly, Offset(center.x - pale.width / 2f, corner.y + bodySize.height - pale.height - 1.5f * u), pale)
+    drawOval(LilyOutline, corner, bodySize, style = Stroke(line))
+
+    b.front?.let {
+        leg(it, -1f, pose.frontLeftUp, pose.frontSpread, behind = false)
+        leg(it, 1f, pose.frontRightUp, pose.frontSpread, behind = false)
     }
-    body(LilyOutline, line)
-    body(b.fur, 0f)
-    // Its pale front, under its chest.
-    val pale = Size(b.chest.w * 0.62f * u, b.chest.h * 0.5f * u)
-    val paleCenter = at(chest + Offset(b.chest.w * 0.1f, b.chest.h * 0.22f))
-    drawOval(b.belly, paleCenter - Offset(pale.width / 2f, pale.height / 2f), pale)
-
-    leg(b.hind, false, pose.hindNearX, pose.hindNearUp, far = false)
-    leg(front, true, pose.frontNearX, pose.frontNearUp, far = false)
 }
 
 private fun DrawScope.drawTail(t: Tail, b: AnimalBuild, pose: LimbPose, facing: Float) {
     val u = size.width / RIG_SIZE
     val mid = size.width / 2f
     val line = 1.5.dp.toPx()
-    val root = Offset(mid + facing * (t.x - pose.rearOut) * u, (t.y + pose.rearSink) * u)
-    if (t.puff > 0f) {
-        drawCircle(b.fur, t.puff * u, root)
-        drawCircle(LilyOutline, t.puff * u, root, style = Stroke(line))
-        return
-    }
-    fun p(o: Offset) = Offset(root.x + facing * o.x * u, root.y + o.y * u)
-    val c1 = p(t.c1 - Offset(t.x, t.y))
-    val c2 = p(t.c2 - Offset(t.x, t.y))
-    val tip = p(t.tip - Offset(t.x, t.y))
+    // Written trailing to the left, as when it faces right.
+    fun at(p: Offset) = Offset(mid + facing * p.x * u, (p.y + pose.sink) * u)
+    val root = at(t.root)
+    val c1 = at(t.c1)
+    val c2 = at(t.c2)
+    val tip = at(t.tip)
     val curve = Path().apply {
         moveTo(root.x, root.y)
         cubicTo(c1.x, c1.y, c2.x, c2.y, tip.x, tip.y)
@@ -317,41 +235,6 @@ private fun DrawScope.drawTail(t: Tail, b: AnimalBuild, pose: LimbPose, facing: 
     }
 }
 
-/** The owl faces the child, on its two feet, with its wings at its shoulders. */
-private fun DrawScope.drawPerchedBird(b: AnimalBuild, frame: GaitFrame) {
-    val pose = frame.limbs
-    val u = size.width / RIG_SIZE
-    val line = 1.5.dp.toPx()
-    val mid = size.width / 2f
-    fun at(p: Offset) = Offset(mid + p.x * u, p.y * u)
-    val shoulderX = b.chest.w / 2f - 3f
-    val shoulderY = 52f + pose.frontSink
-
-    drawOwlWings(b, frame.wings, frame.flap, shoulderX, shoulderY)
-
-    val leg = b.hind
-    for (side in listOf(-1f, 1f)) {
-        val hip = Offset(side * leg.hipX, leg.hipY + pose.frontSink)
-        val foot = Offset(side * leg.footX, FOOT_Y - if (side < 0f) pose.hindNearUp else pose.hindFarUp)
-        val knee = kneeOf(hip, foot, leg.upper, leg.lower, side)
-        for ((width, color) in listOf((leg.width * u + 2f * line) to LilyOutline, (leg.width * u) to b.fur)) {
-            drawLine(color, at(hip), at(knee), width, StrokeCap.Round)
-            drawLine(color, at(knee), at(foot), width, StrokeCap.Round)
-        }
-        val footSize = Size(leg.footWidth * u, FOOT_H * u)
-        val corner = at(foot) + Offset(side * 1.5f * u - footSize.width / 2f, -footSize.height / 2f)
-        drawOval(b.paw, corner, footSize)
-        drawOval(LilyOutline, corner, footSize, style = Stroke(line))
-    }
-
-    val bodyAt = Offset(mid - b.chest.w / 2f * u, (b.chest.y + pose.frontSink - b.chest.h / 2f) * u)
-    val bodySize = Size(b.chest.w * u, b.chest.h * u)
-    drawOval(b.fur, bodyAt, bodySize)
-    val bellySize = Size(bodySize.width * 0.62f, bodySize.height * 0.62f)
-    drawOval(b.belly, Offset(mid - bellySize.width / 2f, bodyAt.y + bodySize.height - bellySize.height - 1.5f * u), bellySize)
-    drawOval(LilyOutline, bodyAt, bodySize, style = Stroke(line))
-}
-
 /** The owl's feather line. */
 private val OwlPurpleShade = Color(0xFF704080)
 
@@ -359,11 +242,11 @@ private val OwlPurpleShade = Color(0xFF704080)
  * The owl's two wings at its shoulders. At [open] 0 they are folded down its sides; at 1 they are spread, at [flap] in
  * their beat (-1 raised, 1 pushed down). Each is a flat rounded wing with three feather tips.
  */
-private fun DrawScope.drawOwlWings(b: AnimalBuild, open: Float, flap: Float, shoulderX: Float, shoulderY: Float) {
+private fun DrawScope.drawOwlWings(b: AnimalBuild, open: Float, flap: Float, sink: Float) {
     val w = size.width
     val u = w / RIG_SIZE
-    val length = w * 0.40f * (0.42f + 0.58f * open)
-    val depth = w * 0.24f * (0.55f + 0.45f * open)
+    val length = w * 0.40f * (0.44f + 0.56f * open)
+    val depth = w * 0.24f * (0.60f + 0.40f * open)
     val line = 2.dp.toPx()
     // Pointing out from the hinge (0, 0) along +x: a rounded leading edge to the tip, three feather tips back.
     val wing = Path().apply {
@@ -381,10 +264,10 @@ private fun DrawScope.drawOwlWings(b: AnimalBuild, open: Float, flap: Float, sho
     }
     // In the air: raised to 50 degrees, pushed down to 25 degrees below level. Folded: nearly straight down.
     val flying = -12.5f + 37.5f * flap
-    val angle = 74f + (flying - 74f) * open
+    val angle = 78f + (flying - 78f) * open
     for (side in listOf(-1f, 1f)) {
         withTransform({
-            translate(left = w / 2f + side * shoulderX * u, top = shoulderY * u)
+            translate(left = w / 2f + side * (b.bodyW / 2f - 2.5f) * u, top = (b.chinY + 1f + sink) * u)
             scale(scaleX = side, scaleY = 1f, pivot = Offset.Zero)
             rotate(degrees = angle, pivot = Offset.Zero)
         }) {

@@ -196,7 +196,7 @@ fun MapCompanionFriends(
             ?.let { explorerOffsetDp(nodeCenters[it], maxWidth.value, density) }
         val to = leader.offsetDp
         val gait = leader.animal.gait
-        // It faces the way it travels; standing at a stop, it faces the stop.
+        // It leans the way it travels, with its tail behind it; standing at a stop, the way of the stop.
         val direction = when {
             from != null -> if (from.x > to.x) -1f else 1f
             nodeCenters[activeNodeIndex].x / density < to.x + EXPLORER_SIZE.value / 2f -> -1f
@@ -237,7 +237,7 @@ fun MapCompanionFriends(
                     val along = if (from != null && travelling) frame().along else 1f
                     val start = from ?: to
                     IntOffset(
-                        (start.x + (to.x - start.x) * along - direction * leader.animal.build.standBack).dp.roundToPx(),
+                        (start.x + (to.x - start.x) * along).dp.roundToPx(),
                         (start.y + (to.y - start.y) * along).dp.roundToPx()
                     )
                 }
@@ -256,8 +256,8 @@ fun MapCompanionFriends(
 val EXPLORER_SIZE = RIG_SIZE.dp
 
 /**
- * The explorer in [frame], facing [facing] (+1 right, -1 left): its head picture on the body and limbs of MapLimbs.kt,
- * on its shadow. Its feet stand at the bottom of this square.
+ * The explorer in [frame]: its head picture on the body and limbs of MapLimbs.kt, on its shadow, looking at the child
+ * with its tail away from [facing] (+1 right, -1 left). Its feet stand at the bottom of this square.
  */
 @Composable
 fun ExplorerFigure(animal: CompanionAnimal, frame: () -> GaitFrame, modifier: Modifier = Modifier, facing: Float = 1f) {
@@ -308,13 +308,10 @@ fun ExplorerFigure(animal: CompanionAnimal, frame: () -> GaitFrame, modifier: Mo
                 modifier = Modifier
                     .fillMaxSize()
                     .graphicsLayer {
-                        // At the front of its body, going with its chest.
-                        val pose = frame().limbs
-                        val u = size.width / RIG_SIZE
+                        // On top of its body, going with it.
                         scaleX = build.headScale
                         scaleY = build.headScale
-                        translationX = facing * (build.headX + pose.frontOut) * u
-                        translationY = build.headDrop(pose) * u
+                        translationY = build.headDrop(frame().limbs) * size.width / RIG_SIZE
                     }
             )
         }
