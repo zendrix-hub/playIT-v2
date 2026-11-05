@@ -40,7 +40,7 @@ The SRS, SDD and STD describe the earlier behaviour. These parts change:
   - The report covers every child on the phone.
   - A replay keeps the best stars.
 - **FR-04 (Find It):** words under the pictures depend on the chapter and on replays.
-- **NFR-ACC-01 (mouth-shape cues):** the cue shows big while Lily models the sound, then beside the mic.
+- **NFR-ACC-01 (mouth-shape cues):** the cue shows big while Lily models the sound twice, and the mouth pulses while the sound plays; then it moves beside the mic.
 - **NFR-IND-01 (independent use):** the return greeting, the child-language wording, the Guidebook content, and the name a new player types (replacing avatar-only onboarding).
 - **STD:** the new tests are `ProgressLevelTest`, `ProgressRecordCalculatorTest`, `ReportGeneratorTest`, `ReportLayoutTest`, `ReportPageRendererTest`, `BestResultTest`, `WordLabelPolicyTest`, `ReturnGreetingPolicyTest`, `ChildWordsTest`, `ParentDashboardScreenshotTest` and `WelcomeBackScreenshotTest`, plus the updated view-model and layout tests.
 
