@@ -76,6 +76,18 @@ import androidx.lifecycle.LifecycleEventObserver
 import com.playit.app.presentation.components.LessonScaffold
 import com.playit.app.presentation.sayit.components.MicButton
 import com.playit.app.presentation.theme.*
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.rounded.ZoomIn
+import androidx.compose.ui.unit.Dp
+import com.playit.app.domain.model.ArticulationGroup
 
 @Composable
 fun SayItScreen(
@@ -165,7 +177,8 @@ fun SayItScreen(
     }
 
     val micStatus by viewModel.micStatus.collectAsStateWithLifecycle()
-    val showMouthCue by viewModel.showMouthCue.collectAsStateWithLifecycle()
+    val cueStage by viewModel.mouthCue.collectAsStateWithLifecycle()
+    val mouthGroup = articulationFor(phoneme?.letter ?: "m")
     val showFeedback = state is SayItState.Correct || state is SayItState.Incorrect
     // Each right attempt pops confetti from the prompt card (user, 2026-10-29).
     var corrects by remember { mutableIntStateOf(0) }
@@ -264,7 +277,23 @@ fun SayItScreen(
                 }
             }
         ) {
-            if (wordMode) {
+          AnimatedContent(
+            targetState = cueStage == MouthCueStage.BIG,
+            contentAlignment = Alignment.Center,
+            transitionSpec = {
+                if (reducedMotion) {
+                    fadeIn(tween(150)) togetherWith fadeOut(tween(150))
+                } else {
+                    (fadeIn(tween(220)) + scaleIn(tween(320), initialScale = 0.45f)) togetherWith
+                        (fadeOut(tween(180)) + scaleOut(tween(260), targetScale = 0.45f))
+                }
+            },
+            label = "mouthCueBig"
+          ) { big ->
+            if (big) {
+                // "Watch my lips", big enough to copy (adviser, 2026-11-05); a tap puts it back beside the mic.
+                BigMouthCue(group = mouthGroup, height = d.letterCardHeight, onTap = { viewModel.shrinkMouthCue() })
+            } else if (wordMode) {
                 // Word prompt card: reuses the Hear It LetterCard (same picture_<word>.png
                 // illustration, same gummy rendering). Tap replays the word audio.
                 LetterCard(
@@ -330,6 +359,7 @@ fun SayItScreen(
                     }
                 }
             }
+          }
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 // "Watch my lips": from the second miss the mouth shape shows beside the mic.
@@ -337,8 +367,8 @@ fun SayItScreen(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (showMouthCue) {
-                        ArticulationCue(group = articulationFor(phoneme?.letter ?: "m"), size = 96.dp)
+                    if (cueStage == MouthCueStage.SMALL) {
+                        SmallMouthCue(group = mouthGroup, onTap = { viewModel.replayMouthCue() })
                     }
                     // After an attempt the line under the mic is the short feedback ("Watch my lips"), as
                     // plain text: it used to be a separate banner that looked like a second button (card 31d).
@@ -393,6 +423,53 @@ fun SayItScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+/** The mouth shape in the prompt card's place, as big as the card, while Lily models the sound. */
+@Composable
+private fun BigMouthCue(group: ArticulationGroup, height: Dp, onTap: () -> Unit) {
+    GummyContainer(
+        onClick = onTap,
+        faceColor = SurfaceCard,
+        shadowColor = SurfaceCardShadow,
+        shape = CardShape,
+        strokeWidth = 2.5.dp,
+        strokeColor = ModernBorder,
+        depthHeight = 6.dp,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(height)
+            .testTag("sayit_cue_big")
+    ) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            ArticulationCue(group = group, size = height - 24.dp)
+        }
+    }
+}
+
+/** The mouth shape beside the mic; a tap shows it big again, with the sound once more. */
+@Composable
+private fun SmallMouthCue(group: ArticulationGroup, onTap: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .size(96.dp)
+            .popIn()
+            .clickable(onClickLabel = "See the mouth big", onClick = onTap)
+            .testTag("sayit_cue_small")
+    ) {
+        ArticulationCue(group = group, size = 96.dp)
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .size(30.dp)
+                .clip(CircleShape)
+                .background(SunnyGold)
+                .border(2.dp, ModernBorder, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(Icons.Rounded.ZoomIn, contentDescription = null, tint = TextMidnight, modifier = Modifier.size(18.dp))
         }
     }
 }

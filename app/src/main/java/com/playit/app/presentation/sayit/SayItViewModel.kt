@@ -105,6 +105,29 @@ class SayItViewModel @Inject constructor(
     private val _showMouthCue = MutableStateFlow(false)
     val showMouthCue: StateFlow<Boolean> = _showMouthCue.asStateFlow()
 
+    /**
+     * How big the cue is (adviser, 2026-11-05: the mouth "should expand on the screen", so the child sees what to
+     * copy). It is BIG while Lily models the sound, and goes SMALL beside the mic by itself when it is the child's
+     * turn; a tap on the small cue shows it big again with the model once more.
+     */
+    private val _mouthCue = MutableStateFlow(MouthCueStage.HIDDEN)
+    val mouthCue: StateFlow<MouthCueStage> = _mouthCue.asStateFlow()
+
+    /** The big cue goes back beside the mic (the child's turn, a tap on it, or the mic). */
+    fun shrinkMouthCue() {
+        if (_mouthCue.value == MouthCueStage.BIG) _mouthCue.value = MouthCueStage.SMALL
+    }
+
+    /** A tap on the small cue: big again, with Lily's model of the sound, then back beside the mic. */
+    fun replayMouthCue() {
+        if (_mouthCue.value != MouthCueStage.SMALL || _state.value is SayItState.Listening) return
+        val letter = _phoneme.value?.letter?.lowercase() ?: return
+        val targetWord = _targetWord.value
+        val model = if (targetWord != null) audioResolver.getKeyWordPath(targetWord) else audioResolver.getPhonemePath(letter)
+        _mouthCue.value = MouthCueStage.BIG
+        audioPlayer.playSequence(listOf(model), onItemStart = null, onComplete = { shrinkMouthCue() })
+    }
+
     private val _attempts = MutableStateFlow<List<Boolean>>(emptyList())
     val attempts: StateFlow<List<Boolean>> = _attempts.asStateFlow()
 
@@ -133,6 +156,7 @@ class SayItViewModel @Inject constructor(
             _canContinue.value = false
             _lastHeard.value = null
             _showMouthCue.value = false
+            _mouthCue.value = MouthCueStage.HIDDEN
             val p = phonemeRepository.getPhonemeById(id)
             if (p == null) {
                 _loadError.value = true
@@ -305,6 +329,7 @@ class SayItViewModel @Inject constructor(
         // Instantly silence any voiceover or phoneme audio so it never bleeds into the mic
         audioPlayer.stop()
         _isPlayingPhoneme.value = false
+        shrinkMouthCue()
 
         autoStopJob?.cancel()
         val targetWord = _targetWord.value
@@ -414,30 +439,40 @@ class SayItViewModel @Inject constructor(
                 _canContinue.value = true
             }
             is TutorAction.Correct -> {
-                if (action.supportLevel >= 2) _showMouthCue.value = true
                 val pop = audioResolver.getSfxPath(SfxEvent.INCORRECT_POP)
                 val yourTurn = audioResolver.getTutorPath("car_your_turn")
-                val sequence = if (action.supportLevel == 1) {
-                    listOf(pop) + levelOneCorrection(action.errorType, letter, targetWord) + yourTurn
+                if (action.supportLevel == 1) {
+                    audioPlayer.playSequence(listOf(pop) + levelOneCorrection(action.errorType, letter, targetWord) + yourTurn)
                 } else {
-                    listOf(pop, audioResolver.getTutorPath("car_watch_my_lips"), model, yourTurn)
+                    // Big while Lily says "Watch my lips" and models it; small beside the mic from "Your turn".
+                    _showMouthCue.value = true
+                    _mouthCue.value = MouthCueStage.BIG
+                    audioPlayer.playSequence(
+                        listOf(pop, audioResolver.getTutorPath("car_watch_my_lips"), model, yourTurn),
+                        onItemStart = { _, path -> if (path == yourTurn) shrinkMouthCue() },
+                        onComplete = { shrinkMouthCue() }
+                    )
                 }
-                audioPlayer.playSequence(sequence)
             }
             is TutorAction.LeadAndMoveOn -> {
                 _showMouthCue.value = true
+                _mouthCue.value = MouthCueStage.BIG
                 // TODO(FR-NEW-REC): mark the letter NEEDS_PRACTICE and queue a recall check. Not before
                 // Room v4 with real migrations: PlayItDatabase is v3 with fallbackToDestructiveMigration(),
                 // so a new table now would wipe every child's progress (card 28). The three misses are
                 // already saved as SayItAttempt rows.
                 // The unlock chime says "Next is open"; the correct chime stays for right answers.
+                // Big while Lily says it together with the child, small again from "Good trying!".
+                val tryLater = audioResolver.getTutorPath("fb_try_later")
                 audioPlayer.playSequence(
                     listOf(
                         audioResolver.getTutorPath("car_lets_say_together"),
                         model,
-                        audioResolver.getTutorPath("fb_try_later"),
+                        tryLater,
                         audioResolver.getSfxPath(SfxEvent.NODE_UNLOCK_CHIME)
-                    )
+                    ),
+                    onItemStart = { _, path -> if (path == tryLater) shrinkMouthCue() },
+                    onComplete = { shrinkMouthCue() }
                 )
                 _canContinue.value = true
             }

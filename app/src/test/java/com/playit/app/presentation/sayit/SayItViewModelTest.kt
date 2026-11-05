@@ -538,6 +538,7 @@ class SayItViewModelTest {
             fakePhoneme(letter = "ng", exampleWord = "PENDING_SME_REVIEW")
         val sequences = mutableListOf<List<String>>()
         every { audioPlayer.playSequence(capture(sequences), any()) } just Runs
+        every { audioPlayer.playSequence(capture(sequences), any(), any()) } just Runs
 
         createViewModel()
         advanceUntilIdle()
@@ -572,6 +573,7 @@ class SayItViewModelTest {
         coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
         val sequences = mutableListOf<List<String>>()
         every { audioPlayer.playSequence(capture(sequences), any()) } just Runs
+        every { audioPlayer.playSequence(capture(sequences), any(), any()) } just Runs
 
         createViewModel()
         advanceUntilIdle()
@@ -586,6 +588,77 @@ class SayItViewModelTest {
             sequences[1]
         )
         assertEquals(TutorAction.Correct(SpeechErrorType.OTHER_WORD, 2), viewModel.tutorAction.value)
+    }
+
+    /** Adviser, 2026-11-05: the mouth shows big while Lily models the sound, then small beside the mic. */
+    @Test
+    fun secondMiss_showsTheMouthBig_thenSmallWhenItIsTheChildsTurn() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        val onItem = mutableListOf<((Int, String) -> Unit)?>()
+        every { audioPlayer.playSequence(any(), captureNullable(onItem), any()) } just Runs
+
+        createViewModel()
+        advanceUntilIdle()
+        viewModel.evaluateSpeech("cat")
+        assertEquals("first miss: no cue", MouthCueStage.HIDDEN, viewModel.mouthCue.value)
+        viewModel.evaluateSpeech("cat")
+        advanceUntilIdle()
+        assertEquals(MouthCueStage.BIG, viewModel.mouthCue.value)
+
+        onItem.last()!!.invoke(2, "word_path")
+        assertEquals("still big while the model plays", MouthCueStage.BIG, viewModel.mouthCue.value)
+        onItem.last()!!.invoke(3, "tutor/car_your_turn.wav")
+        assertEquals(MouthCueStage.SMALL, viewModel.mouthCue.value)
+    }
+
+    @Test
+    fun tappingTheSmallMouth_showsItBigWithTheModelAgain() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        val sequences = mutableListOf<List<String>>()
+        val onDone = mutableListOf<(() -> Unit)?>()
+        every { audioPlayer.playSequence(capture(sequences), any(), captureNullable(onDone)) } just Runs
+
+        createViewModel()
+        advanceUntilIdle()
+        repeat(2) { viewModel.evaluateSpeech("cat") }
+        advanceUntilIdle()
+        onDone.last()!!.invoke()
+        assertEquals(MouthCueStage.SMALL, viewModel.mouthCue.value)
+
+        viewModel.replayMouthCue()
+        assertEquals(MouthCueStage.BIG, viewModel.mouthCue.value)
+        assertEquals(listOf("word_path"), sequences.last())
+        onDone.last()!!.invoke()
+        assertEquals(MouthCueStage.SMALL, viewModel.mouthCue.value)
+    }
+
+    @Test
+    fun theMicWhileTheMouthIsBig_shrinksIt() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+
+        createViewModel()
+        advanceUntilIdle()
+        repeat(2) { viewModel.evaluateSpeech("cat") }
+        advanceUntilIdle()
+        assertEquals(MouthCueStage.BIG, viewModel.mouthCue.value)
+
+        viewModel.startListening()
+        assertEquals(MouthCueStage.SMALL, viewModel.mouthCue.value)
+    }
+
+    @Test
+    fun thirdMiss_showsTheMouthBigWhileSayingItTogether() = runTest {
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme()
+        val onItem = mutableListOf<((Int, String) -> Unit)?>()
+        every { audioPlayer.playSequence(any(), captureNullable(onItem), any()) } just Runs
+
+        createViewModel()
+        advanceUntilIdle()
+        repeat(3) { viewModel.evaluateSpeech("cat") }
+        advanceUntilIdle()
+        assertEquals(MouthCueStage.BIG, viewModel.mouthCue.value)
+        onItem.last()!!.invoke(2, "tutor/fb_try_later.wav")
+        assertEquals(MouthCueStage.SMALL, viewModel.mouthCue.value)
     }
 
     @Test
@@ -609,6 +682,7 @@ class SayItViewModelTest {
         verify {
             audioPlayer.playSequence(
                 listOf("tutor/car_lets_say_together.wav", "word_path", "tutor/fb_try_later.wav", "sfx_path"),
+                any(),
                 any()
             )
         }
@@ -621,6 +695,7 @@ class SayItViewModelTest {
         every { audioResolver.getSfxPath(SfxEvent.CORRECT_CHIME) } returns "sfx_correct"
         val sequences = mutableListOf<List<String>>()
         every { audioPlayer.playSequence(capture(sequences), any()) } just Runs
+        every { audioPlayer.playSequence(capture(sequences), any(), any()) } just Runs
 
         createViewModel()
         advanceUntilIdle()

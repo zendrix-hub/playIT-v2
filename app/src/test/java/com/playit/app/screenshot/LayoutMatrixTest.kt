@@ -217,6 +217,18 @@ abstract class LayoutMatrixTest(private val deviceName: String) {
         compose.waitForIdle()
         compose.runOnIdle { repeat(2) { vm.evaluateSpeech("cat") } }
         compose.waitForIdle()
+        // While Lily models the sound the mouth is big, in the prompt card's place, above the mic and on screen
+        // (adviser, 2026-11-05); the mic stays reachable.
+        val big = compose.onNodeWithTag("sayit_cue_big", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        val micWhileBig = compose.onNodeWithTag("sayit_mic", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        assertTrue("big cue ${big.bottom} over the mic ${micWhileBig.top} on $deviceName", big.bottom <= micWhileBig.top)
+        assertTrue("big cue is not big on $deviceName", big.bottom - big.top >= 160.dp)
+        assertOnScreen("sayit_cue_big")
+        assertOnScreen("sayit_mic")
+        capture("sayit_cue_big")
+        // On the child's turn it goes back beside the mic.
+        compose.runOnIdle { vm.shrinkMouthCue() }
+        compose.waitForIdle()
         val cue = compose.onNodeWithContentDescription("Mouth shape for this sound").getUnclippedBoundsInRoot()
         val mic = compose.onNodeWithTag("sayit_mic", useUnmergedTree = true).getUnclippedBoundsInRoot()
         assertTrue("cue right ${cue.right} > mic left ${mic.left} on $deviceName", cue.right <= mic.left)
