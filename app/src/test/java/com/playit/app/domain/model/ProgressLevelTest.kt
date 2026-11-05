@@ -60,4 +60,13 @@ class ProgressLevelTest {
             assertFalse("$it uses a percentage", it.label.contains("%") || it.remark.contains("%"))
         }
     }
+
+    /** Parents read plain words (user, 2026-11-05); the DepEd words stay for teachers, in the legend and the PDF. */
+    @Test fun parentWords_avoidTheTeachersTerms() {
+        val teacherWords = listOf("outstanding", "satisfactory", "expectations", "grade", "%")
+        ProgressLevel.values().forEach { level ->
+            teacherWords.forEach { w -> assertFalse("$level: ${level.parentLabel}", level.parentLabel.lowercase().contains(w)) }
+        }
+        assertEquals(ProgressLevel.values().size, ProgressLevel.values().map { it.parentLabel }.toSet().size)
+    }
 }

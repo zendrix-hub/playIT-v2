@@ -144,14 +144,14 @@ fun ParentDashboardScreen(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = "Progress Record",
+                        text = "How your child is doing",
                         fontFamily = LexendFontFamily,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = TextMidnight
                     )
                     Text(
-                        text = "Letter sounds, Grade 1",
+                        text = "Reading: letter sounds",
                         fontFamily = LexendFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,

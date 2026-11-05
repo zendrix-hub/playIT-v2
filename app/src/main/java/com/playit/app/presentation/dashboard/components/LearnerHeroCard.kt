@@ -286,29 +286,30 @@ fun LearnerHeroCard(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Row 2: the overall level in words, then how far through the letters the child is (no bare percentage)
+            // Row 2: the overall level in a parent's words; the DepEd word and grade underneath, small, for teachers
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "Overall so far",
-                        fontFamily = LexendFontFamily,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = TextMidnight
-                    )
-                    data.overallGrade?.let { grade ->
-                        Text(
-                            text = "Average grade $grade",
-                            fontFamily = LexendFontFamily,
-                            fontSize = 12.sp,
-                            color = TextMuted
-                        )
-                    }
-                }
+                Text(
+                    text = "Overall so far",
+                    fontFamily = LexendFontFamily,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextMidnight,
+                    modifier = Modifier.weight(1f)
+                )
                 LevelChip(data.overallLevel)
+            }
+            data.overallGrade?.let { grade ->
+                Text(
+                    text = "For teachers: ${data.overallLevel.label}, average grade $grade",
+                    fontFamily = LexendFontFamily,
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp,
+                    color = TextMuted,
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
+                )
             }
 
             Spacer(modifier = Modifier.height(12.dp))

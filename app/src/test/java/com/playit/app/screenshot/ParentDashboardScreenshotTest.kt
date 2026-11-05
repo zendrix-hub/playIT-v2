@@ -60,7 +60,7 @@ class ParentDashboardScreenshotTest {
     @Config(sdk = [34], qualifiers = "w360dp-h3000dp-xhdpi")
     @Test fun threeChildren_classRecordThenTheSelectedChild() {
         show(listOf(frog, bear, owl))
-        compose.onNodeWithText("Class record").assertExists()
+        compose.onNodeWithText("All the children").assertExists()
         compose.onNodeWithText("Practise at home").assertExists()
         compose.onNodeWithText("Chapter 1").assertExists()
         compose.onAllNodesWithText("%", substring = true).assertCountEquals(0)
@@ -70,7 +70,7 @@ class ParentDashboardScreenshotTest {
     @Config(sdk = [34], qualifiers = "w411dp-h3000dp-xxhdpi")
     @Test fun oneChild_hasNoClassRecord() {
         show(listOf(bear))
-        compose.onAllNodesWithText("Class record").assertCountEquals(0)
+        compose.onAllNodesWithText("All the children").assertCountEquals(0)
         compose.onNodeWithText("Learned 4 of 26 sounds").assertExists()
         compose.onAllNodesWithText("%", substring = true).assertCountEquals(0)
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/dashboard_one_child.png")
@@ -79,7 +79,7 @@ class ParentDashboardScreenshotTest {
     @Config(sdk = [34], qualifiers = Devices.COMPACT)
     @Test fun smallestPhone_headerAndClassRecordFit() {
         show(listOf(frog, bear))
-        compose.onNodeWithText("Progress Record").assertExists()
+        compose.onNodeWithText("How your child is doing").assertExists()
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/dashboard_compact.png")
     }
 }

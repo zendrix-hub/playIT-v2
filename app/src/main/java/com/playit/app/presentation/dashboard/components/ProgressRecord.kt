@@ -59,7 +59,7 @@ import com.playit.app.presentation.theme.TextMuted
  * no bare percentages.
  */
 
-/** A level in words, on its colour. */
+/** A level in a parent's words, on its colour (the DepEd word is in the legend and on the PDF). */
 @Composable
 fun LevelChip(level: ProgressLevel, modifier: Modifier = Modifier, small: Boolean = false) {
     val c = LevelColors.of(level)
@@ -72,7 +72,7 @@ fun LevelChip(level: ProgressLevel, modifier: Modifier = Modifier, small: Boolea
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = level.label,
+            text = level.parentLabel,
             fontFamily = LexendFontFamily,
             fontSize = if (small) 12.sp else 14.sp,
             lineHeight = if (small) 14.sp else 17.sp,
@@ -122,7 +122,7 @@ fun ClassRecordCard(
     modifier: Modifier = Modifier
 ) {
     RecordCard(modifier) {
-        CardTitle("Class record", "Every child on this phone. Tap a name to see their letters.")
+        CardTitle("All the children", "Every child who plays on this phone. Tap a name to see how they are doing.")
         learners.forEach { learner ->
             val selected = learner.profile.id == selectedId
             Column(
@@ -135,7 +135,7 @@ fun ClassRecordCard(
                     .heightIn(min = 64.dp)
                     .padding(10.dp)
                     .semantics(mergeDescendants = true) {
-                        contentDescription = "${learner.profile.name}: ${learner.overallLevel.label}. ${learnedText(learner)}."
+                        contentDescription = "${learner.profile.name}: ${learner.overallLevel.parentLabel}. ${learnedText(learner)}."
                     }
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -163,7 +163,7 @@ fun ClassRecordCard(
             Spacer(modifier = Modifier.height(8.dp))
         }
         Text(
-            "Each box is a chapter, coloured by its level. The words are explained below.",
+            "Each box is a chapter. Its colour shows how the child is doing; the colours are explained below.",
             fontFamily = LexendFontFamily, fontSize = 12.sp, color = TextMuted, lineHeight = 16.sp
         )
     }
@@ -231,7 +231,7 @@ private fun LetterRow(letter: LetterPerformance) {
             .heightIn(min = 52.dp)
             .padding(vertical = 4.dp)
             .semantics(mergeDescendants = true) {
-                contentDescription = "Letter ${letter.symbol}, ${letter.keyWord}: ${letter.level.label}. ${letter.level.remark}"
+                contentDescription = "Letter ${letter.symbol}, ${letter.keyWord}: ${letter.level.parentLabel}. ${letter.level.remark}"
             }
     ) {
         LetterTile(letter.symbol)
@@ -284,7 +284,7 @@ fun PracticeAtHomeCard(data: ProfileDashboardData, modifier: Modifier = Modifier
                     Spacer(modifier = Modifier.width(10.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            "${letter.keyWord}: ${letter.level.label}", fontFamily = LexendFontFamily,
+                            "${letter.keyWord}: ${letter.level.parentLabel}", fontFamily = LexendFontFamily,
                             fontSize = 15.sp, lineHeight = 19.sp, fontWeight = FontWeight.Bold, color = TextMidnight
                         )
                         Text(
@@ -311,7 +311,7 @@ fun PracticeAtHomeCard(data: ProfileDashboardData, modifier: Modifier = Modifier
 @Composable
 fun LevelLegendCard(modifier: Modifier = Modifier) {
     RecordCard(modifier) {
-        CardTitle("What the words mean", "The same words as the DepEd report card.")
+        CardTitle("What the words mean", "For teachers, each one is shown with its DepEd report card word and grade.")
         (ProgressLevel.graded + listOf(ProgressLevel.IN_PROGRESS, ProgressLevel.NOT_STARTED)).forEach { level ->
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -322,7 +322,7 @@ fun LevelLegendCard(modifier: Modifier = Modifier) {
                 Column(modifier = Modifier.weight(1f)) {
                     if (level.band != null) {
                         Text(
-                            "Grade ${level.band}", fontFamily = LexendFontFamily, fontSize = 13.sp,
+                            "${level.label}, grade ${level.band}", fontFamily = LexendFontFamily, fontSize = 13.sp,
                             fontWeight = FontWeight.Bold, color = TextMidnight
                         )
                     }
@@ -332,9 +332,9 @@ fun LevelLegendCard(modifier: Modifier = Modifier) {
         }
         Spacer(modifier = Modifier.height(6.dp))
         Text(
-            "A letter is graded once your child finishes it. The grade comes from the right answers in Say It and " +
-                "Find It, changed into a grade with the DepEd table (DepEd Order 8, s. 2015): 6 right out of 10 is a " +
-                "grade of 75, and all right is 100.",
+            "A letter gets its words once your child finishes it, from how many answers were right in Say It and " +
+                "Find It. Teachers: the grade uses the DepEd transmutation table (DepEd Order 8, s. 2015), so 6 right " +
+                "out of 10 is a grade of 75.",
             fontFamily = LexendFontFamily, fontSize = 12.sp, color = TextMuted, lineHeight = 16.sp
         )
     }
