@@ -29,9 +29,9 @@ data class BiomeTheme(
 object BiomeThemes {
     val SECTION_1 = BiomeTheme(
         sectionNumber = 1,
-        title = "Chocolate Hills Phonics",
+        title = "Chocolate Hills",
         lettersSummary = "Practice sounds M, S, A, I",
-        mascotDialogue = "Welcome to Chocolate Hills! Let's master the first phonemes!",
+        mascotDialogue = "Welcome to Chocolate Hills! Let's learn our first sounds!",
         primaryColor = Color(0xFFFFC800),
         shelfColor = Color(0xFFE5A500),
         backgroundTint = Color(0xFFFEFCE8),
@@ -44,9 +44,9 @@ object BiomeThemes {
 
     val SECTION_2 = BiomeTheme(
         sectionNumber = 2,
-        title = "Loboc River Valley",
+        title = "Loboc River",
         lettersSummary = "Practice sounds O, B, E, U",
-        mascotDialogue = "Navigating the Loboc River! Listen closely to the sounds!",
+        mascotDialogue = "We are at the Loboc River! Listen to the sounds!",
         primaryColor = Color(0xFF0D9488),
         shelfColor = Color(0xFF0F766E),
         backgroundTint = Color(0xFFF0FDFA),
@@ -59,9 +59,9 @@ object BiomeThemes {
 
     val SECTION_3 = BiomeTheme(
         sectionNumber = 3,
-        title = "Panglao Coral Shore",
+        title = "Panglao Beach",
         lettersSummary = "Practice sounds T, K, L, Y",
-        mascotDialogue = "Diving into Panglao Coral Shore! Catch new letter sounds!",
+        mascotDialogue = "We are at Panglao Beach! Let's find new sounds!",
         primaryColor = Color(0xFF0284C7),
         shelfColor = Color(0xFF0369A1),
         backgroundTint = Color(0xFFF0F9FF),
@@ -74,9 +74,9 @@ object BiomeThemes {
 
     val SECTION_4 = BiomeTheme(
         sectionNumber = 4,
-        title = "Tarsier Forest Sanctuary",
+        title = "Tarsier Forest",
         lettersSummary = "Practice sounds N, G, NG, P",
-        mascotDialogue = "Deep in the Tarsier Forest Sanctuary! Keep up the great pace!",
+        mascotDialogue = "We are in the Tarsier Forest! You are doing great!",
         primaryColor = Color(0xFF15803D),
         shelfColor = Color(0xFF166534),
         backgroundTint = Color(0xFFF0FDF4),
@@ -89,9 +89,9 @@ object BiomeThemes {
 
     val SECTION_5 = BiomeTheme(
         sectionNumber = 5,
-        title = "Bohol Mountain Summit",
+        title = "Bohol Mountains",
         lettersSummary = "Practice sounds R, D, H, W",
-        mascotDialogue = "Reaching the Bohol Mountain Summit! You're almost a master!",
+        mascotDialogue = "We are up in the Bohol Mountains! Keep going!",
         primaryColor = Color(0xFFD97706),
         shelfColor = Color(0xFFB45309),
         backgroundTint = Color(0xFFFFF7ED),
@@ -104,9 +104,9 @@ object BiomeThemes {
 
     val SECTION_6 = BiomeTheme(
         sectionNumber = 6,
-        title = "Baclayon Heritage",
+        title = "Baclayon Church",
         lettersSummary = "Practice sounds C, F, J, Ñ",
-        mascotDialogue = "At historic Baclayon Heritage! Discover wonderful new sounds!",
+        mascotDialogue = "We are at Baclayon Church! More new sounds!",
         primaryColor = Color(0xFFEA580C),
         shelfColor = Color(0xFFC2410C),
         backgroundTint = Color(0xFFFFFBEB),
@@ -119,9 +119,9 @@ object BiomeThemes {
 
     val SECTION_7 = BiomeTheme(
         sectionNumber = 7,
-        title = "Mount Pulag Summit",
+        title = "Mount Pulag",
         lettersSummary = "Practice sounds Q, V, X, Z",
-        mascotDialogue = "At the majestic Mount Pulag Summit! Complete the final phonics journey!",
+        mascotDialogue = "We are on Mount Pulag! These are the last sounds!",
         primaryColor = Color(0xFF8B5FBF),
         shelfColor = Color(0xFF6E3FA3),
         backgroundTint = Color(0xFFFAF5FF),

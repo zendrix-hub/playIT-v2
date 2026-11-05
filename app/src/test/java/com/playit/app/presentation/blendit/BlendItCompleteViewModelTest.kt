@@ -86,6 +86,26 @@ class BlendItCompleteViewModelTest {
         assertTrue(viewModel.nextHighlighted.value)
     }
 
+    /** "You've been practicing every day" played on every word game, even on a child's first day. */
+    @Test
+    fun theStreakLine_playsOnlyOnARealStreak() = runTest {
+        every { audioResolver.getVoPath(com.playit.app.data.audio.VoContext.STREAK_01) } returns "vo_streak.wav"
+        val sequences = mutableListOf<List<String>>()
+        every { audioPlayer.playSequence(capture(sequences), any()) } just Runs
+
+        coEvery { streakTracker.recordActivity(1L) } returns
+            com.playit.app.domain.model.Profile(id = 1, name = "Frog", avatarResId = 5, currentStreak = 1)
+        BlendItCompleteViewModel(blendItProgressRepository, streakTracker, sessionManager, audioPlayer, audioResolver, savedStateHandle)
+        advanceUntilIdle()
+        assertTrue("day 1: no streak line", "vo_streak.wav" !in sequences.last())
+
+        coEvery { streakTracker.recordActivity(1L) } returns
+            com.playit.app.domain.model.Profile(id = 1, name = "Frog", avatarResId = 5, currentStreak = 3)
+        BlendItCompleteViewModel(blendItProgressRepository, streakTracker, sessionManager, audioPlayer, audioResolver, savedStateHandle)
+        advanceUntilIdle()
+        assertTrue("day 3 in a row: the streak line", "vo_streak.wav" in sequences.last())
+    }
+
     @Test
     fun idle_waitsForCompletionSequence() = runTest {
         viewModel = BlendItCompleteViewModel(

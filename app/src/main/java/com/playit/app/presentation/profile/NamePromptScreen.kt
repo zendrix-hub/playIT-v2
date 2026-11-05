@@ -108,7 +108,7 @@ fun NamePromptScreen(
                 Spacer(modifier = Modifier.width(12.dp))
                 // One title; Lily's bubble says what to do (card 31d dropped two headings that repeated it).
                 Text(
-                    text = "New Player Profile",
+                    text = "New player",
                     style = MaterialTheme.typography.headlineLarge,
                     color = TextMidnight,
                     maxLines = 2,

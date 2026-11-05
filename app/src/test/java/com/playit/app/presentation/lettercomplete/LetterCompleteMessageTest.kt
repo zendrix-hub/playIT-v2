@@ -7,11 +7,11 @@ import org.junit.Test
 class LetterCompleteMessageTest {
 
     @Test fun oneStar_saysFinished() {
-        assertEquals("You finished Letter M! Amazing sound practice!", letterCompleteMessage("M", 1))
+        assertEquals("You finished M! Good work!", letterCompleteMessage("M", 1))
     }
 
     @Test fun twoOrThreeStars_sayMastered() {
-        assertEquals("You mastered Letter S! Amazing sound practice!", letterCompleteMessage("S", 2))
-        assertEquals("You mastered Letter S! Amazing sound practice!", letterCompleteMessage("S", 3))
+        assertEquals("You learned S! Great job!", letterCompleteMessage("S", 2))
+        assertEquals("You learned S! Great job!", letterCompleteMessage("S", 3))
     }
 }

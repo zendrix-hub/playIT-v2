@@ -128,7 +128,7 @@ class ProfileViewModel @Inject constructor(
                 _uiState.value = ProfileUiState.Created(newId)
             }.onFailure { exception ->
                 _uiState.value = ProfileUiState.Error(
-                    exception.message ?: "Failed to create profile."
+                    exception.message ?: "Something went wrong. Please try again."
                 )
             }
         }

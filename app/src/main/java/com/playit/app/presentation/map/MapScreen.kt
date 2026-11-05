@@ -524,9 +524,9 @@ fun MapScreen(
         if (lockedBlendItDialogGroup != null) {
             val group = lockedBlendItDialogGroup ?: "1"
             GummyDialog(
-                title = "Group $group Locked",
-                body = "Complete all letters in Group $group to unlock the Blend-It Challenge!",
-                confirmText = "Got It",
+                title = "Not yet!",
+                body = "Finish the letters of chapter $group first. Then you can build words with them!",
+                confirmText = "OK",
                 onConfirm = { lockedBlendItDialogGroup = null },
                 onDismiss = { lockedBlendItDialogGroup = null },
                 confirmColor = Mango,
@@ -822,9 +822,9 @@ fun BlendItChallengeNodeCard(
     val chestShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp, bottomStart = 16.dp, bottomEnd = 16.dp)
 
     val accessibilityLabel = if (isUnlocked) {
-        "Blend-It Treasure Chest Milestone, Unit ${node.groupId}, unlocked"
+        "Word game, chapter ${node.groupId}, open"
     } else {
-        "Blend-It Treasure Chest Milestone, Unit ${node.groupId}, locked"
+        "Word game, chapter ${node.groupId}, locked"
     }
 
     Column(
@@ -909,7 +909,7 @@ fun BlendItChallengeNodeCard(
                         if (isUnlocked) {
                             Icon(
                                 imageVector = Icons.Rounded.Star,
-                                contentDescription = "Milestone Star",
+                                contentDescription = "Star",
                                 tint = Color(0xFF78350F),
                                 modifier = Modifier.size(20.dp)
                             )
@@ -946,7 +946,7 @@ fun BlendItChallengeNodeCard(
                 )
                 // 16 sp like all map text (it was 9.5 sp, card 31e).
                 Text(
-                    text = "BLEND ${node.groupId}",
+                    text = "WORDS ${node.groupId}",
                     fontFamily = LexendFontFamily,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Black,

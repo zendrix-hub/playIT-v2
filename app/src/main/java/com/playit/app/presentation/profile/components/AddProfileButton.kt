@@ -67,9 +67,9 @@ fun AddProfileButton(
 
             Text(
                 text = if (enabled) {
-                    if (currentCount > 0) "Add Profile ($currentCount/$maxCount)" else "Add Profile"
+                    if (currentCount > 0) "New player ($currentCount of $maxCount)" else "New player"
                 } else {
-                    "Limit Reached ($maxCount/$maxCount)"
+                    "Full: $maxCount players"
                 },
                 fontFamily = LexendFontFamily,
                 fontSize = 24.sp,

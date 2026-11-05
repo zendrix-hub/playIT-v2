@@ -104,18 +104,20 @@ class BlendItCompleteViewModel @Inject constructor(
                     )
                 )
             )
-            streakTracker.recordActivity(profileId)
+            val streak = streakTracker.recordActivity(profileId)?.currentStreak ?: 0
 
-            // Play completion fanfare + complete VO line + milestone/streak badge unlock audio + next cue
+            // Fanfare, the complete line, then the streak badge and "You've been practicing every day" only on a real
+            // streak (it used to play every time, even on a child's first day), then the next cue.
             val fanfareSfx = audioResolver.getSfxPath(SfxEvent.LEVEL_COMPLETE_FANFARE)
             val completeVo = audioResolver.getVoPath(VoContext.COMPLETE_01)
-            val streakSfx = audioResolver.getSfxPath(SfxEvent.STREAK_BADGE_UNLOCK)
-            val streakVo = audioResolver.getVoPath(VoContext.STREAK_01)
+            val streakLines = if (streak >= 2) {
+                listOf(audioResolver.getSfxPath(SfxEvent.STREAK_BADGE_UNLOCK), audioResolver.getVoPath(VoContext.STREAK_01))
+            } else emptyList()
             val nextCue = audioResolver.getUiPath("ui_complete_next")
 
             _nextHighlighted.value = true
             _isPlaying.value = true
-            audioPlayer.playSequence(listOf(fanfareSfx, completeVo, streakSfx, streakVo, nextCue)) {
+            audioPlayer.playSequence(listOf(fanfareSfx, completeVo) + streakLines + nextCue) {
                 _isPlaying.value = false
             }
         }

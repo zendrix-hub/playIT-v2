@@ -173,7 +173,7 @@ fun HearItScreen(
                 // While the sound plays the card already shows "Sound: /m/", so the bubble only says "Listen!" (card 31d).
                 MascotSpeechHeader(
                     greet = true,
-                    message = if (isPlaying) "Listen!" else "Listen closely to the sound of the letter, then tap play.",
+                    message = if (isPlaying) "Listen!" else "Listen! Tap the letter to hear it again.",
                     mascotState = if (isPlaying) MascotState.LISTENING else if (playCount > 0) MascotState.POINTING else MascotState.IDLE,
                     isPlayingAudio = isPlayingPrompt,
                     onMascotTap = { viewModel.playHearItIntroAudio() }

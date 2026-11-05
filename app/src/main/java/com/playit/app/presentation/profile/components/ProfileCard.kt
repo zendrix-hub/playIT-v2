@@ -35,7 +35,7 @@ fun ProfileCard(
     val starsWordLower = if (profile.totalStars == 1) "star" else "stars"
     val starsWordTitle = if (profile.totalStars == 1) "Star" else "Stars"
     val accessibilityDescription =
-        "Profile for ${profile.name}, ${profile.totalStars} $starsWordLower earned. Tap to start learning."
+        "${profile.name}, ${profile.totalStars} $starsWordLower. Tap to play."
 
     GummyContainer(
         onClick = { onSelect(profile.id) },

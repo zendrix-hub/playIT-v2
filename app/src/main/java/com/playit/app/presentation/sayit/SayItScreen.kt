@@ -218,7 +218,7 @@ fun SayItScreen(
                 MascotSpeechHeader(
                     greet = true,
                     message = when {
-                        permissionDeniedMessage -> "Please allow microphone access so Lily can hear you."
+                        permissionDeniedMessage -> "Ask a grown-up to turn on the microphone."
                         isModelInitializing -> "Lily is getting ready..."
                         isNoisyEnvironment -> "It's a little noisy right now. Let's find a quiet spot to practice!"
                         state is SayItState.Listening ->
@@ -227,7 +227,7 @@ fun SayItScreen(
                         state is SayItState.Correct -> "Yes! You said it!"
                         state is SayItState.Incorrect -> "Good try! Listen again."
                         wordMode -> "Now it's your turn! Say the whole word clearly into the microphone!"
-                        else -> "Now it's your turn. Say the sound clearly into the microphone!"
+                        else -> "Your turn! Say it into the microphone."
                     },
                     mascotState = when {
                         permissionDeniedMessage -> MascotState.ENCOURAGING

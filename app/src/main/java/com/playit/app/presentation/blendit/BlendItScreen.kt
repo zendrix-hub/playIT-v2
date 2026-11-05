@@ -130,7 +130,7 @@ fun BlendItScreen(
                     message = when (uiState) {
                         is BlendItUiState.WordCorrect -> "Perfect! Great job!"
                         is BlendItUiState.WordIncorrect -> "Good try! Let's listen again."
-                        else -> "Let's blend letter sounds together to build words!"
+                        else -> "Let's build some words together!"
                     },
                     mascotState = when (uiState) {
                         is BlendItUiState.WordCorrect -> MascotState.CELEBRATING
@@ -170,7 +170,7 @@ fun BlendItScreen(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = if (isWordCorrect) "Blending..." else "Check Word",
+                            text = if (isWordCorrect) "Listen..." else "Done",
                             fontFamily = LexendFontFamily,
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Black,
@@ -182,7 +182,7 @@ fun BlendItScreen(
         ) {
             // Word progress pill (24sp child reading floor)
             Text(
-                text = "Word: ${currentWordIndex + 1} / $totalWords",
+                text = "Word ${currentWordIndex + 1} of $totalWords",
                 fontFamily = LexendFontFamily,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,

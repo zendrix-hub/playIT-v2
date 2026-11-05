@@ -93,7 +93,7 @@ fun BlendItCompleteScreen(
             topBar = {},
             header = {
                 DockedMascotWithBubble(
-                    message = "Group ${viewModel.groupId} Mastered!",
+                    message = "You built all the words!",
                     mascotState = MascotState.CELEBRATING,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
@@ -132,13 +132,13 @@ fun BlendItCompleteScreen(
             // Title pair stays together; the scaffold spaces the groups evenly.
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "GROUP ${viewModel.groupId}",
+                    text = "CHAPTER ${viewModel.groupId}",
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp),
                     color = Cloud.copy(alpha = 0.85f),
                     maxLines = 1
                 )
                 Text(
-                    text = "Challenge Mastered!",
+                    text = "Great job!",
                     style = MaterialTheme.typography.headlineLarge,
                     color = Cloud,
                     textAlign = TextAlign.Center,
@@ -174,7 +174,7 @@ fun BlendItCompleteScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "$starsEarned ${if (starsEarned == 1) "Star" else "Stars"} • Bonus Unlocked!",
+                        text = "$starsEarned ${if (starsEarned == 1) "Star" else "Stars"}",
                         style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
                         color = Cloud,
                         textAlign = TextAlign.Center,

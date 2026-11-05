@@ -54,8 +54,8 @@ import com.playit.app.presentation.theme.UbeDark
 
 /** Lily's line on the letter's end screen: one star means the child finished the letter, not mastered it (card 31d). */
 internal fun letterCompleteMessage(letter: String, stars: Int): String =
-    if (stars == 1) "You finished Letter $letter! Amazing sound practice!"
-    else "You mastered Letter $letter! Amazing sound practice!"
+    if (stars == 1) "You finished $letter! Good work!"
+    else "You learned $letter! Great job!"
 
 @Composable
 fun LetterCompleteScreen(

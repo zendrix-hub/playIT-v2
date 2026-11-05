@@ -178,7 +178,7 @@ fun NodeActionPopupDialog(
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = if (isUnlocked) "Phonics Sound: /${letterNode.symbol.lowercase()}/" else "Unit ${letterNode.groupNumber} Phonics",
+                        text = if (isUnlocked) "Sound: ${letterNode.symbol.lowercase()}" else "Chapter ${letterNode.groupNumber}",
                         fontFamily = LexendFontFamily,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
@@ -187,7 +187,7 @@ fun NodeActionPopupDialog(
                 } else {
                     val blendNode = node as MapNode.BlendItNode
                     Text(
-                        text = "BLEND CHALLENGE ${blendNode.groupId}",
+                        text = "WORD GAME ${blendNode.groupId}",
                         fontFamily = LexendFontFamily,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Black,
@@ -195,7 +195,7 @@ fun NodeActionPopupDialog(
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = "Word Blending Milestone",
+                        text = "Build words",
                         fontFamily = LexendFontFamily,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
@@ -245,8 +245,8 @@ fun NodeActionPopupDialog(
                                 MiniPill(label = "Find It")
                             } else {
                                 MiniPill(label = "Listen")
-                                MiniPill(label = "Blend")
-                                MiniPill(label = "Master")
+                                MiniPill(label = "Build")
+                                MiniPill(label = "Hear it")
                             }
                         }
                     }
@@ -255,9 +255,9 @@ fun NodeActionPopupDialog(
 
                     // Gummy Action Button
                     val buttonText = when {
-                        isCompleted -> "PRACTICE AGAIN"
-                        isLetter -> "START CHALLENGE"
-                        else -> "START BLEND CHALLENGE"
+                        isCompleted -> "PLAY AGAIN"
+                        isLetter -> "START"
+                        else -> "BUILD WORDS"
                     }
                     val btnBg = if (isCompleted) PopGoldFace else PopGreenFace
                     val btnShelf = if (isCompleted) PopGoldShelf else PopGreenShelf
@@ -287,7 +287,7 @@ fun NodeActionPopupDialog(
                             .padding(14.dp)
                     ) {
                         Text(
-                            text = "Complete the previous sounds to unlock this challenge!",
+                            text = "Finish the letter before this one first.",
                             fontFamily = LexendFontFamily,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,

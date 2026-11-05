@@ -148,7 +148,7 @@ fun MarungkoGroupBanner(
                     ) {
                         // 16 sp floor for all map text (it was 11 sp, card 31e).
                         Text(
-                            text = "SECTION 1, UNIT $groupNumber".uppercase(),
+                            text = "CHAPTER $groupNumber",
                             fontFamily = LexendFontFamily,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.ExtraBold,
@@ -182,7 +182,7 @@ fun MarungkoGroupBanner(
                     ) {
                         Icon(
                             imageVector = Icons.Rounded.AutoStories,
-                            contentDescription = "Guidebook for Unit $groupNumber",
+                            contentDescription = "Chapter $groupNumber: the sounds and words",
                             tint = Color.White,
                             modifier = Modifier.size(32.dp)
                         )
