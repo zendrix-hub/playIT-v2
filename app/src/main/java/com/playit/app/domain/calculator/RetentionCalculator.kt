@@ -24,4 +24,16 @@ class RetentionCalculator @Inject constructor() {
         val correctRecent = recentSayIt.count { it.isCorrect } + recentFindIt.count { it.isCorrect }
         return (correctRecent.toFloat() / totalRecent.toFloat()) * 100f
     }
+
+    /** Right answers and attempts in the last 7 days, for a score the record can grade. */
+    fun recentAttempts(
+        sayItAttempts: List<SayItAttempt>,
+        findItAttempts: List<FindItAttempt>,
+        currentTimeMillis: Long = System.currentTimeMillis()
+    ): Pair<Int, Int> {
+        val sevenDaysAgo = currentTimeMillis - (7L * 24 * 60 * 60 * 1000)
+        val recent = sayItAttempts.filter { it.attemptedAt >= sevenDaysAgo }.map { it.isCorrect } +
+            findItAttempts.filter { it.attemptedAt >= sevenDaysAgo }.map { it.isCorrect }
+        return recent.count { it } to recent.size
+    }
 }

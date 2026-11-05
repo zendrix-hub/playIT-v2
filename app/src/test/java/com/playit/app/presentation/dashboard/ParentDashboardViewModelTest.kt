@@ -4,6 +4,7 @@ import com.playit.app.data.pdf.PdfExporter
 import com.playit.app.domain.calculator.ReportGenerator
 import com.playit.app.domain.model.Profile
 import com.playit.app.domain.model.ProfileDashboardData
+import com.playit.app.domain.model.ProgressLevel
 import com.playit.app.domain.model.ReportData
 import com.playit.app.domain.repository.ProfileRepository
 import com.playit.app.navigation.SessionManager
@@ -37,14 +38,14 @@ class ParentDashboardViewModelTest {
     private val sampleDashboardData = ProfileDashboardData(
         profile = sampleProfile1,
         totalStars = 24,
-        retentionScore = 0.85f,
-        overallAccuracy = 0.90f,
         completedLettersCount = 8,
         totalLettersCount = 26,
         letterPerformances = emptyList(),
+        overallGrade = 88,
+        overallLevel = ProgressLevel.VERY_SATISFACTORY,
+        recentScore = 85,
         blendItCompletedCount = 2,
-        blendItTotalCount = 7,
-        atRiskLetters = emptyList()
+        blendItTotalCount = 7
     )
 
     @Before
@@ -125,7 +126,7 @@ class ParentDashboardViewModelTest {
         val dummyReportData: ReportData = mockk()
         val dummyFile = File("test_report.pdf")
         coEvery { reportGenerator.generateDashboardData(1L) } returns sampleDashboardData
-        coEvery { reportGenerator.generateReportData(1L) } returns dummyReportData
+        coEvery { reportGenerator.generateReportData() } returns dummyReportData
         coEvery { pdfExporter.exportReport(dummyReportData) } returns Result.success(dummyFile)
 
         viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager)
@@ -144,7 +145,7 @@ class ParentDashboardViewModelTest {
     fun exportPdfReport_failure_updatesExportStatus() = runTest {
         val dummyReportData: ReportData = mockk()
         coEvery { reportGenerator.generateDashboardData(1L) } returns sampleDashboardData
-        coEvery { reportGenerator.generateReportData(1L) } returns dummyReportData
+        coEvery { reportGenerator.generateReportData() } returns dummyReportData
         coEvery { pdfExporter.exportReport(dummyReportData) } returns Result.failure(RuntimeException("Disk full"))
 
         viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager)
@@ -160,6 +161,45 @@ class ParentDashboardViewModelTest {
 
         viewModel.resetExportStatus()
         assertTrue(viewModel.uiState.value.exportStatus is ExportStatus.Idle)
+    }
+
+    /** Two or more children on the phone: the class record of all of them shows above the selected child. */
+    @Test
+    fun withTwoChildren_theClassRecordLoads() = runTest {
+        val record = listOf(sampleDashboardData, sampleDashboardData.copy(profile = sampleProfile2))
+        coEvery { reportGenerator.generateDashboardData(1L) } returns sampleDashboardData
+        coEvery { reportGenerator.generateClassRecord() } returns record
+
+        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager)
+        profilesFlow.emit(listOf(sampleProfile1, sampleProfile2))
+        advanceUntilIdle()
+
+        assertEquals(record, viewModel.uiState.value.classRecord)
+    }
+
+    @Test
+    fun withOneChild_thereIsNoClassRecord() = runTest {
+        coEvery { reportGenerator.generateDashboardData(1L) } returns sampleDashboardData
+
+        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager)
+        profilesFlow.emit(listOf(sampleProfile1))
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.classRecord.isEmpty())
+        coVerify(exactly = 0) { reportGenerator.generateClassRecord() }
+    }
+
+    @Test
+    fun exportPdfReport_withNoChildren_doesNothing() = runTest {
+        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager)
+        profilesFlow.emit(emptyList())
+        advanceUntilIdle()
+
+        viewModel.exportPdfReport()
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.exportStatus is ExportStatus.Idle)
+        coVerify(exactly = 0) { reportGenerator.generateReportData() }
     }
 
     @Test

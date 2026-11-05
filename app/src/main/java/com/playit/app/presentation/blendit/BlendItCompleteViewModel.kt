@@ -7,6 +7,7 @@ import com.playit.app.data.audio.AudioPlayer
 import com.playit.app.data.audio.AudioResolver
 import com.playit.app.data.audio.SfxEvent
 import com.playit.app.data.audio.VoContext
+import com.playit.app.domain.manager.BestResult
 import com.playit.app.domain.manager.BlendItStarThresholds
 import com.playit.app.domain.manager.StreakTracker
 import com.playit.app.domain.model.BlendItProgress
@@ -91,13 +92,16 @@ class BlendItCompleteViewModel @Inject constructor(
             _starsEarned.value = stars
 
             blendItProgressRepository.saveProgress(
-                BlendItProgress(
-                    profileId = profileId,
-                    groupId = groupId,
-                    starsEarned = stars,
-                    heartsLost = heartsLost,
-                    isCompleted = true,
-                    completedAt = System.currentTimeMillis()
+                BestResult.blendIt(
+                    saved = blendItProgressRepository.getProgressForGroup(profileId, groupId),
+                    played = BlendItProgress(
+                        profileId = profileId,
+                        groupId = groupId,
+                        starsEarned = stars,
+                        heartsLost = heartsLost,
+                        isCompleted = true,
+                        completedAt = System.currentTimeMillis()
+                    )
                 )
             )
             streakTracker.recordActivity(profileId)

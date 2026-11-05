@@ -27,10 +27,12 @@ sealed interface ExportStatus {
     data class Error(val message: String) : ExportStatus
 }
 
+/** [classRecord] holds every learner on this phone, for the class record shown when there are two or more. */
 data class ParentDashboardUiState(
     val profiles: List<Profile> = emptyList(),
     val selectedProfile: Profile? = null,
     val dashboardData: ProfileDashboardData? = null,
+    val classRecord: List<ProfileDashboardData> = emptyList(),
     val isLoading: Boolean = true,
     val exportStatus: ExportStatus = ExportStatus.Idle
 )
@@ -66,7 +68,8 @@ class ParentDashboardViewModel @Inject constructor(
                         ?: profiles.firstOrNull()
                     _uiState.value = _uiState.value.copy(
                         profiles = profiles,
-                        selectedProfile = currentSelected
+                        selectedProfile = currentSelected,
+                        classRecord = if (profiles.size > 1) reportGenerator.generateClassRecord() else emptyList()
                     )
                     currentSelected?.let { selectProfile(it) } ?: run {
                         _uiState.value = _uiState.value.copy(isLoading = false, dashboardData = null)
@@ -99,11 +102,12 @@ class ParentDashboardViewModel @Inject constructor(
         }
     }
 
+    /** The report covers every learner on this phone: a class record, then one record per learner. */
     fun exportPdfReport() {
-        val selected = _uiState.value.selectedProfile ?: return
+        if (_uiState.value.profiles.isEmpty()) return
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(exportStatus = ExportStatus.Exporting)
-            val reportData: ReportData? = reportGenerator.generateReportData(selected.id)
+            val reportData: ReportData? = reportGenerator.generateReportData()
             if (reportData != null) {
                 val result = pdfExporter.exportReport(reportData)
                 result.fold(

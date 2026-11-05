@@ -7,6 +7,7 @@ import com.playit.app.data.audio.AudioPlayer
 import com.playit.app.data.audio.AudioResolver
 import com.playit.app.data.audio.SfxEvent
 import com.playit.app.data.audio.VoContext
+import com.playit.app.domain.manager.BestResult
 import com.playit.app.domain.manager.StarCalculator
 import com.playit.app.domain.manager.StreakTracker
 import com.playit.app.domain.model.LessonProgress
@@ -102,15 +103,18 @@ class LetterCompleteViewModel @Inject constructor(
             val stars = StarCalculator.calculateStars(heartsLost = heartsLost)
             _starsEarned.value = stars
 
-            // Save lesson completion and record streak activity
+            // Save lesson completion (a replay never lowers the stars) and record streak activity
             lessonProgressRepository.saveProgress(
-                LessonProgress(
-                    profileId = profileId,
-                    phonemeId = phonemeId,
-                    starsEarned = stars,
-                    heartsLost = heartsLost,
-                    isCompleted = true,
-                    completedAt = System.currentTimeMillis()
+                BestResult.lesson(
+                    saved = lessonProgressRepository.getProgressForPhoneme(profileId, phonemeId),
+                    played = LessonProgress(
+                        profileId = profileId,
+                        phonemeId = phonemeId,
+                        starsEarned = stars,
+                        heartsLost = heartsLost,
+                        isCompleted = true,
+                        completedAt = System.currentTimeMillis()
+                    )
                 )
             )
             streakTracker.recordActivity(profileId)

@@ -260,7 +260,8 @@ fun LearnerHeroCard(
                         }
                     }
                     Text(
-                        text = "Marungko Phonics Explorer",
+                        text = "Grade 1 reading: letter sounds",
+                        lineHeight = 18.sp,
                         fontFamily = LexendFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
@@ -281,29 +282,37 @@ fun LearnerHeroCard(
                     }
                 }
 
-                // Streak Pill
-                Box(
-                    modifier = Modifier
-                        .clip(PillShape)
-                        .background(SunnyGoldLight)
-                        .border(2.dp, SunnyGold, PillShape)
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Row 2: the overall level in words, then how far through the letters the child is (no bare percentage)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Overall so far",
+                        fontFamily = LexendFontFamily,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = TextMidnight
+                    )
+                    data.overallGrade?.let { grade ->
                         Text(
-                            text = "Streak: ${data.profile.currentStreak}d",
+                            text = "Average grade $grade",
                             fontFamily = LexendFontFamily,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = SunnyGoldDark
+                            fontSize = 12.sp,
+                            color = TextMuted
                         )
                     }
                 }
+                LevelChip(data.overallLevel)
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // Row 2: Mastery Progress Bar
             Column(modifier = Modifier.fillMaxWidth()) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -311,19 +320,29 @@ fun LearnerHeroCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Curriculum Mastery",
-                        fontFamily = LexendFontFamily,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = TextMidnight
-                    )
-                    Text(
-                        text = "${data.completedLettersCount} of ${data.totalLettersCount} Sounds (${(masteryFraction * 100).toInt()}%)",
+                        text = learnedText(data),
                         fontFamily = LexendFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = PrimaryJoy
                     )
+                    if (data.profile.currentStreak > 1) {
+                        Box(
+                            modifier = Modifier
+                                .clip(PillShape)
+                                .background(SunnyGoldLight)
+                                .border(2.dp, SunnyGold, PillShape)
+                                .padding(horizontal = 10.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = "${data.profile.currentStreak} days in a row",
+                                fontFamily = LexendFontFamily,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = TextMidnight
+                            )
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
