@@ -21,6 +21,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.presentation.components.GummyBackButton
 import com.playit.app.presentation.components.GummyButton
+import com.playit.app.presentation.components.GummyTextField
+import com.playit.app.presentation.dashboard.MAX_NAME_LENGTH
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import com.playit.app.presentation.components.MascotSpeechHeader
 import com.playit.app.presentation.components.MascotState
 import com.playit.app.presentation.profile.components.AvatarPicker
@@ -36,6 +42,10 @@ fun NamePromptScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isPlayingIntro by viewModel.isPlayingIntro.collectAsStateWithLifecycle()
     val hasSelectedAvatar = remember { mutableStateOf(false) }
+    // The child types their name (user, 2026-11-05: "the child has to type their name", so Lily's card says
+    // "Welcome back, <name>"): letters only, like the Parent Zone's rename.
+    var childName by rememberSaveable { mutableStateOf("") }
+    val nameReady = childName.trim().isNotEmpty()
 
     val mascotState = when {
         // Error takes priority: don't let Lily celebrate next to an error banner.
@@ -95,6 +105,7 @@ fun NamePromptScreen(
                 .fillMaxSize()
                 .statusBarsPadding()
                 .navigationBarsPadding()
+                .imePadding()
                 .padding(horizontal = 20.dp, vertical = 12.dp)
         ) {
             // Header Bar with Back Button
@@ -120,7 +131,7 @@ fun NamePromptScreen(
 
             // Companion Mascot Dialogue
             MascotSpeechHeader(
-                message = "Pick your animal friend!",
+                message = if (hasSelectedAvatar.value) "Now type your name!" else "Pick your animal friend!",
                 mascotState = mascotState,
                 isPlayingAudio = isPlayingIntro,
                 onMascotTap = { viewModel.playNamePromptIntro() },
@@ -145,6 +156,24 @@ fun NamePromptScreen(
                             hasSelectedAvatar.value = true
                             viewModel.onAvatarSelected(it)
                         }
+                    )
+
+                    GummyTextField(
+                        value = childName,
+                        onValueChange = { input ->
+                            val letters = input.filter { it.isLetter() || it == ' ' || it == '-' || it == '\'' }
+                            if (letters.length <= MAX_NAME_LENGTH) childName = letters
+                        },
+                        label = "Your name",
+                        placeholder = "Type your name",
+                        maxLength = MAX_NAME_LENGTH,
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Words,
+                            imeAction = ImeAction.Done
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("nameprompt_name")
                     )
 
                     if (uiState is ProfileUiState.Error) {
@@ -173,11 +202,11 @@ fun NamePromptScreen(
 
             GummyButton(
                 text = if (uiState is ProfileUiState.Loading) "Creating..." else "Let's Play",
-                onClick = { viewModel.createProfile("", selectedAvatarId) },
+                onClick = { if (nameReady) viewModel.createProfile(childName, selectedAvatarId) },
                 backgroundColor = EmeraldLeaf,
                 shadowColor = EmeraldLeafShadow,
                 contentColor = Color.White,
-                enabled = uiState !is ProfileUiState.Loading,
+                enabled = uiState !is ProfileUiState.Loading && nameReady,
                 fontSize = 24,
                 modifier = Modifier
                     .fillMaxWidth()

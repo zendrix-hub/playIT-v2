@@ -2,6 +2,12 @@ package com.playit.app.screenshot
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import com.github.takahirom.roborazzi.captureRoboImage
 import com.playit.app.data.audio.AudioPlayer
 import com.playit.app.data.audio.AudioResolver
@@ -42,5 +48,24 @@ class NamePromptScreenshotTest {
         compose.waitForIdle()
         compose.waitForIdle()
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/nameprompt.png")
+    }
+
+    /** The child types a name (user, 2026-11-05); Let's Play waits for it and the profile takes it. */
+    @Test
+    fun namePrompt_letsPlayWaitsForATypedName_andUsesIt() {
+        val profileRepo: ProfileRepository = mockk(relaxed = true)
+        every { profileRepo.getAllProfiles() } returns MutableStateFlow(emptyList())
+        io.mockk.coEvery { profileRepo.createProfile(any(), any()) } returns Result.success(7L)
+        val vm = ProfileViewModel(profileRepo, mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true))
+
+        compose.setContent { PlayItTheme { NamePromptScreen(vm, onProfileCreated = {}, onBack = {}) } }
+        compose.waitForIdle()
+        compose.onNodeWithTag("nameprompt_play").assertIsNotEnabled()
+        compose.onNode(hasSetTextAction()).performTextInput("Ana2!")
+        compose.waitForIdle()
+        compose.onNodeWithTag("nameprompt_play").assertIsEnabled().performClick()
+        compose.waitForIdle()
+        io.mockk.coVerify { profileRepo.createProfile("Ana", any()) }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/nameprompt_typed.png")
     }
 }
