@@ -1,0 +1,26 @@
+{
+  "release": "2026-11-05-return",
+  "approvedBy": "user: OK marks on review page 2026-11-05-return-greeting (CSV exported 2026-11-05 22:49); ret_all_done had all three takes marked OK and take 3 was used, at speed 1.00 like the other three lines",
+  "clips": [
+    {"clipId": "ret_welcome_back", "dest": "ui", "sourceBatch": "2026-11-05-return-greeting", "sourceFile": "ret_welcome_back_t*.wav",
+     "text": "Welcome back! I missed you.", "voice": "kokoro-82M mix af_heart*0.7+af_bella*0.3", "speed": 1.00,
+     "license": "Apache-2.0 (Kokoro-82M)",
+     "tool": "tools/audio/return_greeting_batch.py (kokoro_local.synth + clean, 24 kHz, RMS -20 dBFS)",
+     "note": "Lily's welcome back on the first map of a launch for a child who has played before (adviser, 2026-11-05)."},
+    {"clipId": "ret_keep_going", "dest": "ui", "sourceBatch": "2026-11-05-return-greeting", "sourceFile": "ret_keep_going_t*.wav",
+     "text": "Do you want to keep going with this sound?", "voice": "kokoro-82M mix af_heart*0.7+af_bella*0.3", "speed": 1.00,
+     "license": "Apache-2.0 (Kokoro-82M)",
+     "tool": "tools/audio/return_greeting_batch.py (kokoro_local.synth + clean, 24 kHz, RMS -20 dBFS)",
+     "note": "Follows the welcome; then the next letter's own sound plays."},
+    {"clipId": "ret_build_words", "dest": "ui", "sourceBatch": "2026-11-05-return-greeting", "sourceFile": "ret_build_words_t*.wav",
+     "text": "Do you want to build some words?", "voice": "kokoro-82M mix af_heart*0.7+af_bella*0.3", "speed": 1.00,
+     "license": "Apache-2.0 (Kokoro-82M)",
+     "tool": "tools/audio/return_greeting_batch.py (kokoro_local.synth + clean, 24 kHz, RMS -20 dBFS)",
+     "note": "Instead of ret_keep_going when the chapter's word game is next."},
+    {"clipId": "ret_all_done", "dest": "ui", "sourceBatch": "2026-11-05-return-greeting", "sourceFile": "ret_all_done_t3.wav",
+     "text": "You learned all the sounds! Pick any letter to play again.", "voice": "kokoro-82M mix af_heart*0.7+af_bella*0.3", "speed": 1.00,
+     "license": "Apache-2.0 (Kokoro-82M)",
+     "tool": "tools/audio/return_greeting_batch.py (kokoro_local.synth + clean, 24 kHz, RMS -20 dBFS)",
+     "note": "When every letter is done. All three takes were marked OK; take 3 matches the speed of the other lines."}
+  ]
+}
