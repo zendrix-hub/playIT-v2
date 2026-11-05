@@ -48,6 +48,9 @@ data class HeardAttempt(
     val attempt: Int
 )
 
+/** The pause between the two models of the sound while the mouth shows big (AudioPlayer pause token). */
+private const val MODEL_PAUSE = "PAUSE_500"
+
 @HiltViewModel
 class SayItViewModel @Inject constructor(
     private val phonemeRepository: PhonemeRepository,
@@ -125,7 +128,7 @@ class SayItViewModel @Inject constructor(
         val targetWord = _targetWord.value
         val model = if (targetWord != null) audioResolver.getKeyWordPath(targetWord) else audioResolver.getPhonemePath(letter)
         _mouthCue.value = MouthCueStage.BIG
-        audioPlayer.playSequence(listOf(model), onItemStart = null, onComplete = { shrinkMouthCue() })
+        audioPlayer.playSequence(listOf(model, MODEL_PAUSE, model), onItemStart = null, onComplete = { shrinkMouthCue() })
     }
 
     private val _attempts = MutableStateFlow<List<Boolean>>(emptyList())
@@ -447,8 +450,9 @@ class SayItViewModel @Inject constructor(
                     // Big while Lily says "Watch my lips" and models it; small beside the mic from "Your turn".
                     _showMouthCue.value = true
                     _mouthCue.value = MouthCueStage.BIG
+                    // The model twice, with a pause, so the child sees the mouth say it (user, 2026-11-05).
                     audioPlayer.playSequence(
-                        listOf(pop, audioResolver.getTutorPath("car_watch_my_lips"), model, yourTurn),
+                        listOf(pop, audioResolver.getTutorPath("car_watch_my_lips"), model, MODEL_PAUSE, model, yourTurn),
                         onItemStart = { _, path -> if (path == yourTurn) shrinkMouthCue() },
                         onComplete = { shrinkMouthCue() }
                     )

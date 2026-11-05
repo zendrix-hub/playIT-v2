@@ -40,6 +40,22 @@ import com.playit.app.presentation.theme.SurfaceCard
 /** How a mouth settles into its shape: quick, with a small overshoot. */
 internal val MOUTH_SETTLE = spring<Float>(dampingRatio = 0.55f, stiffness = 260f)
 
+/** How loud the voice must be (its envelope level, 0 to 1) to count as the sound playing. */
+internal const val MOUTH_SOUNDING = 0.08f
+/** While the sound plays, the mouth pulses this far out of its shape, this many times a second. */
+internal const val MOUTH_PULSE = 0.22f
+internal const val MOUTH_PULSE_HZ = 4.5f
+/** Before, between and after the sounds the mouth is nearly relaxed. */
+internal const val MOUTH_RESTING = 0.12f
+
+/**
+ * Where the mouth goes ([open]: 0 relaxed, 1 the picture's shape) at [seconds] into the model, for a voice [level]:
+ * the shape while the sound plays, pulsing with it, and nearly relaxed in the gaps.
+ */
+internal fun mouthSaying(level: Float, seconds: Float): Float =
+    if (level < MOUTH_SOUNDING) MOUTH_RESTING
+    else 1f - MOUTH_PULSE * (0.5f + 0.5f * kotlin.math.sin(2f * kotlin.math.PI.toFloat() * MOUTH_PULSE_HZ * seconds))
+
 /**
  * Mouth-shape picture for the current sound (NFR-ACC-01). Pictures arrive through an image
  * release (card 25); until a group's picture is in assets this draws nothing at all, with no
@@ -72,11 +88,13 @@ internal fun ArticulationCue(assetPath: String, size: Dp, modifier: Modifier = M
         if (reduced) {
             open.snapTo(1f)
         } else if (following) {
-            // Same reach as Lily's mouth on a letter's sound, so the two keep time when both show.
+            // The mouth "says" the sound (user, 2026-11-05: "the mouth needs to move when saying the letter"): it
+            // relaxes before and between the sounds, goes into the shape while the sound plays, and pulses there as
+            // the voice does, so a held sound such as mmm visibly moves too. Only while the sound plays.
+            val start = withFrameMillis { it }
             while (true) {
-                withFrameMillis { }
-                val target = (voice.level * 3f).coerceAtMost(1f)
-                open.snapTo(open.value + (target - open.value) * 0.35f)
+                val now = withFrameMillis { it }
+                open.snapTo(open.value + (mouthSaying(voice.level, (now - start) / 1000f) - open.value) * 0.3f)
             }
         } else {
             open.animateTo(1f, MOUTH_SETTLE)

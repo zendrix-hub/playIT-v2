@@ -584,7 +584,7 @@ class SayItViewModelTest {
 
         assertEquals(2, sequences.size)
         assertEquals(
-            listOf("sfx_path", "tutor/car_watch_my_lips.wav", "word_path", "tutor/car_your_turn.wav"),
+            listOf("sfx_path", "tutor/car_watch_my_lips.wav", "word_path", "PAUSE_500", "word_path", "tutor/car_your_turn.wav"),
             sequences[1]
         )
         assertEquals(TutorAction.Correct(SpeechErrorType.OTHER_WORD, 2), viewModel.tutorAction.value)
@@ -627,7 +627,7 @@ class SayItViewModelTest {
 
         viewModel.replayMouthCue()
         assertEquals(MouthCueStage.BIG, viewModel.mouthCue.value)
-        assertEquals(listOf("word_path"), sequences.last())
+        assertEquals(listOf("word_path", "PAUSE_500", "word_path"), sequences.last())
         onDone.last()!!.invoke()
         assertEquals(MouthCueStage.SMALL, viewModel.mouthCue.value)
     }
