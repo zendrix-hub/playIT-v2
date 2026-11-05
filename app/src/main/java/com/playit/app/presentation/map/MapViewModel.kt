@@ -7,6 +7,8 @@ import com.playit.app.data.audio.AudioResolver
 import com.playit.app.data.audio.SfxEvent
 import com.playit.app.data.audio.VoContext
 import com.playit.app.domain.manager.GroupUnlockManager
+import com.playit.app.domain.manager.ReturnGreetingPolicy
+import com.playit.app.domain.repository.SayItAttemptRepository
 import com.playit.app.domain.manager.StreakTracker
 import com.playit.app.domain.manager.UnlockManager
 import com.playit.app.domain.model.MapNode
@@ -23,12 +25,25 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+/**
+ * Lily's welcome back over the map (adviser, 2026-11-05). [letter], [keyWord] and [imagePath] are the next letter's,
+ * for [ReturnGreetingPolicy.KeepGoing]; the name shows on screen only, as Lily can't say a typed name.
+ */
+data class WelcomeBack(
+    val offer: ReturnGreetingPolicy.Offer,
+    val name: String,
+    val letter: String? = null,
+    val keyWord: String? = null,
+    val imagePath: String? = null
+)
 
 data class UserMapStats(
     val profileName: String = "",
@@ -52,8 +67,46 @@ class MapViewModel @Inject constructor(
     private val groupUnlockManager: GroupUnlockManager,
     private val streakTracker: StreakTracker,
     private val audioPlayer: AudioPlayer,
-    private val audioResolver: AudioResolver
+    private val audioResolver: AudioResolver,
+    private val sayItAttemptRepository: SayItAttemptRepository
 ) : ViewModel() {
+
+    private val _welcomeBack = MutableStateFlow<WelcomeBack?>(null)
+
+    /** The welcome-back card, shown once per app launch to a child who has played before; null when closed. */
+    val welcomeBack: StateFlow<WelcomeBack?> = _welcomeBack.asStateFlow()
+
+    /** "Let's go!" or "Not now": the card closes and Lily stops. */
+    fun dismissWelcomeBack() {
+        if (_welcomeBack.value != null) audioPlayer.stop()
+        _welcomeBack.value = null
+    }
+
+    /** A tap on Lily in the card says it again. */
+    fun replayWelcomeBack() {
+        _welcomeBack.value?.let { playWelcomeBack(it) }
+    }
+
+    private suspend fun hasPlayedBefore(profileId: Long): Boolean =
+        lessonProgressRepository.getProgressForProfile(profileId).first().any { it.isCompleted } ||
+            sayItAttemptRepository.getAttemptsForProfile(profileId).isNotEmpty()
+
+    private suspend fun showWelcomeBack(profileId: Long) {
+        val nodes = mapNodes.first { it.isNotEmpty() }
+        val offer = ReturnGreetingPolicy.offerFor(nodes) ?: return
+        val name = profileRepository.getProfileById(profileId)?.name.orEmpty()
+        val phoneme = (offer as? ReturnGreetingPolicy.KeepGoing)?.nodeId?.toIntOrNull()?.let { phonemeRepository.getPhonemeById(it) }
+        val card = WelcomeBack(offer, name, phoneme?.letter, phoneme?.exampleWord, phoneme?.imagePath)
+        _welcomeBack.value = card
+        playWelcomeBack(card)
+    }
+
+    /** Lily's lines, then the next letter's own sound (never its name). A clip not yet released is skipped. */
+    private fun playWelcomeBack(card: WelcomeBack) {
+        val lines = ReturnGreetingPolicy.lines(card.offer).map { audioResolver.getUiPath(it) }
+        val sound = card.letter?.let { listOf(audioResolver.getPhonemePath(it)) }.orEmpty()
+        audioPlayer.playSequence(lines + sound)
+    }
 
     val activeProfileId: StateFlow<Long?> = sessionManager.activeProfileId
 
@@ -195,8 +248,13 @@ class MapViewModel @Inject constructor(
         viewModelScope.launch {
             activeProfileId.collect { profileId ->
                 if (profileId != null) {
+                    // Decided before today's activity is recorded: the first map of this launch, for a child who has
+                    // played before, gets Lily's welcome back.
+                    val firstMap = sessionManager.firstMapOpenThisLaunch(profileId)
+                    val greet = firstMap && ReturnGreetingPolicy.shouldGreet(hasPlayedBefore(profileId), firstMap)
                     streakTracker.resetIfInactive(profileId)
                     streakTracker.recordActivity(profileId)
+                    if (greet) showWelcomeBack(profileId)
                 }
             }
         }

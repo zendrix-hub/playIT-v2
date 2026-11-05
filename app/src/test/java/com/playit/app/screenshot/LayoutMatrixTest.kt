@@ -330,7 +330,8 @@ abstract class LayoutMatrixTest(private val deviceName: String) {
                 groupUnlockManager = mockk<GroupUnlockManager>(relaxed = true),
                 streakTracker = mockk<StreakTracker>(relaxed = true),
                 audioPlayer = mockk<AudioPlayer>(relaxed = true),
-                audioResolver = mockk<AudioResolver>(relaxed = true)
+                audioResolver = mockk<AudioResolver>(relaxed = true),
+                sayItAttemptRepository = mockk(relaxed = true)
             )
         }
         MapScreen(vm, onNodeSelected = {}, onBack = {})

@@ -45,6 +45,12 @@ class SessionManager @Inject constructor(
         return visitedScreenIntros.add(screenName)
     }
 
+    /** Profiles whose map has opened since the app started; kept when a child goes back to "Who is playing?". */
+    private val mapOpenedThisLaunch = mutableSetOf<Long>()
+
+    /** True the first time [profileId]'s map opens in this app launch (Lily's welcome back), false after. */
+    fun firstMapOpenThisLaunch(profileId: Long): Boolean = mapOpenedThisLaunch.add(profileId)
+
     fun markReturnWelcomePlayed() {
         hasPlayedReturnWelcome = true
     }

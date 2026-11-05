@@ -80,6 +80,7 @@ import com.playit.app.presentation.components.idleBounce
 import com.playit.app.presentation.components.mapPopDelayMs
 import com.playit.app.presentation.components.popIn
 import com.playit.app.presentation.components.rememberAssetPainter
+import com.playit.app.presentation.map.components.WelcomeBackCard
 import com.playit.app.presentation.map.components.BiomeThemes
 import com.playit.app.presentation.map.components.ChocolateHillsBackground
 import com.playit.app.presentation.map.components.GroupBannerStatus
@@ -531,6 +532,20 @@ fun MapScreen(
                 onDismiss = { lockedBlendItDialogGroup = null },
                 confirmColor = Mango,
                 confirmShadowColor = MangoShadow
+            )
+        }
+
+        // Lily's welcome back, once per app launch for a child who has played before (adviser, 2026-11-05).
+        val welcomeBack by viewModel.welcomeBack.collectAsStateWithLifecycle()
+        welcomeBack?.let { card ->
+            WelcomeBackCard(
+                card = card,
+                onGo = {
+                    viewModel.dismissWelcomeBack()
+                    card.offer.nodeId?.let(onNodeSelected)
+                },
+                onNotNow = { viewModel.dismissWelcomeBack() },
+                onLilyTap = { viewModel.replayWelcomeBack() }
             )
         }
     }

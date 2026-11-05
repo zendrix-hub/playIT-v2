@@ -99,7 +99,8 @@ class MapScrollTest {
             groupUnlockManager = mockk<GroupUnlockManager>(relaxed = true),
             streakTracker = mockk<StreakTracker>(relaxed = true),
             audioPlayer = mockk<AudioPlayer>(relaxed = true),
-            audioResolver = mockk<AudioResolver>(relaxed = true)
+            audioResolver = mockk<AudioResolver>(relaxed = true),
+            sayItAttemptRepository = mockk(relaxed = true)
         )
     }
 }
