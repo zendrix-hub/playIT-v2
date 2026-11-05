@@ -24,14 +24,11 @@ Branch `enhance/adviser-feedback`, cut from `design/visual-refresh` at `86408a9`
 
 | **Who is playing? and the name step** | `d2eaa33` | <ul><li>Release `2026-11-05-name-lines`: "Who is playing? Tap your animal!" and "Now type your name!".</li><li>The long hello plays only before any child has a profile.</li></ul> |
 
+| **New Find It pictures** | (this commit) | <ul><li>Release `2026-11-05-findit-newart`: 11 Canva pictures, each marked OK on the final review page.</li><li>Lamp, Guitar, Horse, Jeep, Octopus and Question (a question mark) replace Lit, Gap, Hen, Jet, Ox and Quiz, and show without their word.</li><li>Ink, Up, Uncle, Yak and Quilt are redrawn and keep their word.</li><li>Insect keeps today's picture.</li><li>The pictures were exported full size from the Canva design "PlayIT Canva pictures" (page 14, saved with the user's OK), then cut out. The jeepney's bright red was turned to tomato.</li></ul> |
+
 ## Waiting for the user
 
-1. **Final check of the new Canva pictures** (`Documents/playIT-image-batches/2026-11-05-findit-newart/final/index.html`):
-   - The user picked 11 on 2026-11-05: ink, octopus, up, uncle, lamp, yak, guitar, horse, jeepney, question mark and quilt. Insect keeps today's picture.
-   - They were exported full size from the Canva design "PlayIT Canva pictures", page 14, saved with the user's OK. They were then cut out (the gap between the octopus's tentacles is cut out too), and the jeepney's bright red was turned to tomato. They pass every automatic check.
-   - After the OK, `tools/images/make_release.py` releases them:
-     - `GridGenerator.pictureBank` takes Octopus, Lamp, Guitar, Horse, Jeep and Question in place of Ox, Lit, Gap, Hen, Jet and Quiz, and new art for Ink, Up, Uncle, Yak and Quilt;
-     - `WordLabelPolicy.keepsWord` drops the six replaced words.
+Nothing from this round. The new clips and pictures still need the teacher audit before main.
 
 ## For the documents (Zendrix)
 

@@ -17,14 +17,14 @@ object WordLabelPolicy {
     const val WORDS_KEPT_IN_CHAPTER_2 = 2
 
     /**
-     * Pictures that keep their word, from the user's choices on review page 2026-11-05-findit-clarity: the ones marked
-     * "keep the word", and the ones waiting for new art. Mat, Kit, Draw and Web were swapped for Mom, King, Drum and
-     * Wing instead.
+     * Pictures that keep their word, from the user's choices on review page 2026-11-05-findit-clarity ("keep the
+     * word"), and the redrawn ones (release 2026-11-05-findit-newart) whose subject a child may still call something
+     * else. Lamp, Guitar, Horse, Jeep, Octopus and Question replaced Lit, Gap, Hen, Jet, Ox and Quiz, and show
+     * without a word.
      */
     val keepsWord: Set<String> = setOf(
-        // waiting for new art
-        "picture_insect", "picture_ink", "picture_ox", "picture_up", "picture_uncle", "blendword_lit", "picture_yak",
-        "blendword_gap", "blendword_hen", "picture_jet", "blendword_quiz", "picture_quilt",
+        // redrawn, but a child may still call it something else
+        "picture_insect", "picture_ink", "picture_up", "picture_uncle", "picture_yak", "picture_quilt",
         // keep the word
         "picture_axe", "picture_igloo", "picture_envelope", "picture_top", "picture_yarn", "picture_nut",
         "blendword_pin", "blendword_fox", "picture_jug", "picture_queen", "picture_vase"
