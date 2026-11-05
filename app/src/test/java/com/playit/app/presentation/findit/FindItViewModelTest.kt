@@ -47,10 +47,10 @@ class FindItViewModelTest {
 
     private val mockPictureGrid = listOf(
         FindItPictureItem("m_0", "m", "Mouse", "images/pictures/picture_mouse.png", true),
-        FindItPictureItem("m_1", "m", "Mat", "images/pictures/blendword_mat.png", true),
+        FindItPictureItem("m_1", "m", "Mom", "images/pictures/blendword_mom.png", true),
         FindItPictureItem("m_2", "m", "Map", "images/pictures/picture_map.png", true),
         FindItPictureItem("s_0", "s", "Sun", "images/pictures/picture_sun.png", false),
-        FindItPictureItem("a_0", "a", "Apple", "images/pictures/picture_apple.png", false)
+        FindItPictureItem("a_0", "a", "Axe", "images/pictures/picture_axe.png", false)
     )
 
     @Before
@@ -326,7 +326,7 @@ class FindItViewModelTest {
     fun chapterThree_showsPicturesOnly_exceptOnesStillWaitingForBetterArt() = runTest {
         inChapter(3)
         val grid = load()
-        assertEquals(listOf("Mat"), grid.filter { it.showWord }.map { it.word })
+        assertEquals(listOf("Axe"), grid.filter { it.showWord }.map { it.word })
     }
 
     @Test
@@ -334,6 +334,6 @@ class FindItViewModelTest {
         inChapter(1)
         coEvery { lessonProgress.getProgressForPhoneme(1L, 1) } returns
             LessonProgress(profileId = 1, phonemeId = 1, starsEarned = 2, isCompleted = true)
-        assertEquals(listOf("Mat"), load().filter { it.showWord }.map { it.word })
+        assertEquals(listOf("Axe"), load().filter { it.showWord }.map { it.word })
     }
 }

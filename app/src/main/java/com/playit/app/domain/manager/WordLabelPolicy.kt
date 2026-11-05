@@ -16,11 +16,18 @@ import kotlin.random.Random
 object WordLabelPolicy {
     const val WORDS_KEPT_IN_CHAPTER_2 = 2
 
-    /** Rated "unclear" (or waiting for a swap) on the 2026-11-05 review: they keep their word for now. */
+    /**
+     * Pictures that keep their word, from the user's choices on review page 2026-11-05-findit-clarity: the ones marked
+     * "keep the word", and the ones waiting for new art. Mat, Kit, Draw and Web were swapped for Mom, King, Drum and
+     * Wing instead.
+     */
     val keepsWord: Set<String> = setOf(
-        "picture_insect", "picture_ink", "picture_ox", "picture_up", "picture_uncle", "blendword_kit",
-        "blendword_lit", "picture_yak", "blendword_gap", "blendword_draw", "picture_jet", "blendword_quiz",
-        "picture_quilt", "blendword_hen", "blendword_mat", "blendword_web"
+        // waiting for new art
+        "picture_insect", "picture_ink", "picture_ox", "picture_up", "picture_uncle", "blendword_lit", "picture_yak",
+        "blendword_gap", "blendword_hen", "picture_jet", "blendword_quiz", "picture_quilt",
+        // keep the word
+        "picture_axe", "picture_igloo", "picture_envelope", "picture_top", "picture_yarn", "picture_nut",
+        "blendword_pin", "blendword_fox", "picture_jug", "picture_queen", "picture_vase"
     ).map { "images/pictures/$it.png" }.toSet()
 
     fun apply(

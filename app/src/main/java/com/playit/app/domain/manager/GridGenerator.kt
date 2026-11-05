@@ -18,7 +18,7 @@ data class FindItPictureItem(
 class GridGenerator @Inject constructor() {
 
     private val pictureBank: Map<String, List<Pair<String, String>>> = mapOf(
-        "m" to listOf("Mouse" to "images/pictures/picture_mouse.png", "Mat" to "images/pictures/blendword_mat.png", "Map" to "images/pictures/picture_map.png"),
+        "m" to listOf("Mouse" to "images/pictures/picture_mouse.png", "Mom" to "images/pictures/blendword_mom.png", "Map" to "images/pictures/picture_map.png"),
         "s" to listOf("Sun" to "images/pictures/picture_sun.png", "Star" to "images/pictures/picture_star.png", "Snake" to "images/pictures/picture_snake.png"),
         "a" to listOf("Apple" to "images/pictures/picture_apple.png", "Ant" to "images/pictures/picture_ant.png", "Axe" to "images/pictures/picture_axe.png"),
         "i" to listOf("Insect" to "images/pictures/picture_insect.png", "Igloo" to "images/pictures/picture_igloo.png", "Ink" to "images/pictures/picture_ink.png"),
@@ -27,7 +27,7 @@ class GridGenerator @Inject constructor() {
         "e" to listOf("Elephant" to "images/pictures/picture_elephant.png", "Egg" to "images/pictures/picture_egg.png", "Envelope" to "images/pictures/picture_envelope.png"),
         "u" to listOf("Umbrella" to "images/pictures/picture_umbrella.png", "Up" to "images/pictures/picture_up.png", "Uncle" to "images/pictures/picture_uncle.png"),
         "t" to listOf("Tiger" to "images/pictures/picture_tiger.png", "Tree" to "images/pictures/picture_tree.png", "Top" to "images/pictures/picture_top.png"),
-        "k" to listOf("Kite" to "images/pictures/picture_kite.png", "Kit" to "images/pictures/blendword_kit.png", "Key" to "images/pictures/picture_key.png"),
+        "k" to listOf("Kite" to "images/pictures/picture_kite.png", "King" to "images/pictures/picture_king.png", "Key" to "images/pictures/picture_key.png"),
         "l" to listOf("Lion" to "images/pictures/picture_lion.png", "Lit" to "images/pictures/blendword_lit.png", "Leaf" to "images/pictures/picture_leaf.png"),
         "y" to listOf("Yoyo" to "images/pictures/picture_yoyo.png", "Yak" to "images/pictures/picture_yak.png", "Yarn" to "images/pictures/picture_yarn.png"),
         "n" to listOf("Nest" to "images/pictures/picture_nest.png", "Nut" to "images/pictures/picture_nut.png", "Net" to "images/pictures/picture_net.png"),
@@ -35,9 +35,9 @@ class GridGenerator @Inject constructor() {
         "ng" to listOf("Ring" to "images/pictures/picture_ring.png", "Wing" to "images/pictures/picture_wing.png", "King" to "images/pictures/picture_king.png"),
         "p" to listOf("Pig" to "images/pictures/picture_pig.png", "Pan" to "images/pictures/blendword_pan.png", "Pin" to "images/pictures/blendword_pin.png"),
         "r" to listOf("Rabbit" to "images/pictures/picture_rabbit.png", "Road" to "images/pictures/blendword_road.png", "Rocket" to "images/pictures/picture_rocket.png"),
-        "d" to listOf("Dog" to "images/pictures/picture_dog.png", "Draw" to "images/pictures/blendword_draw.png", "Duck" to "images/pictures/picture_duck.png"),
+        "d" to listOf("Dog" to "images/pictures/picture_dog.png", "Drum" to "images/pictures/picture_drum.png", "Duck" to "images/pictures/picture_duck.png"),
         "h" to listOf("Hat" to "images/pictures/picture_hat.png", "Hen" to "images/pictures/blendword_hen.png", "Hand" to "images/pictures/blendword_hand.png"),
-        "w" to listOf("Watch" to "images/pictures/picture_watch.png", "Web" to "images/pictures/blendword_web.png", "Worm" to "images/pictures/picture_worm.png"),
+        "w" to listOf("Watch" to "images/pictures/picture_watch.png", "Wing" to "images/pictures/picture_wing.png", "Worm" to "images/pictures/picture_worm.png"),
         "c" to listOf("Cat" to "images/pictures/picture_cat.png", "Cake" to "images/pictures/blendword_cake.png", "Cup" to "images/pictures/blendword_cup.png"),
         "f" to listOf("Fish" to "images/pictures/picture_fish.png", "Fan" to "images/pictures/blendword_fan.png", "Fox" to "images/pictures/blendword_fox.png"),
         "j" to listOf("Jug" to "images/pictures/picture_jug.png", "Jam" to "images/pictures/blendword_jam.png", "Jet" to "images/pictures/picture_jet.png"),
