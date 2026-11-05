@@ -22,14 +22,16 @@ Branch `enhance/adviser-feedback`, cut from `design/visual-refresh` at `86408a9`
 | **Welcome-back voice** | `77d419b` | <ul><li>Release `2026-11-05-return`: "Welcome back! I missed you.", "Do you want to keep going with this sound?", "Do you want to build some words?" and "You learned all the sounds! ...".</li><li>The Say It word intro and Find It intro keep today's clips: the user kept the Find It one, and left the Say It one unmarked.</li></ul> |
 | **Picture choices** | `549d9d8` | <ul><li>Swapped: Mat to Mom, Kit to King, Draw to Drum, Web to Wing.</li><li>11 pictures keep their word.</li><li>12 keep their word until the new Canva art is chosen.</li></ul> |
 
+| **Who is playing? and the name step** | `d2eaa33` | <ul><li>Release `2026-11-05-name-lines`: "Who is playing? Tap your animal!" and "Now type your name!".</li><li>The long hello plays only before any child has a profile.</li></ul> |
+
 ## Waiting for the user
 
-1. **Voice batch `2026-11-05-name-lines`** (`Documents/playIT-audio-batches/`):
-   - "Who is playing? Tap your animal!" or "... Pick your animal!", and "Now type your name!" with or without "A grown-up can help!".
-   - After the OK, Profile Select plays the long hello only on the first use and this line after that, and the name step speaks.
-2. **New Canva pictures `2026-11-05-findit-newart`** (`Documents/playIT-image-batches/`):
-   - Iguana, ink, octopus, up, uncle, lamp, yak, guitar, horse, jeepney, question mark and quilt, beside today's pictures.
-   - After the choice, the full-size pictures are exported from Canva, cut out and released, and `WordLabelPolicy.keepsWord` shrinks to match.
+1. **Final check of the new Canva pictures** (`Documents/playIT-image-batches/2026-11-05-findit-newart/final/index.html`):
+   - The user picked 11 on 2026-11-05: ink, octopus, up, uncle, lamp, yak, guitar, horse, jeepney, question mark and quilt. Insect keeps today's picture.
+   - They were exported full size from the Canva design "PlayIT Canva pictures", page 14, saved with the user's OK. They were then cut out (the gap between the octopus's tentacles is cut out too), and the jeepney's bright red was turned to tomato. They pass every automatic check.
+   - After the OK, `tools/images/make_release.py` releases them:
+     - `GridGenerator.pictureBank` takes Octopus, Lamp, Guitar, Horse, Jeep and Question in place of Ox, Lit, Gap, Hen, Jet and Quiz, and new art for Ink, Up, Uncle, Yak and Quilt;
+     - `WordLabelPolicy.keepsWord` drops the six replaced words.
 
 ## For the documents (Zendrix)
 
