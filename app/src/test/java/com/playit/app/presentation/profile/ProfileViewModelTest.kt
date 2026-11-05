@@ -156,4 +156,25 @@ class ProfileViewModelTest {
         assertEquals("", viewModel.nameInput.value)
         assertEquals(1, viewModel.selectedAvatarId.value)
     }
+
+    /** The long hello only before any child has a profile; then "Who is playing? Tap your animal!". */
+    @Test
+    fun theLongHello_onlyOnTheFirstUse() = runTest {
+        viewModel.playWelcomeGreeting()
+        advanceUntilIdle()
+        assertEquals(FIRST_HELLO, viewModel.greeting.value)
+        verify { audioPlayer.playAssetAudio("vo_path.mp3", any()) }
+
+        profilesFlow.value = listOf(Profile(id = 1L, name = "Ana", avatarResId = 5))
+        viewModel.playWelcomeGreeting()
+        advanceUntilIdle()
+        assertEquals(WHO_IS_PLAYING, viewModel.greeting.value)
+        verify { audioPlayer.playAssetAudio("ui/ui_who_is_playing.wav", any()) }
+    }
+
+    @Test
+    fun theNameStep_hasItsOwnLine() = runTest {
+        viewModel.playTypeNamePrompt()
+        verify { audioPlayer.playAssetAudio("ui/ui_type_name.wav", any()) }
+    }
 }

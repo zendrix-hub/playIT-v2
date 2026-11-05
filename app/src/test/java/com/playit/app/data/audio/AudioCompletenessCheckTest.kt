@@ -53,6 +53,13 @@ class AudioCompletenessCheckTest {
     /** Lily's welcome back (release 2026-11-05-return, adviser 2026-11-05), in audio/vo/ui. */
     private val returnLines = listOf("ret_welcome_back.wav", "ret_keep_going.wav", "ret_build_words.wav", "ret_all_done.wav")
 
+    /** "Who is playing? Tap your animal!" and "Now type your name!" (release 2026-11-05-name-lines). */
+    @Test
+    fun theProfileLines_areReleased() {
+        val dir = java.io.File("src/main/assets/audio/vo/ui")
+        listOf("ui_who_is_playing.wav", "ui_type_name.wav").forEach { assertTrue("missing $it", java.io.File(dir, it).exists()) }
+    }
+
     /** Every line ReturnGreetingPolicy names is released, so the welcome back is never silent. */
     @Test
     fun theWelcomeBackLines_areAllReleased() {

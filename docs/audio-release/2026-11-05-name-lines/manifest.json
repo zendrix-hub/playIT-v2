@@ -1,0 +1,41 @@
+{
+  "release": "2026-11-05-name-lines",
+  "approvedBy": "user: OK marks on review page 2026-11-05-name-lines (CSV exported 2026-11-05 23:28)",
+  "teacherAudit": "pending, required before merge to main",
+  "clips": [
+    {
+      "clipId": "ui_who_is_playing",
+      "file": "ui/ui_who_is_playing.wav",
+      "text": "Who is playing? Tap your animal!",
+      "voice": "kokoro-82M mix af_heart*0.7+af_bella*0.3",
+      "speed": 1.0,
+      "sourceBatch": "2026-11-05-name-lines",
+      "sourceFile": "ui_who_is_playing_a2.wav",
+      "reviewCsv": "2026-11-05-name-lines_review.csv",
+      "userVerdict": "OK",
+      "userNote": "",
+      "teacherAudit": "pending",
+      "license": "Apache-2.0 (Kokoro-82M)",
+      "sha256": "3fde007e1717e573c2dedc00ac1994ece14a26d0a3eea5a5779f6ad73f7a80be",
+      "tool": "tools/audio/name_lines_batch.py (kokoro_local.synth + clean, 24 kHz, RMS -20 dBFS)",
+      "note": "Who is playing? screen after the first use; the long hello (vo_welcome_01) plays only the first time. Reworded from the user's note on 2026-11-05-return-greeting (tap the animal)."
+    },
+    {
+      "clipId": "ui_type_name",
+      "file": "ui/ui_type_name.wav",
+      "text": "Now type your name!",
+      "voice": "kokoro-82M mix af_heart*0.7+af_bella*0.3",
+      "speed": 1.0,
+      "sourceBatch": "2026-11-05-name-lines",
+      "sourceFile": "ui_type_name_a2.wav",
+      "reviewCsv": "2026-11-05-name-lines_review.csv",
+      "userVerdict": "OK",
+      "userNote": "",
+      "teacherAudit": "pending",
+      "license": "Apache-2.0 (Kokoro-82M)",
+      "sha256": "7bbd7138a3e58451b6cf71153ee9c1a3559c939dc158bf8ef770aa3e1e877793",
+      "tool": "tools/audio/name_lines_batch.py (kokoro_local.synth + clean, 24 kHz, RMS -20 dBFS)",
+      "note": "New player screen, once the child has picked an animal (the child types their name, user 2026-11-05)."
+    }
+  ]
+}

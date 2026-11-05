@@ -1,5 +1,6 @@
 package com.playit.app.presentation.profile
 
+import kotlinx.coroutines.flow.first
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.playit.app.domain.model.GameplayConstants
@@ -26,6 +27,10 @@ sealed class ProfileUiState {
     data class Error(val message: String) : ProfileUiState()
     data class Created(val profileId: Long) : ProfileUiState()
 }
+
+/** What Lily says on "Who is playing?": the long hello the first time, then the short question. */
+const val FIRST_HELLO = "Hi there! I'm so happy you're here. Let's play and learn together!"
+const val WHO_IS_PLAYING = "Who is playing? Tap your animal!"
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
@@ -91,10 +96,31 @@ class ProfileViewModel @Inject constructor(
         audioPlayer.playAssetAudio(audioResolver.getSfxPath(SfxEvent.INCORRECT_POP))
     }
 
+    /**
+     * The long hello only the first time, before any child has a profile; after that Lily just asks "Who is playing?
+     * Tap your animal!" (release 2026-11-05-name-lines), so a returning child is not greeted twice: the map's
+     * welcome back says hello.
+     */
+    private val _greeting = MutableStateFlow(FIRST_HELLO)
+    val greeting: StateFlow<String> = _greeting.asStateFlow()
+
     fun playWelcomeGreeting() {
-        _isPlayingGreeting.value = true
-        audioPlayer.playAssetAudio(audioResolver.getVoPath(VoContext.WELCOME_01)) {
-            _isPlayingGreeting.value = false
+        viewModelScope.launch {
+            val firstUse = profileRepository.getAllProfiles().first().isEmpty()
+            _greeting.value = if (firstUse) FIRST_HELLO else WHO_IS_PLAYING
+            _isPlayingGreeting.value = true
+            val clip = if (firstUse) audioResolver.getVoPath(VoContext.WELCOME_01) else audioResolver.getUiPath("ui_who_is_playing")
+            audioPlayer.playAssetAudio(clip) {
+                _isPlayingGreeting.value = false
+            }
+        }
+    }
+
+    /** Once the child has picked an animal: "Now type your name!" (the child types it, user 2026-11-05). */
+    fun playTypeNamePrompt() {
+        _isPlayingIntro.value = true
+        audioPlayer.playAssetAudio(audioResolver.getUiPath("ui_type_name")) {
+            _isPlayingIntro.value = false
         }
     }
 

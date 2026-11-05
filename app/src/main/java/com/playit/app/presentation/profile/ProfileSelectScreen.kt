@@ -40,6 +40,7 @@ fun ProfileSelectScreen(
     val profiles by viewModel.profiles.collectAsStateWithLifecycle()
     val showArithmeticGuard by viewModel.showArithmeticGuard.collectAsStateWithLifecycle()
     val isPlayingGreeting by viewModel.isPlayingGreeting.collectAsStateWithLifecycle()
+    val greeting by viewModel.greeting.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
 
     // Snappy, warm auto-greeting on screen open
@@ -135,7 +136,7 @@ fun ProfileSelectScreen(
 
             // Companion Mascot Dialogue (Warm auto-greeting + visible speaker replay badge with 100% verbatim text)
             MascotSpeechHeader(
-                message = "Hi there! I'm so happy you're here. Let's play and learn together!",
+                message = greeting,
                 mascotState = if (profiles.isEmpty()) MascotState.POINTING else MascotState.WAVING,
                 isPlayingAudio = isPlayingGreeting,
                 onMascotTap = { viewModel.playWelcomeGreeting() },

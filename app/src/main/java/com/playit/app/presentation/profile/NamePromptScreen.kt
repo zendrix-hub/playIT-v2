@@ -134,7 +134,7 @@ fun NamePromptScreen(
                 message = if (hasSelectedAvatar.value) "Now type your name!" else "Pick your animal friend!",
                 mascotState = mascotState,
                 isPlayingAudio = isPlayingIntro,
-                onMascotTap = { viewModel.playNamePromptIntro() },
+                onMascotTap = { if (hasSelectedAvatar.value) viewModel.playTypeNamePrompt() else viewModel.playNamePromptIntro() },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -153,8 +153,10 @@ fun NamePromptScreen(
                     AvatarPicker(
                         selectedAvatarId = selectedAvatarId,
                         onAvatarSelect = {
+                            val firstPick = !hasSelectedAvatar.value
                             hasSelectedAvatar.value = true
                             viewModel.onAvatarSelected(it)
+                            if (firstPick) viewModel.playTypeNamePrompt()
                         }
                     )
 
