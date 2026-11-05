@@ -8,6 +8,10 @@ import com.playit.app.domain.manager.GridGenerator
 import com.playit.app.domain.model.Phoneme
 import com.playit.app.domain.repository.FindItAttemptRepository
 import com.playit.app.domain.repository.PhonemeRepository
+import com.playit.app.domain.repository.LessonProgressRepository
+import com.playit.app.domain.repository.LetterGroupMemberRepository
+import com.playit.app.domain.model.LessonProgress
+import com.playit.app.domain.model.LetterGroupMember
 import com.playit.app.navigation.SessionManager
 import io.mockk.*
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +35,9 @@ class FindItViewModelTest {
     private val audioPlayer: AudioPlayer = mockk(relaxed = true)
     private val audioResolver: AudioResolver = mockk()
     private val savedStateHandle: SavedStateHandle = mockk()
+    private val groupMembers: LetterGroupMemberRepository = mockk()
+    private val lessonProgress: LessonProgressRepository = mockk()
+    private val members = MutableStateFlow<List<LetterGroupMember>>(emptyList())
     
     private val testDispatcher = StandardTestDispatcher()
 
@@ -53,6 +60,8 @@ class FindItViewModelTest {
         every { phonemeRepository.getAllPhonemes() } returns flowOf(allPhonemes)
         every { gridGenerator.generate5ItemGrid(any(), any()) } returns mockPictureGrid
         every { savedStateHandle.get<String>("phonemeId") } returns "1"
+        every { groupMembers.getAllMembers() } returns members
+        coEvery { lessonProgress.getProgressForPhoneme(any(), any()) } returns null
         every { sessionManager.shouldPlayScreenIntro(any()) } returns false
         every { sessionManager.activeProfileId } returns MutableStateFlow(1L)
         every { audioResolver.getPhonemePath(any()) } returns "test_path"
@@ -72,7 +81,7 @@ class FindItViewModelTest {
     fun loadGrid_validId_loadsTargetAnd5ItemGrid() = runTest {
         viewModel = FindItViewModel(
             phonemeRepository, findItAttemptRepository, gridGenerator,
-            sessionManager, audioPlayer, audioResolver, savedStateHandle
+            sessionManager, audioPlayer, audioResolver, savedStateHandle, groupMembers, lessonProgress
         )
         advanceUntilIdle()
 
@@ -88,7 +97,7 @@ class FindItViewModelTest {
         
         viewModel = FindItViewModel(
             phonemeRepository, findItAttemptRepository, gridGenerator,
-            sessionManager, audioPlayer, audioResolver, savedStateHandle
+            sessionManager, audioPlayer, audioResolver, savedStateHandle, groupMembers, lessonProgress
         )
         advanceUntilIdle()
 
@@ -100,7 +109,7 @@ class FindItViewModelTest {
     fun selectPictureItem_correctItem_incrementsFoundCount() = runTest {
         viewModel = FindItViewModel(
             phonemeRepository, findItAttemptRepository, gridGenerator,
-            sessionManager, audioPlayer, audioResolver, savedStateHandle
+            sessionManager, audioPlayer, audioResolver, savedStateHandle, groupMembers, lessonProgress
         )
         advanceUntilIdle()
 
@@ -116,7 +125,7 @@ class FindItViewModelTest {
     fun selectPictureItem_allThreeCorrect_completesLesson() = runTest {
         viewModel = FindItViewModel(
             phonemeRepository, findItAttemptRepository, gridGenerator,
-            sessionManager, audioPlayer, audioResolver, savedStateHandle
+            sessionManager, audioPlayer, audioResolver, savedStateHandle, groupMembers, lessonProgress
         )
         advanceUntilIdle()
 
@@ -133,7 +142,7 @@ class FindItViewModelTest {
     fun selectPictureItem_incorrectItem_deductsHeart() = runTest {
         viewModel = FindItViewModel(
             phonemeRepository, findItAttemptRepository, gridGenerator,
-            sessionManager, audioPlayer, audioResolver, savedStateHandle
+            sessionManager, audioPlayer, audioResolver, savedStateHandle, groupMembers, lessonProgress
         )
         advanceUntilIdle()
 
@@ -150,7 +159,7 @@ class FindItViewModelTest {
     fun selectPictureItem_allHeartsLost_setsGameOver() = runTest {
         viewModel = FindItViewModel(
             phonemeRepository, findItAttemptRepository, gridGenerator,
-            sessionManager, audioPlayer, audioResolver, savedStateHandle
+            sessionManager, audioPlayer, audioResolver, savedStateHandle, groupMembers, lessonProgress
         )
         advanceUntilIdle()
 
@@ -169,7 +178,7 @@ class FindItViewModelTest {
     fun restartSession_resetsHeartsAndState() = runTest {
         viewModel = FindItViewModel(
             phonemeRepository, findItAttemptRepository, gridGenerator,
-            sessionManager, audioPlayer, audioResolver, savedStateHandle
+            sessionManager, audioPlayer, audioResolver, savedStateHandle, groupMembers, lessonProgress
         )
         advanceUntilIdle()
 
@@ -190,7 +199,7 @@ class FindItViewModelTest {
     fun completion_appendsNextCue() = runTest {
         viewModel = FindItViewModel(
             phonemeRepository, findItAttemptRepository, gridGenerator,
-            sessionManager, audioPlayer, audioResolver, savedStateHandle
+            sessionManager, audioPlayer, audioResolver, savedStateHandle, groupMembers, lessonProgress
         )
         advanceUntilIdle()
 
@@ -213,7 +222,7 @@ class FindItViewModelTest {
 
         viewModel = FindItViewModel(
             phonemeRepository, findItAttemptRepository, gridGenerator,
-            sessionManager, audioPlayer, audioResolver, savedStateHandle
+            sessionManager, audioPlayer, audioResolver, savedStateHandle, groupMembers, lessonProgress
         )
         advanceUntilIdle()
 
@@ -228,7 +237,7 @@ class FindItViewModelTest {
     fun wrongTaps_countIntoSessionHeartsLost() = runTest {
         viewModel = FindItViewModel(
             phonemeRepository, findItAttemptRepository, gridGenerator,
-            sessionManager, audioPlayer, audioResolver, savedStateHandle
+            sessionManager, audioPlayer, audioResolver, savedStateHandle, groupMembers, lessonProgress
         )
         advanceUntilIdle()
 
@@ -243,7 +252,7 @@ class FindItViewModelTest {
     fun sessionHeartsLost_survivesRestart() = runTest {
         viewModel = FindItViewModel(
             phonemeRepository, findItAttemptRepository, gridGenerator,
-            sessionManager, audioPlayer, audioResolver, savedStateHandle
+            sessionManager, audioPlayer, audioResolver, savedStateHandle, groupMembers, lessonProgress
         )
         advanceUntilIdle()
 
@@ -266,7 +275,7 @@ class FindItViewModelTest {
     fun threeCorrectInARow_recoversAHeart() = runTest {
         viewModel = FindItViewModel(
             phonemeRepository, findItAttemptRepository, gridGenerator,
-            sessionManager, audioPlayer, audioResolver, savedStateHandle
+            sessionManager, audioPlayer, audioResolver, savedStateHandle, groupMembers, lessonProgress
         )
         advanceUntilIdle()
 
@@ -280,5 +289,51 @@ class FindItViewModelTest {
         advanceUntilIdle()
 
         assertEquals(5, viewModel.hearts.value)
+    }
+
+    // ---- Words under the pictures (adviser, 2026-11-05: no labels on harder levels)
+
+    private fun inChapter(chapter: Int) {
+        members.value = listOf(LetterGroupMember(groupId = chapter, phonemeId = 1, position = 0))
+    }
+
+    private fun TestScope.load(): List<FindItPictureItem> {
+        viewModel = FindItViewModel(
+            phonemeRepository, findItAttemptRepository, gridGenerator,
+            sessionManager, audioPlayer, audioResolver, savedStateHandle, groupMembers, lessonProgress
+        )
+        advanceUntilIdle()
+        return viewModel.pictureGrid.value
+    }
+
+    @Test
+    fun chapterOne_showsEveryWord() = runTest {
+        inChapter(1)
+        assertTrue(load().all { it.showWord })
+    }
+
+    @Test
+    fun chapterTwo_showsTheWordOnTwoPictures_plusOnesThatNeedIt() = runTest {
+        inChapter(2)
+        val grid = load()
+        val needIt = grid.filter { it.imagePath in com.playit.app.domain.manager.WordLabelPolicy.keepsWord }
+        val shown = grid.count { it.showWord }
+        assertTrue("$shown shown", shown in 2..(2 + needIt.size))
+        assertTrue(needIt.all { it.showWord })
+    }
+
+    @Test
+    fun chapterThree_showsPicturesOnly_exceptOnesStillWaitingForBetterArt() = runTest {
+        inChapter(3)
+        val grid = load()
+        assertEquals(listOf("Mat"), grid.filter { it.showWord }.map { it.word })
+    }
+
+    @Test
+    fun replayingAFinishedLetter_showsPicturesOnly_evenInChapterOne() = runTest {
+        inChapter(1)
+        coEvery { lessonProgress.getProgressForPhoneme(1L, 1) } returns
+            LessonProgress(profileId = 1, phonemeId = 1, starsEarned = 2, isCompleted = true)
+        assertEquals(listOf("Mat"), load().filter { it.showWord }.map { it.word })
     }
 }

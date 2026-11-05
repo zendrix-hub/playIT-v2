@@ -10,6 +10,9 @@ import com.playit.app.data.audio.VoContext
 import com.playit.app.domain.manager.FindItPictureItem
 import com.playit.app.domain.manager.GridGenerator
 import com.playit.app.domain.manager.HeartManager
+import com.playit.app.domain.manager.WordLabelPolicy
+import com.playit.app.domain.repository.LessonProgressRepository
+import com.playit.app.domain.repository.LetterGroupMemberRepository
 import com.playit.app.domain.model.Phoneme
 import com.playit.app.domain.repository.FindItAttemptRepository
 import com.playit.app.domain.repository.PhonemeRepository
@@ -39,7 +42,9 @@ class FindItViewModel @Inject constructor(
     private val sessionManager: SessionManager,
     private val audioPlayer: AudioPlayer,
     private val audioResolver: AudioResolver,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    private val letterGroupMemberRepository: LetterGroupMemberRepository,
+    private val lessonProgressRepository: LessonProgressRepository
 ) : ViewModel() {
 
     private val phonemeIdArg: String? = savedStateHandle["phonemeId"]
@@ -120,7 +125,17 @@ class FindItViewModel @Inject constructor(
                 _targetPhoneme.value = target
                 _foundItemIds.value = emptySet()
                 _foundCount.value = 0
-                _pictureGrid.value = gridGenerator.generate5ItemGrid(target.letter, allPhonemes)
+                // Harder chapters and replays show fewer words under the pictures (adviser, 2026-11-05). If this
+                // lookup fails, the words show: it must never stop the round from loading.
+                val chapter = runCatching {
+                    letterGroupMemberRepository.getAllMembers().first().firstOrNull { it.phonemeId == target.id }?.groupId
+                }.getOrNull() ?: 1
+                val isReplay = runCatching {
+                    val profileId = sessionManager.activeProfileId.value
+                    profileId != null && lessonProgressRepository.getProgressForPhoneme(profileId, target.id)
+                        ?.let { it.isCompleted && it.starsEarned > 0 } == true
+                }.getOrDefault(false)
+                _pictureGrid.value = WordLabelPolicy.apply(gridGenerator.generate5ItemGrid(target.letter, allPhonemes), chapter, isReplay)
 
                 // Automatically play "Can you find all..." prompt first, then seamlessly play the letter sound
                 playIntroThenTargetSound()

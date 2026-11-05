@@ -9,7 +9,9 @@ data class FindItPictureItem(
     val phonemeLetter: String,
     val word: String,
     val imagePath: String,
-    val isCorrect: Boolean
+    val isCorrect: Boolean,
+    /** False hides the word under the picture (WordLabelPolicy); the screen reader still says it. */
+    val showWord: Boolean = true
 )
 
 @Singleton

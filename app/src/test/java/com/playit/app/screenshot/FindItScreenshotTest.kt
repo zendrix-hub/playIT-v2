@@ -2,6 +2,8 @@ package com.playit.app.screenshot
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.assertCountEquals
 import androidx.lifecycle.SavedStateHandle
 import com.github.takahirom.roborazzi.captureRoboImage
 import com.playit.app.data.audio.AudioPlayer
@@ -53,12 +55,49 @@ class FindItScreenshotTest {
             sessionManager = sessionManager,
             audioPlayer = player,
             audioResolver = resolver,
-            savedStateHandle = handle
+            savedStateHandle = handle,
+            letterGroupMemberRepository = mockk { every { getAllMembers() } returns flowOf(emptyList()) },
+            lessonProgressRepository = mockk(relaxed = true)
         )
 
         compose.setContent { PlayItTheme { FindItScreen(vm, onNext = { _, _ -> }, onBack = {}) } }
         compose.waitForIdle()
         compose.waitForIdle()
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/findit_letter_m.png")
+    }
+
+    /** Chapter 3 (t): pictures only, so the child picks by the sound (adviser, 2026-11-05). */
+    @Test
+    fun findIt_chapterThree_picturesOnly() {
+        val tiger = Phoneme(id = 9, letter = "t", audioPath = "path", imagePath = "images/pictures/picture_tiger.png", exampleWord = "tiger")
+        val sun = Phoneme(id = 2, letter = "s", audioPath = "path2", imagePath = "images/pictures/picture_sun.png", exampleWord = "sun")
+        val phonemeRepo: PhonemeRepository = mockk()
+        every { phonemeRepo.getAllPhonemes() } returns flowOf(listOf(tiger, sun))
+        val handle: SavedStateHandle = mockk()
+        every { handle.get<String>("phonemeId") } returns "9"
+        val vm = FindItViewModel(
+            phonemeRepository = phonemeRepo,
+            findItAttemptRepository = mockk(relaxed = true),
+            gridGenerator = GridGenerator(),
+            sessionManager = mockk(relaxed = true) { every { activeProfileId } returns kotlinx.coroutines.flow.MutableStateFlow<Long?>(1L) },
+            audioPlayer = mockk(relaxed = true),
+            audioResolver = mockk(relaxed = true),
+            savedStateHandle = handle,
+            letterGroupMemberRepository = mockk {
+                every { getAllMembers() } returns flowOf(listOf(com.playit.app.domain.model.LetterGroupMember(groupId = 3, phonemeId = 9, position = 0)))
+            },
+            lessonProgressRepository = mockk { io.mockk.coEvery { getProgressForPhoneme(any(), any()) } returns null }
+        )
+        compose.setContent { PlayItTheme { FindItScreen(vm, onNext = { _, _ -> }, onBack = {}) } }
+        compose.waitForIdle()
+        // The cards settle in one by one (stickerIn), after a delay on the main looper: run it on before the capture.
+        repeat(30) {
+            org.robolectric.shadows.ShadowLooper.idleMainLooper(100, java.util.concurrent.TimeUnit.MILLISECONDS)
+            compose.mainClock.advanceTimeBy(100)
+        }
+        compose.waitForIdle()
+        compose.onAllNodesWithText("Tiger").assertCountEquals(0)
+        compose.onAllNodesWithText("Tree").assertCountEquals(0)
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/findit_chapter3_pictures_only.png")
     }
 }

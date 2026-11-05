@@ -258,7 +258,9 @@ abstract class LayoutMatrixTest(private val deviceName: String) {
                 sessionManager = mockk<SessionManager>(relaxed = true),
                 audioPlayer = mockk<AudioPlayer>(relaxed = true),
                 audioResolver = mockk<AudioResolver>(relaxed = true),
-                savedStateHandle = h
+                savedStateHandle = h,
+                letterGroupMemberRepository = mockk { every { getAllMembers() } returns flowOf(emptyList()) },
+                lessonProgressRepository = mockk(relaxed = true)
             )
         }
         FindItScreen(vm, onNext = { _, _ -> }, onBack = {})
