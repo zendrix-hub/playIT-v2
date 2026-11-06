@@ -17,6 +17,9 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0.0"
+        // The test build ("unlocked" below) opens every map stop; the real app never does.
+        buildConfigField("boolean", "UNLOCK_ALL", "false")
+        manifestPlaceholders["appLabel"] = "playIT"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -49,6 +52,15 @@ android {
         getByName("debug") {
             isDebuggable = true
             signingConfig = signingConfigs.getByName("debug")
+        }
+        // A test APK with every letter and word game open, for testing and demos (user, 2026-11-06). It is a
+        // separate app ("playIT test", com.playit.app.unlocked), so its play never mixes with a child's real record.
+        create("unlocked") {
+            initWith(getByName("debug"))
+            applicationIdSuffix = ".unlocked"
+            versionNameSuffix = "-unlocked"
+            buildConfigField("boolean", "UNLOCK_ALL", "true")
+            manifestPlaceholders["appLabel"] = "playIT test"
         }
         release {
             isMinifyEnabled = true

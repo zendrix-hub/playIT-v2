@@ -183,6 +183,9 @@ class MapViewModel @Inject constructor(
         initialValue = UserMapStats()
     )
 
+    /** True only in the test APK (build type "unlocked"): every letter and word game is open. */
+    internal var unlockAll: Boolean = com.playit.app.BuildConfig.UNLOCK_ALL
+
     val mapNodes: StateFlow<List<MapNode>> = activeProfileId.flatMapLatest { profileId ->
         // Another child's map: its first load is not an unlock. The same child coming back from a
         // lesson resubscribes here too, and keeps the comparison.
@@ -207,7 +210,7 @@ class MapViewModel @Inject constructor(
                     val phoneme = phonemes.find { it.id == member.phonemeId }
                     if (phoneme != null) {
                         val progress = progressList.find { it.phonemeId == phoneme.id }
-                        val isUnlocked = unlockManager.isPhonemeUnlocked(phoneme.id, progressList)
+                        val isUnlocked = unlockAll || unlockManager.isPhonemeUnlocked(phoneme.id, progressList)
                         nodesList.add(
                             MapNode.LetterNode(
                                 id = phoneme.id.toString(),
@@ -222,7 +225,7 @@ class MapViewModel @Inject constructor(
                 }
 
                 // Insert BlendIt Challenge Node after each group of letters
-                val isBlendItUnlocked = groupUnlockManager.isBlendItUnlocked(group.groupId, members, progressList)
+                val isBlendItUnlocked = unlockAll || groupUnlockManager.isBlendItUnlocked(group.groupId, members, progressList)
                 nodesList.add(
                     MapNode.BlendItNode(
                         id = "blend_${group.groupId}",

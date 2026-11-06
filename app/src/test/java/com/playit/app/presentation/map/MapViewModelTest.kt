@@ -164,6 +164,30 @@ class MapViewModelTest {
         collectJob.cancel()
     }
 
+    /** The test APK (user, 2026-11-06): every letter and word game is open; the real app keeps the order. */
+    @Test
+    fun theTestBuild_opensEveryLetterAndWordGame_theAppDoesNot() = runTest {
+        every { unlockManager.isPhonemeUnlocked(1, any()) } returns true
+        every { unlockManager.isPhonemeUnlocked(2, any()) } returns false
+        every { groupUnlockManager.isBlendItUnlocked(1, any(), any()) } returns false
+        assertFalse("the app's own build keeps the order", com.playit.app.BuildConfig.UNLOCK_ALL)
+
+        viewModel = MapViewModel(
+            phonemeRepository, letterGroupRepository, letterGroupMemberRepository,
+            lessonProgressRepository, profileRepository, achievementRepository,
+            sessionManager, unlockManager, groupUnlockManager, streakTracker,
+            audioPlayer, audioResolver, sayItAttemptRepository
+        )
+        viewModel.unlockAll = true
+        val collectJob = launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.mapNodes.collect()
+        }
+        advanceUntilIdle()
+        assertEquals(3, viewModel.mapNodes.value.size)
+        assertTrue(viewModel.mapNodes.value.all { it.isUnlocked })
+        collectJob.cancel()
+    }
+
     @Test
     fun audioActions_invokeAudioPlayerCorrectly() {
         viewModel = MapViewModel(
