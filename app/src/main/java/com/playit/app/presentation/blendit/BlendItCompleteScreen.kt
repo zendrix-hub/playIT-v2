@@ -1,5 +1,9 @@
 package com.playit.app.presentation.blendit
 
+import androidx.compose.material3.Icon
+import com.playit.app.presentation.components.NextLines
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
+import androidx.compose.material.icons.Icons
 import com.playit.app.presentation.components.LessonScaffold
 import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.Image
@@ -119,8 +123,15 @@ fun BlendItCompleteScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
+                            contentDescription = null,
+                            tint = com.playit.app.presentation.theme.TextMidnight,
+                            modifier = Modifier.size(26.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Continue to Map",
+                            text = NextLines.NEXT,
                             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Black),
                             maxLines = 1,
                             color = com.playit.app.presentation.theme.TextMidnight

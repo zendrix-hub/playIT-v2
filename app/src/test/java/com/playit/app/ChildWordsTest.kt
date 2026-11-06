@@ -13,7 +13,9 @@ class ChildWordsTest {
     private val childScreens = listOf("splash", "profile", "map", "hearit", "sayit", "findit", "lettercomplete", "blendit", "soundcheck")
         .map { File("src/main/java/com/playit/app/presentation/$it") }
     private val tooAdvanced = listOf("challenge", "milestone", "mastered", "phonics", "section ", "unit ", "guidebook",
-        "blend-it", "blending", "limit reached", "profile")
+        "blend-it", "blending", "limit reached", "profile",
+        // Teacher, 2026-11-06: every button is big, so name the button's word instead.
+        "big button")
 
     @Test fun childScreens_avoidWordsTooAdvancedForTheirAge() {
         val found = mutableListOf<String>()

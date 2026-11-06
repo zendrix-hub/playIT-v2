@@ -1,5 +1,7 @@
 package com.playit.app.presentation.sayit
 
+import com.playit.app.presentation.components.NextLines
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import com.playit.app.domain.model.articulationFor
 import com.playit.app.presentation.components.ArticulationCue
 import android.Manifest
@@ -258,7 +260,8 @@ fun SayItScreen(
                         wasUnlocked = canContinue
                     }
                     GummyButton(
-                        text = "Next: Find It",
+                        text = NextLines.NEXT,
+                        icon = Icons.AutoMirrored.Rounded.ArrowForward,
                         onClick = { if (canContinue) onNext(phoneme?.id?.toString() ?: "1") },
                         enabled = canContinue,
                         backgroundColor = EmeraldLeaf,

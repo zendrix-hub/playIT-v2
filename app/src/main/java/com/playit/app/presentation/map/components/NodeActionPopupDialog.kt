@@ -1,5 +1,6 @@
 package com.playit.app.presentation.map.components
 
+import com.playit.app.presentation.components.NextLines
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -254,11 +255,8 @@ fun NodeActionPopupDialog(
                     Spacer(modifier = Modifier.height(18.dp))
 
                     // Gummy Action Button
-                    val buttonText = when {
-                        isCompleted -> "PLAY AGAIN"
-                        isLetter -> "START"
-                        else -> "BUILD WORDS"
-                    }
+                    // The word Lily names: "Tap Play to start!" (teacher, 2026-11-06: not "the big button").
+                    val buttonText = if (isCompleted) NextLines.PLAY_AGAIN else NextLines.PLAY
                     val btnBg = if (isCompleted) PopGoldFace else PopGreenFace
                     val btnShelf = if (isCompleted) PopGoldShelf else PopGreenShelf
 

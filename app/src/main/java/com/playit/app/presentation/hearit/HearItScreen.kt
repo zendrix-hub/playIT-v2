@@ -1,5 +1,7 @@
 package com.playit.app.presentation.hearit
 
+import com.playit.app.presentation.components.NextLines
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import com.playit.app.presentation.theme.*
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.RepeatMode
@@ -173,7 +175,11 @@ fun HearItScreen(
                 // While the sound plays the card already shows "Sound: /m/", so the bubble only says "Listen!" (card 31d).
                 MascotSpeechHeader(
                     greet = true,
-                    message = if (isPlaying) "Listen!" else "Listen! Tap the letter to hear it again.",
+                    message = when {
+                        isPlaying -> "Listen!"
+                        isUnlocked -> NextLines.HEAR_IT
+                        else -> "Listen! Tap the letter to hear it again."
+                    },
                     mascotState = if (isPlaying) MascotState.LISTENING else if (playCount > 0) MascotState.POINTING else MascotState.IDLE,
                     isPlayingAudio = isPlayingPrompt,
                     onMascotTap = { viewModel.playHearItIntroAudio() }
@@ -181,7 +187,8 @@ fun HearItScreen(
             },
             bottomBar = {
                 GummyButton(
-                    text = "Next: Say It",
+                    text = NextLines.NEXT,
+                    icon = Icons.AutoMirrored.Rounded.ArrowForward,
                     onClick = {
                         if (isUnlocked) {
                             onNext(phoneme?.id?.toString() ?: "1")

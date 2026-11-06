@@ -44,7 +44,10 @@ FRAGMENTS = {
 }
 
 # Spoken UI lines for the no-reading pass (NFR-IND-01; docs/proposals/2026-10-01-learning-ux.md).
-# 8 words or fewer; never rely on color ("the big button", and the button pulses on screen).
+# 8 words or fewer; never rely on color. The four "Tap the big button" lines below were replaced on 2026-11-06 by
+# VoiceStudio takes that name the button's word (release 2026-11-06-next-lines; the teacher: every button is big):
+#   ui_hearit_next "Great listening! Tap Next to keep going.", ui_findit_next "You found them all! Tap Next to keep
+#   going.", ui_complete_next "You did it! Tap Next to keep going.", ui_node_start "Tap Play to start!".
 UI_LINES = {
     "ui_hearit_next":   ("Great listening! Tap the big button.", 0.95, "card 07: Hear It next step unlocked"),
     "ui_findit_next":   ("You found them all! Tap the big button.", 0.95, "card 07: Find It complete"),
