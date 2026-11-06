@@ -20,6 +20,8 @@ import com.playit.app.presentation.blendit.BlendItCompleteScreen
 import com.playit.app.presentation.blendit.BlendItCompleteViewModel
 import com.playit.app.presentation.blendit.BlendItScreen
 import com.playit.app.presentation.blendit.BlendItViewModel
+import com.playit.app.presentation.soundcheck.SoundCheckScreen
+import com.playit.app.presentation.soundcheck.SoundCheckViewModel
 import com.playit.app.presentation.dashboard.ParentDashboardScreen
 import com.playit.app.presentation.dashboard.ParentDashboardViewModel
 import com.playit.app.presentation.dashboard.ReportPreviewScreen
@@ -111,8 +113,9 @@ fun NavGraph(
                 viewModel = viewModel,
                 onNodeSelected = { nodeId ->
                     if (nodeId.startsWith("blend_")) {
+                        // Every word game opens with the sound check (user choice, 2026-11-06).
                         val groupId = nodeId.removePrefix("blend_")
-                        navController.navigate(Routes.blendIt(groupId))
+                        navController.navigate(Routes.soundCheck(groupId))
                     } else {
                         navController.navigate(Routes.hearIt(nodeId))
                     }
@@ -181,6 +184,22 @@ fun NavGraph(
                     navController.navigate(Routes.MAP) {
                         popUpTo(Routes.MAP) { inclusive = true }
                     }
+                }
+            )
+        }
+
+        composable(Routes.SOUND_CHECK) { backStackEntry ->
+            val viewModel: SoundCheckViewModel = hiltViewModel()
+            val groupId = backStackEntry.arguments?.getString("groupId") ?: viewModel.groupId.toString()
+            SoundCheckScreen(
+                viewModel = viewModel,
+                onDone = {
+                    navController.navigate(Routes.blendIt(groupId)) {
+                        popUpTo(Routes.SOUND_CHECK) { inclusive = true }
+                    }
+                },
+                onBack = {
+                    navController.popBackStack()
                 }
             )
         }

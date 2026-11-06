@@ -10,7 +10,7 @@ import java.io.File
  * string literals of the child-facing screens; the Parent Zone is for adults and is not scanned.
  */
 class ChildWordsTest {
-    private val childScreens = listOf("splash", "profile", "map", "hearit", "sayit", "findit", "lettercomplete", "blendit")
+    private val childScreens = listOf("splash", "profile", "map", "hearit", "sayit", "findit", "lettercomplete", "blendit", "soundcheck")
         .map { File("src/main/java/com/playit/app/presentation/$it") }
     private val tooAdvanced = listOf("challenge", "milestone", "mastered", "phonics", "section ", "unit ", "guidebook",
         "blend-it", "blending", "limit reached", "profile")

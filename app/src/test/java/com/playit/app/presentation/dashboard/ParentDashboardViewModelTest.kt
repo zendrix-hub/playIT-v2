@@ -28,6 +28,7 @@ class ParentDashboardViewModelTest {
     private val reportGenerator: ReportGenerator = mockk(relaxed = true)
     private val pdfExporter: PdfExporter = mockk(relaxed = true)
     private val sessionManager: SessionManager = mockk(relaxed = true)
+    private val soundChecks: com.playit.app.domain.repository.SoundCheckRepository = mockk(relaxed = true)
 
     private val testDispatcher = StandardTestDispatcher()
     private val profilesFlow = MutableSharedFlow<List<Profile>>(replay = 1)
@@ -64,7 +65,7 @@ class ParentDashboardViewModelTest {
     fun init_selectsFirstProfileAndLoadsDashboardData() = runTest {
         coEvery { reportGenerator.generateDashboardData(1L) } returns sampleDashboardData
 
-        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager)
+        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager, soundChecks)
         profilesFlow.emit(listOf(sampleProfile1, sampleProfile2))
         advanceUntilIdle()
 
@@ -78,7 +79,7 @@ class ParentDashboardViewModelTest {
 
     @Test
     fun init_withEmptyProfiles_setsLoadingFalse() = runTest {
-        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager)
+        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager, soundChecks)
         profilesFlow.emit(emptyList())
         advanceUntilIdle()
 
@@ -94,7 +95,7 @@ class ParentDashboardViewModelTest {
         coEvery { reportGenerator.generateDashboardData(1L) } returns sampleDashboardData
         coEvery { reportGenerator.generateDashboardData(2L) } returns sampleDashboardData2
 
-        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager)
+        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager, soundChecks)
         profilesFlow.emit(listOf(sampleProfile1, sampleProfile2))
         advanceUntilIdle()
 
@@ -111,7 +112,7 @@ class ParentDashboardViewModelTest {
     fun selectProfile_handlesDashboardDataError() = runTest {
         coEvery { reportGenerator.generateDashboardData(any()) } throws RuntimeException("Data error")
 
-        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager)
+        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager, soundChecks)
         profilesFlow.emit(listOf(sampleProfile1))
         advanceUntilIdle()
 
@@ -129,7 +130,7 @@ class ParentDashboardViewModelTest {
         coEvery { reportGenerator.generateReportData() } returns dummyReportData
         coEvery { pdfExporter.exportReport(dummyReportData) } returns Result.success(dummyFile)
 
-        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager)
+        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager, soundChecks)
         profilesFlow.emit(listOf(sampleProfile1))
         advanceUntilIdle()
 
@@ -148,7 +149,7 @@ class ParentDashboardViewModelTest {
         coEvery { reportGenerator.generateReportData() } returns dummyReportData
         coEvery { pdfExporter.exportReport(dummyReportData) } returns Result.failure(RuntimeException("Disk full"))
 
-        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager)
+        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager, soundChecks)
         profilesFlow.emit(listOf(sampleProfile1))
         advanceUntilIdle()
 
@@ -170,7 +171,7 @@ class ParentDashboardViewModelTest {
         coEvery { reportGenerator.generateDashboardData(1L) } returns sampleDashboardData
         coEvery { reportGenerator.generateClassRecord() } returns record
 
-        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager)
+        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager, soundChecks)
         profilesFlow.emit(listOf(sampleProfile1, sampleProfile2))
         advanceUntilIdle()
 
@@ -181,7 +182,7 @@ class ParentDashboardViewModelTest {
     fun withOneChild_thereIsNoClassRecord() = runTest {
         coEvery { reportGenerator.generateDashboardData(1L) } returns sampleDashboardData
 
-        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager)
+        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager, soundChecks)
         profilesFlow.emit(listOf(sampleProfile1))
         advanceUntilIdle()
 
@@ -191,7 +192,7 @@ class ParentDashboardViewModelTest {
 
     @Test
     fun exportPdfReport_withNoChildren_doesNothing() = runTest {
-        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager)
+        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager, soundChecks)
         profilesFlow.emit(emptyList())
         advanceUntilIdle()
 
@@ -204,7 +205,7 @@ class ParentDashboardViewModelTest {
 
     @Test
     fun renameProfile_updatesTrimmedName() = runTest {
-        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager)
+        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager, soundChecks)
 
         viewModel.renameProfile(sampleProfile1, " Maya ")
         advanceUntilIdle()
@@ -214,7 +215,7 @@ class ParentDashboardViewModelTest {
 
     @Test
     fun renameProfile_blankOrTooLong_isIgnored() = runTest {
-        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager)
+        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager, soundChecks)
 
         viewModel.renameProfile(sampleProfile1, "   ")
         viewModel.renameProfile(sampleProfile1, "12345678901234567")
@@ -227,7 +228,7 @@ class ParentDashboardViewModelTest {
     fun rename_refreshesSelectedProfile() = runTest {
         coEvery { reportGenerator.generateDashboardData(any()) } returns sampleDashboardData
 
-        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager)
+        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager, soundChecks)
         profilesFlow.emit(listOf(sampleProfile1))
         advanceUntilIdle()
         assertEquals("Maya", viewModel.uiState.value.selectedProfile?.name)
@@ -241,17 +242,19 @@ class ParentDashboardViewModelTest {
 
     @Test
     fun deleteProfile_callsRepository() = runTest {
-        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager)
+        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager, soundChecks)
         viewModel.deleteProfile(sampleProfile1)
         advanceUntilIdle()
 
         coVerify { profileRepository.deleteProfile(sampleProfile1) }
+        // Sound checks live outside the database, so they are deleted with the child too.
+        coVerify { soundChecks.deleteFor(sampleProfile1.id) }
     }
 
     @Test
     fun deleteActiveProfile_clearsSession() = runTest {
         every { sessionManager.activeProfileId } returns MutableStateFlow(sampleProfile1.id)
-        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager)
+        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager, soundChecks)
         viewModel.deleteProfile(sampleProfile1)
         advanceUntilIdle()
 
@@ -261,7 +264,7 @@ class ParentDashboardViewModelTest {
     @Test
     fun deleteOtherProfile_keepsSession() = runTest {
         every { sessionManager.activeProfileId } returns MutableStateFlow(sampleProfile2.id)
-        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager)
+        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager, soundChecks)
         viewModel.deleteProfile(sampleProfile1)
         advanceUntilIdle()
 
@@ -271,7 +274,7 @@ class ParentDashboardViewModelTest {
     @Test
     fun deleteLastProfile_setsNoProfilesLeft() = runTest {
         every { sessionManager.activeProfileId } returns MutableStateFlow(null)
-        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager)
+        viewModel = ParentDashboardViewModel(profileRepository, reportGenerator, pdfExporter, sessionManager, soundChecks)
         profilesFlow.emit(listOf(sampleProfile1))
         advanceUntilIdle()
         assertFalse(viewModel.noProfilesLeft.value)

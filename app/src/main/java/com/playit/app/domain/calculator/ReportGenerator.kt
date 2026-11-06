@@ -9,6 +9,7 @@ import com.playit.app.domain.repository.LetterGroupMemberRepository
 import com.playit.app.domain.repository.PhonemeRepository
 import com.playit.app.domain.repository.ProfileRepository
 import com.playit.app.domain.repository.SayItAttemptRepository
+import com.playit.app.domain.repository.SoundCheckRepository
 import kotlinx.coroutines.flow.first
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -26,7 +27,8 @@ class ReportGenerator @Inject constructor(
     private val findItAttemptRepository: FindItAttemptRepository,
     private val blendItProgressRepository: BlendItProgressRepository,
     private val letterGroupMemberRepository: LetterGroupMemberRepository,
-    private val retentionCalculator: RetentionCalculator
+    private val retentionCalculator: RetentionCalculator,
+    private val soundCheckRepository: SoundCheckRepository
 ) {
 
     suspend fun generateDashboardData(profileId: Long): ProfileDashboardData? {
@@ -53,6 +55,10 @@ class ReportGenerator @Inject constructor(
             )
         }
         val blendByChapter = blendItProgresses.associateBy { it.groupId }
+        // Checks saved before this profile was made belong to an earlier child with the same id.
+        val checksByChapter = runCatching { soundCheckRepository.resultsFor(profileId) }.getOrDefault(emptyList())
+            .filter { it.checkedAt >= profile.createdAt }
+            .groupBy { it.groupId }
         val chapters = letters.filter { it.chapter > 0 }
             .groupBy { it.chapter }
             .toSortedMap()
@@ -60,7 +66,8 @@ class ReportGenerator @Inject constructor(
                 ProgressRecordCalculator.chapter(
                     chapter,
                     inChapter.sortedBy { orderInChapter[it.phonemeId] ?: 0 },
-                    blendByChapter[chapter]
+                    blendByChapter[chapter],
+                    checksByChapter[chapter].orEmpty()
                 )
             }
         val (overallGrade, overallLevel) = ProgressRecordCalculator.overall(letters)

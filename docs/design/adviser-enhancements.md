@@ -26,6 +26,15 @@ Branch `enhance/adviser-feedback`, cut from `design/visual-refresh` at `86408a9`
 
 | **New Find It pictures** | (this commit) | <ul><li>Release `2026-11-05-findit-newart`: 11 Canva pictures, each marked OK on the final review page.</li><li>Lamp, Guitar, Horse, Jeep, Octopus and Question (a question mark) replace Lit, Gap, Hen, Jet, Ox and Quiz, and show without their word.</li><li>Ink, Up, Uncle, Yak and Quilt are redrawn and keep their word.</li><li>Insect keeps today's picture.</li><li>The pictures were exported full size from the Canva design "PlayIT Canva pictures" (page 14, saved with the user's OK), then cut out. The jeepney's bright red was turned to tomato.</li></ul> |
 
+### Third round (user, 2026-11-06, after the demo to the teacher)
+
+| What | Commit | How |
+|---|---|---|
+| **Say It no longer takes a wrong first sound** | `378ae05` | <ul><li>User: on letter i, "onsect", "ansect" and even "applesect" passed as "insect".</li><li>Cause: the speech grammar held only the key word and the letter's names, so Vosk forced any "-sect" onto "insect".</li><li>Each key word now adds near-miss decoys to the grammar ("on sect", "apple sect"; "house" for mouse; "fun" for sun). A decoy is never accepted.</li><li>Measured with `tools/speech/near_miss_probe.py` (24 synthetic takes per word): onsect, ansect and unsect went from 24 of 24 accepted to 0 or 1; the right words pass as often as before.</li><li>Elephant, orange and umbrella still accept a wrong first vowel: no decoy beat their long endings.</li></ul> |
+| **Find It: one word hidden in Chapter 1** | `98f985a` | <ul><li>User: from the second letter of Chapter 1, one picture without its word.</li><li>m still shows every word. From s on, one picture per round shows without its word, never one that must keep it.</li></ul> |
+| **The map says BLEND n again** | `1b8ae3b` | <ul><li>User choice: back to "BLEND 1" (it said "WORDS 1" after `eb24dd5`).</li><li>The pop-up keeps "Word game n".</li></ul> |
+| **Sound check before Blend It** | (this commit) | <ul><li>The teacher asked, at Blend It, how anyone can tell the child learned. The user chose a sound check.</li><li>The map's BLEND stop opens it, then Blend It. Lily says each of the chapter's sounds once ("Which letter says..." and the sound), and the child taps its letter.</li><li>No help and no second try. A wrong tap gets "Good try! Let's do the next one." The speaker button, and Lily after 10 s, play the sound again.</li><li>The end shows "You know these sounds!" and the ones to practise, then "Build words".</li><li>Each check is saved. Every chapter in the Parent Zone and the PDF shows it: "Sound check: first time 2 of 4, latest 4 of 4. Practise: a". This shows learning over days.</li><li>Saved in the app's private preferences, so the database schema does not change; deleting a child deletes them.</li><li>Voice: release `2026-11-06-sound-check`, VoiceStudio (OmniVoice) cloned from Lily's own clips, the takes the user marked OK. Licence: CC BY-NC (non-commercial, credited in the Parent Zone), as the opening's voice.</li></ul> |
+
 ## Waiting for the user
 
 Nothing from this round. The new clips and pictures still need the teacher audit before main.
@@ -38,9 +47,11 @@ The SRS, SDD and STD describe the earlier behaviour. These parts change:
   - Mastered/Developing/At-Risk and percentages become plain words for parents, with the DepEd descriptors and transmuted grades for teachers.
   - The report covers every child on the phone.
   - A replay keeps the best stars.
-- **FR-04 (Find It):** words under the pictures depend on the chapter and on replays.
+- **FR-04 (Find It):** words under the pictures depend on the chapter, the letter's place in Chapter 1, and replays.
+- **FR-03 (Say It):** the word-mode grammar adds near-miss decoys, so a wrong first sound is not accepted.
+- **FR-13 (Blend It):** each word game opens with a sound check; FR-10 and FR-12 show its first and latest result per chapter.
 - **NFR-ACC-01 (mouth-shape cues):** the cue shows big while Lily models the sound twice, and the mouth pulses while the sound plays; then it moves beside the mic.
 - **NFR-IND-01 (independent use):** the return greeting, the child-language wording, the Guidebook content, and the name a new player types (replacing avatar-only onboarding).
-- **STD:** the new tests are `ProgressLevelTest`, `ProgressRecordCalculatorTest`, `ReportGeneratorTest`, `ReportLayoutTest`, `ReportPageRendererTest`, `BestResultTest`, `WordLabelPolicyTest`, `ReturnGreetingPolicyTest`, `ChildWordsTest`, `ParentDashboardScreenshotTest` and `WelcomeBackScreenshotTest`, plus the updated view-model and layout tests.
+- **STD:** the new tests are `ProgressLevelTest`, `ProgressRecordCalculatorTest`, `ReportGeneratorTest`, `ReportLayoutTest`, `ReportPageRendererTest`, `BestResultTest`, `WordLabelPolicyTest`, `ReturnGreetingPolicyTest`, `ChildWordsTest`, `ParentDashboardScreenshotTest` and `WelcomeBackScreenshotTest`, plus the updated view-model and layout tests. The third round adds `SoundCheckRoundTest`, `SoundCheckRepositoryImplTest`, `SoundCheckViewModelTest` and `SoundCheckScreenshotTest`, and decoy tests in `SpeechValidatorTest`.
 
 No database schema changed. A teacher audit of the new clips is still required before merging to main.

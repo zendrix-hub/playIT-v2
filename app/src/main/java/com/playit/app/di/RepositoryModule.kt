@@ -10,6 +10,7 @@ import com.playit.app.data.repository.LetterGroupRepositoryImpl
 import com.playit.app.data.repository.PhonemeRepositoryImpl
 import com.playit.app.data.repository.ProfileRepositoryImpl
 import com.playit.app.data.repository.SayItAttemptRepositoryImpl
+import com.playit.app.data.repository.SoundCheckRepositoryImpl
 import com.playit.app.domain.repository.BlendItAttemptRepository
 import com.playit.app.domain.repository.BlendItProgressRepository
 import com.playit.app.domain.repository.BlendItWordRepository
@@ -20,6 +21,7 @@ import com.playit.app.domain.repository.LetterGroupRepository
 import com.playit.app.domain.repository.PhonemeRepository
 import com.playit.app.domain.repository.ProfileRepository
 import com.playit.app.domain.repository.SayItAttemptRepository
+import com.playit.app.domain.repository.SoundCheckRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -98,4 +100,10 @@ abstract class RepositoryModule {
     abstract fun bindBlendItAttemptRepository(
         impl: BlendItAttemptRepositoryImpl
     ): BlendItAttemptRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSoundCheckRepository(
+        impl: SoundCheckRepositoryImpl
+    ): SoundCheckRepository
 }

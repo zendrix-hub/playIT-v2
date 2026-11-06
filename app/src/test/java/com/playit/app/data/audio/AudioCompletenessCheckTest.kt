@@ -53,6 +53,15 @@ class AudioCompletenessCheckTest {
     /** Lily's welcome back (release 2026-11-05-return, adviser 2026-11-05), in audio/vo/ui. */
     private val returnLines = listOf("ret_welcome_back.wav", "ret_keep_going.wav", "ret_build_words.wav", "ret_all_done.wav")
 
+    /** Every line the sound check before Blend It plays is released (release 2026-11-06-sound-check). */
+    @Test
+    fun theSoundCheckLines_areReleased() {
+        val dir = java.io.File("src/main/assets/audio/vo/ui")
+        com.playit.app.presentation.soundcheck.SoundCheckLines.ALL.forEach {
+            assertTrue("missing $it", java.io.File(dir, "$it.wav").exists())
+        }
+    }
+
     /** "Who is playing? Tap your animal!" and "Now type your name!" (release 2026-11-05-name-lines). */
     @Test
     fun theProfileLines_areReleased() {

@@ -13,6 +13,8 @@ object Routes {
     const val FIND_IT = "findit/{phonemeId}"
     const val LETTER_COMPLETE = "letter_complete/{phonemeId}?heartsLost={heartsLost}"
     const val BLEND_IT = "blendit/{groupId}"
+    /** The sound check that opens each word game (user choice, 2026-11-06). */
+    const val SOUND_CHECK = "soundcheck/{groupId}"
     const val BLEND_IT_COMPLETE = "blendit_complete/{groupId}?heartsLost={heartsLost}&wordsCorrect={wordsCorrect}&totalWords={totalWords}"
     const val PARENT_DASHBOARD = "parent_dashboard"
     const val REPORT_PREVIEW = "report_preview/{filePath}"
@@ -22,6 +24,7 @@ object Routes {
     fun findIt(phonemeId: String) = "findit/$phonemeId"
     fun letterComplete(phonemeId: String, heartsLost: Int = 0) = "letter_complete/$phonemeId?heartsLost=$heartsLost"
     fun blendIt(groupId: String) = "blendit/$groupId"
+    fun soundCheck(groupId: String) = "soundcheck/$groupId"
     fun blendItComplete(groupId: String, heartsLost: Int = 0, wordsCorrect: Int = 5, totalWords: Int = 5) =
         "blendit_complete/$groupId?heartsLost=$heartsLost&wordsCorrect=$wordsCorrect&totalWords=$totalWords"
     fun reportPreview(filePath: String): String {

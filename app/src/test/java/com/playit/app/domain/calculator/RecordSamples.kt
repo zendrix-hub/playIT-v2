@@ -54,7 +54,12 @@ object RecordSamples {
         }
         val chapters = rows.groupBy { it.chapter }.toSortedMap().map { (ch, ls) ->
             val blend = if (ls.all { it.isCompleted }) BlendItProgress(profileId = id, groupId = ch, starsEarned = 3, isCompleted = true) else null
-            ProgressRecordCalculator.chapter(ch, ls, blend)
+            val letters = ls.map { it.symbol.lowercase() }
+            val checks = if (blend == null) emptyList() else listOf(
+                com.playit.app.domain.model.SoundCheckResult(ch, t0 + ch * day, letters.drop(1), letters.take(1)),
+                com.playit.app.domain.model.SoundCheckResult(ch, t0 + (ch + 9) * day, letters, emptyList())
+            )
+            ProgressRecordCalculator.chapter(ch, ls, blend, checks)
         }
         val (grade, level) = ProgressRecordCalculator.overall(rows)
         return ProfileDashboardData(

@@ -13,5 +13,6 @@ class VoiceCreditTest {
 
     @Test fun creditNamesOmniVoiceForTheOpeningsVoice() {
         assertTrue(VOICE_CREDIT.contains("OmniVoice by k2-fsa"))
+        assertTrue("release 2026-11-06-sound-check", VOICE_CREDIT.contains("sound check"))
     }
 }

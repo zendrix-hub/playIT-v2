@@ -63,7 +63,24 @@ class ReportGeneratorTest {
         ))
         every { getProgressForProfile(2) } returns flowOf(emptyList())
     }
-    private val generator = ReportGenerator(profiles, phonemes, lessons, sayIt, findIt, blend, members, RetentionCalculator())
+    private val checks: com.playit.app.domain.repository.SoundCheckRepository = mockk {
+        coEvery { resultsFor(1) } returns listOf(
+            // Saved before Frog's profile was made (createdAt 1): an earlier child with the same id.
+            com.playit.app.domain.model.SoundCheckResult(1, 0, listOf("m"), listOf("s", "a", "i")),
+            com.playit.app.domain.model.SoundCheckResult(1, 6000, listOf("m", "s", "i"), listOf("a")),
+            com.playit.app.domain.model.SoundCheckResult(1, 9000, listOf("m", "s", "a", "i"), emptyList())
+        )
+        coEvery { resultsFor(2) } returns emptyList()
+    }
+    private val generator = ReportGenerator(profiles, phonemes, lessons, sayIt, findIt, blend, members, RetentionCalculator(), checks)
+
+    /** User choice, 2026-11-06: each chapter carries its sound checks, oldest first, only this child's. */
+    @Test fun aChapterCarriesItsSoundChecks_withoutAnEarlierChildsWithTheSameId() = runTest {
+        val chapter1 = generator.generateDashboardData(1)!!.chapters.first { it.chapter == 1 }
+        assertEquals(listOf(6000L, 9000L), chapter1.soundChecks.map { it.checkedAt })
+        assertTrue(generator.generateDashboardData(1)!!.chapters.filter { it.chapter != 1 }.all { it.soundChecks.isEmpty() })
+        assertTrue(generator.generateDashboardData(2)!!.chapters.all { it.soundChecks.isEmpty() })
+    }
 
     @Test fun aChildsRecord_hasSevenChaptersFromTheSeededGroups() = runTest {
         val data = generator.generateDashboardData(1)!!

@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Extension
+import androidx.compose.material.icons.rounded.Hearing
+import com.playit.app.domain.manager.SoundCheckSummary
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -217,6 +219,18 @@ fun ChapterRecordCard(chapter: ChapterRecord, modifier: Modifier = Modifier) {
                     "done, ${chapter.blendItStars} of 3 stars"
                 } else "not yet",
                 fontFamily = LexendFontFamily, fontSize = 13.sp, color = TextMuted
+            )
+        }
+        // The sound check before the word game, the first time against the latest (user choice, 2026-11-06).
+        Row(
+            verticalAlignment = Alignment.Top,
+            modifier = Modifier.padding(top = 4.dp).semantics(mergeDescendants = true) {}
+        ) {
+            Icon(Icons.Rounded.Hearing, contentDescription = null, tint = TextMuted, modifier = Modifier.size(18.dp))
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                "Sound check: " + SoundCheckSummary.lines(chapter.soundChecks).joinToString("\n"),
+                fontFamily = LexendFontFamily, fontSize = 13.sp, color = TextMuted, lineHeight = 17.sp
             )
         }
     }

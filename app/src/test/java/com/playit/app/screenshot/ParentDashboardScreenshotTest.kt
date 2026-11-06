@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onRoot
 import com.github.takahirom.roborazzi.captureRoboImage
 import com.playit.app.data.pdf.PdfExporter
@@ -52,7 +53,7 @@ class ParentDashboardScreenshotTest {
         coEvery { generator.generateClassRecord() } returns learners
         val session: SessionManager = mockk(relaxed = true)
         every { session.activeProfileId } returns MutableStateFlow(null)
-        val vm = ParentDashboardViewModel(profiles, generator, mockk<PdfExporter>(relaxed = true), session)
+        val vm = ParentDashboardViewModel(profiles, generator, mockk<PdfExporter>(relaxed = true), session, mockk(relaxed = true))
         compose.setContent { PlayItTheme { ParentDashboardScreen(vm, onBack = {}, onReportPreview = {}) } }
         compose.waitForIdle()
     }
@@ -63,6 +64,9 @@ class ParentDashboardScreenshotTest {
         compose.onNodeWithText("All the children").assertExists()
         compose.onNodeWithText("Practise at home").assertExists()
         compose.onNodeWithText("Chapter 1").assertExists()
+        // The sound check before the word game, first time against the latest (user choice, 2026-11-06).
+        compose.onAllNodesWithText("Sound check: first time 3 of 4\nLatest 4 of 4", substring = true).onFirst().assertExists()
+        compose.onAllNodesWithText("Sound check: not yet", substring = true).onFirst().assertExists()
         compose.onAllNodesWithText("%", substring = true).assertCountEquals(0)
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/dashboard_three_children.png")
     }

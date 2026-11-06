@@ -8,6 +8,7 @@ import com.playit.app.domain.model.LetterPerformance
 import com.playit.app.domain.model.Phoneme
 import com.playit.app.domain.model.ProgressLevel
 import com.playit.app.domain.model.SayItAttempt
+import com.playit.app.domain.model.SoundCheckResult
 import kotlin.math.roundToInt
 
 /**
@@ -58,7 +59,12 @@ object ProgressRecordCalculator {
         )
     }
 
-    fun chapter(chapter: Int, letters: List<LetterPerformance>, blendIt: BlendItProgress?): ChapterRecord {
+    fun chapter(
+        chapter: Int,
+        letters: List<LetterPerformance>,
+        blendIt: BlendItProgress?,
+        soundChecks: List<SoundCheckResult> = emptyList()
+    ): ChapterRecord {
         val allDone = letters.isNotEmpty() && letters.all { it.isCompleted }
         val grade = if (allDone) meanGrade(letters) else null
         val level = when {
@@ -72,7 +78,8 @@ object ProgressRecordCalculator {
             blendItCompleted = blendIt?.isCompleted == true,
             blendItStars = blendIt?.starsEarned ?: 0,
             grade = grade,
-            level = level
+            level = level,
+            soundChecks = soundChecks.sortedBy { it.checkedAt }
         )
     }
 

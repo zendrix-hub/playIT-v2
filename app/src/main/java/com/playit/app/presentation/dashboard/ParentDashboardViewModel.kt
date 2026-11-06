@@ -8,6 +8,7 @@ import com.playit.app.domain.model.Profile
 import com.playit.app.domain.model.ProfileDashboardData
 import com.playit.app.domain.model.ReportData
 import com.playit.app.domain.repository.ProfileRepository
+import com.playit.app.domain.repository.SoundCheckRepository
 import com.playit.app.navigation.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,7 +43,8 @@ class ParentDashboardViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val reportGenerator: ReportGenerator,
     private val pdfExporter: PdfExporter,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val soundCheckRepository: SoundCheckRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ParentDashboardUiState())
@@ -142,6 +144,8 @@ class ParentDashboardViewModel @Inject constructor(
         hasDeleted = true
         viewModelScope.launch {
             profileRepository.deleteProfile(profile)
+            // Its sound checks are kept outside the database, so they go separately.
+            runCatching { soundCheckRepository.deleteFor(profile.id) }
             if (sessionManager.activeProfileId.value == profile.id) {
                 sessionManager.clearActiveProfile()
             }

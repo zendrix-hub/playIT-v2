@@ -14,9 +14,10 @@ import com.playit.app.presentation.theme.TextMuted
 
 /**
  * The ElevenLabs Free plan requires this credit wherever its audio is published (release 2026-10-11-words), and the
- * OmniVoice model's CC BY-NC licence requires one for the opening's voice (release 2026-10-30-opening).
+ * OmniVoice model's CC BY-NC licence requires one for the opening's voice (release 2026-10-30-opening) and Lily's
+ * sound check lines (release 2026-11-06-sound-check).
  */
-const val VOICE_CREDIT = "Some word voices made with ElevenLabs (elevenlabs.io). Opening voice made with OmniVoice by k2-fsa."
+const val VOICE_CREDIT = "Some word voices made with ElevenLabs (elevenlabs.io). Opening voice and sound check lines made with OmniVoice by k2-fsa."
 
 @Composable
 fun VoiceCreditLine(modifier: Modifier = Modifier) {

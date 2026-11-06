@@ -11,7 +11,9 @@ data class ChapterRecord(
     val blendItCompleted: Boolean,
     val blendItStars: Int,
     val grade: Int?,
-    val level: ProgressLevel
+    val level: ProgressLevel,
+    /** The chapter's sound checks, oldest first (user choice, 2026-11-06). */
+    val soundChecks: List<SoundCheckResult> = emptyList()
 ) {
     val lettersDone: Int get() = letters.count { it.isCompleted }
     val lettersTotal: Int get() = letters.size

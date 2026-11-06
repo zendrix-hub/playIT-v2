@@ -12,6 +12,7 @@ import com.playit.app.data.pdf.ReportLayout.NEXT_HEADER
 import com.playit.app.data.pdf.ReportLayout.PAGE_HEIGHT
 import com.playit.app.data.pdf.ReportLayout.PAGE_WIDTH
 import com.playit.app.data.pdf.ReportLayout.TABLE_HEADER
+import com.playit.app.domain.manager.SoundCheckSummary
 import com.playit.app.domain.model.ChapterRecord
 import com.playit.app.domain.model.ProfileDashboardData
 import com.playit.app.domain.model.ProgressLevel
@@ -323,7 +324,8 @@ class ReportPageRenderer {
 
     private fun blendRow(c: Canvas, chapter: ChapterRecord, top: Float) {
         val s = if (chapter.blendItCompleted) "done, ${chapter.blendItStars} of 3 stars" else "not yet"
-        text(c, "Word game (Blend It) for chapter ${chapter.chapter}: $s", left + 26f, top + BLEND_ROW - 4f, 8f, muted)
+        val check = SoundCheckSummary.describe(chapter.soundChecks)
+        text(c, "Word game (Blend It) for chapter ${chapter.chapter}: $s.   Sound check: $check.", left + 26f, top + BLEND_ROW - 4f, 8f, muted)
         hline(c, left, top + BLEND_ROW, right)
     }
 }
