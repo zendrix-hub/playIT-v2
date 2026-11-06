@@ -20,6 +20,7 @@ Round 2 uses ROUND2, the spellings from the user's notes, in its own batch folde
 """
 import json
 import pathlib
+import re
 import sys
 
 import numpy as np
@@ -67,14 +68,32 @@ LETTERS = {
 # Round 2 (user's notes on the part 2 page, 2026-11-06): every take of these was FIX. The user wants a
 # consonant with a short vowel after it, like the approved g and d, and for p and r the key word's vowel.
 ROUND2 = {
-    "l": ("lion", "l, 'luh'", ["luh, luh, lion."]),  # "should be luh luh lion"
+    # "Luh. Luh. Lion." and "Fuh. Fuh. Fish.": full stops for clearer pauses, after every "luh, luh, lion." take
+    # and both "fuh, fuh, ffff." takes ran together (2026-11-06).
+    "l": ("lion", "l, 'luh'", ["luh, luh, lion.", "Luh. Luh. Lion."]),  # "should be luh luh lion"
     "p": ("pig", "p, 'puh' or 'pih'", ["puh, puh, pig.", "pih, pih, pig."]),  # "should be puh or pih since pig"
     "r": ("rabbit", "r, 'ruh' or 'rah'", ["ruh, ruh, rabbit.", "rah, rah, rabbit."]),  # "should be ruh or rah for rabbit"
     "h": ("hat", "h, 'huh' or 'hah'", ["huh, huh, hat.", "ha, ha, hat."]),  # FIX, no note: as p and r
-    "f": ("fish", "f, 'fuh'", ["fuh, fuh, fish.", "fuh, fuh, ffff."]),  # "is it possible that fuh fuh ffff"
+    "f": ("fish", "f, 'fuh'", ["fuh, fuh, fish.", "fuh, fuh, ffff.", "Fuh. Fuh. Fish."]),  # "is it possible that fuh fuh ffff"
     "v": ("van", "v, 'vuh'", ["vuh, vuh, van."]),  # "should be vuh vuh"
     "z": ("zebra", "z, 'zuh'", ["zuh, zuh, zebra.", "zuh, zuh, zzz."]),  # "it should be zuh zuh zzz"
 }
+
+
+def is_held(text):
+    """True for a sound said alone ("Nnnnn."): the whole take is the sound. "guh, guh, goat." and "Luh. Luh. Lion."
+    have three parts, and their first sound is cut out."""
+    return len([t for t in re.split(r"[,.]", text) if t.strip()]) == 1
+
+
+# Words a child must never hear. Vosk maps a cut "fuh" to the nearest word it knows, and on 2026-11-06 it heard one
+# of these, so such a take is flagged for the listener (the listener decides; Vosk is often wrong on one syllable).
+RUDE = {"fuck", "fucking", "shit", "damn", "hell", "ass", "bitch", "dick", "cock", "piss", "crap"}
+
+
+def rude_warning(*heard_texts):
+    hits = sorted({w for t in heard_texts for w in t.split() if w in RUDE})
+    return f"LISTEN CLOSELY: the checker heard a rude word ({', '.join(hits)}); mark FIX if it sounds like one. "         if hits else ""
 
 
 def segments(a, sr, gap_ms=120, rel_db=-35):
@@ -174,13 +193,13 @@ def main():
         for ti, text in enumerate(texts):
             for seed in (seeds if len(texts) > 1 else seeds + [max(seeds) + 1]):
                 name = f"{letter}_t{ti + 1}_vs{seed}.wav"
-                if name in done:
-                    continue
+                if name in done or (out / "phrases" / name).exists():
+                    continue  # made already (a take that ran together keeps only its phrase)
                 a, sr = say(text, seed, ref_wav, ref_text, num_step=NUM_STEP)
                 assert sr == SR_OUT, sr
                 (out / "phrases").mkdir(exist_ok=True)
                 sf.write(out / "phrases" / name, a, sr)
-                held = "," not in text  # "Nnnnn." alone: the whole take is the sound
+                held = is_held(text)
                 cut = a if held else first_sound(a, sr)
                 if cut is None:
                     print(f"{name}: the sounds ran together in {text!r}; dropped", flush=True)
@@ -190,7 +209,8 @@ def main():
                 rows.append({"file": name, "group": group,
                              "says": f"\"{text}\" (the whole take)" if held else f"the first sound of \"{text}\"",
                              "listen_for": listen,
-                             "auto_check": f"VoiceStudio (OmniVoice, Lily reference), seed {seed}, "
+                             "auto_check": rude_warning(heard(vosk, au, SR_OUT), heard(vosk, a, sr)) +
+                                           f"VoiceStudio (OmniVoice, Lily reference), seed {seed}, "
                                            f"{core_ms(au, SR_OUT)} ms; Vosk hears the sound as "
                                            f"\"{heard(vosk, au, SR_OUT)}\" and the phrase as \"{heard(vosk, a, sr)}\""})
                 print(f"{name}: {core_ms(au, SR_OUT)} ms", flush=True)
