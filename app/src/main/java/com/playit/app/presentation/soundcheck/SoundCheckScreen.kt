@@ -87,12 +87,16 @@ fun SoundCheckScreen(
     val result by viewModel.result.collectAsStateWithLifecycle()
     val skip by viewModel.skip.collectAsStateWithLifecycle()
 
-    LaunchedEffect(skip) { if (skip) onDone() }
+    val goToWords = {
+        viewModel.goToWords()
+        onDone()
+    }
+    LaunchedEffect(skip) { if (skip) goToWords() }
     DisposableEffect(Unit) {
         viewModel.onScreenVisible()
         onDispose {
             viewModel.onScreenHidden()
-            viewModel.stopAudio()
+            viewModel.onLeave()
         }
     }
 
@@ -108,10 +112,7 @@ fun SoundCheckScreen(
         onTap = viewModel::tap,
         onReplay = viewModel::replaySound,
         onInteraction = viewModel::onUserInteraction,
-        onDone = {
-            viewModel.stopAudio()
-            onDone()
-        },
+        onDone = goToWords,
         onBack = onBack
     )
 }

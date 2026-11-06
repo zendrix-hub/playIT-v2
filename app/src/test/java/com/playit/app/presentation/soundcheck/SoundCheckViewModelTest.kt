@@ -14,6 +14,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -134,5 +135,31 @@ class SoundCheckViewModelTest {
         advanceUntilIdle()
         assertTrue(vm.skip.value)
         coVerify(exactly = 0) { checks.save(any(), any()) }
+    }
+
+    private fun close(vm: SoundCheckViewModel) =
+        SoundCheckViewModel::class.java.getDeclaredMethod("onCleared").apply { isAccessible = true }.invoke(vm)
+
+    /**
+     * User, 2026-11-06: after "Build words" Lily no longer said "Let's build some words together!". The player is
+     * shared and this screen closes after Blend It has started that line, so closing must leave the player alone.
+     */
+    @Test fun afterBuildWords_closingTheScreen_doesNotStopBlendItsVoice() = runTest(dispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.goToWords()
+        verify(exactly = 1) { audio.stop() }
+        vm.onLeave()
+        close(vm)
+        verify(exactly = 1) { audio.stop() }
+    }
+
+    @Test fun leavingWithoutBuildingWords_stillStopsTheChecksVoice() = runTest(dispatcher) {
+        val vm = vm()
+        advanceUntilIdle()
+        vm.onLeave()
+        verify(exactly = 1) { audio.stop() }
+        close(vm)
+        verify(exactly = 2) { audio.stop() }
     }
 }

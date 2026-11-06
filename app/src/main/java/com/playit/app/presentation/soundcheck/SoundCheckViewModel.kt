@@ -102,6 +102,13 @@ class SoundCheckViewModel @Inject constructor(
 
     private var flow: Job? = null
 
+    /**
+     * True once the child goes on to the word game. The player is shared, and this screen closes only after Blend It
+     * has started "Let's build some words together!" (user, 2026-11-06: Lily stopped saying it), so from then on
+     * leaving must not stop the player.
+     */
+    private var handedOff = false
+
     private val idleTimer = IdleTimer(
         scope = viewModelScope,
         isBusy = { _isPlaying.value || !_acceptingTaps.value },
@@ -209,8 +216,20 @@ class SoundCheckViewModel @Inject constructor(
         _isPlaying.value = false
     }
 
+    /** "Build words" (or a chapter with no letters): stop the check's own voice, then leave the player to Blend It. */
+    fun goToWords() {
+        stopAudio()
+        handedOff = true
+    }
+
+    /** The screen left: stop the check's voice, unless Blend It already owns the player. */
+    fun onLeave() {
+        if (handedOff) flow?.cancel() else stopAudio()
+    }
+
     override fun onCleared() {
         super.onCleared()
-        audioPlayer.stop()
+        flow?.cancel()
+        if (!handedOff) audioPlayer.stop()
     }
 }
