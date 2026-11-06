@@ -961,7 +961,7 @@ fun BlendItChallengeNodeCard(
                 )
                 // 16 sp like all map text (it was 9.5 sp, card 31e).
                 Text(
-                    text = "WORDS ${node.groupId}",
+                    text = "BLEND ${node.groupId}", // user, 2026-11-06: back to BLEND (was WORDS in eb24dd5)
                     fontFamily = LexendFontFamily,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Black,

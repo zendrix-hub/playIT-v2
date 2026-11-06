@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.dp
 import com.github.takahirom.roborazzi.captureRoboImage
@@ -73,6 +74,20 @@ class BlendNodeShapeTest {
         // Just outside the 16 dp corners at the bottom, the rim used to cover the depth band behind the box.
         assertEquals("bottom left", SunnyGoldDark.toArgb(), pixels.getPixel(left + 4, top + 72))
         assertEquals("bottom right", SunnyGoldDark.toArgb(), pixels.getPixel(right - 4, top + 72))
+    }
+
+    /** User, 2026-11-06: the stop says BLEND and its chapter again (it said WORDS for a while). */
+    @Config(sdk = [34])
+    @Test fun theLabelSaysBlendAndTheChapter() {
+        compose.setContent {
+            PlayItTheme {
+                CompositionLocalProvider(LocalReducedMotion provides true) {
+                    BlendItChallengeNodeCard(node(unlocked = true), onClick = {})
+                }
+            }
+        }
+        compose.onNodeWithText("BLEND 1").assertExists()
+        compose.onNodeWithText("WORDS 1").assertDoesNotExist()
     }
 
     /** Locked and unlocked, large enough to judge the corners. */
