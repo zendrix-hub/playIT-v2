@@ -1,0 +1,400 @@
+{
+ "apple": {
+  "letter": "a",
+  "ipa": "ˈæpəl",
+  "wrong": {
+   "opple": "ˈɑpəl",
+   "epple": "ˈɛpəl",
+   "upple": "ˈʌpəl",
+   "ipple": "ˈɪpəl"
+  },
+  "decoys": [
+   "up all",
+   "a pull",
+   "up pull",
+   "pull",
+   "opal",
+   "ripple"
+  ]
+ },
+ "ball": {
+  "letter": "b",
+  "ipa": "bˈɔl",
+  "wrong": {
+   "fall": "fˈɔl",
+   "call": "kˈɔl",
+   "pall": "pˈɔl",
+   "doll": "dˈɑl"
+  },
+  "decoys": [
+   "fall",
+   "call",
+   "paul",
+   "all",
+   "tall"
+  ]
+ },
+ "box": {
+  "letter": "x",
+  "ipa": "bˈɑks",
+  "wrong": {
+   "fox": "fˈɑks",
+   "pox": "pˈɑks",
+   "docks": "dˈɑks"
+  },
+  "decoys": [
+   "fox",
+   "socks",
+   "ox",
+   "rocks"
+  ]
+ },
+ "cat": {
+  "letter": "c",
+  "ipa": "kˈæt",
+  "wrong": {
+   "hat": "hˈæt",
+   "bat": "bˈæt",
+   "tat": "tˈæt"
+  },
+  "decoys": [
+   "hat",
+   "bat",
+   "at",
+   "pat",
+   "that"
+  ]
+ },
+ "dog": {
+  "letter": "d",
+  "ipa": "dˈɔɡ",
+  "wrong": {
+   "log": "lˈɔɡ",
+   "bog": "bˈɔɡ",
+   "tog": "tˈɔɡ"
+  },
+  "decoys": [
+   "log",
+   "bog",
+   "fog",
+   "hog",
+   "frog"
+  ]
+ },
+ "elephant": {
+  "letter": "e",
+  "ipa": "ˈɛləfənt",
+  "wrong": {
+   "alephant": "ˈæləfənt",
+   "ilephant": "ˈɪləfənt",
+   "olephant": "ˈɑləfənt"
+  },
+  "decoys": []
+ },
+ "fish": {
+  "letter": "f",
+  "ipa": "fˈɪʃ",
+  "wrong": {
+   "dish": "dˈɪʃ",
+   "wish": "wˈɪʃ",
+   "pish": "pˈɪʃ"
+  },
+  "decoys": [
+   "dish",
+   "is",
+   "pitch"
+  ]
+ },
+ "goat": {
+  "letter": "g",
+  "ipa": "ɡˈOt",
+  "wrong": {
+   "coat": "kˈOt",
+   "boat": "bˈOt",
+   "dote": "dˈOt"
+  },
+  "decoys": [
+   "coat",
+   "boat",
+   "oat",
+   "note",
+   "vote"
+  ]
+ },
+ "hat": {
+  "letter": "h",
+  "ipa": "hˈæt",
+  "wrong": {
+   "cat": "kˈæt",
+   "bat": "bˈæt",
+   "at": "ˈæt"
+  },
+  "decoys": [
+   "cat",
+   "bat",
+   "at",
+   "pat",
+   "that"
+  ]
+ },
+ "insect": {
+  "letter": "i",
+  "ipa": "ˈɪnsɛkt",
+  "wrong": {
+   "onsect": "ˈɑnsɛkt",
+   "ansect": "ˈænsɛkt",
+   "applesect": "ˈæpəlsɛkt",
+   "unsect": "ˈʌnsɛkt",
+   "ensect": "ˈɛnsɛkt"
+  },
+  "decoys": [
+   "on sect",
+   "an sect",
+   "and sect",
+   "apple sect",
+   "un sect",
+   "end sect",
+   "sect"
+  ]
+ },
+ "jug": {
+  "letter": "j",
+  "ipa": "ʤˈʌɡ",
+  "wrong": {
+   "mug": "mˈʌɡ",
+   "bug": "bˈʌɡ",
+   "gug": "ɡˈʌɡ"
+  },
+  "decoys": [
+   "mug",
+   "bug",
+   "rug",
+   "hug",
+   "dug"
+  ]
+ },
+ "kite": {
+  "letter": "k",
+  "ipa": "kˈIt",
+  "wrong": {
+   "bite": "bˈIt",
+   "white": "wˈIt",
+   "tight": "tˈIt"
+  },
+  "decoys": [
+   "bite",
+   "white",
+   "tight",
+   "light",
+   "night"
+  ]
+ },
+ "lion": {
+  "letter": "l",
+  "ipa": "lˈIən",
+  "wrong": {
+   "ryan": "ɹˈIən",
+   "nion": "nˈIən",
+   "ion": "ˈIən"
+  },
+  "decoys": [
+   "iron",
+   "ryan",
+   "i on",
+   "eye and"
+  ]
+ },
+ "mouse": {
+  "letter": "m",
+  "ipa": "mˈWs",
+  "wrong": {
+   "house": "hˈWs",
+   "nouse": "nˈWs",
+   "ouse": "ˈWs"
+  },
+  "decoys": [
+   "house",
+   "how's",
+   "now's",
+   "louse"
+  ]
+ },
+ "nest": {
+  "letter": "n",
+  "ipa": "nˈɛst",
+  "wrong": {
+   "best": "bˈɛst",
+   "west": "wˈɛst",
+   "messed": "mˈɛst"
+  },
+  "decoys": [
+   "best",
+   "west",
+   "rest",
+   "test",
+   "messed"
+  ]
+ },
+ "orange": {
+  "letter": "o",
+  "ipa": "ˈɔɹɪnʤ",
+  "wrong": {
+   "arange": "ˈæɹɪnʤ",
+   "irinj": "ˈɪɹɪnʤ",
+   "urange": "ˈʌɹɪnʤ"
+  },
+  "decoys": []
+ },
+ "pig": {
+  "letter": "p",
+  "ipa": "pˈɪɡ",
+  "wrong": {
+   "big": "bˈɪɡ",
+   "dig": "dˈɪɡ",
+   "fig": "fˈɪɡ"
+  },
+  "decoys": [
+   "big",
+   "dig",
+   "fig",
+   "wig"
+  ]
+ },
+ "queen": {
+  "letter": "q",
+  "ipa": "kwˈin",
+  "wrong": {
+   "green": "ɡɹˈin",
+   "keen": "kˈin",
+   "ween": "wˈin"
+  },
+  "decoys": [
+   "green",
+   "keen",
+   "clean",
+   "teen",
+   "seen",
+   "bean"
+  ]
+ },
+ "rabbit": {
+  "letter": "r",
+  "ipa": "ɹˈæbɪt",
+  "wrong": {
+   "habit": "hˈæbɪt",
+   "labbit": "lˈæbɪt",
+   "wabbit": "wˈæbɪt"
+  },
+  "decoys": [
+   "habit",
+   "a bit",
+   "grab it"
+  ]
+ },
+ "sun": {
+  "letter": "s",
+  "ipa": "sˈʌn",
+  "wrong": {
+   "fun": "fˈʌn",
+   "bun": "bˈʌn",
+   "run": "ɹˈʌn"
+  },
+  "decoys": [
+   "fun",
+   "bun",
+   "run",
+   "one",
+   "done",
+   "gun",
+   "none"
+  ]
+ },
+ "tiger": {
+  "letter": "t",
+  "ipa": "tˈIɡəɹ",
+  "wrong": {
+   "diger": "dˈIɡəɹ",
+   "kiger": "kˈIɡəɹ",
+   "piger": "pˈIɡəɹ"
+  },
+  "decoys": [
+   "higher",
+   "eager",
+   "die girl",
+   "pie girl"
+  ]
+ },
+ "umbrella": {
+  "letter": "u",
+  "ipa": "ʌmbɹˈɛlə",
+  "wrong": {
+   "ambrella": "æmbɹˈɛlə",
+   "imbrella": "ɪmbɹˈɛlə",
+   "ombrella": "ɑmbɹˈɛlə"
+  },
+  "decoys": []
+ },
+ "van": {
+  "letter": "v",
+  "ipa": "vˈæn",
+  "wrong": {
+   "fan": "fˈæn",
+   "ban": "bˈæn",
+   "man": "mˈæn"
+  },
+  "decoys": [
+   "ban",
+   "man",
+   "an",
+   "pan",
+   "than"
+  ]
+ },
+ "watch": {
+  "letter": "w",
+  "ipa": "wˈɑʧ",
+  "wrong": {
+   "botch": "bˈɑʧ",
+   "notch": "nˈɑʧ",
+   "rotch": "ɹˈɑʧ"
+  },
+  "decoys": [
+   "botch",
+   "notch",
+   "scotch",
+   "top"
+  ]
+ },
+ "yoyo": {
+  "letter": "y",
+  "ipa": "jˈOjO",
+  "accept": [
+   "yoyo",
+   "yo-yo"
+  ],
+  "wrong": {
+   "gogo": "ɡˈOɡO",
+   "jojo": "ʤˈOʤO",
+   "lolo": "lˈOlO"
+  },
+  "decoys": [
+   "go go",
+   "no no",
+   "joe joe",
+   "low low",
+   "oh oh"
+  ]
+ },
+ "zebra": {
+  "letter": "z",
+  "ipa": "zˈibɹə",
+  "wrong": {
+   "sebra": "sˈibɹə",
+   "jebra": "ʤˈibɹə",
+   "debra": "dˈibɹə"
+  },
+  "decoys": [
+   "debra"
+  ]
+ }
+}

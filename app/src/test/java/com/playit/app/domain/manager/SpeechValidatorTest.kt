@@ -178,6 +178,42 @@ class SpeechValidatorTest {
         assertFalse(grammar.contains("no"))
     }
 
+    /** User, 2026-11-06: "onsect", "ansect" and "applesect" were accepted as "insect". */
+    @Test
+    fun grammarFor_wordMode_hasNearMissDecoys_soAWrongFirstSoundIsNotForcedOntoTheWord() {
+        val grammar = speechValidator.grammarFor("i", "insect")
+        listOf("on sect", "an sect", "apple sect", "un sect").forEach { assertTrue(it, grammar.contains(it)) }
+        assertTrue(speechValidator.grammarFor("m", "mouse").contains("house"))
+        assertTrue(speechValidator.grammarFor("s", "sun").contains("fun"))
+        assertFalse("sound mode keeps only the letter's foils", speechValidator.grammarFor("i", null).contains("on sect"))
+    }
+
+    @Test
+    fun nearMissDecoy_isJudgedAnotherWord_neverCorrect() {
+        listOf("on sect", "an sect", "apple sect", "i on sect").forEach {
+            val j = speechValidator.judgeWord(it, "insect", "i")
+            assertFalse(it, j.isCorrect)
+        }
+        assertEquals(SpeechErrorType.OTHER_WORD, speechValidator.judgeWord("on sect", "insect", "i").errorType)
+        assertFalse(speechValidator.judgeWord("house", "mouse", "m").isCorrect)
+        assertTrue(speechValidator.judgeWord("insect", "insect", "i").isCorrect)
+    }
+
+    @Test
+    fun noDecoyContainsItsOwnWord_orAnAcceptedVariant() {
+        val words = listOf("apple", "ball", "box", "cat", "dog", "elephant", "fish", "goat", "hat", "insect", "jug",
+            "kite", "lion", "mouse", "nest", "orange", "pig", "queen", "rabbit", "sun", "tiger", "umbrella", "van",
+            "watch", "yoyo", "zebra")
+        words.forEach { word ->
+            val accepted = speechValidator.getAcceptedWordVariants(word).toSet()
+            speechValidator.nearMissDecoysFor(word).forEach { decoy ->
+                assertTrue("$word: $decoy", decoy.split(" ").none { it in accepted })
+                assertFalse("$word: $decoy passes", speechValidator.validateWord(decoy, word))
+            }
+        }
+        assertTrue(speechValidator.nearMissDecoysFor("elephant").isEmpty())
+    }
+
     @Test
     fun grammarFor_soundMode_hasNoAcceptedTokens() {
         val grammar = speechValidator.grammarFor("m", null)
