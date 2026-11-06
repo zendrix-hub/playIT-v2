@@ -1,0 +1,18 @@
+{
+ "release": "2026-11-06-umbrella",
+ "approvedBy": "user: OK mark on review page 2026-11-06-umbrella-vs (CSV exported 2026-11-06)",
+ "clips": [
+  {
+   "clipId": "kw_umbrella",
+   "dest": "keywords",
+   "sourceBatch": "2026-11-06-umbrella-vs",
+   "sourceFile": "kw_umbrella_b_vs2.wav",
+   "text": "Umbrella!",
+   "voice": "OmniVoice clone of Lily (reference: the app's Kokoro af_heart*0.7+af_bella*0.3 lesson clips)",
+   "speed": 1.0,
+   "license": "CC BY-NC (the OmniVoice pre-trained model, k2-fsa; its code is Apache-2.0; VoiceStudio's model_licenses.json also lists Higgs Audio 2 and Meta Llama 3 terms for its audio tokenizer): non-commercial use only, with credit; the app credits OmniVoice by k2-fsa in the Parent Zone",
+   "tool": "tools/audio/keyword_fix_batch.py: VoiceStudio 0.5.7 on this PC (localhost:3900, GTX 1650), POST /generate, engine OmniVoice, language English, effect_preset raw, num_step 16, seed 2, text 'Umbrella!', voice cloned from Lily's own Kokoro clips (vo_welcome_01, vo_blendit_intro_01, vo_complete_01, vo_unlock_01, joined with 0.35 s gaps, with their text as ref_text); then kokoro_local.clean (trim, 8 ms fades, RMS -20 dBFS, peak at most -1 dBFS, 50 ms of silence each end), 24 kHz",
+   "note": "Key word for u, played by Hear It (after the letter sound) and Say It (the word to copy). Replaces the Kokoro clip of release 2026-09-30, which the user heard as 'umbrelleh' (2026-11-06). The user marked this take OK. Amends the Kokoro-only source (AGENTS.md), adviser confirmation pending."
+  }
+ ]
+}

@@ -16,5 +16,6 @@ class VoiceCreditTest {
         assertTrue("release 2026-11-06-sound-check", VOICE_CREDIT.contains("sound check"))
         assertTrue("release 2026-11-06-next-lines", VOICE_CREDIT.contains("Next lines"))
         assertTrue("release 2026-11-06-letter-sounds", VOICE_CREDIT.contains("letter sounds"))
+        assertTrue("release 2026-11-06-umbrella", VOICE_CREDIT.contains("the word umbrella"))
     }
 }

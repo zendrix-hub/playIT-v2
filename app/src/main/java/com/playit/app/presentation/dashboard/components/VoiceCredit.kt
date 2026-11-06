@@ -18,7 +18,7 @@ import com.playit.app.presentation.theme.TextMuted
  * sound check lines (release 2026-11-06-sound-check), her Next lines (release 2026-11-06-next-lines) and her letter
  * sounds (release 2026-11-06-letter-sounds).
  */
-const val VOICE_CREDIT = "Some word voices made with ElevenLabs (elevenlabs.io). Opening voice, sound check, Next lines and letter sounds made with OmniVoice by k2-fsa."
+const val VOICE_CREDIT = "Some word voices made with ElevenLabs (elevenlabs.io). Opening voice, sound check, Next lines, letter sounds and the word umbrella made with OmniVoice by k2-fsa."
 
 @Composable
 fun VoiceCreditLine(modifier: Modifier = Modifier) {

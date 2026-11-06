@@ -86,6 +86,34 @@ class AudioResolverTest {
         }
     }
 
+    /**
+     * Every key word clip in the app (Hear It, Say It) is byte for byte the clip of the one manifest entry that no
+     * later release replaced. Umbrella is the VoiceStudio take of release 2026-11-06-umbrella, not the Kokoro clip
+     * of 2026-09-30 that the user heard as "umbrelleh".
+     */
+    @Test
+    fun everyKeyWordClip_isTheClipOfItsLatestManifest() {
+        val root = listOf(File("."), File("..")).first { File(it, "docs/audio-release").exists() }
+        val entries = File(root, "docs/audio-release").listFiles()!!
+            .mapNotNull { File(it, "manifest.json").takeIf(File::exists)?.readText() }
+            .flatMap { it.split("\"clipId\"").drop(1) }
+        val clips = File(root, "app/src/main/assets/audio/keywords").listFiles { f -> f.name.endsWith(".wav") }!!
+        assertEquals("26 key words, one per letter", 26, clips.size)
+        clips.forEach { clip ->
+            val sha = java.security.MessageDigest.getInstance("SHA-256").digest(clip.readBytes())
+                .joinToString("") { "%02x".format(it) }
+            val current = entries.filter {
+                it.contains("\"keywords/${clip.name}\"") && !it.contains("\"supersededBy\"")
+            }
+            assertEquals("${clip.name}: one current manifest entry", 1, current.size)
+            assertTrue("${clip.name} should match its manifest", current.single().contains("\"$sha\""))
+        }
+        val umbrella = entries.single {
+            it.contains("\"keywords/kw_umbrella.wav\"") && !it.contains("\"supersededBy\"")
+        }
+        assertTrue("umbrella is the VoiceStudio take", umbrella.contains("\"sourceBatch\": \"2026-11-06-umbrella-vs\""))
+    }
+
     @Test
     fun releasedPhoneme_fileExists() {
         val assetsDir = listOf(

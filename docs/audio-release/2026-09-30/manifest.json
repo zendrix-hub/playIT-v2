@@ -286,6 +286,7 @@
     {
       "clipId": "kw_umbrella",
       "file": "keywords/kw_umbrella.wav",
+      "supersededBy": "2026-11-06-umbrella: the user heard this clip as 'umbrelleh' and approved a VoiceStudio take (kw_umbrella_b_vs2, 'Umbrella!')",
       "text": "umbrella",
       "voice": "kokoro-82M mix af_heart*0.7+af_bella*0.3",
       "speed": 0.95,
