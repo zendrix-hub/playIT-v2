@@ -293,8 +293,8 @@ class FindItViewModelTest {
 
     // ---- Words under the pictures (adviser, 2026-11-05: no labels on harder levels)
 
-    private fun inChapter(chapter: Int) {
-        members.value = listOf(LetterGroupMember(groupId = chapter, phonemeId = 1, position = 0))
+    private fun inChapter(chapter: Int, position: Int = 0) {
+        members.value = listOf(LetterGroupMember(groupId = chapter, phonemeId = 1, position = position))
     }
 
     private fun TestScope.load(): List<FindItPictureItem> {
@@ -307,9 +307,19 @@ class FindItViewModelTest {
     }
 
     @Test
-    fun chapterOne_showsEveryWord() = runTest {
+    fun chapterOne_firstLetter_showsEveryWord() = runTest {
         inChapter(1)
         assertTrue(load().all { it.showWord })
+    }
+
+    /** User, 2026-11-06: from the second letter of Chapter 1, one picture shows without its word. */
+    @Test
+    fun chapterOne_secondLetterOn_hidesOneWord_neverOneAPictureNeeds() = runTest {
+        inChapter(1, position = 2)
+        val grid = load()
+        val hidden = grid.filterNot { it.showWord }
+        assertEquals(1, hidden.size)
+        assertTrue(hidden.none { it.imagePath in com.playit.app.domain.manager.WordLabelPolicy.keepsWord })
     }
 
     @Test

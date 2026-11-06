@@ -127,15 +127,19 @@ class FindItViewModel @Inject constructor(
                 _foundCount.value = 0
                 // Harder chapters and replays show fewer words under the pictures (adviser, 2026-11-05). If this
                 // lookup fails, the words show: it must never stop the round from loading.
-                val chapter = runCatching {
-                    letterGroupMemberRepository.getAllMembers().first().firstOrNull { it.phonemeId == target.id }?.groupId
-                }.getOrNull() ?: 1
+                val member = runCatching {
+                    letterGroupMemberRepository.getAllMembers().first().firstOrNull { it.phonemeId == target.id }
+                }.getOrNull()
+                val chapter = member?.groupId ?: 1
+                val positionInChapter = member?.position ?: 0
                 val isReplay = runCatching {
                     val profileId = sessionManager.activeProfileId.value
                     profileId != null && lessonProgressRepository.getProgressForPhoneme(profileId, target.id)
                         ?.let { it.isCompleted && it.starsEarned > 0 } == true
                 }.getOrDefault(false)
-                _pictureGrid.value = WordLabelPolicy.apply(gridGenerator.generate5ItemGrid(target.letter, allPhonemes), chapter, isReplay)
+                _pictureGrid.value = WordLabelPolicy.apply(
+                    gridGenerator.generate5ItemGrid(target.letter, allPhonemes), chapter, positionInChapter, isReplay
+                )
 
                 // Automatically play "Can you find all..." prompt first, then seamlessly play the letter sound
                 playIntroThenTargetSound()
