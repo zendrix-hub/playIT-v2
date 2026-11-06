@@ -165,7 +165,7 @@ fun ClassRecordCard(
             Spacer(modifier = Modifier.height(8.dp))
         }
         Text(
-            "Each box is a chapter. Its colour shows how the child is doing; the colours are explained below.",
+            "Each box is a chapter. Its color shows how the child is doing; the colors are explained below.",
             fontFamily = LexendFontFamily, fontSize = 12.sp, color = TextMuted, lineHeight = 16.sp
         )
     }
@@ -286,7 +286,7 @@ private fun LetterTile(symbol: String) {
 @Composable
 fun PracticeAtHomeCard(data: ProfileDashboardData, modifier: Modifier = Modifier) {
     RecordCard(modifier) {
-        CardTitle("Practise at home")
+        CardTitle("Practice at home")
         val letters = data.needsPractice
         when {
             letters.isNotEmpty() -> letters.forEach { letter ->

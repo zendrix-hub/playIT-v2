@@ -57,13 +57,13 @@ class SoundCheckRoundTest {
         assertEquals("not yet", SoundCheckSummary.describe(emptyList()))
         val first = SoundCheckResult(1, 10, listOf("m", "s"), listOf("a", "i"))
         val latest = SoundCheckResult(1, 20, listOf("m", "s", "a", "i"), emptyList())
-        assertEquals("knew 2 of 4 sounds. Practise: a, i", SoundCheckSummary.describe(listOf(first)))
+        assertEquals("knew 2 of 4 sounds. Practice: a, i", SoundCheckSummary.describe(listOf(first)))
         assertEquals("knew all 4 sounds", SoundCheckSummary.describe(listOf(latest)))
         assertEquals("first time 2 of 4, latest 4 of 4", SoundCheckSummary.describe(listOf(latest, first)))
         val worse = SoundCheckResult(1, 30, listOf("m", "s", "i"), listOf("a"))
-        assertEquals("first time 2 of 4, latest 3 of 4. Practise: a", SoundCheckSummary.describe(listOf(first, latest, worse)))
-        assertEquals(listOf("first time 2 of 4", "Latest 3 of 4", "Practise: a"), SoundCheckSummary.lines(listOf(first, latest, worse)))
-        assertEquals(listOf("knew 2 of 4 sounds", "Practise: a, i"), SoundCheckSummary.lines(listOf(first)))
+        assertEquals("first time 2 of 4, latest 3 of 4. Practice: a", SoundCheckSummary.describe(listOf(first, latest, worse)))
+        assertEquals(listOf("first time 2 of 4", "Latest 3 of 4", "Practice: a"), SoundCheckSummary.lines(listOf(first, latest, worse)))
+        assertEquals(listOf("knew 2 of 4 sounds", "Practice: a, i"), SoundCheckSummary.lines(listOf(first)))
         assertEquals(listOf("not yet"), SoundCheckSummary.lines(emptyList()))
     }
 }

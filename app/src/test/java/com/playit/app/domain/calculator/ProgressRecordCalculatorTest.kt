@@ -81,7 +81,7 @@ class ProgressRecordCalculatorTest {
         assertEquals(ProgressLevel.VERY_SATISFACTORY, learner.overallLevel)
     }
 
-    @Test fun practiseAtHome_listsOnlyFinishedLettersAtTheTwoLowestLevels() {
+    @Test fun practiceAtHome_listsOnlyFinishedLettersAtTheTwoLowestLevels() {
         val learner = RecordSamples.learner(1, "Frog", done = 4, sayMisses = { if (it == 2) 3 else 0 },
             findMisses = { if (it == 2) 2 else 0 })
         assertEquals(listOf("s"), learner.needsPractice.map { it.symbol })

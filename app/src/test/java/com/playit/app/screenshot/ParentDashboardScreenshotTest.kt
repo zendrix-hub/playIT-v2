@@ -62,7 +62,7 @@ class ParentDashboardScreenshotTest {
     @Test fun threeChildren_classRecordThenTheSelectedChild() {
         show(listOf(frog, bear, owl))
         compose.onNodeWithText("All the children").assertExists()
-        compose.onNodeWithText("Practise at home").assertExists()
+        compose.onNodeWithText("Practice at home").assertExists()
         compose.onNodeWithText("Chapter 1").assertExists()
         // The sound check before the word game, first time against the latest (user choice, 2026-11-06).
         compose.onAllNodesWithText("Sound check: first time 3 of 4\nLatest 4 of 4", substring = true).onFirst().assertExists()

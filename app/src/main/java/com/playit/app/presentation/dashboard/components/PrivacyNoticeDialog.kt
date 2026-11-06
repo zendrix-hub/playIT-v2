@@ -74,7 +74,7 @@ fun PrivacyNoticeDialog(
                         color = TextMuted
                     )
                     Text(
-                        text = "Saved on this device: your child's name and animal, stars, and which letters they have practised.",
+                        text = "Saved on this device: your child's name and animal, stars, and which letters they have practiced.",
                         fontFamily = LexendFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Normal,

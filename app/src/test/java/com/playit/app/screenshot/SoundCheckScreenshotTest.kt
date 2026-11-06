@@ -3,7 +3,9 @@ package com.playit.app.screenshot
 import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertWidthIsAtLeast
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
@@ -63,7 +65,7 @@ class SoundCheckScreenshotTest {
         compose.waitForIdle()
         compose.onNodeWithText("You know these sounds!").assertIsDisplayed()
         compose.onNodeWithTag("soundcheck_known_m").assertIsDisplayed()
-        compose.onNodeWithTag("soundcheck_practise_a").assertIsDisplayed()
+        compose.onNodeWithTag("soundcheck_practice_a").assertIsDisplayed()
         compose.onNodeWithTag("soundcheck_build_words").assertIsDisplayed().assertHeightIsAtLeast(64.dp).performClick()
         assertEquals(1, built)
         compose.onRoot().captureRoboImage("build/outputs/roborazzi/soundcheck_done_$name.png")
@@ -94,4 +96,24 @@ class SoundCheckScreenshotTest {
 
     @Config(sdk = [34], qualifiers = Devices.TABLET)
     @Test fun done_tablet() = done("tablet")
+
+    /** User's phone, 2026-11-06: with no sound known, "You know these sounds!" stood over an empty row. */
+    @Config(sdk = [34], qualifiers = Devices.A21S)
+    @Test fun done_noSoundKnown_showsOnlyTheOnesToPractice() {
+        compose.setContent {
+            PlayItTheme {
+                SoundCheckContent(
+                    tiles = emptyList(), index = 4, total = 4, speech = SoundCheckSpeech.DONE, lastTap = null,
+                    accepting = false, isPlaying = false,
+                    result = SoundCheckResult(1, 0, known = emptyList(), notYet = listOf("m", "s", "a", "i")),
+                    onTap = {}, onReplay = {}, onInteraction = {}, onDone = {}, onBack = {}
+                )
+            }
+        }
+        compose.waitForIdle()
+        compose.onAllNodesWithText("You know these sounds!").assertCountEquals(0)
+        compose.onNodeWithText("Let's practice these again:").assertIsDisplayed()
+        listOf("m", "s", "a", "i").forEach { compose.onNodeWithTag("soundcheck_practice_$it").assertIsDisplayed() }
+        compose.onRoot().captureRoboImage("build/outputs/roborazzi/soundcheck_done_none_known.png")
+    }
 }

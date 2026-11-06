@@ -20,6 +20,6 @@ data class ProfileDashboardData(
     val firstPlayedAt: Long? = null,
     val lastPlayedAt: Long? = null
 ) {
-    /** Letters finished at one of the two lowest levels, to practise at home. */
+    /** Letters finished at one of the two lowest levels, to practice at home. */
     val needsPractice: List<LetterPerformance> get() = letterPerformances.filter { it.level.needsPractice }
 }

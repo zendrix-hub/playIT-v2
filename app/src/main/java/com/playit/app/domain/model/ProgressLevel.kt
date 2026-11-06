@@ -13,7 +13,7 @@ enum class ProgressLevel(val label: String, val parentLabel: String, val band: S
     OUTSTANDING("Outstanding", "Knows it very well", "90-100", "Great! Keep playing so it stays strong."),
     VERY_SATISFACTORY("Very Satisfactory", "Knows it well", "85-89", "Good! A little more play keeps it strong."),
     SATISFACTORY("Satisfactory", "Knows it", "80-84", "Doing fine. Play this letter again some time."),
-    FAIRLY_SATISFACTORY("Fairly Satisfactory", "Almost there", "75-79", "Practise this sound together at home."),
+    FAIRLY_SATISFACTORY("Fairly Satisfactory", "Almost there", "75-79", "Practice this sound together at home."),
     DID_NOT_MEET("Did Not Meet Expectations", "Needs more practice", "below 75", "Play this letter again together, slowly."),
     IN_PROGRESS("Still learning", "Still learning", null, "Started. Let your child finish this letter."),
     NOT_STARTED("Not started yet", "Not started yet", null, "Not played yet.");
@@ -21,7 +21,7 @@ enum class ProgressLevel(val label: String, val parentLabel: String, val band: S
     /** One of the five DepEd levels, with a grade behind it. */
     val isGraded: Boolean get() = band != null
 
-    /** The two lowest levels: worth practising together at home. */
+    /** The two lowest levels: worth practicing together at home. */
     val needsPractice: Boolean get() = this == FAIRLY_SATISFACTORY || this == DID_NOT_MEET
 
     companion object {

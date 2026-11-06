@@ -69,7 +69,7 @@ import com.playit.app.presentation.theme.TextMuted
 /**
  * The sound check before a chapter's word game (user choice, 2026-11-06). While asking: "Sound n of N", a speaker
  * button that plays the sound again, and the chapter's letters as tiles. At the end: the sounds the child knew, the
- * ones to practise, and "Build words", which opens Blend It.
+ * ones to practice, and "Build words", which opens Blend It.
  */
 @Composable
 fun SoundCheckScreen(
@@ -251,8 +251,10 @@ internal fun SoundCheckContent(
                     }
                 }
             } else {
-                ResultLetters("You know these sounds!", done.known, known = true)
-                if (done.notYet.isNotEmpty()) ResultLetters("Let's practise these again:", done.notYet, known = false)
+                // Each heading only over letters (user's phone, 2026-11-06: "You know these sounds!" stood over an
+                // empty row when the child knew none of them).
+                if (done.known.isNotEmpty()) ResultLetters("You know these sounds!", done.known, known = true)
+                if (done.notYet.isNotEmpty()) ResultLetters("Let's practice these again:", done.notYet, known = false)
             }
         }
     }
@@ -272,9 +274,6 @@ private fun ResultLetters(title: String, letters: List<String>, known: Boolean) 
             lineHeight = 28.sp
         )
         Spacer(Modifier.size(8.dp))
-        if (letters.isEmpty()) {
-            Text("Let's keep listening!", fontFamily = LexendFontFamily, fontSize = 18.sp, color = TextMuted)
-        }
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
             verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -288,7 +287,7 @@ private fun ResultLetters(title: String, letters: List<String>, known: Boolean) 
                     strokeWidth = 2.dp,
                     strokeColor = ModernBorder,
                     depthHeight = 4.dp,
-                    modifier = Modifier.size(72.dp).testTag(if (known) "soundcheck_known_$letter" else "soundcheck_practise_$letter")
+                    modifier = Modifier.size(72.dp).testTag(if (known) "soundcheck_known_$letter" else "soundcheck_practice_$letter")
                 ) {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(

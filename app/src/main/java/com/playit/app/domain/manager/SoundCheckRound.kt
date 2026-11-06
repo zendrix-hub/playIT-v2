@@ -52,11 +52,11 @@ object SoundCheckSummary {
             sorted.size == 1 -> "knew ${latest.known.size} of ${latest.total} sounds"
             else -> "first time ${first.known.size} of ${first.total}, latest ${latest.known.size} of ${latest.total}"
         }
-        val practise = if (latest.notYet.isEmpty()) "" else ". Practise: ${latest.notYet.joinToString(", ")}"
-        return head + practise
+        val practice = if (latest.notYet.isEmpty()) "" else ". Practice: ${latest.notYet.joinToString(", ")}"
+        return head + practice
     }
 
-    /** The same facts one per line, for the narrow Parent Zone card: "first time 3 of 4", "Latest 4 of 4", "Practise: a". */
+    /** The same facts one per line, for the narrow Parent Zone card: "first time 3 of 4", "Latest 4 of 4", "Practice: a". */
     fun lines(checks: List<SoundCheckResult>): List<String> {
         val sorted = checks.sortedBy { it.checkedAt }
         val latest = sorted.lastOrNull() ?: return listOf("not yet")
@@ -66,6 +66,6 @@ object SoundCheckSummary {
             sorted.size == 1 -> listOf("knew ${latest.known.size} of ${latest.total} sounds")
             else -> listOf("first time ${first.known.size} of ${first.total}", "Latest ${latest.known.size} of ${latest.total}")
         }
-        return head + if (latest.notYet.isEmpty()) emptyList() else listOf("Practise: ${latest.notYet.joinToString(", ")}")
+        return head + if (latest.notYet.isEmpty()) emptyList() else listOf("Practice: ${latest.notYet.joinToString(", ")}")
     }
 }
