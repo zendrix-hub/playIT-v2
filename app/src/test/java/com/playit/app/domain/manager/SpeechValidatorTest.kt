@@ -212,6 +212,20 @@ class SpeechValidatorTest {
             }
         }
         assertTrue(speechValidator.nearMissDecoysFor("elephant").isEmpty())
+        assertTrue(speechValidator.nearMissDecoysFor("umbrella").isEmpty())
+    }
+
+    /** User, 2026-11-06: "aronge" and even "app range" passed as "orange"; chapter 2 on was searched for decoys. */
+    @Test
+    fun orangeAndTheLaterChapters_haveDecoysForTheirWrongFirstSounds() {
+        val grammar = speechValidator.grammarFor("o", "orange")
+        listOf("app range", "a range", "air inch").forEach { assertTrue(it, grammar.contains(it)) }
+        assertFalse(speechValidator.judgeWord("app range", "orange", "o").isCorrect)
+        assertTrue(speechValidator.judgeWord("orange", "orange", "o").isCorrect)
+        mapOf("lion" to "nyan", "box" to "boss", "goat" to "dote", "queen" to "twin", "dog" to "tog", "tiger" to "eiger")
+            .forEach { (word, decoy) -> assertTrue("$word: $decoy", speechValidator.nearMissDecoysFor(word).contains(decoy)) }
+        // A child saying the plural is not wrong, so "zebras" is not a decoy.
+        assertFalse(speechValidator.nearMissDecoysFor("zebra").contains("zebras"))
     }
 
     @Test

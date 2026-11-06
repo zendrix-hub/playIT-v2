@@ -14,7 +14,11 @@
    "up pull",
    "pull",
    "opal",
-   "ripple"
+   "ripple",
+   "ah pull",
+   "ah pool",
+   "ah pill",
+   "ah bull"
   ]
  },
  "ball": {
@@ -46,7 +50,10 @@
    "fox",
    "socks",
    "ox",
-   "rocks"
+   "rocks",
+   "boss",
+   "bock",
+   "pox"
   ]
  },
  "cat": {
@@ -62,7 +69,8 @@
    "bat",
    "at",
    "pat",
-   "that"
+   "that",
+   "tat"
   ]
  },
  "dog": {
@@ -78,7 +86,12 @@
    "bog",
    "fog",
    "hog",
-   "frog"
+   "frog",
+   "tug",
+   "tog",
+   "gawk",
+   "jog",
+   "cog"
   ]
  },
  "elephant": {
@@ -118,7 +131,9 @@
    "boat",
    "oat",
    "note",
-   "vote"
+   "vote",
+   "dote",
+   "joe"
   ]
  },
  "hat": {
@@ -201,7 +216,10 @@
    "iron",
    "ryan",
    "i on",
-   "eye and"
+   "eye and",
+   "dion",
+   "nigh un",
+   "nyan"
   ]
  },
  "mouse": {
@@ -243,7 +261,20 @@
    "irinj": "ˈɪɹɪnʤ",
    "urange": "ˈʌɹɪnʤ"
   },
-  "decoys": []
+  "decoys": [
+   "air inch",
+   "err inch",
+   "air hinge",
+   "err hinge",
+   "ear inch",
+   "ear hinge",
+   "err ran",
+   "end range",
+   "app range",
+   "a range",
+   "ah ranch",
+   "a ranch"
+  ]
  },
  "pig": {
   "letter": "p",
@@ -274,7 +305,9 @@
    "clean",
    "teen",
    "seen",
-   "bean"
+   "bean",
+   "twin",
+   "wean"
   ]
  },
  "rabbit": {
@@ -288,7 +321,10 @@
   "decoys": [
    "habit",
    "a bit",
-   "grab it"
+   "grab it",
+   "nab it",
+   "abbot",
+   "dab it"
   ]
  },
  "sun": {
@@ -321,7 +357,12 @@
    "higher",
    "eager",
    "die girl",
-   "pie girl"
+   "pie girl",
+   "eiger",
+   "eye girl",
+   "kiker",
+   "dagger",
+   "pie gore"
   ]
  },
  "umbrella": {
@@ -347,7 +388,10 @@
    "man",
    "an",
    "pan",
-   "than"
+   "than",
+   "when",
+   "fun",
+   "fang"
   ]
  },
  "watch": {
@@ -362,7 +406,8 @@
    "botch",
    "notch",
    "scotch",
-   "top"
+   "top",
+   "rot"
   ]
  },
  "yoyo": {
@@ -394,7 +439,8 @@
    "debra": "dˈibɹə"
   },
   "decoys": [
-   "debra"
+   "debra",
+   "libra"
   ]
  }
 }

@@ -1,0 +1,824 @@
+{
+ "words": {
+  "orange": {
+   "letter": "o",
+   "base": [
+    "orange",
+    "o",
+    "oh"
+   ],
+   "right": {
+    "orange": "ˈɔɹɪnʤ",
+    "orange_ah": "ˈɑɹɪnʤ",
+    "orange_schwa": "ˈɔɹənʤ"
+   },
+   "wrong": {
+    "aronge": "əˈɹɔnʤ",
+    "app_range": "ˈæp ɹˈAnʤ",
+    "arange": "ˈæɹɪnʤ",
+    "irange": "ˈɪɹɪnʤ",
+    "erange": "ˈɛɹɪnʤ",
+    "urange": "ˈʌɹɪnʤ"
+   },
+   "prefixes": [
+    "a",
+    "an",
+    "and",
+    "app",
+    "up",
+    "at",
+    "add",
+    "ant",
+    "in",
+    "on",
+    "un",
+    "air",
+    "ear",
+    "eye",
+    "all",
+    "of",
+    "um",
+    "am",
+    "end",
+    "ill",
+    "it",
+    "err",
+    "our",
+    "ok",
+    "are",
+    "ah",
+    "eh"
+   ],
+   "tails": [
+    "range",
+    "ranch",
+    "rinse",
+    "ring",
+    "inch",
+    "hinge",
+    "ridge",
+    "rich",
+    "wrench",
+    "lunge",
+    "rage",
+    "ran",
+    "run",
+    "rang",
+    "launch",
+    "lunch",
+    "ron"
+   ],
+   "singles": [
+    "arrange",
+    "errand",
+    "arrow",
+    "aaron",
+    "erin",
+    "iron",
+    "irish",
+    "era",
+    "ranger",
+    "porridge",
+    "courage",
+    "garage",
+    "marriage",
+    "carriage",
+    "sponge",
+    "fringe",
+    "syringe"
+   ]
+  },
+  "elephant": {
+   "letter": "e",
+   "base": [
+    "elephant",
+    "e",
+    "ee"
+   ],
+   "right": {
+    "elephant": "ˈɛləfənt",
+    "elephant_i": "ˈɛlɪfənt"
+   },
+   "wrong": {
+    "alephant": "ˈæləfənt",
+    "ilephant": "ˈɪləfənt",
+    "olephant": "ˈɑləfənt",
+    "ulephant": "ˈʌləfənt",
+    "eelephant": "ˈiləfənt",
+    "aylephant": "ˈAləfənt"
+   },
+   "prefixes": [
+    "a",
+    "an",
+    "and",
+    "app",
+    "up",
+    "at",
+    "in",
+    "on",
+    "un",
+    "all",
+    "ill",
+    "eel",
+    "eye",
+    "oh",
+    "ah",
+    "ok",
+    "hey",
+    "i"
+   ],
+   "tails": [
+    "left and",
+    "lift and",
+    "love and",
+    "life and",
+    "la fun",
+    "la font",
+    "love fun",
+    "lo fun",
+    "left on",
+    "laugh and",
+    "leaf and",
+    "live and",
+    "lived and",
+    "living",
+    "left"
+   ],
+   "singles": [
+    "alphabet",
+    "elegant",
+    "relevant",
+    "illegal",
+    "olive",
+    "elf",
+    "ella",
+    "elephants",
+    "oliphant",
+    "alfred",
+    "allophone",
+    "illiterate"
+   ]
+  },
+  "umbrella": {
+   "letter": "u",
+   "base": [
+    "umbrella",
+    "u",
+    "you",
+    "yu"
+   ],
+   "right": {
+    "umbrella": "ʌmbɹˈɛlə",
+    "umbrella_schwa": "əmbɹˈɛlə",
+    "umbrella_oo": "ʊmbɹˈɛlə"
+   },
+   "wrong": {
+    "ambrella": "æmbɹˈɛlə",
+    "imbrella": "ɪmbɹˈɛlə",
+    "ombrella": "ɑmbɹˈɛlə",
+    "embrella": "ɛmbɹˈɛlə",
+    "youmbrella": "jumbɹˈɛlə"
+   },
+   "prefixes": [
+    "a",
+    "am",
+    "an",
+    "and",
+    "app",
+    "in",
+    "him",
+    "on",
+    "em",
+    "m",
+    "ham",
+    "jam",
+    "tom",
+    "sam",
+    "pam",
+    "yum",
+    "gum",
+    "i'm",
+    "them",
+    "hymn"
+   ],
+   "tails": [
+    "bella",
+    "bread a",
+    "bred a",
+    "brew ella",
+    "brad ella",
+    "ella",
+    "brella"
+   ],
+   "singles": [
+    "cinderella",
+    "propeller",
+    "umbrage",
+    "embryo",
+    "ambrose",
+    "imbroglio",
+    "amber",
+    "ember"
+   ]
+  },
+  "apple": {
+   "letter": "a",
+   "base": [
+    "apple",
+    "a",
+    "ay",
+    "up all",
+    "a pull",
+    "up pull",
+    "pull",
+    "opal",
+    "ripple"
+   ],
+   "right": {
+    "apple": "ˈæpəl"
+   },
+   "wrong": {
+    "opple": "ˈɑpəl",
+    "epple": "ˈɛpəl",
+    "upple": "ˈʌpəl",
+    "ipple": "ˈɪpəl",
+    "aypple": "ˈApəl"
+   },
+   "prefixes": [
+    "a",
+    "ah",
+    "up",
+    "on",
+    "in",
+    "eh",
+    "oh",
+    "ape",
+    "hey",
+    "i",
+    "all",
+    "of",
+    "app"
+   ],
+   "tails": [
+    "pull",
+    "pal",
+    "pole",
+    "pill",
+    "pool",
+    "people",
+    "bull",
+    "poll"
+   ],
+   "singles": [
+    "opal",
+    "ripple",
+    "maple",
+    "chapel",
+    "epic",
+    "upper",
+    "hippo",
+    "tipple",
+    "topple",
+    "purple",
+    "people",
+    "papal",
+    "apples"
+   ]
+  },
+  "tiger": {
+   "letter": "t",
+   "base": [
+    "tiger",
+    "t",
+    "tee",
+    "tea",
+    "ta",
+    "tuh",
+    "higher",
+    "eager",
+    "die girl",
+    "pie girl"
+   ],
+   "right": {
+    "tiger": "tˈIɡəɹ"
+   },
+   "wrong": {
+    "diger": "dˈIɡəɹ",
+    "kiger": "kˈIɡəɹ",
+    "piger": "pˈIɡəɹ",
+    "iger": "ˈIɡəɹ"
+   },
+   "prefixes": [
+    "die",
+    "pie",
+    "kai",
+    "guy",
+    "dye",
+    "eye",
+    "bye",
+    "high",
+    "my",
+    "why"
+   ],
+   "tails": [
+    "girl",
+    "go",
+    "gore",
+    "gear",
+    "care",
+    "grr"
+   ],
+   "singles": [
+    "biker",
+    "hiker",
+    "piper",
+    "viper",
+    "wiper",
+    "spider",
+    "cider",
+    "diaper",
+    "kaiser",
+    "liger",
+    "dicer",
+    "dagger",
+    "digger",
+    "figure",
+    "kicker",
+    "tigger",
+    "tyler",
+    "tire",
+    "dyer",
+    "diet",
+    "bigger",
+    "eiger",
+    "kiker",
+    "digger"
+   ]
+  },
+  "lion": {
+   "letter": "l",
+   "base": [
+    "lion",
+    "l",
+    "el",
+    "la",
+    "luh",
+    "iron",
+    "ryan",
+    "i on",
+    "eye and"
+   ],
+   "right": {
+    "lion": "lˈIən"
+   },
+   "wrong": {
+    "nion": "nˈIən",
+    "ryan": "ɹˈIən",
+    "ion": "ˈIən",
+    "yion": "jˈIən"
+   },
+   "prefixes": [
+    "nigh",
+    "why",
+    "my",
+    "rye",
+    "die",
+    "eye",
+    "i",
+    "hi"
+   ],
+   "tails": [
+    "on",
+    "and",
+    "in",
+    "an",
+    "un"
+   ],
+   "singles": [
+    "neon",
+    "nylon",
+    "nine",
+    "dion",
+    "zion",
+    "brian",
+    "bryan",
+    "ion",
+    "knife",
+    "nyan",
+    "mayan"
+   ]
+  },
+  "queen": {
+   "letter": "q",
+   "base": [
+    "queen",
+    "q",
+    "cue",
+    "queue",
+    "qa",
+    "quh",
+    "kwa",
+    "green",
+    "keen",
+    "clean",
+    "teen",
+    "seen",
+    "bean"
+   ],
+   "right": {
+    "queen": "kwˈin"
+   },
+   "wrong": {
+    "ween": "wˈin",
+    "keen": "kˈin",
+    "gween": "ɡwˈin",
+    "tween": "twˈin"
+   },
+   "prefixes": [
+    "we",
+    "wee",
+    "oh",
+    "a",
+    "go"
+   ],
+   "tails": [
+    "in",
+    "inn",
+    "ian",
+    "een"
+   ],
+   "singles": [
+    "wean",
+    "we",
+    "wee",
+    "win",
+    "wing",
+    "wheel",
+    "weed",
+    "tween",
+    "twin",
+    "gwen",
+    "when",
+    "wheeze",
+    "sweet",
+    "sweeney",
+    "green"
+   ]
+  },
+  "goat": {
+   "letter": "g",
+   "base": [
+    "goat",
+    "g",
+    "gee",
+    "jee",
+    "ga",
+    "guh",
+    "coat",
+    "boat",
+    "oat",
+    "note",
+    "vote"
+   ],
+   "right": {
+    "goat": "ɡˈOt"
+   },
+   "wrong": {
+    "dote": "dˈOt",
+    "coat": "kˈOt",
+    "boat": "bˈOt",
+    "joat": "ʤˈOt"
+   },
+   "prefixes": [],
+   "tails": [],
+   "singles": [
+    "dote",
+    "don't",
+    "tote",
+    "toad",
+    "joke",
+    "wrote",
+    "moat",
+    "quote",
+    "throat",
+    "dough",
+    "toe",
+    "doe",
+    "joe",
+    "jody",
+    "dotes",
+    "dolt"
+   ]
+  },
+  "dog": {
+   "letter": "d",
+   "base": [
+    "dog",
+    "d",
+    "dee",
+    "da",
+    "duh",
+    "log",
+    "bog",
+    "fog",
+    "hog",
+    "frog"
+   ],
+   "right": {
+    "dog": "dˈɔɡ",
+    "dog_ah": "dˈɑɡ"
+   },
+   "wrong": {
+    "tog": "tˈɔɡ",
+    "gog": "ɡˈɔɡ",
+    "bog": "bˈɔɡ",
+    "og": "ˈɔɡ"
+   },
+   "prefixes": [],
+   "tails": [],
+   "singles": [
+    "talk",
+    "tug",
+    "dock",
+    "jog",
+    "cog",
+    "clog",
+    "smog",
+    "top",
+    "togo",
+    "gawk",
+    "hawk",
+    "walk",
+    "tog",
+    "tock",
+    "tall",
+    "august"
+   ]
+  },
+  "watch": {
+   "letter": "w",
+   "base": [
+    "watch",
+    "w",
+    "double",
+    "wa",
+    "wuh",
+    "botch",
+    "notch",
+    "scotch",
+    "top"
+   ],
+   "right": {
+    "watch": "wˈɑʧ",
+    "watch_aw": "wˈɔʧ"
+   },
+   "wrong": {
+    "rotch": "ɹˈɑʧ",
+    "botch": "bˈɑʧ",
+    "otch": "ˈɑʧ",
+    "votch": "vˈɑʧ"
+   },
+   "prefixes": [],
+   "tails": [],
+   "singles": [
+    "rot",
+    "rock",
+    "roach",
+    "rich",
+    "ouch",
+    "hatch",
+    "match",
+    "catch",
+    "latch",
+    "patch",
+    "batch",
+    "scratch",
+    "gotcha",
+    "notch",
+    "vatch",
+    "voch",
+    "botched",
+    "otto"
+   ]
+  },
+  "box": {
+   "letter": "x",
+   "base": [
+    "box",
+    "x",
+    "ex",
+    "eks",
+    "xa",
+    "xuh",
+    "fox",
+    "socks",
+    "ox",
+    "rocks"
+   ],
+   "right": {
+    "box": "bˈɑks",
+    "box_aw": "bˈɔks"
+   },
+   "wrong": {
+    "pox": "pˈɑks",
+    "bock": "bˈɑk",
+    "boss": "bˈɑs",
+    "bot": "bˈɑt"
+   },
+   "prefixes": [],
+   "tails": [],
+   "singles": [
+    "pox",
+    "pocks",
+    "bock",
+    "boss",
+    "bot",
+    "bop",
+    "bob",
+    "bach",
+    "blocks",
+    "talks",
+    "walks",
+    "locks",
+    "knocks",
+    "bog",
+    "pops",
+    "bonk"
+   ]
+  },
+  "cat": {
+   "letter": "c",
+   "base": [
+    "cat",
+    "c",
+    "see",
+    "sea",
+    "ca",
+    "cuh",
+    "ka",
+    "kuh",
+    "hat",
+    "bat",
+    "at",
+    "pat",
+    "that"
+   ],
+   "right": {
+    "cat": "kˈæt"
+   },
+   "wrong": {
+    "tat": "tˈæt",
+    "gat": "ɡˈæt",
+    "pat": "pˈæt"
+   },
+   "prefixes": [],
+   "tails": [],
+   "singles": [
+    "tat",
+    "gat",
+    "sat",
+    "mat",
+    "rat",
+    "gap",
+    "tack",
+    "tap",
+    "tad",
+    "gad",
+    "pad",
+    "tab"
+   ]
+  },
+  "zebra": {
+   "letter": "z",
+   "base": [
+    "zebra",
+    "z",
+    "zee",
+    "zed",
+    "za",
+    "zuh",
+    "s",
+    "sa",
+    "es",
+    "debra"
+   ],
+   "right": {
+    "zebra": "zˈibɹə",
+    "zebra_eh": "zˈɛbɹə"
+   },
+   "wrong": {
+    "sebra": "sˈibɹə",
+    "jebra": "ʤˈibɹə",
+    "thebra": "ðˈibɹə",
+    "eebra": "ˈibɹə"
+   },
+   "prefixes": [
+    "see",
+    "sea",
+    "she",
+    "the",
+    "gee",
+    "g",
+    "z"
+   ],
+   "tails": [
+    "brew",
+    "brow",
+    "brah",
+    "brie"
+   ],
+   "singles": [
+    "sabre",
+    "libra",
+    "cobra",
+    "deborah",
+    "seabird",
+    "sierra",
+    "zebras",
+    "zebu"
+   ]
+  },
+  "rabbit": {
+   "letter": "r",
+   "base": [
+    "rabbit",
+    "r",
+    "ar",
+    "ra",
+    "ruh",
+    "habit",
+    "a bit",
+    "grab it"
+   ],
+   "right": {
+    "rabbit": "ɹˈæbɪt",
+    "wabbit": "wˈæbɪt"
+   },
+   "wrong": {
+    "labbit": "lˈæbɪt",
+    "abbit": "ˈæbɪt",
+    "jabbit": "ʤˈæbɪt",
+    "nabbit": "nˈæbɪt"
+   },
+   "prefixes": [],
+   "tails": [],
+   "singles": [
+    "lab it",
+    "nab it",
+    "jab it",
+    "tab it",
+    "cab it",
+    "dab it",
+    "stab it",
+    "abbot",
+    "an bit",
+    "a bit",
+    "rabbi",
+    "habits",
+    "ladder",
+    "lavish"
+   ]
+  },
+  "van": {
+   "letter": "v",
+   "base": [
+    "van",
+    "v",
+    "vee",
+    "va",
+    "vuh",
+    "b",
+    "ba",
+    "bee",
+    "ban",
+    "man",
+    "an",
+    "pan",
+    "than"
+   ],
+   "right": {
+    "van": "vˈæn"
+   },
+   "wrong": {
+    "fan": "fˈæn",
+    "ban": "bˈæn",
+    "wan": "wˈæn"
+   },
+   "prefixes": [],
+   "tails": [],
+   "singles": [
+    "fan",
+    "wan",
+    "one",
+    "when",
+    "ran",
+    "tan",
+    "can",
+    "fun",
+    "vain",
+    "fang",
+    "fanned"
+   ]
+  }
+ }
+}

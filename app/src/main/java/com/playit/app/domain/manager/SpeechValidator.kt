@@ -189,33 +189,36 @@ class SpeechValidator internal constructor(
      *
      * Each list was measured with `tools/speech/near_miss_probe.py`: 24 synthetic takes per utterance (8 voices,
      * 3 speeds) through the app's own model. A decoy stays only if the right word passes as often as without it, so
-     * no decoy adds a false reject. Elephant, orange and umbrella have none: no decoy beat the word's long ending,
+     * no decoy adds a false reject. The chapter 2 on lists, orange's and apple's extras were then searched over hundreds
+     * of candidates with `tools/speech/decoy_search.py` (user, 2026-11-06: "aronge" and "app range" passed as orange).
+     * Elephant and umbrella have none: every candidate that caught a wrong first vowel also rejected some right takes,
      * and Vosk's confidence was 1.0 for the wrong first vowels too, so their first sound is not checked yet.
      */
     private val nearMissDecoys: Map<String, List<String>> = mapOf(
-        "apple" to listOf("up all", "a pull", "up pull", "pull", "opal", "ripple"),
+        "apple" to listOf("up all", "a pull", "up pull", "pull", "opal", "ripple", "ah pull", "ah pool", "ah pill", "ah bull"),
         "ball" to listOf("fall", "call", "paul", "all", "tall"),
-        "box" to listOf("fox", "socks", "ox", "rocks"),
-        "cat" to listOf("hat", "bat", "at", "pat", "that"),
-        "dog" to listOf("log", "bog", "fog", "hog", "frog"),
+        "box" to listOf("fox", "socks", "ox", "rocks", "boss", "bock", "pox"),
+        "cat" to listOf("hat", "bat", "at", "pat", "that", "tat"),
+        "dog" to listOf("log", "bog", "fog", "hog", "frog", "tug", "tog", "gawk", "jog", "cog"),
         "fish" to listOf("dish", "is", "pitch"),
-        "goat" to listOf("coat", "boat", "oat", "note", "vote"),
+        "goat" to listOf("coat", "boat", "oat", "note", "vote", "dote", "joe"),
         "hat" to listOf("cat", "bat", "at", "pat", "that"),
         "insect" to listOf("on sect", "an sect", "and sect", "apple sect", "un sect", "end sect", "sect"),
         "jug" to listOf("mug", "bug", "rug", "hug", "dug"),
         "kite" to listOf("bite", "white", "tight", "light", "night"),
-        "lion" to listOf("iron", "ryan", "i on", "eye and"),
+        "lion" to listOf("iron", "ryan", "i on", "eye and", "dion", "nigh un", "nyan"),
         "mouse" to listOf("house", "how's", "now's", "louse"),
         "nest" to listOf("best", "west", "rest", "test", "messed"),
+        "orange" to listOf("air inch", "err inch", "air hinge", "err hinge", "ear inch", "ear hinge", "err ran", "end range", "app range", "a range", "ah ranch", "a ranch"),
         "pig" to listOf("big", "dig", "fig", "wig"),
-        "queen" to listOf("green", "keen", "clean", "teen", "seen", "bean"),
-        "rabbit" to listOf("habit", "a bit", "grab it"),
+        "queen" to listOf("green", "keen", "clean", "teen", "seen", "bean", "twin", "wean"),
+        "rabbit" to listOf("habit", "a bit", "grab it", "nab it", "abbot", "dab it"),
         "sun" to listOf("fun", "bun", "run", "one", "done", "gun", "none"),
-        "tiger" to listOf("higher", "eager", "die girl", "pie girl"),
-        "van" to listOf("ban", "man", "an", "pan", "than"),
-        "watch" to listOf("botch", "notch", "scotch", "top"),
+        "tiger" to listOf("higher", "eager", "die girl", "pie girl", "eiger", "eye girl", "kiker", "dagger", "pie gore"),
+        "van" to listOf("ban", "man", "an", "pan", "than", "when", "fun", "fang"),
+        "watch" to listOf("botch", "notch", "scotch", "top", "rot"),
         "yoyo" to listOf("go go", "no no", "joe joe", "low low", "oh oh"),
-        "zebra" to listOf("debra")
+        "zebra" to listOf("debra", "libra")
     )
 
     fun nearMissDecoysFor(targetWord: String): List<String> = nearMissDecoys[targetWord.lowercase().trim()] ?: emptyList()
