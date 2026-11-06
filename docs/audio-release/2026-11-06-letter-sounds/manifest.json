@@ -6,6 +6,7 @@
     {
       "clipId": "ph_o",
       "file": "phonemes/ph_o.wav",
+      "supersededBy": "2026-11-06-letter-sounds-2: the user moved the OK for o to o_t3_vs1 ('oh, oh, orange.') on the part 2 page",
       "text": "short o, as at the start of 'orange' (the first sound of 'aw, aw, orange.')",
       "voice": "OmniVoice clone of Lily (reference: the app's Kokoro af_heart*0.7+af_bella*0.3 lesson clips)",
       "speed": 1.0,

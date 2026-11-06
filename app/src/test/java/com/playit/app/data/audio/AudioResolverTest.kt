@@ -19,9 +19,9 @@ class AudioResolverTest {
 
     @Test
     fun getPhonemePath_returnsCorrectPathForStandardLetters() {
-        assertEquals("audio/phonemes/phoneme_g.mp3", audioResolver.getPhonemePath("g"))
+        assertEquals("audio/phonemes/phoneme_l.mp3", audioResolver.getPhonemePath("l"))
         assertEquals("audio/phonemes/phoneme_a.mp3", audioResolver.getPhonemePath("a"))
-        assertEquals("audio/phonemes/phoneme_n.mp3", audioResolver.getPhonemePath("n"))
+        assertEquals("audio/phonemes/phoneme_p.mp3", audioResolver.getPhonemePath("p"))
     }
 
     @Test
@@ -46,29 +46,41 @@ class AudioResolverTest {
     fun otherPhonemes_keepOldPath() {
         // a: the user kept today's clip on review page 2026-11-06-letter-sounds.
         assertEquals("audio/phonemes/phoneme_a.mp3", audioResolver.getPhonemePath("a"))
-        assertEquals("audio/phonemes/phoneme_g.mp3", audioResolver.getPhonemePath("g"))
+        assertEquals("audio/phonemes/phoneme_z.mp3", audioResolver.getPhonemePath("z"))
     }
 
-    /** Release 2026-11-06-letter-sounds: Lily's letter sounds from VoiceStudio, the takes the user marked OK. */
+    /**
+     * Lily's letter sounds from VoiceStudio, the takes the user marked OK: release 2026-11-06-letter-sounds, then
+     * 2026-11-06-letter-sounds-2 (with g and n, which the user reported: the old clips said "G, U, H" and "eh, nah").
+     */
     @Test
     fun voiceStudioLetterSounds_useTheReleasedClips() {
-        listOf("o", "b", "e", "u", "t", "k").forEach {
+        listOf("b", "e", "u", "t", "k", "o", "y", "n", "g", "d", "w", "c", "j", "q", "x").forEach {
             assertEquals("audio/phonemes/ph_$it.wav", audioResolver.getPhonemePath(it))
             assertEquals("audio/phonemes/ph_$it.wav", audioResolver.getPhonemePath(it.uppercase()))
         }
     }
 
-    /** Every released letter sound is in the app and in a release manifest (the audio gate, AGENTS.md). */
+    /**
+     * Every released letter sound is in the app, byte for byte the clip of a release manifest entry that no later
+     * release replaced (the audio gate, AGENTS.md).
+     */
     @Test
-    fun everyReleasedLetterSound_isInTheAppAndInAManifest() {
+    fun everyReleasedLetterSound_isTheClipOfItsLatestManifest() {
         val root = listOf(File("."), File("..")).first { File(it, "docs/audio-release").exists() }
-        val manifests = File(root, "docs/audio-release").listFiles()!!
+        val entries = File(root, "docs/audio-release").listFiles()!!
             .mapNotNull { File(it, "manifest.json").takeIf(File::exists)?.readText() }
+            .flatMap { it.split("\"clipId\"").drop(1) }
         audioResolver.releasedPhonemes.forEach { letter ->
             val clip = File(root, "app/src/main/assets/audio/phonemes/ph_$letter.wav")
             assertTrue("ph_$letter.wav should exist", clip.exists() && clip.length() > 1_000L)
-            assertTrue("ph_$letter.wav should be in a release manifest",
-                manifests.any { it.contains("\"phonemes/ph_$letter.wav\"") })
+            val sha = java.security.MessageDigest.getInstance("SHA-256").digest(clip.readBytes())
+                .joinToString("") { "%02x".format(it) }
+            val current = entries.filter {
+                it.contains("\"phonemes/ph_$letter.wav\"") && !it.contains("\"supersededBy\"")
+            }
+            assertEquals("ph_$letter.wav: one current manifest entry", 1, current.size)
+            assertTrue("ph_$letter.wav should match its manifest", current.single().contains("\"$sha\""))
         }
     }
 
@@ -112,9 +124,10 @@ class AudioResolverTest {
         assertEquals("audio/phonemes/phoneme_enye.mp3", audioResolver.getPhonemePath("enye"))
     }
 
+    /** x was a draft clip; the user approved Lily's "kss" (release 2026-11-06-letter-sounds-2). */
     @Test
-    fun getPhonemePath_returnsDraftPathForX() {
-        assertEquals("audio/phonemes/phoneme_x.mp3", audioResolver.getPhonemePath("x"))
+    fun getPhonemePath_returnsReleasedPathForX() {
+        assertEquals("audio/phonemes/ph_x.wav", audioResolver.getPhonemePath("x"))
     }
 
     @Test

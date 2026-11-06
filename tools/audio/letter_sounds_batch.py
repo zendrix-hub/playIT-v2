@@ -15,7 +15,8 @@ kokoro_local.clean (trim, RMS -20 dBFS, peak -1 dBFS). Today's clip is on the pa
 OmniVoice's weights are CC BY-NC: non-commercial, credited in the Parent Zone. Review audio only: nothing here goes
 into app/src/main/assets/.
 
-Usage: python -I letter_sounds_batch.py <out dir> [letters, e.g. g,n] [seeds, e.g. 1,2]
+Usage: python -I letter_sounds_batch.py <out dir> [letters, e.g. g,n] [seeds, e.g. 1,2] [round, 1 or 2]
+Round 2 uses ROUND2, the spellings from the user's notes, in its own batch folder.
 """
 import json
 import pathlib
@@ -60,6 +61,19 @@ LETTERS = {
     "v": ("van", "v, a held 'vvv'", ["vvv, vvv, van.", "Vvvvv."]),
     "x": ("box", "x, 'ks', as at the end of 'box'", ["ks, ks, box.", "kss, kss, box."]),
     "z": ("zebra", "z, a held 'zzz'", ["zzz, zzz, zebra.", "Zzzzz."]),
+}
+
+
+# Round 2 (user's notes on the part 2 page, 2026-11-06): every take of these was FIX. The user wants a
+# consonant with a short vowel after it, like the approved g and d, and for p and r the key word's vowel.
+ROUND2 = {
+    "l": ("lion", "l, 'luh'", ["luh, luh, lion."]),  # "should be luh luh lion"
+    "p": ("pig", "p, 'puh' or 'pih'", ["puh, puh, pig.", "pih, pih, pig."]),  # "should be puh or pih since pig"
+    "r": ("rabbit", "r, 'ruh' or 'rah'", ["ruh, ruh, rabbit.", "rah, rah, rabbit."]),  # "should be ruh or rah for rabbit"
+    "h": ("hat", "h, 'huh' or 'hah'", ["huh, huh, hat.", "ha, ha, hat."]),  # FIX, no note: as p and r
+    "f": ("fish", "f, 'fuh'", ["fuh, fuh, fish.", "fuh, fuh, ffff."]),  # "is it possible that fuh fuh ffff"
+    "v": ("van", "v, 'vuh'", ["vuh, vuh, van."]),  # "should be vuh vuh"
+    "z": ("zebra", "z, 'zuh'", ["zuh, zuh, zebra.", "zuh, zuh, zzz."]),  # "it should be zuh zuh zzz"
 }
 
 
@@ -136,7 +150,8 @@ def today(letter):
 def main():
     out = pathlib.Path(sys.argv[1])
     out.mkdir(parents=True, exist_ok=True)
-    letters = sys.argv[2].split(",") if len(sys.argv) > 2 and sys.argv[2] else list(LETTERS)
+    table = ROUND2 if len(sys.argv) > 4 and sys.argv[4] == "2" else LETTERS
+    letters = sys.argv[2].split(",") if len(sys.argv) > 2 and sys.argv[2] else list(table)
     seeds = [int(s) for s in sys.argv[3].split(",")] if len(sys.argv) > 3 else [1, 2]
     from vosk import Model, SetLogLevel
     SetLogLevel(-1)
@@ -146,7 +161,7 @@ def main():
     rows = json.loads(rows_path.read_text(encoding="utf-8")) if rows_path.exists() else []
     done = {r["file"] for r in rows}
     for letter in letters:
-        word, sound, texts = LETTERS[letter]
+        word, sound, texts = table[letter]
         group = f"Letter {letter.upper()} ({word})"
         listen = f"Is it the {sound}? Not the letter's name, not a different sound, no extra 'uh' on a held sound."
         old, old_name = today(letter)
@@ -181,16 +196,22 @@ def main():
                 print(f"{name}: {core_ms(au, SR_OUT)} ms", flush=True)
                 rows_path.write_text(json.dumps(rows, ensure_ascii=False, indent=1), encoding="utf-8")
         rows_path.write_text(json.dumps(rows, ensure_ascii=False, indent=1), encoding="utf-8")
-    order = {l: i for i, l in enumerate(LETTERS)}
+    order = {l: i for i, l in enumerate(LETTERS)}  # chapter order; ROUND2 letters are all in LETTERS
     rows.sort(key=lambda r: (order[r["file"].split("_")[0]], r["file"] != f"{r['file'].split('_')[0]}_today.wav", r["file"]))
-    write_review_page(
-        out, out.name, "playIT: Lily's letter sounds",
+    intro = (
         "Every letter except m, s and i still plays an old computer clip, and some are wrong (g says 'G, U, H'). "
         "These are new takes in Lily's voice from VoiceStudio: she said the sound twice and the key word "
         "('guh, guh, goat'), and the first sound was cut out. The held letters (l, n, r, f, v, z) also have takes "
-        "of the sound alone ('Nnnnn.'). The first row of each letter is today's clip, to "
-        "compare. For EACH letter, mark exactly ONE new take OK and the others FIX (FIX all, with a note, if none is "
-        "right). Export CSV when done.",
+        "of the sound alone ('Nnnnn.'). The first row of each letter is today's clip, to compare. "
+        if table is LETTERS else
+        "Round 2 for the letters where every take was FIX, made with the spellings from your notes ('luh, luh, "
+        "lion', 'puh' or 'pih' for pig, 'ruh' or 'rah' for rabbit, 'fuh', 'vuh', 'zuh'; for h, 'huh' and 'ha'). "
+        "Lily said the sound twice and then the word, and the first sound was cut out. The first row of each letter "
+        "is today's clip, to compare. ")
+    write_review_page(
+        out, out.name, "playIT: Lily's letter sounds" + ("" if table is LETTERS else ", round 2"),
+        intro + "For EACH letter, mark exactly ONE new take OK and the others FIX (FIX all, with a note, if none "
+        "is right). Export CSV when done.",
         rows, mode="okfix")
     print(f"wrote {len(rows)} rows to {out}")
 

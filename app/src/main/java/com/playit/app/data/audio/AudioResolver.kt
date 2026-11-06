@@ -86,10 +86,15 @@ class AudioResolver @Inject constructor() {
         if (suffix in kokoroLessonVo) "audio/vo/lesson/vo_$suffix.wav" else "audio/ui/vo_$suffix.mp3"
 
     /**
-     * Letter sounds the user approved (docs/audio-release): m, s and i, then o, b, e, u, t and k in Lily's voice from
-     * VoiceStudio (release 2026-11-06-letter-sounds). The rest are still the old MP3s; for a the user kept the old one.
+     * Letter sounds the user approved (docs/audio-release): m, s and i, then Lily's voice from VoiceStudio: b, e, u, t
+     * and k (release 2026-11-06-letter-sounds), and o, y, n, g, d, w, c, j, q and x (release 2026-11-06-letter-sounds-2).
+     * The rest are still the old MP3s: for a the user kept the old one; l, p, r, h, f, v and z wait for another round.
      */
-    internal val releasedPhonemes = setOf("m", "s", "i", "o", "b", "e", "u", "t", "k")
+    internal val releasedPhonemes = setOf(
+        "m", "s", "i",
+        "b", "e", "u", "t", "k",
+        "o", "y", "n", "g", "d", "w", "c", "j", "q", "x"
+    )
 
     /**
      * Resolves the asset path for a phoneme letter.
