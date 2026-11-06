@@ -37,9 +37,11 @@ def reference():
     return buf.getvalue(), " ".join(t for _, t in REFERENCE)
 
 
-def say(text, seed, ref_wav, ref_text, url="http://localhost:3900"):
-    """One take of [text] in Lily's voice: (mono float32 samples, sample rate). Raises if VoiceStudio sends no audio."""
-    fields = {"text": text, "language": "English", "ref_text": ref_text, "seed": str(seed), "effect_preset": "raw"}
+def say(text, seed, ref_wav, ref_text, url="http://localhost:3900", **extra):
+    """One take of [text] in Lily's voice: (mono float32 samples, sample rate). Raises if VoiceStudio sends no audio.
+    [extra] adds /generate form fields, such as num_step or pronounce (see the running server's /openapi.json)."""
+    fields = {"text": text, "language": "English", "ref_text": ref_text, "seed": str(seed), "effect_preset": "raw",
+              **{k: str(v).lower() if isinstance(v, bool) else str(v) for k, v in extra.items()}}
     b = uuid.uuid4().hex
     body = b"".join(f'--{b}\r\nContent-Disposition: form-data; name="{k}"\r\n\r\n{v}\r\n'.encode() for k, v in fields.items())
     body += (f'--{b}\r\nContent-Disposition: form-data; name="ref_audio"; filename="lily_ref.wav"\r\n'

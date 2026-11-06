@@ -19,9 +19,9 @@ class AudioResolverTest {
 
     @Test
     fun getPhonemePath_returnsCorrectPathForStandardLetters() {
-        assertEquals("audio/phonemes/phoneme_b.mp3", audioResolver.getPhonemePath("b"))
+        assertEquals("audio/phonemes/phoneme_g.mp3", audioResolver.getPhonemePath("g"))
         assertEquals("audio/phonemes/phoneme_a.mp3", audioResolver.getPhonemePath("a"))
-        assertEquals("audio/phonemes/phoneme_t.mp3", audioResolver.getPhonemePath("t"))
+        assertEquals("audio/phonemes/phoneme_n.mp3", audioResolver.getPhonemePath("n"))
     }
 
     @Test
@@ -44,8 +44,32 @@ class AudioResolverTest {
 
     @Test
     fun otherPhonemes_keepOldPath() {
+        // a: the user kept today's clip on review page 2026-11-06-letter-sounds.
         assertEquals("audio/phonemes/phoneme_a.mp3", audioResolver.getPhonemePath("a"))
-        assertEquals("audio/phonemes/phoneme_t.mp3", audioResolver.getPhonemePath("t"))
+        assertEquals("audio/phonemes/phoneme_g.mp3", audioResolver.getPhonemePath("g"))
+    }
+
+    /** Release 2026-11-06-letter-sounds: Lily's letter sounds from VoiceStudio, the takes the user marked OK. */
+    @Test
+    fun voiceStudioLetterSounds_useTheReleasedClips() {
+        listOf("o", "b", "e", "u", "t", "k").forEach {
+            assertEquals("audio/phonemes/ph_$it.wav", audioResolver.getPhonemePath(it))
+            assertEquals("audio/phonemes/ph_$it.wav", audioResolver.getPhonemePath(it.uppercase()))
+        }
+    }
+
+    /** Every released letter sound is in the app and in a release manifest (the audio gate, AGENTS.md). */
+    @Test
+    fun everyReleasedLetterSound_isInTheAppAndInAManifest() {
+        val root = listOf(File("."), File("..")).first { File(it, "docs/audio-release").exists() }
+        val manifests = File(root, "docs/audio-release").listFiles()!!
+            .mapNotNull { File(it, "manifest.json").takeIf(File::exists)?.readText() }
+        audioResolver.releasedPhonemes.forEach { letter ->
+            val clip = File(root, "app/src/main/assets/audio/phonemes/ph_$letter.wav")
+            assertTrue("ph_$letter.wav should exist", clip.exists() && clip.length() > 1_000L)
+            assertTrue("ph_$letter.wav should be in a release manifest",
+                manifests.any { it.contains("\"phonemes/ph_$letter.wav\"") })
+        }
     }
 
     @Test

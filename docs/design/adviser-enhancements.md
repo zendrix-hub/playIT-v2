@@ -44,9 +44,17 @@ Branch `enhance/adviser-feedback`, cut from `design/visual-refresh` at `86408a9`
 | **Test APK, all unlocked** | `4265c45` | <ul><li>Build type `unlocked`: a separate app, "playIT test", with every letter and word game open, for testing and demos.</li></ul> |
 | **American spelling** | `4199df7` | <ul><li>"Practise" becomes "practice" and "colour" becomes "color"; `AmericanSpellingTest` guards it.</li><li>The sound check's end no longer shows "You know these sounds!" over an empty row.</li></ul> |
 
+### Fifth round (user, 2026-11-06 evening)
+
+| What | Commit | How |
+|---|---|---|
+| **Blend It speaks after the sound check** | `83c892b` | <ul><li>User: after "Build words", Lily no longer said "Let's build some words together!".</li><li>Cause: the audio player is shared, and the sound check stopped it as it closed, after Blend It had started its line.</li><li>Now "Build words" stops the check's own voice once and leaves the player to Blend It.</li></ul> |
+| **Letter sounds in Lily's voice** | (this commit) | <ul><li>User: g and n sound wrong; check the other letters too.</li><li>Only m, s and i had approved sounds. The other 23 were the Edge TTS placeholders of 2026-08-31, and the voice spelled some out: g says "G, U, H", n "eh, nah, nah".</li><li>`tools/audio/letter_sounds_batch.py`: VoiceStudio (OmniVoice, Lily's reference) says "guh, guh, goat." and the first sound is cut out, as for the approved short i. Held letters also get the sound alone ("Nnnnn.").</li><li>Release `2026-11-06-letter-sounds`: o, b, e, u, t and k, the takes the user marked OK. For a the user kept today's clip.</li><li>The batch stopped at k (the laptop ran low on memory). The other 16 letters (y, l, n, g, p, r, d, h, w, c, f, j, q, v, x, z) wait for the next run, plus "oh, oh, orange." takes from the user's note.</li><li>Licence CC BY-NC, credited in the Parent Zone ("letter sounds"). This amends "short sounds still come from a human model" (AGENTS.md), adviser confirmation pending.</li></ul> |
+
 ## Waiting for the user
 
-Nothing from this round. The new clips and pictures still need the teacher audit before main.
+- The rest of the letter sounds: the batch picks up at k when the user says to continue.
+- The new clips and pictures still need the teacher audit before main.
 
 ## For the documents (Zendrix)
 
