@@ -1,6 +1,7 @@
 package com.playit.app.data.audio
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -19,9 +20,8 @@ class AudioResolverTest {
 
     @Test
     fun getPhonemePath_returnsCorrectPathForStandardLetters() {
-        assertEquals("audio/phonemes/phoneme_l.mp3", audioResolver.getPhonemePath("l"))
         assertEquals("audio/phonemes/phoneme_a.mp3", audioResolver.getPhonemePath("a"))
-        assertEquals("audio/phonemes/phoneme_p.mp3", audioResolver.getPhonemePath("p"))
+        assertEquals("audio/phonemes/phoneme_a.mp3", audioResolver.getPhonemePath("A "))
     }
 
     @Test
@@ -44,18 +44,20 @@ class AudioResolverTest {
 
     @Test
     fun otherPhonemes_keepOldPath() {
-        // a: the user kept today's clip on review page 2026-11-06-letter-sounds.
+        // a: the user kept today's clip on review page 2026-11-06-letter-sounds. No chapter uses ng.
         assertEquals("audio/phonemes/phoneme_a.mp3", audioResolver.getPhonemePath("a"))
-        assertEquals("audio/phonemes/phoneme_z.mp3", audioResolver.getPhonemePath("z"))
+        assertEquals("audio/phonemes/phoneme_ng.mp3", audioResolver.getPhonemePath("ng"))
     }
 
     /**
      * Lily's letter sounds from VoiceStudio, the takes the user marked OK: release 2026-11-06-letter-sounds, then
-     * 2026-11-06-letter-sounds-2 (with g and n, which the user reported: the old clips said "G, U, H" and "eh, nah").
+     * 2026-11-06-letter-sounds-2 (with g and n, which the user reported: the old clips said "G, U, H" and "eh, nah"),
+     * then 2026-11-06-letter-sounds-3 (round 2, with the user's spellings).
      */
     @Test
     fun voiceStudioLetterSounds_useTheReleasedClips() {
-        listOf("b", "e", "u", "t", "k", "o", "y", "n", "g", "d", "w", "c", "j", "q", "x").forEach {
+        listOf("b", "e", "u", "t", "k", "o", "y", "n", "g", "d", "w", "c", "j", "q", "x",
+            "l", "p", "r", "h", "f", "v", "z").forEach {
             assertEquals("audio/phonemes/ph_$it.wav", audioResolver.getPhonemePath(it))
             assertEquals("audio/phonemes/ph_$it.wav", audioResolver.getPhonemePath(it.uppercase()))
         }
@@ -289,5 +291,15 @@ class AudioResolverTest {
     fun devPlaceholder_mapsUiLines() {
         assertEquals(DevAudioCategory.VO.assetPath, audioResolver.getDevPlaceholderForAsset("audio/vo/ui/ui_hearit_next.wav"))
     }
-}
 
+    /** Every letter of the 7 chapters plays a sound the user approved; only a keeps its old clip, by the user's choice. */
+    @Test
+    fun everyChapterLetter_hasAnApprovedSound_exceptA() {
+        val letters = "msai" + "obeu" + "tkly" + "ngp" + "rdhw" + "cfj" + "qvxz"  // DatabaseModule groups 1 to 7
+        assertEquals(26, letters.toSet().size)
+        letters.filter { it != 'a' }.forEach {
+            assertTrue("$it", it.toString() in audioResolver.releasedPhonemes)
+        }
+        assertFalse("a" in audioResolver.releasedPhonemes)
+    }
+}

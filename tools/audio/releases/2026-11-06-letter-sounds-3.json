@@ -1,0 +1,90 @@
+{
+ "release": "2026-11-06-letter-sounds-3",
+ "approvedBy": "user: OK marks on review page 2026-11-06-letter-sounds-r2 (CSV exported 2026-11-06 21:47)",
+ "clips": [
+  {
+   "clipId": "ph_l",
+   "dest": "phonemes",
+   "sourceBatch": "2026-11-06-letter-sounds-r2",
+   "sourceFile": "l_t2_vs5.wav",
+   "text": "l, 'luh' (the first sound of 'Luh. Luh. Lion.')",
+   "voice": "OmniVoice clone of Lily (reference: the app's Kokoro af_heart*0.7+af_bella*0.3 lesson clips)",
+   "speed": 1.0,
+   "license": "CC BY-NC (the OmniVoice pre-trained model, k2-fsa; its code is Apache-2.0; VoiceStudio's model_licenses.json also lists Higgs Audio 2 and Meta Llama 3 terms for its audio tokenizer): non-commercial use only, with credit; the app credits OmniVoice by k2-fsa in the Parent Zone",
+   "tool": "tools/audio/letter_sounds_batch.py round 2 (ROUND2): VoiceStudio 0.5.7 on this PC (localhost:3900, GTX 1650), POST /generate, engine OmniVoice, language English, effect_preset raw, num_step 16, seed 5, text 'Luh. Luh. Lion.', voice cloned from Lily's own Kokoro clips (vo_welcome_01, vo_blendit_intro_01, vo_complete_01, vo_unlock_01, joined with 0.35 s gaps, with their text as ref_text); the first sound cut where the loudness first dips 25 dB below the phrase's peak (30 ms before, 40 ms after); then kokoro_local.clean (trim, 8 ms fades, RMS -20 dBFS, peak at most -1 dBFS, 50 ms of silence each end), 24 kHz",
+   "note": "Letter sound for Hear It, Say It, Find It, Blend It, the sound check and the welcome back (FR-02). Replaces the Edge TTS placeholder of 2026-08-31 (phoneme_l.mp3). Every round 1 take of this letter was FIX; round 2 used the spelling from the user's note, and the user marked this take OK. Amends the Kokoro-only source and 'short sounds from a human model' (AGENTS.md), adviser confirmation pending."
+  },
+  {
+   "clipId": "ph_p",
+   "dest": "phonemes",
+   "sourceBatch": "2026-11-06-letter-sounds-r2",
+   "sourceFile": "p_t1_vs4.wav",
+   "text": "p, 'puh' or 'pih' (the first sound of 'puh, puh, pig.')",
+   "voice": "OmniVoice clone of Lily (reference: the app's Kokoro af_heart*0.7+af_bella*0.3 lesson clips)",
+   "speed": 1.0,
+   "license": "CC BY-NC (the OmniVoice pre-trained model, k2-fsa; its code is Apache-2.0; VoiceStudio's model_licenses.json also lists Higgs Audio 2 and Meta Llama 3 terms for its audio tokenizer): non-commercial use only, with credit; the app credits OmniVoice by k2-fsa in the Parent Zone",
+   "tool": "tools/audio/letter_sounds_batch.py round 2 (ROUND2): VoiceStudio 0.5.7 on this PC (localhost:3900, GTX 1650), POST /generate, engine OmniVoice, language English, effect_preset raw, num_step 16, seed 4, text 'puh, puh, pig.', voice cloned from Lily's own Kokoro clips (vo_welcome_01, vo_blendit_intro_01, vo_complete_01, vo_unlock_01, joined with 0.35 s gaps, with their text as ref_text); the first sound cut where the loudness first dips 25 dB below the phrase's peak (30 ms before, 40 ms after); then kokoro_local.clean (trim, 8 ms fades, RMS -20 dBFS, peak at most -1 dBFS, 50 ms of silence each end), 24 kHz",
+   "note": "Letter sound for Hear It, Say It, Find It, Blend It, the sound check and the welcome back (FR-02). Replaces the Edge TTS placeholder of 2026-08-31 (phoneme_p.mp3). Every round 1 take of this letter was FIX; round 2 used the spelling from the user's note, and the user marked this take OK. Amends the Kokoro-only source and 'short sounds from a human model' (AGENTS.md), adviser confirmation pending."
+  },
+  {
+   "clipId": "ph_r",
+   "dest": "phonemes",
+   "sourceBatch": "2026-11-06-letter-sounds-r2",
+   "sourceFile": "r_t2_vs3.wav",
+   "text": "r, 'ruh' or 'rah' (the first sound of 'rah, rah, rabbit.')",
+   "voice": "OmniVoice clone of Lily (reference: the app's Kokoro af_heart*0.7+af_bella*0.3 lesson clips)",
+   "speed": 1.0,
+   "license": "CC BY-NC (the OmniVoice pre-trained model, k2-fsa; its code is Apache-2.0; VoiceStudio's model_licenses.json also lists Higgs Audio 2 and Meta Llama 3 terms for its audio tokenizer): non-commercial use only, with credit; the app credits OmniVoice by k2-fsa in the Parent Zone",
+   "tool": "tools/audio/letter_sounds_batch.py round 2 (ROUND2): VoiceStudio 0.5.7 on this PC (localhost:3900, GTX 1650), POST /generate, engine OmniVoice, language English, effect_preset raw, num_step 16, seed 3, text 'rah, rah, rabbit.', voice cloned from Lily's own Kokoro clips (vo_welcome_01, vo_blendit_intro_01, vo_complete_01, vo_unlock_01, joined with 0.35 s gaps, with their text as ref_text); the first sound cut where the loudness first dips 25 dB below the phrase's peak (30 ms before, 40 ms after); then kokoro_local.clean (trim, 8 ms fades, RMS -20 dBFS, peak at most -1 dBFS, 50 ms of silence each end), 24 kHz",
+   "note": "Letter sound for Hear It, Say It, Find It, Blend It, the sound check and the welcome back (FR-02). Replaces the Edge TTS placeholder of 2026-08-31 (phoneme_r.mp3). Every round 1 take of this letter was FIX; round 2 used the spelling from the user's note, and the user marked this take OK. Amends the Kokoro-only source and 'short sounds from a human model' (AGENTS.md), adviser confirmation pending."
+  },
+  {
+   "clipId": "ph_h",
+   "dest": "phonemes",
+   "sourceBatch": "2026-11-06-letter-sounds-r2",
+   "sourceFile": "h_t1_vs4.wav",
+   "text": "h, 'huh' or 'hah' (the first sound of 'huh, huh, hat.')",
+   "voice": "OmniVoice clone of Lily (reference: the app's Kokoro af_heart*0.7+af_bella*0.3 lesson clips)",
+   "speed": 1.0,
+   "license": "CC BY-NC (the OmniVoice pre-trained model, k2-fsa; its code is Apache-2.0; VoiceStudio's model_licenses.json also lists Higgs Audio 2 and Meta Llama 3 terms for its audio tokenizer): non-commercial use only, with credit; the app credits OmniVoice by k2-fsa in the Parent Zone",
+   "tool": "tools/audio/letter_sounds_batch.py round 2 (ROUND2): VoiceStudio 0.5.7 on this PC (localhost:3900, GTX 1650), POST /generate, engine OmniVoice, language English, effect_preset raw, num_step 16, seed 4, text 'huh, huh, hat.', voice cloned from Lily's own Kokoro clips (vo_welcome_01, vo_blendit_intro_01, vo_complete_01, vo_unlock_01, joined with 0.35 s gaps, with their text as ref_text); the first sound cut where the loudness first dips 25 dB below the phrase's peak (30 ms before, 40 ms after); then kokoro_local.clean (trim, 8 ms fades, RMS -20 dBFS, peak at most -1 dBFS, 50 ms of silence each end), 24 kHz",
+   "note": "Letter sound for Hear It, Say It, Find It, Blend It, the sound check and the welcome back (FR-02). Replaces the Edge TTS placeholder of 2026-08-31 (phoneme_h.mp3). Every round 1 take of this letter was FIX; round 2 used the spelling from the user's note, and the user marked this take OK. Amends the Kokoro-only source and 'short sounds from a human model' (AGENTS.md), adviser confirmation pending."
+  },
+  {
+   "clipId": "ph_f",
+   "dest": "phonemes",
+   "sourceBatch": "2026-11-06-letter-sounds-r2",
+   "sourceFile": "f_t1_vs3.wav",
+   "text": "f, 'fuh' (the first sound of 'fuh, fuh, fish.')",
+   "voice": "OmniVoice clone of Lily (reference: the app's Kokoro af_heart*0.7+af_bella*0.3 lesson clips)",
+   "speed": 1.0,
+   "license": "CC BY-NC (the OmniVoice pre-trained model, k2-fsa; its code is Apache-2.0; VoiceStudio's model_licenses.json also lists Higgs Audio 2 and Meta Llama 3 terms for its audio tokenizer): non-commercial use only, with credit; the app credits OmniVoice by k2-fsa in the Parent Zone",
+   "tool": "tools/audio/letter_sounds_batch.py round 2 (ROUND2): VoiceStudio 0.5.7 on this PC (localhost:3900, GTX 1650), POST /generate, engine OmniVoice, language English, effect_preset raw, num_step 16, seed 3, text 'fuh, fuh, fish.', voice cloned from Lily's own Kokoro clips (vo_welcome_01, vo_blendit_intro_01, vo_complete_01, vo_unlock_01, joined with 0.35 s gaps, with their text as ref_text); the first sound cut where the loudness first dips 25 dB below the phrase's peak (30 ms before, 40 ms after); then kokoro_local.clean (trim, 8 ms fades, RMS -20 dBFS, peak at most -1 dBFS, 50 ms of silence each end), 24 kHz",
+   "note": "Letter sound for Hear It, Say It, Find It, Blend It, the sound check and the welcome back (FR-02). Replaces the Edge TTS placeholder of 2026-08-31 (phoneme_f.mp3). Every round 1 take of this letter was FIX; round 2 used the spelling from the user's note, and the user marked this take OK. The page flagged this take LISTEN CLOSELY (Vosk heard the cut 'fuh' as a rude word); the user listened and marked it OK; the teacher audit should listen for it too. Amends the Kokoro-only source and 'short sounds from a human model' (AGENTS.md), adviser confirmation pending."
+  },
+  {
+   "clipId": "ph_v",
+   "dest": "phonemes",
+   "sourceBatch": "2026-11-06-letter-sounds-r2",
+   "sourceFile": "v_t1_vs3.wav",
+   "text": "v, 'vuh' (the first sound of 'vuh, vuh, van.')",
+   "voice": "OmniVoice clone of Lily (reference: the app's Kokoro af_heart*0.7+af_bella*0.3 lesson clips)",
+   "speed": 1.0,
+   "license": "CC BY-NC (the OmniVoice pre-trained model, k2-fsa; its code is Apache-2.0; VoiceStudio's model_licenses.json also lists Higgs Audio 2 and Meta Llama 3 terms for its audio tokenizer): non-commercial use only, with credit; the app credits OmniVoice by k2-fsa in the Parent Zone",
+   "tool": "tools/audio/letter_sounds_batch.py round 2 (ROUND2): VoiceStudio 0.5.7 on this PC (localhost:3900, GTX 1650), POST /generate, engine OmniVoice, language English, effect_preset raw, num_step 16, seed 3, text 'vuh, vuh, van.', voice cloned from Lily's own Kokoro clips (vo_welcome_01, vo_blendit_intro_01, vo_complete_01, vo_unlock_01, joined with 0.35 s gaps, with their text as ref_text); the first sound cut where the loudness first dips 25 dB below the phrase's peak (30 ms before, 40 ms after); then kokoro_local.clean (trim, 8 ms fades, RMS -20 dBFS, peak at most -1 dBFS, 50 ms of silence each end), 24 kHz",
+   "note": "Letter sound for Hear It, Say It, Find It, Blend It, the sound check and the welcome back (FR-02). Replaces the Edge TTS placeholder of 2026-08-31 (phoneme_v.mp3). Every round 1 take of this letter was FIX; round 2 used the spelling from the user's note, and the user marked this take OK. Amends the Kokoro-only source and 'short sounds from a human model' (AGENTS.md), adviser confirmation pending."
+  },
+  {
+   "clipId": "ph_z",
+   "dest": "phonemes",
+   "sourceBatch": "2026-11-06-letter-sounds-r2",
+   "sourceFile": "z_t2_vs3.wav",
+   "text": "z, 'zuh' (the first sound of 'zuh, zuh, zzz.')",
+   "voice": "OmniVoice clone of Lily (reference: the app's Kokoro af_heart*0.7+af_bella*0.3 lesson clips)",
+   "speed": 1.0,
+   "license": "CC BY-NC (the OmniVoice pre-trained model, k2-fsa; its code is Apache-2.0; VoiceStudio's model_licenses.json also lists Higgs Audio 2 and Meta Llama 3 terms for its audio tokenizer): non-commercial use only, with credit; the app credits OmniVoice by k2-fsa in the Parent Zone",
+   "tool": "tools/audio/letter_sounds_batch.py round 2 (ROUND2): VoiceStudio 0.5.7 on this PC (localhost:3900, GTX 1650), POST /generate, engine OmniVoice, language English, effect_preset raw, num_step 16, seed 3, text 'zuh, zuh, zzz.', voice cloned from Lily's own Kokoro clips (vo_welcome_01, vo_blendit_intro_01, vo_complete_01, vo_unlock_01, joined with 0.35 s gaps, with their text as ref_text); the first sound cut where the loudness first dips 25 dB below the phrase's peak (30 ms before, 40 ms after); then kokoro_local.clean (trim, 8 ms fades, RMS -20 dBFS, peak at most -1 dBFS, 50 ms of silence each end), 24 kHz",
+   "note": "Letter sound for Hear It, Say It, Find It, Blend It, the sound check and the welcome back (FR-02). Replaces the Edge TTS placeholder of 2026-08-31 (phoneme_z.mp3). Every round 1 take of this letter was FIX; round 2 used the spelling from the user's note, and the user marked this take OK. Amends the Kokoro-only source and 'short sounds from a human model' (AGENTS.md), adviser confirmation pending."
+  }
+ ]
+}

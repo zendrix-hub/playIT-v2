@@ -87,13 +87,15 @@ class AudioResolver @Inject constructor() {
 
     /**
      * Letter sounds the user approved (docs/audio-release): m, s and i, then Lily's voice from VoiceStudio: b, e, u, t
-     * and k (release 2026-11-06-letter-sounds), and o, y, n, g, d, w, c, j, q and x (release 2026-11-06-letter-sounds-2).
-     * The rest are still the old MP3s: for a the user kept the old one; l, p, r, h, f, v and z wait for another round.
+     * and k (release 2026-11-06-letter-sounds), o, y, n, g, d, w, c, j, q and x (release 2026-11-06-letter-sounds-2),
+     * and l, p, r, h, f, v and z (release 2026-11-06-letter-sounds-3, round 2 with the user's spellings).
+     * Only a keeps its old MP3, by the user's choice on the first page (and ng and enye, which no chapter uses).
      */
     internal val releasedPhonemes = setOf(
         "m", "s", "i",
         "b", "e", "u", "t", "k",
-        "o", "y", "n", "g", "d", "w", "c", "j", "q", "x"
+        "o", "y", "n", "g", "d", "w", "c", "j", "q", "x",
+        "l", "p", "r", "h", "f", "v", "z"
     )
 
     /**
