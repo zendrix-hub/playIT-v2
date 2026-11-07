@@ -312,14 +312,11 @@ class FindItViewModelTest {
         assertTrue(load().all { it.showWord })
     }
 
-    /** User, 2026-11-06: from the second letter of Chapter 1, one picture shows without its word. */
+    /** User decision 2026-11-07: Chapter 1 is the easy one; its later letters show every word too. */
     @Test
-    fun chapterOne_secondLetterOn_hidesOneWord_neverOneAPictureNeeds() = runTest {
+    fun chapterOne_laterLetters_showEveryWord() = runTest {
         inChapter(1, position = 2)
-        val grid = load()
-        val hidden = grid.filterNot { it.showWord }
-        assertEquals(1, hidden.size)
-        assertTrue(hidden.none { it.imagePath in com.playit.app.domain.manager.WordLabelPolicy.keepsWord })
+        assertTrue(load().all { it.showWord })
     }
 
     @Test
@@ -340,10 +337,19 @@ class FindItViewModelTest {
     }
 
     @Test
-    fun replayingAFinishedLetter_showsPicturesOnly_evenInChapterOne() = runTest {
-        inChapter(1)
+    fun replayingAFinishedLetter_showsPicturesOnly_fromChapterTwo() = runTest {
+        inChapter(2)
         coEvery { lessonProgress.getProgressForPhoneme(1L, 1) } returns
             LessonProgress(profileId = 1, phonemeId = 1, starsEarned = 2, isCompleted = true)
         assertEquals(listOf("Axe"), load().filter { it.showWord }.map { it.word })
+    }
+
+    /** User decision 2026-11-07: a replay in Chapter 1 still shows every word (only Chapter 1). */
+    @Test
+    fun replayingAFinishedLetter_inChapterOne_showsEveryWord() = runTest {
+        inChapter(1)
+        coEvery { lessonProgress.getProgressForPhoneme(1L, 1) } returns
+            LessonProgress(profileId = 1, phonemeId = 1, starsEarned = 2, isCompleted = true)
+        assertTrue(load().all { it.showWord })
     }
 }

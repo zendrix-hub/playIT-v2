@@ -5,34 +5,24 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.random.Random
 
-/** Harder chapters and replays show fewer words under the Find It pictures (adviser and user, 2026-11-05). */
+/** Harder chapters and replays show fewer words under the Find It pictures (adviser and user, 2026-11-05); Chapter 1 shows them all (user, 2026-11-07). */
 class WordLabelPolicyTest {
     private val clear = listOf("mouse", "map", "sun", "apple", "ball").mapIndexed { i, w ->
         FindItPictureItem("id$i", "m", w, "images/pictures/picture_$w.png", isCorrect = i < 3)
     }
 
-    @Test fun chapterOne_firstLetter_everyWord() {
-        assertTrue(WordLabelPolicy.apply(clear, chapter = 1, positionInChapter = 0, isReplay = false).all { it.showWord })
-    }
-
-    /** User, 2026-11-06: from the second letter of Chapter 1 (s, a, i), one picture shows without its word. */
-    @Test fun chapterOne_laterLetters_onePictureWithoutItsWord_differentEachRound() {
-        (1..3).forEach { position ->
-            val rounds = (1..20).map { seed ->
-                WordLabelPolicy.apply(clear, chapter = 1, positionInChapter = position, isReplay = false, random = Random(seed))
-                    .filterNot { it.showWord }.map { it.id }.toSet()
+    /**
+     * User decision 2026-11-07: Chapter 1 is the easy chapter, so every picture shows its word, on all four letters
+     * (m, s, a, i) and on replays. Only Chapter 1 does (Chapter 2 on is unchanged, below).
+     */
+    @Test fun chapterOne_everyWord_onEveryLetterAndEveryReplay() {
+        (0..3).forEach { position ->
+            listOf(false, true).forEach { replay ->
+                (1..20).forEach { seed ->
+                    val grid = WordLabelPolicy.apply(clear, chapter = 1, positionInChapter = position, isReplay = replay, random = Random(seed))
+                    assertTrue("letter ${position + 1}, replay $replay", grid.all { it.showWord })
+                }
             }
-            rounds.forEach { assertEquals(1, it.size) }
-            assertTrue("picked at random", rounds.toSet().size > 1)
-        }
-    }
-
-    @Test fun chapterOne_laterLetters_neverHideAWordAPictureNeeds() {
-        val insect = FindItPictureItem("i0", "i", "Insect", "images/pictures/picture_insect.png", isCorrect = true)
-        (1..30).forEach { seed ->
-            val grid = WordLabelPolicy.apply(clear + insect, chapter = 1, positionInChapter = 3, isReplay = false, random = Random(seed))
-            assertTrue(grid.first { it.word == "Insect" }.showWord)
-            assertEquals(1, grid.count { !it.showWord })
         }
     }
 
@@ -45,12 +35,12 @@ class WordLabelPolicyTest {
         assertTrue("picked at random", rounds.toSet().size > 1)
     }
 
-    @Test fun chapterThreeOn_andReplays_noWords() {
+    @Test fun chapterThreeOn_andReplaysFromChapterTwo_noWords() {
         (3..7).forEach { ch ->
             (0..3).forEach { pos -> assertTrue(WordLabelPolicy.apply(clear, ch, pos, isReplay = false).none { it.showWord }) }
         }
-        (0..3).forEach { pos ->
-            assertTrue(WordLabelPolicy.apply(clear, chapter = 1, positionInChapter = pos, isReplay = true).none { it.showWord })
+        (2..7).forEach { ch ->
+            (0..3).forEach { pos -> assertTrue(WordLabelPolicy.apply(clear, ch, pos, isReplay = true).none { it.showWord }) }
         }
     }
 
