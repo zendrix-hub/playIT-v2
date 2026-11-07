@@ -12,6 +12,7 @@ import com.playit.app.data.pdf.ReportLayout.NEXT_HEADER
 import com.playit.app.data.pdf.ReportLayout.PAGE_HEIGHT
 import com.playit.app.data.pdf.ReportLayout.PAGE_WIDTH
 import com.playit.app.data.pdf.ReportLayout.TABLE_HEADER
+import com.playit.app.domain.calculator.PracticeNext
 import com.playit.app.domain.manager.SoundCheckSummary
 import com.playit.app.domain.model.ChapterRecord
 import com.playit.app.domain.model.ProfileDashboardData
@@ -23,9 +24,10 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * Draws one page of the report in the form of a DepEd class record (adviser, 2026-11-05): a header with the school
- * fields to fill in by hand, a table with a level in words on every row, the legend and the signature lines. It draws
- * on any Canvas, so the PDF and the tests share it.
+ * Draws one page of the report, structured like a DepEd class record (adviser, 2026-11-05) but with nothing to fill
+ * in by hand (user decision 2026-11-07): a title, a table with a level in words on every row, and the legend. It is
+ * written for the facilitator, teacher first: each child's page says first which letters need help. It draws on any
+ * Canvas, so the PDF and the tests share it.
  */
 class ReportPageRenderer {
     private val ink = 0xFF3B2416.toInt()
@@ -111,15 +113,6 @@ class ReportPageRenderer {
         }
     }
 
-    private fun blank(c: Canvas, label: String, x: Float, y: Float, lineWidth: Float): Float {
-        text(c, label, x, y, 8.5f, muted)
-        p.textSize = 8.5f
-        p.typeface = regular
-        val start = x + p.measureText(label) + 4f
-        hline(c, start, y + 2f, start + lineWidth, ink, 0.6f)
-        return start + lineWidth + 18f
-    }
-
     // ------------------------------------------------------------------------------------------------ blocks
 
     private fun title(c: Canvas, heading: String): Float {
@@ -128,13 +121,7 @@ class ReportPageRenderer {
         y += 15f
         text(c, "Reading: letter sounds (Marungko approach), Grade 1. Made with PlayIT.", PAGE_WIDTH / 2f, y, 9f, muted,
             align = Paint.Align.CENTER)
-        y += 20f
-        var x = left
-        x = blank(c, "School:", x, y, 170f)
-        x = blank(c, "School Year:", x, y, 70f)
-        x = blank(c, "Grade and Section:", x, y, 100f)
-        blank(c, "Adviser:", x, y, 150f)
-        return y + 8f
+        return y + 6f
     }
 
     private fun footer(c: Canvas, page: Int, count: Int) {
@@ -152,30 +139,23 @@ class ReportPageRenderer {
         val colWidth = width / 2f
         levels.forEachIndexed { i, level ->
             val x = left + (i % 2) * colWidth
-            val rowY = y + (i / 2) * 15f
+            val rowY = y + (i / 2) * 13f
             val colors = LevelColors.of(level)
-            fill(c, x, rowY + 3f, x + 120f, rowY + 15f, colors.fill, radius = 3f)
-            text(c, level.label, x + 60f, rowY + 12f, 7.5f, colors.ink, isBold = true, align = Paint.Align.CENTER)
-            val band = level.band?.let { "Grade $it. " } ?: ""
-            text(c, band + level.remark, x + 126f, rowY + 12f, 7.8f, ink)
+            fill(c, x, rowY + 2f, x + 120f, rowY + 13f, colors.fill, radius = 3f)
+            text(c, level.label, x + 60f, rowY + 10.5f, 7.5f, colors.ink, isBold = true, align = Paint.Align.CENTER)
+            text(c, plainLine(level), x + 126f, rowY + 10.5f, 7.8f, ink)
         }
-        y += 4 * 15f + 14f
-        wrap(
-            "A letter is graded once the child finishes it. Say It and Find It show the right answers out of the " +
-                "tries. The score is the share of right answers in both; the grade is that score changed with the " +
-                "DepEd transmutation table (60% right is a grade of 75, 100% is 100). A chapter's grade is the " +
-                "average of its letters.",
-            width, 7.5f
-        ).forEach {
-            text(c, it, left, y, 7.5f, muted)
-            y += 10f
-        }
-        y += 16f
-        var x = left
-        x = blank(c, "Prepared by:", x, y, 190f)
-        x = blank(c, "Checked by:", x, y, 190f)
-        blank(c, "Date:", x, y, 90f)
-        text(c, "(parent, guardian or teacher)", left + 60f, y + 11f, 7f, muted)
+        y += 4 * 13f + 12f
+        text(c, "A finished letter's grade is its right answers in Say It and Find It, changed with the DepEd " +
+            "transmutation table (60% right is 75, all right is 100).", left, y, 7.5f, muted)
+    }
+
+    /** A level in a parent's words: "Grade 90-100: knows it very well." */
+    private fun plainLine(level: ProgressLevel): String = when {
+        level.band != null && level.needsPractice -> "Grade ${level.band}: ${level.parentLabel.lowercase()}. Practice it together."
+        level.band != null -> "Grade ${level.band}: ${level.parentLabel.lowercase()}."
+        level == ProgressLevel.IN_PROGRESS -> "Started, not finished yet."
+        else -> "Not played yet."
     }
 
     // ------------------------------------------------------------------------------------------------ class page
@@ -206,7 +186,12 @@ class ReportPageRenderer {
             x += classCols[2]
             (0 until 7).forEach { i ->
                 val chapter = learner.chapters.getOrNull(i)
-                if (chapter != null) levelCell(c, chapter.level, x, y, x + classCols[3 + i], b, 7f)
+                // Not started: a plain dash, so the eye goes to the coloured cells (user decision 2026-11-07).
+                if (chapter != null && ReportLayout.started(chapter)) {
+                    levelCell(c, chapter.level, x, y, x + classCols[3 + i], b, 7f)
+                } else {
+                    text(c, "-", x + classCols[3 + i] / 2f, y + 20f, 10f, muted, align = Paint.Align.CENTER)
+                }
                 x += classCols[3 + i]
             }
             levelCell(c, learner.overallLevel, x, y, x + classCols[10], b, 7.2f,
@@ -219,8 +204,8 @@ class ReportPageRenderer {
 
     // ------------------------------------------------------------------------------------------------ learner pages
 
-    private val cols = floatArrayOf(96f, 64f, 64f, 44f, 46f, 44f, 140f, 288f)
-    private val colNames = listOf("Letter and word", "Say It", "Find It", "Stars", "Score", "Grade", "Level", "Remarks")
+    private val cols = floatArrayOf(190f, 130f, 130f, 110f, 226f)
+    private val colNames = listOf("Letter and word", "Say It (right of tries)", "Find It (right of taps)", "Grade", "Level")
 
     private fun drawLearnerPage(c: Canvas, page: ReportLayout.LearnerPage, report: ReportData) {
         val learner = page.learner
@@ -238,7 +223,7 @@ class ReportPageRenderer {
             fill(c, left, y, right, y + TABLE_HEADER, headFill)
             var x = left
             colNames.forEachIndexed { i, h ->
-                val alignLeft = i == 0 || i == colNames.lastIndex
+                val alignLeft = i == 0
                 text(c, h, if (alignLeft) x + 4f else x + cols[i] / 2f, y + 13f, 7.8f, ink, isBold = true,
                     align = if (alignLeft) Paint.Align.LEFT else Paint.Align.CENTER)
                 x += cols[i]
@@ -249,6 +234,7 @@ class ReportPageRenderer {
                     is ReportLayout.ChapterRow -> chapterRow(c, row.chapter, y)
                     is ReportLayout.LetterRow -> letterRow(c, row, y)
                     is ReportLayout.BlendRow -> blendRow(c, row.chapter, y)
+                    is ReportLayout.NotStartedRow -> notStartedRow(c, row, y)
                 }
                 y += row.height
             }
@@ -263,20 +249,22 @@ class ReportPageRenderer {
         text(c, "Date made: ${report.generatedDate}", right, y, 9f, ink, align = Paint.Align.RIGHT)
         y += 8f
         fill(c, left, y, right, y + 34f, chapterFill, radius = 6f)
-        text(c, "Overall so far", left + 10f, y + 21f, 9.5f, ink, isBold = true)
-        levelCell(c, learner.overallLevel, left + 92f, y + 4f, left + 232f, y + 30f, 8.5f)
-        var x = left + 244f
-        learner.overallGrade?.let {
-            text(c, "Average grade $it", x, y + 21f, 9f, ink)
-            x += 104f
-        }
-        val facts = listOfNotNull(
-            "Learned ${learner.completedLettersCount} of ${learner.totalLettersCount} sounds",
-            "Word games done: ${learner.blendItCompletedCount} of ${learner.blendItTotalCount}",
-            "Stars: ${learner.totalStars}",
-            learner.recentScore?.let { "Last 7 days: $it% right" }
-        )
-        text(c, facts.joinToString("     "), x, y + 21f, 9f, ink)
+        text(c, "Learned ${learner.completedLettersCount} of ${learner.totalLettersCount} sounds", left + 10f, y + 21f,
+            10f, ink, isBold = true)
+        levelCell(c, learner.overallLevel, left + 200f, y + 4f, left + 400f, y + 30f, 8.5f,
+            suffix = learner.overallGrade?.let { "grade $it" })
+        text(c, "Word games done: ${learner.blendItCompletedCount} of ${learner.blendItTotalCount}", left + 420f, y + 21f,
+            10f, ink, isBold = true)
+        y += 34f + 16f
+        text(c, needsHelp(learner), left + 10f, y, 10f, ink, isBold = true)
+    }
+
+    /** The first thing the facilitator reads: the same letters as the Parent Zone's "Practice next". */
+    private fun needsHelp(learner: ProfileDashboardData): String = when (val pick = PracticeNext.of(learner.chapters)) {
+        is PracticeNext.Pick.NeedsHelp -> "Needs help with: ${PracticeNext.names(pick.letters)}"
+        is PracticeNext.Pick.PlayingNow -> "No letter needs extra help. Playing now: ${PracticeNext.names(listOf(pick.letter))}"
+        PracticeNext.Pick.AllGood ->
+            if (learner.completedLettersCount > 0) "No letter needs extra help right now." else "Not played yet."
     }
 
     private fun period(learner: ProfileDashboardData): String {
@@ -307,23 +295,25 @@ class ReportPageRenderer {
         val cells = listOf(
             if (l.sayItAttempts > 0) "${l.sayItCorrect} of ${l.sayItAttempts}" else "-",
             if (l.findItAttempts > 0) "${l.findItCorrect} of ${l.findItAttempts}" else "-",
-            if (l.isCompleted) "${l.starsEarned}" else "-",
-            // A score and a grade only for a finished letter, as the level: "Still learning" shows no 0%.
-            if (l.isCompleted) l.score?.let { "$it%" } ?: "-" else "-",
+            // A grade only for a finished letter, as the level: "Still learning" shows no grade.
             if (l.isCompleted) l.grade?.toString() ?: "-" else "-"
         )
         cells.forEachIndexed { i, s ->
             text(c, s, x + cols[i + 1] / 2f, base, 8.5f, ink, align = Paint.Align.CENTER)
             x += cols[i + 1]
         }
-        levelCell(c, l.level, x, top, x + cols[6], b, 7.5f)
-        x += cols[6]
-        text(c, l.level.remark, x + 4f, base, 8f, muted)
+        levelCell(c, l.level, x, top, x + cols[4], b, 7.5f)
         hline(c, left, b, right)
     }
 
+    private fun notStartedRow(c: Canvas, row: ReportLayout.NotStartedRow, top: Float) {
+        text(c, "Not started yet: ${ReportLayout.chapterNames(row.chapters)}.", left + 4f, top + 11.5f, 8.5f, muted,
+            isBold = true)
+        hline(c, left, top + row.height, right)
+    }
+
     private fun blendRow(c: Canvas, chapter: ChapterRecord, top: Float) {
-        val s = if (chapter.blendItCompleted) "done, ${chapter.blendItStars} of 3 stars" else "not yet"
+        val s = if (chapter.blendItCompleted) "done" else "not yet"  // no stars: a game reward, not learning
         val check = SoundCheckSummary.describe(chapter.soundChecks)
         text(c, "Word game (Blend It) for chapter ${chapter.chapter}: $s.   Sound check: $check.", left + 26f, top + BLEND_ROW - 4f, 8f, muted)
         hline(c, left, top + BLEND_ROW, right)

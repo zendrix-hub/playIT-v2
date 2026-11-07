@@ -26,15 +26,29 @@ class ReportLayoutTest {
         assertEquals(listOf("Frog", "Bear", "Owl"), learners.filter { it.first }.map { it.learner.profile.name })
     }
 
-    @Test fun everyRowIsOnAPage_andEachChildEndsWithTheLegend() {
-        listOf(frog, bear, owl).forEach { learner ->
+    /**
+     * User decisions 2026-11-07: only the chapters a child has started get rows (a chapter line, its letters, its word
+     * game), then one line for the rest; every row is on a page, and each child ends with the legend.
+     */
+    @Test fun onlyStartedChapters_thenOneLineForTheRest_onOnePage() {
+        mapOf(frog to listOf(1, 2, 3), bear to listOf(1, 2), owl to emptyList()).forEach { (learner, started) ->
             val pages = ReportLayout.learnerPages(learner)
-            assertEquals("${learner.profile.name}: 7 chapters, 26 letters, 7 word games", 40, pages.sumOf { it.rows.size })
-            assertEquals(ReportLayout.rows(learner), pages.flatMap { it.rows })
+            val rows = pages.flatMap { it.rows }
+            assertEquals(ReportLayout.rows(learner), rows)
+            assertEquals(started, rows.filterIsInstance<ReportLayout.ChapterRow>().map { it.chapter.chapter })
+            val letters = learner.chapters.filter { it.chapter in started }.sumOf { it.letters.size }
+            assertEquals(letters, rows.count { it is ReportLayout.LetterRow })
+            assertEquals((1..7).filterNot { it in started }, rows.filterIsInstance<ReportLayout.NotStartedRow>().single().chapters)
             assertTrue(pages.last().closing)
             assertEquals(1, pages.count { it.closing })
-            assertTrue("fits in two pages", pages.size <= 2)
+            assertEquals("${learner.profile.name} fits on one page", 1, pages.size)
         }
+    }
+
+    @Test fun chapterNames_readAsARangeOrAList() {
+        assertEquals("Chapter 7", ReportLayout.chapterNames(listOf(7)))
+        assertEquals("Chapters 4 to 7", ReportLayout.chapterNames(listOf(4, 5, 6, 7)))
+        assertEquals("Chapters 3, 5 and 7", ReportLayout.chapterNames(listOf(7, 3, 5)))
     }
 
     @Test fun noPage_runsPastItsBottom() {
