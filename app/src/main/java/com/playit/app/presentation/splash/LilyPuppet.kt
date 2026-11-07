@@ -487,49 +487,45 @@ private fun DrawScope.drawFace(
 }
 
 /**
- * Her paw as her pictures draw it (user, 2026-11-07: the old one looked "kind of wierd"): a round palm and four thin
- * fingers, each ending in a round pad, a tarsier's hand. [fingers] run from each finger's root to its pad.
+ * Her paw holding the panel, as the user picked it (2026-11-08, picture 1 of the Canva set "her holding the panel"):
+ * a soft rounded mitten in her orange, wrapped over the panel's top edge, with a darker shade along its lower side and
+ * three small creases on its front for her fingers. The earlier paws (a palm with padded fingers) looked "kind of
+ * wierd". [body] is the mitten; [creases] run from the top of each crease to its bottom.
  */
-internal class Paw(val palm: Offset, val palmR: Float, val fingers: List<Pair<Offset, Offset>>, val fingerW: Float, val padR: Float)
+internal class Paw(val body: Rect, val corner: Float, val creases: List<Pair<Offset, Offset>>, val creaseW: Float)
 
 /**
- * A paw holding the panel's edge at [edgeY], centred at [x], with a palm of radius [r]: the palm sits on the edge and
- * covers the end of her arm, the fingers curl over it, and their pads rest on its front in a shallow arc, clear of
- * each other and of the Start button below.
+ * A paw holding the panel's edge at [edgeY], centred at [x], sized by [r] (a little more than half her arm's width):
+ * its upper part above the edge covers the end of her arm, its front with the creases hangs over the edge, clear of
+ * the Start button below.
  */
 internal fun paw(x: Float, edgeY: Float, r: Float): Paw {
-    val palm = Offset(x, edgeY - 0.55f * r)
-    // Fanned as in her pictures: the middle two curl down over the edge, the outer two spread along it, so each thin
-    // finger shows between the palm and its pad and the pads stay clear of the Start button.
-    val fingers = PAW_FINGER_ANGLES.map { deg ->
-        val a = Math.toRadians(deg.toDouble())
-        val dir = Offset(kotlin.math.sin(a).toFloat(), kotlin.math.cos(a).toFloat())
-        palm + dir * (0.55f * r) to palm + dir * (1.65f * r)
+    val body = Rect(x - 1.2f * r, edgeY - 0.85f * r, x + 1.2f * r, edgeY + 1.0f * r)
+    val creases = listOf(-0.5f, 0f, 0.5f).map { dx ->
+        Offset(x + dx * r, edgeY + 0.3f * r) to Offset(x + dx * r * 1.1f, edgeY + 0.82f * r)
     }
-    // As thick and as round as in her pictures: fingers 0.3 of the palm, pads 0.42.
-    return Paw(palm, r, fingers, fingerW = 0.3f * r, padR = 0.42f * r)
+    return Paw(body, corner = 0.9f * r, creases = creases, creaseW = 0.14f * r)
 }
 
-/** Each finger's angle from straight down, in degrees. */
-private val PAW_FINGER_ANGLES = listOf(-65f, -28f, 28f, 65f)
-
-/** Her hands on the panel's edge, in front of it, fingers over it (the edge is 14 dp below this drawing's top). */
+/** Her hands on the panel's edge, in front of it, holding it (the edge is 14 dp below this drawing's top). */
 @Composable
 internal fun LilyHands(modifier: Modifier = Modifier) {
     Spacer(
         modifier = modifier.drawWithCache {
             val w = size.width
             val edgeY = 14.dp.toPx()
-            // A palm a little wider than her arm (0.06 of her figure, about 0.124 of this width), so it covers its end.
+            // Wider than her arm (0.06 of her figure, about 0.124 of this width), so the mitten covers its end.
             val r = minOf(w * 0.064f, 15.dp.toPx())
             val paws = listOf(w * 0.18f, w * 0.82f).map { paw(it, edgeY, r) }
             onDrawBehind {
                 paws.forEach { pw ->
-                    pw.fingers.forEach { (root, pad) ->
-                        drawLine(LilyOrangeShade, root, pad, strokeWidth = pw.fingerW, cap = StrokeCap.Round)
-                        drawCircle(LilyOrangeShade, pw.padR, pad)
+                    val c = CornerRadius(pw.corner)
+                    // Her shade along the lower side, then her orange over the rest, as her pictures shade a part.
+                    drawRoundRect(LilyOrangeShade, pw.body.topLeft, pw.body.size, c)
+                    drawRoundRect(LilyOrange, pw.body.topLeft, Size(pw.body.width, pw.body.height * 0.88f), c)
+                    pw.creases.forEach { (a, b) ->
+                        drawLine(LilyOrangeShade, a, b, strokeWidth = pw.creaseW, cap = StrokeCap.Round)
                     }
-                    drawCircle(LilyOrangeShade, pw.palmR, pw.palm)
                 }
             }
         }

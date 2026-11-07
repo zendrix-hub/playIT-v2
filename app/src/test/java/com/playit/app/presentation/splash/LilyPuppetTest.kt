@@ -57,23 +57,20 @@ class LilyPuppetTest {
         assertTrue("lean $lean", lean in 3f..5f)
     }
 
-    /** Her paws as her pictures draw them (user, 2026-11-07: the old paw looked "kind of wierd"). */
-    @Test fun herPaws_aPalmAndFourPaddedFingers_overTheEdge() {
+    /** Her paws holding the panel as the user picked them (2026-11-08, Canva picture 1): soft mittens over the edge. */
+    @Test fun herPaws_softMittensHoldingTheEdge() {
         val edge = 100f
         val r = 16f
         val pw = paw(200f, edge, r)
-        assertEquals(4, pw.fingers.size)
-        assertTrue("the palm sits on the edge", pw.palm.y in (edge - r)..edge)
-        val pads = pw.fingers.map { it.second }
-        pads.forEach { pad ->
-            assertTrue("each pad on the panel's front", pad.y > edge)
-            assertTrue("clear of the Start button", pad.y + pw.padR <= edge + 1.4f * r)
-            assertTrue("a thin finger shows between palm and pad", (pad - pw.palm).getDistance() - pw.palmR - pw.padR > 0.15f * r)
+        assertTrue("over the edge: part above it", pw.body.top < edge && pw.body.bottom > edge)
+        assertTrue("clear of the Start button", pw.body.bottom <= edge + 1.4f * r)
+        assertTrue("wider than her arm (about 1.9 r)", pw.body.width > 1.9f * r)
+        assertEquals("three creases, four fingers", 3, pw.creases.size)
+        pw.creases.forEach { (a, b) ->
+            assertTrue("each crease on the front, below the edge", a.y > edge && b.y < pw.body.bottom)
+            assertTrue("inside the mitten", a.x in pw.body.left..pw.body.right && b.x in pw.body.left..pw.body.right)
         }
-        pads.zipWithNext().forEach { (a, b) ->
-            assertTrue("pads apart, not one blob", (b - a).getDistance() > 2f * pw.padR)
-        }
-        assertTrue("fingers thinner than their round pads", pw.fingerW < 2f * pw.padR && pw.padR < pw.palmR / 2f)
+        assertTrue("soft and round", pw.corner >= 0.4f * pw.body.height)
     }
 
     @Test fun herEyes_followTheOpening() {
