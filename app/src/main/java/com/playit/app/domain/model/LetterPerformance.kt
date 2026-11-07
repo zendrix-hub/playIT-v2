@@ -20,7 +20,9 @@ data class LetterPerformance(
     val isCompleted: Boolean,
     val score: Int?,
     val grade: Int?,
-    val level: ProgressLevel
+    val level: ProgressLevel,
+    /** The letter's key-word picture (`Phoneme.imagePath`), for the Parent Zone's letter details. */
+    val imagePath: String = ""
 ) {
     val totalAttempts: Int get() = sayItAttempts + findItAttempts
     val failedAttempts: Int get() = totalAttempts - sayItCorrect - findItCorrect

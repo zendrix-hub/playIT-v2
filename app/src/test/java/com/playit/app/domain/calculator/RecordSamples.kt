@@ -20,7 +20,7 @@ object RecordSamples {
         .mapIndexed { index, chapter -> index + 1 to chapter }.toMap()
 
     val phonemes = letters.mapIndexed { i, l ->
-        Phoneme(i + 1, l, "audio/phonemes/phoneme_$l.mp3", "images/pictures/picture.png", words[i])
+        Phoneme(i + 1, l, "audio/phonemes/phoneme_$l.mp3", "images/pictures/picture_${words[i].lowercase()}.png", words[i])
     }
 
     /** A learner who has finished [done] letters, each with [sayMisses] Say It and [findMisses] Find It misses. */

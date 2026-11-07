@@ -46,64 +46,33 @@ fun BadgeCollectionCase(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         border = BorderStroke(2.5.dp, ModernBorder)
     ) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            // Header
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(SunnyGoldLight)
-                        .border(2.dp, SunnyGold, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.AutoAwesome,
-                        contentDescription = "Badges",
-                        tint = SunnyGoldDark,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.size(10.dp))
-
-                Column {
-                    Text(
-                        text = "Companion Badges",
-                        fontFamily = LexendFontFamily,
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = TextMidnight
-                    )
-                    Text(
-                        text = "Animal explorer stamps earned",
-                        fontFamily = LexendFontFamily,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = TextMuted
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // 6 Avatars / Badges
+        // One compact row (user decision 2026-11-07): the count, then the six companions.
+        Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp)) {
+            val unlocked = (1..6).count { badgeUnlocked(it, completedLettersCount) }
+            Text(
+                text = "Badges: $unlocked of 6",
+                fontFamily = LexendFontFamily,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = TextMidnight
+            )
+            Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 (1..6).forEach { avatarId ->
-                    val isUnlocked = avatarId <= 1 || completedLettersCount >= (avatarId - 1) * 4
-                    CompanionBadgeSlot(avatarId = avatarId, isUnlocked = isUnlocked)
+                    CompanionBadgeSlot(avatarId = avatarId, isUnlocked = badgeUnlocked(avatarId, completedLettersCount))
                 }
             }
         }
     }
 }
+
+/** The first companion from the start, then one more every 4 letters. */
+fun badgeUnlocked(avatarId: Int, completedLettersCount: Int): Boolean =
+    avatarId <= 1 || completedLettersCount >= (avatarId - 1) * 4
 
 @Composable
 private fun CompanionBadgeSlot(

@@ -55,7 +55,8 @@ object ProgressRecordCalculator {
             isCompleted = isCompleted,
             score = score,
             grade = grade,
-            level = level
+            level = level,
+            imagePath = phoneme.imagePath
         )
     }
 

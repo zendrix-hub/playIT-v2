@@ -40,15 +40,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.playit.app.presentation.components.GummyBackButton
 import com.playit.app.presentation.components.GummyButton
-import androidx.compose.foundation.lazy.items
 import com.playit.app.presentation.dashboard.components.BadgeCollectionCase
-import com.playit.app.presentation.dashboard.components.ChapterRecordCard
-import com.playit.app.presentation.dashboard.components.ClassRecordCard
+import com.playit.app.presentation.dashboard.components.ChildrenCard
 import com.playit.app.presentation.dashboard.components.LearnerHeroCard
-import com.playit.app.presentation.dashboard.components.LevelLegendCard
-import com.playit.app.presentation.dashboard.components.PracticeAtHomeCard
+import com.playit.app.presentation.dashboard.components.LetterGridCard
 import com.playit.app.presentation.dashboard.components.PrivacyNoticeDialog
-import com.playit.app.presentation.dashboard.components.ProfileSwitcherDropdown
 import com.playit.app.presentation.dashboard.components.VoiceCreditLine
 import androidx.compose.ui.graphics.Color
 import com.playit.app.presentation.theme.*
@@ -127,7 +123,7 @@ fun ParentDashboardScreen(
                 .fillMaxSize()
                 .statusBarsPadding()
                 .navigationBarsPadding()
-                .padding(horizontal = 18.dp, vertical = 12.dp)
+                .padding(horizontal = 14.dp, vertical = 12.dp)
         ) {
             // Header Row: Back button, Title & PDF Export CTA
             Row(
@@ -143,12 +139,15 @@ fun ParentDashboardScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.weight(1f)
                 ) {
+                    // One line, so the child's summary starts high enough to show on the smallest phone.
                     Text(
                         text = "How your child is doing",
                         fontFamily = LexendFontFamily,
-                        fontSize = 22.sp,
+                        fontSize = 19.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = TextMidnight
+                        color = TextMidnight,
+                        maxLines = 1,
+                        softWrap = false
                     )
                     Text(
                         text = "Reading: letter sounds",
@@ -159,35 +158,11 @@ fun ParentDashboardScreen(
                     )
                 }
 
-                // Balances the back button, so the title stays centred.
-                Spacer(modifier = Modifier.size(64.dp))
+                // Balances the back button a little; the title needs most of the row on a small phone.
+                Spacer(modifier = Modifier.size(8.dp))
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-
-            // The PDF report, in its own row so it never squeezes the title on a small phone.
-            GummyButton(
-                text = if (uiState.exportStatus is ExportStatus.Exporting) "Making the PDF report" else "Make the PDF report",
-                icon = Icons.Filled.PictureAsPdf,
-                onClick = { viewModel.exportPdfReport() },
-                backgroundColor = PrimaryJoy,
-                shadowColor = PrimaryJoyShadow,
-                contentColor = Color.White,
-                enabled = uiState.exportStatus !is ExportStatus.Exporting && uiState.profiles.isNotEmpty(),
-                fontSize = 16,
-                modifier = Modifier.heightIn(min = 52.dp)
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Profile Switcher Dropdown
-            ProfileSwitcherDropdown(
-                profiles = uiState.profiles,
-                selectedProfile = uiState.selectedProfile,
-                onProfileSelect = { profile -> viewModel.selectProfile(profile) }
-            )
-
-            Spacer(modifier = Modifier.height(14.dp))
 
             if (uiState.isLoading) {
                 Box(
@@ -205,11 +180,13 @@ fun ParentDashboardScreen(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
+                        // Short and plain, top to bottom (user decisions 2026-11-07): a row per child, the child's
+                        // summary, the letters, then the PDF report, the badges and the small links.
                         if (uiState.classRecord.size > 1) {
                             item {
-                                ClassRecordCard(
+                                ChildrenCard(
                                     learners = uiState.classRecord,
                                     selectedId = uiState.selectedProfile?.id,
                                     onSelect = { viewModel.selectProfile(it) }
@@ -223,11 +200,21 @@ fun ParentDashboardScreen(
                                 onDelete = { viewModel.deleteProfile(dashboardData.profile) }
                             )
                         }
-                        item { PracticeAtHomeCard(data = dashboardData) }
-                        items(dashboardData.chapters, key = { "chapter_${it.chapter}" }) { chapter ->
-                            ChapterRecordCard(chapter)
+                        item { LetterGridCard(chapters = dashboardData.chapters) }
+                        item {
+                            // The report for the teacher, or the parent's records: every child on this phone.
+                            GummyButton(
+                                text = if (uiState.exportStatus is ExportStatus.Exporting) "Making the PDF report" else "Make the PDF report",
+                                icon = Icons.Filled.PictureAsPdf,
+                                onClick = { viewModel.exportPdfReport() },
+                                backgroundColor = PrimaryJoy,
+                                shadowColor = PrimaryJoyShadow,
+                                contentColor = Color.White,
+                                enabled = uiState.exportStatus !is ExportStatus.Exporting && uiState.profiles.isNotEmpty(),
+                                fontSize = 16,
+                                modifier = Modifier.heightIn(min = 52.dp)
+                            )
                         }
-                        item { LevelLegendCard() }
                         item { BadgeCollectionCase(completedLettersCount = dashboardData.completedLettersCount) }
                         item {
                             Box(

@@ -25,7 +25,8 @@ fun VoiceCreditLine(modifier: Modifier = Modifier) {
     Text(
         text = VOICE_CREDIT,
         fontFamily = LexendFontFamily,
-        fontSize = 12.sp,
+        fontSize = 14.sp,  // the smallest text in the Parent Zone (user decision 2026-11-07)
+        lineHeight = 18.sp,
         color = TextMuted,
         textAlign = TextAlign.Center,
         modifier = modifier.fillMaxWidth().padding(bottom = 16.dp).testTag("parent_voice_credit")
