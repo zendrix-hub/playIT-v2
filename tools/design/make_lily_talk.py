@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Make Lily's talking frames: each released pose with its mouth painted out, for TalkingLily.
 
+RETIRED 2026-11-07: this is for the old Lily (image release 2026-10-12-mascot) only. The user redesigned her
+(image release 2026-11-07-new-lily); her talking frames come from tools/images/make_new_lily.py. The mouth boxes
+below are the old pictures', so run on the new ones this would paint the wrong places; it refuses to.
+
 The app draws Lily's moving mouth in code (presentation/components/TalkingLily.kt) on top of these frames, so the
 mouth can follow her voice. Lily herself is not redrawn: each frame is the released picture
 (images/mascot/lily_<pose>.png, image release 2026-10-12-mascot) with only the mouth replaced by the face around it.
@@ -92,6 +96,7 @@ def remove_mouth(pose):
 
 
 def main():
+    raise SystemExit("retired: the new Lily's talking frames come from tools/images/make_new_lily.py")
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--sheet", help="also write a before and after sheet, zoomed on the faces")
     args = parser.parse_args()

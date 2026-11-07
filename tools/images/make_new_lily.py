@@ -21,7 +21,8 @@ For every pose it:
 Usage:
   python -I tools/images/make_new_lily.py <batch>
   python -I tools/images/make_new_lily.py <batch> --release <docs/image-release/<date>> --csv <review csv>
-      copies the takes the user marked OK into the release folder with its manifest.json
+      copies the takes the user marked OK into the release folder with its manifest.json;
+      add --install app to copy them into the app (mascot pictures into assets, the icon into res)
 Needs NumPy, SciPy and Pillow.
 """
 import argparse
@@ -458,6 +459,11 @@ def write_review(batch, meta):
                  "pics": ["out/icon/ic_launcher.png", "out/icon/ic_launcher_round.png", "out/icon/adaptive_circle.png",
                           "out/icon/adaptive_squircle.png"],
                  "what": "square and round icons (older phones), then the adaptive icon as a circle and a rounded square"})
+    if (batch / "out" / "splash").exists():  # the opening's Lily, drawn in code (LilyPuppet.kt), as tests render it
+        rows.append({"file": "opening_lily", "group": "Opening screen (Lily drawn in the app's code)",
+                     "source": "LilyPuppet.kt redrawn in the new design; she moves, blinks, looks about and answers taps",
+                     "pics": [f"out/splash/splash_{n}.png" for n in ("compact", "a21s", "phone", "tablet")],
+                     "what": "the first screen on four phone sizes (small, Galaxy A21s, phone, tablet)"})
     data = json.dumps(rows).replace("</", "<\\/")
     page = f"""<!doctype html>
 <meta charset="utf-8">
@@ -466,7 +472,7 @@ def write_review(batch, meta):
 body {{ font-family: system-ui, sans-serif; margin: 24px; color: #1d2b36; }}
 .row {{ display: flex; gap: 16px; align-items: center; border-bottom: 1px solid #dde3e8; padding: 10px 0; flex-wrap: wrap; }}
 .tile {{ width: 200px; height: 200px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }}
-.tile img {{ width: 192px; height: 192px; }}
+.tile img {{ width: 192px; height: 192px; object-fit: contain; }}
 .light {{ background: #fff8ef; }} .dark {{ background: #24343f; }} .green {{ background: #cfe8c0; }}
 h2 {{ background: #eef3f7; padding: 6px 8px; margin: 18px 0 0; font-size: 1.05em; }}
 .bar {{ position: sticky; top: 0; background: #fff; padding: 8px 0; border-bottom: 2px solid #1d2b36; z-index: 2; }}
@@ -550,13 +556,54 @@ def release(batch, out_dir, csv_path):
                 "tool": "tools/images/make_new_lily.py", "eyes512": meta[pose]["eyes"], "mouthBox512": meta[pose]["mouth"],
                 "reviewCsv": pathlib.Path(csv_path).name, "userVerdict": "OK",
                 "userNote": rows[f"lily_{pose}.png"]["note"].strip(), "sha256": sha256(dest)})
+    icon = rows.get("app_icon")
+    if icon and icon["OK_or_FIX"].strip().upper() == "OK":
+        (out_dir / "icon").mkdir(exist_ok=True)
+        for name in ICON_FILES:
+            dest = out_dir / "icon" / f"{name}.png"
+            shutil.copyfile(batch / "out" / "icon" / f"{name}.png", dest)
+            images.append({
+                "itemId": name, "file": f"icon/{name}.png", "resPath": ICON_RES[name],  # not appPath: not an asset
+                "word": "the app icon: her head from the idle picture on the old icon's cream tile",
+                "sourceBatch": batch.name, "pick": f"out/icon/{name}.png", "source": "release mascot/lily_idle.png",
+                "tool": "tools/images/make_new_lily.py (make_icon)", "reviewCsv": pathlib.Path(csv_path).name,
+                "userVerdict": "OK", "userNote": icon["note"].strip(), "sha256": sha256(dest)})
     manifest = {"release": out_dir.name, "approvedBy": f"user: OK marks on review page {batch.name} ({pathlib.Path(csv_path).name})",
                 "decision": "user, 2026-11-07: \"this is our updated mascot i want you to change the moscots on the app to that\"; "
                             "listening and pointing from Canva (user: \"you can make that on canva the new poses but be sure to not to change the design of the mascot\")",
+                "teacherAudit": "pending, required before merge to main",
                 "images": images}
     (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     shutil.copyfile(csv_path, out_dir / pathlib.Path(csv_path).name)
     print(f"released {len(images)} images to {out_dir}: {picks}")
+
+
+ICON_FILES = ("ic_launcher", "ic_launcher_round", "ic_launcher_foreground", "ic_launcher_background")
+ICON_RES = {n: f"res/mipmap-*dpi/{n}.png (48 to 192 px), res/drawable-xxxhdpi" for n in ICON_FILES}
+# The sizes the old icon set used (scripts/generate_splash_style_app_icon.py), so only the pictures change.
+DENSITIES = {"mipmap-mdpi": 48, "mipmap-hdpi": 72, "mipmap-xhdpi": 96, "mipmap-xxhdpi": 144, "mipmap-xxxhdpi": 192}
+
+
+def install(release_dir, app_dir):
+    """Copies a release into the app: the mascot pictures into assets/images/mascot, and the icon into res, at the
+    old icon set's sizes (the Play Store picture and the adaptive layers at 512 in drawable-xxxhdpi)."""
+    release_dir, app_dir = pathlib.Path(release_dir), pathlib.Path(app_dir)
+    m = json.loads((release_dir / "manifest.json").read_text(encoding="utf-8"))
+    for e in m["images"]:
+        src = release_dir / e["file"]
+        assert sha256(src) == e["sha256"], e["file"]
+        if e.get("appPath", "").startswith("images/"):
+            shutil.copyfile(src, app_dir / "src" / "main" / "assets" / e["appPath"])
+    res = app_dir / "src" / "main" / "res"
+    if (release_dir / "icon").exists():
+        pics = {n: Image.open(release_dir / "icon" / f"{n}.png") for n in ICON_FILES}
+        for folder, px in DENSITIES.items():
+            for n, im in pics.items():
+                im.resize((px, px), Image.LANCZOS).save(res / folder / f"{n}.png")
+        pics["ic_launcher"].save(res / "drawable-xxxhdpi" / "ic_launcher_playstore.png")
+        pics["ic_launcher_foreground"].save(res / "drawable-xxxhdpi" / "ic_launcher_foreground.png")
+        pics["ic_launcher_background"].save(res / "drawable-xxxhdpi" / "ic_launcher_background.png")
+    print(f"installed {release_dir.name} into {app_dir}")
 
 
 def main(argv=None):
@@ -564,10 +611,13 @@ def main(argv=None):
     ap.add_argument("batch")
     ap.add_argument("--release")
     ap.add_argument("--csv")
+    ap.add_argument("--install", help="the app folder (app/): copy the release's pictures and icon into it")
     a = ap.parse_args(argv)
     batch = pathlib.Path(a.batch)
     if a.release:
         release(batch, a.release, a.csv)
+        if a.install:
+            install(a.release, a.install)
     else:
         build(batch)
 
