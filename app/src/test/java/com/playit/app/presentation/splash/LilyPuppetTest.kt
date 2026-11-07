@@ -14,17 +14,22 @@ class LilyPuppetTest {
     @Test fun herShape_keepsHerFaceClearOfStartAndHerHeadOnScreen() {
         val s = LILY_SHAPE
         assertTrue("face ends at ${faceBottom(s)}", faceBottom(s) < LILY_FACE_BOTTOM)
-        // Her drawing is 0.92 of its height wide: her head must fit in it.
-        assertTrue(s.headRx * FIGURE_SCALE <= 0.46f)
-        assertTrue("the head sits on the body", s.headY + s.headRy > s.bodyY - s.bodyR)
+        // Her drawing is 0.92 of its height wide: her head and ears must fit in it.
+        assertTrue((s.earX + s.earR) * FIGURE_SCALE <= 0.46f)
+        assertTrue(s.bodyHalfW * FIGURE_SCALE <= 0.46f)
+        // The new Lily (2026-11-07): her eye rings sit on her body, their side tabs just reach past its edge.
+        assertTrue("eye rings inside her body", s.eyeX + s.glassesR < s.bodyHalfW)
+        assertTrue("tabs reach her edge", s.templeX in s.bodyHalfW..(s.bodyHalfW + 0.02f))
+        assertTrue("the white, its ring and the glasses round it", s.eyeR < s.ringR && s.ringR < s.glassesR)
+        assertTrue("her ears' tops are her figure's top", s.earY - s.earR in -0.001f..0.001f)
     }
 
     @Test fun herEyes_areHerPictures_bigPupilsThatStillMove() {
-        // lily_idle.png: the pupil fills about 0.7 of the cream patch, and leaves room to look about.
+        // lily_idle.png (new Lily): the pupil fills about two thirds of the white, and leaves room to look about.
         val s = LILY_SHAPE
-        assertTrue(s.pupilR / s.eyeR in 0.66f..0.74f)
+        assertTrue(s.pupilR / s.eyeR in 0.6f..0.72f)
         assertTrue("room to look about", (s.eyeR - s.pupilR) * 0.9f > 0.02f)
-        assertTrue("the shade is a thin crescent", SHADE_SHIFT in 0.03f..0.06f)
+        assertTrue("the shade is a thin band", SHADE_SHIFT in 0.03f..0.06f)
     }
 
     @Test fun herEyes_followTheOpening() {

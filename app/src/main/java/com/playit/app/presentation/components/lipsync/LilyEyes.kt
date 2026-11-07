@@ -5,20 +5,21 @@ import kotlin.math.PI
 import kotlin.math.sin
 
 /**
- * Where a pose's two eyes are in its 512 x 512 picture (their cream patches, measured from the released pictures),
- * so a drawn lid can close them for a blink.
+ * Where a pose's two eyes are in its 512 x 512 picture: the white of each eye inside its ring, measured from the
+ * released pictures by tools/images/make_new_lily.py (measurements.json), so a drawn lid can close them for a blink.
+ * Each eye has its own height, because she tilts her head in some poses.
  */
-data class PoseEyes(val leftX: Float, val rightX: Float, val y: Float, val radius: Float)
+data class PoseEyes(val leftX: Float, val leftY: Float, val rightX: Float, val rightY: Float, val radius: Float)
 
 /** The eyes of [pose]; null for celebrating, whose eyes are already closed in a happy curve. */
 fun poseEyes(pose: MascotState): PoseEyes? = when (pose) {
     MascotState.CELEBRATING -> null
-    MascotState.ENCOURAGING -> PoseEyes(210f, 300f, 182f, 38f)
-    MascotState.IDLE -> PoseEyes(204f, 294f, 182f, 38f)
-    MascotState.LISTENING -> PoseEyes(204f, 294f, 182f, 38f)
-    MascotState.POINTING -> PoseEyes(202f, 292f, 182f, 38f)
-    MascotState.THINKING -> PoseEyes(216f, 306f, 182f, 38f)
-    MascotState.WAVING -> PoseEyes(208f, 296f, 182f, 38f)
+    MascotState.ENCOURAGING -> PoseEyes(207.5f, 188.5f, 303.5f, 188.5f, 33.5f)
+    MascotState.IDLE -> PoseEyes(209f, 189.5f, 302.5f, 189.5f, 33.4f)
+    MascotState.LISTENING -> PoseEyes(221f, 178.5f, 312.5f, 195.5f, 33.1f)
+    MascotState.POINTING -> PoseEyes(210f, 181f, 304.5f, 181f, 33.1f)
+    MascotState.THINKING -> PoseEyes(237.5f, 180f, 327.5f, 211f, 33.7f)
+    MascotState.WAVING -> PoseEyes(208.5f, 186f, 303.5f, 186f, 33.7f)
 }
 
 /** One blink: the eyes shut in 70 ms, stay shut 40 ms and open in 90 ms. */

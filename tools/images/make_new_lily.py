@@ -524,16 +524,23 @@ document.getElementById("clear").onclick = () => {{ if (confirm("Clear every ans
     (batch / "index.html").write_text(page, encoding="utf-8")
 
 
-def release(batch, out_dir, csv_path):
+def release(batch, out_dir, csv_path, choose=None):
+    """[choose] {app pose: take} settles a pose whose takes the user all marked OK (the chosen one must be OK)."""
     rows = {r["file"]: r for r in csv.DictReader(open(csv_path, encoding="utf-8-sig"))}
     meta = json.loads((batch / "out" / "measurements.json").read_text())
-    picks = {}
+    choose = choose or {}
+    picks, chosen = {}, {}
     for pose in POSES:
         r = rows.get(f"lily_{pose}.png")
         if r and r["OK_or_FIX"].strip().upper() == "OK":
             app = APP_POSE[pose]
+            if app in choose:
+                if choose[app] == pose:
+                    picks[app] = pose
+                    chosen[app] = [q for q in POSES if APP_POSE[q] == app]
+                continue
             if app in picks:
-                raise SystemExit(f"two OK takes for {app}")
+                raise SystemExit(f"two OK takes for {app}: pass --choose {app}=<take>")
             picks[app] = pose
     missing = sorted(set(APP_POSE.values()) - set(picks))
     if missing:
@@ -555,7 +562,9 @@ def release(batch, out_dir, csv_path):
                 "source": f"source/{POSES[pose][0]} ({SOURCE_NOTE[POSES[pose][0]]})",
                 "tool": "tools/images/make_new_lily.py", "eyes512": meta[pose]["eyes"], "mouthBox512": meta[pose]["mouth"],
                 "reviewCsv": pathlib.Path(csv_path).name, "userVerdict": "OK",
-                "userNote": rows[f"lily_{pose}.png"]["note"].strip(), "sha256": sha256(dest)})
+                "userNote": rows[f"lily_{pose}.png"]["note"].strip(), "sha256": sha256(dest),
+                **({"choice": f"the user marked every take OK ({', '.join(chosen[app])}); Claude chose {pose}: "
+                              f"{CHOICE_WHY.get(pose, '')}"} if app in chosen else {})})
     icon = rows.get("app_icon")
     if icon and icon["OK_or_FIX"].strip().upper() == "OK":
         (out_dir / "icon").mkdir(exist_ok=True)
@@ -578,6 +587,10 @@ def release(batch, out_dir, csv_path):
     print(f"released {len(images)} images to {out_dir}: {picks}")
 
 
+CHOICE_WHY = {
+    "listening_b": "her paw cupped at her ear reads as listening; take a, a paw beside her face, reads like a wave",
+    "pointing_a": "the two takes are near the same; this one's measurements were already in the app code",
+}
 ICON_FILES = ("ic_launcher", "ic_launcher_round", "ic_launcher_foreground", "ic_launcher_background")
 ICON_RES = {n: f"res/mipmap-*dpi/{n}.png (48 to 192 px), res/drawable-xxxhdpi" for n in ICON_FILES}
 # The sizes the old icon set used (scripts/generate_splash_style_app_icon.py), so only the pictures change.
@@ -611,11 +624,12 @@ def main(argv=None):
     ap.add_argument("batch")
     ap.add_argument("--release")
     ap.add_argument("--csv")
+    ap.add_argument("--choose", help="pose=take,... for a pose whose takes the user all marked OK")
     ap.add_argument("--install", help="the app folder (app/): copy the release's pictures and icon into it")
     a = ap.parse_args(argv)
     batch = pathlib.Path(a.batch)
     if a.release:
-        release(batch, a.release, a.csv)
+        release(batch, a.release, a.csv, dict(kv.split("=") for kv in a.choose.split(",")) if a.choose else None)
         if a.install:
             install(a.release, a.install)
     else:

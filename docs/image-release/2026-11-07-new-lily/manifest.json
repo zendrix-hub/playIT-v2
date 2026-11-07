@@ -1,0 +1,494 @@
+{
+ "release": "2026-11-07-new-lily",
+ "approvedBy": "user: OK marks on review page 2026-11-07-new-lily (2026-11-07-new-lily_review.csv)",
+ "decision": "user, 2026-11-07: \"this is our updated mascot i want you to change the moscots on the app to that\"; listening and pointing from Canva (user: \"you can make that on canva the new poses but be sure to not to change the design of the mascot\")",
+ "teacherAudit": "pending, required before merge to main",
+ "images": [
+  {
+   "itemId": "lily_celebrating",
+   "file": "mascot/lily_celebrating.png",
+   "appPath": "images/mascot/lily_celebrating.png",
+   "word": "Lily celebrating, pose",
+   "sourceBatch": "2026-11-07-new-lily",
+   "pick": "out/mascot/lily_celebrating.png",
+   "source": "source/user_sheet.jpg (the user's four-pose sheet (2026-11-07))",
+   "tool": "tools/images/make_new_lily.py",
+   "eyes512": [],
+   "mouthBox512": [
+    233,
+    218,
+    278,
+    256
+   ],
+   "reviewCsv": "2026-11-07-new-lily_review.csv",
+   "userVerdict": "OK",
+   "userNote": "why does the 4th picture got no mouth",
+   "sha256": "abb3ede2ed6a57948a652d791e7c65a74987fb3da5593c7b48bfe9f73f485cac"
+  },
+  {
+   "itemId": "lily_talk_celebrating",
+   "file": "mascot/talk/lily_celebrating.png",
+   "appPath": "images/mascot/talk/lily_celebrating.png",
+   "word": "Lily celebrating, talking frame (mouth painted out; TalkingLily draws the mouth)",
+   "sourceBatch": "2026-11-07-new-lily",
+   "pick": "out/mascot/talk/lily_celebrating.png",
+   "source": "source/user_sheet.jpg (the user's four-pose sheet (2026-11-07))",
+   "tool": "tools/images/make_new_lily.py",
+   "eyes512": [],
+   "mouthBox512": [
+    233,
+    218,
+    278,
+    256
+   ],
+   "reviewCsv": "2026-11-07-new-lily_review.csv",
+   "userVerdict": "OK",
+   "userNote": "why does the 4th picture got no mouth",
+   "sha256": "e403769299e2d8ccfa4eba862ae94820ddbdb5ab398e4744b97e79eedb6eb14f"
+  },
+  {
+   "itemId": "lily_encouraging",
+   "file": "mascot/lily_encouraging.png",
+   "appPath": "images/mascot/lily_encouraging.png",
+   "word": "Lily encouraging, pose",
+   "sourceBatch": "2026-11-07-new-lily",
+   "pick": "out/mascot/lily_encouraging.png",
+   "source": "source/user_sheet.jpg (the user's four-pose sheet (2026-11-07))",
+   "tool": "tools/images/make_new_lily.py",
+   "eyes512": [
+    [
+     207.5,
+     188.5,
+     33.0
+    ],
+    [
+     303.5,
+     188.5,
+     33.0
+    ]
+   ],
+   "mouthBox512": [
+    229,
+    232,
+    281,
+    258
+   ],
+   "reviewCsv": "2026-11-07-new-lily_review.csv",
+   "userVerdict": "OK",
+   "userNote": "why does the 4th picture got no mouth",
+   "sha256": "22032fca82004f12c7b07145a311f1ac6d7a850bc4a549299714ec329de76eaf"
+  },
+  {
+   "itemId": "lily_talk_encouraging",
+   "file": "mascot/talk/lily_encouraging.png",
+   "appPath": "images/mascot/talk/lily_encouraging.png",
+   "word": "Lily encouraging, talking frame (mouth painted out; TalkingLily draws the mouth)",
+   "sourceBatch": "2026-11-07-new-lily",
+   "pick": "out/mascot/talk/lily_encouraging.png",
+   "source": "source/user_sheet.jpg (the user's four-pose sheet (2026-11-07))",
+   "tool": "tools/images/make_new_lily.py",
+   "eyes512": [
+    [
+     207.5,
+     188.5,
+     33.0
+    ],
+    [
+     303.5,
+     188.5,
+     33.0
+    ]
+   ],
+   "mouthBox512": [
+    229,
+    232,
+    281,
+    258
+   ],
+   "reviewCsv": "2026-11-07-new-lily_review.csv",
+   "userVerdict": "OK",
+   "userNote": "why does the 4th picture got no mouth",
+   "sha256": "d884f81c2a587507f30ad0479ee3bea32afae06185e852e4f77842c7b983ba2a"
+  },
+  {
+   "itemId": "lily_idle",
+   "file": "mascot/lily_idle.png",
+   "appPath": "images/mascot/lily_idle.png",
+   "word": "Lily idle, pose",
+   "sourceBatch": "2026-11-07-new-lily",
+   "pick": "out/mascot/lily_idle.png",
+   "source": "source/user_front.jpg (the user's picture (2026-11-07))",
+   "tool": "tools/images/make_new_lily.py",
+   "eyes512": [
+    [
+     209.0,
+     189.5,
+     32.8
+    ],
+    [
+     302.5,
+     189.5,
+     33.0
+    ]
+   ],
+   "mouthBox512": [
+    239,
+    236,
+    272,
+    253
+   ],
+   "reviewCsv": "2026-11-07-new-lily_review.csv",
+   "userVerdict": "OK",
+   "userNote": "why does the 4th picture got no mouth",
+   "sha256": "ff241abf7c5cd9377e4551b18d2bc8db2e5609e60a91c9050cd5d8ff68d5aecb"
+  },
+  {
+   "itemId": "lily_talk_idle",
+   "file": "mascot/talk/lily_idle.png",
+   "appPath": "images/mascot/talk/lily_idle.png",
+   "word": "Lily idle, talking frame (mouth painted out; TalkingLily draws the mouth)",
+   "sourceBatch": "2026-11-07-new-lily",
+   "pick": "out/mascot/talk/lily_idle.png",
+   "source": "source/user_front.jpg (the user's picture (2026-11-07))",
+   "tool": "tools/images/make_new_lily.py",
+   "eyes512": [
+    [
+     209.0,
+     189.5,
+     32.8
+    ],
+    [
+     302.5,
+     189.5,
+     33.0
+    ]
+   ],
+   "mouthBox512": [
+    239,
+    236,
+    272,
+    253
+   ],
+   "reviewCsv": "2026-11-07-new-lily_review.csv",
+   "userVerdict": "OK",
+   "userNote": "why does the 4th picture got no mouth",
+   "sha256": "44128c41476231688bddcfe5e48cf7c4a4f1e68a27ae6bda59636bd323b55912"
+  },
+  {
+   "itemId": "lily_listening",
+   "file": "mascot/lily_listening.png",
+   "appPath": "images/mascot/lily_listening.png",
+   "word": "Lily listening, pose",
+   "sourceBatch": "2026-11-07-new-lily",
+   "pick": "out/mascot/lily_listening_b.png",
+   "source": "source/canva_page15.png (Canva image AI from the user's two pictures, page 15 of design DAHZTibHMH8)",
+   "tool": "tools/images/make_new_lily.py",
+   "eyes512": [
+    [
+     221.0,
+     178.5,
+     32.2
+    ],
+    [
+     312.5,
+     195.5,
+     33.0
+    ]
+   ],
+   "mouthBox512": [
+    240,
+    226,
+    275,
+    249
+   ],
+   "reviewCsv": "2026-11-07-new-lily_review.csv",
+   "userVerdict": "OK",
+   "userNote": "why does the 4th picture got no mouth",
+   "sha256": "8cb8d7fcdf536e01d84b99731e2dcce41f666bb0b6503801e84021fac8a00396",
+   "choice": "the user marked every take OK (listening_a, listening_b); Claude chose listening_b: her paw cupped at her ear reads as listening; take a, a paw beside her face, reads like a wave"
+  },
+  {
+   "itemId": "lily_talk_listening",
+   "file": "mascot/talk/lily_listening.png",
+   "appPath": "images/mascot/talk/lily_listening.png",
+   "word": "Lily listening, talking frame (mouth painted out; TalkingLily draws the mouth)",
+   "sourceBatch": "2026-11-07-new-lily",
+   "pick": "out/mascot/talk/lily_listening_b.png",
+   "source": "source/canva_page15.png (Canva image AI from the user's two pictures, page 15 of design DAHZTibHMH8)",
+   "tool": "tools/images/make_new_lily.py",
+   "eyes512": [
+    [
+     221.0,
+     178.5,
+     32.2
+    ],
+    [
+     312.5,
+     195.5,
+     33.0
+    ]
+   ],
+   "mouthBox512": [
+    240,
+    226,
+    275,
+    249
+   ],
+   "reviewCsv": "2026-11-07-new-lily_review.csv",
+   "userVerdict": "OK",
+   "userNote": "why does the 4th picture got no mouth",
+   "sha256": "7f2b6371e28cab5841a7a2edc349b233c00222b813d25deb1bafc4e0c419e859",
+   "choice": "the user marked every take OK (listening_a, listening_b); Claude chose listening_b: her paw cupped at her ear reads as listening; take a, a paw beside her face, reads like a wave"
+  },
+  {
+   "itemId": "lily_pointing",
+   "file": "mascot/lily_pointing.png",
+   "appPath": "images/mascot/lily_pointing.png",
+   "word": "Lily pointing, pose",
+   "sourceBatch": "2026-11-07-new-lily",
+   "pick": "out/mascot/lily_pointing_a.png",
+   "source": "source/canva_page15.png (Canva image AI from the user's two pictures, page 15 of design DAHZTibHMH8)",
+   "tool": "tools/images/make_new_lily.py",
+   "eyes512": [
+    [
+     210.0,
+     181.0,
+     32.5
+    ],
+    [
+     304.5,
+     181.0,
+     32.8
+    ]
+   ],
+   "mouthBox512": [
+    240,
+    225,
+    275,
+    244
+   ],
+   "reviewCsv": "2026-11-07-new-lily_review.csv",
+   "userVerdict": "OK",
+   "userNote": "why does the 4th picture got no mouth",
+   "sha256": "6423907c375a7bb1ae8b4ea2e303f3bf96d20adc1904774af5bab971cecee8ba",
+   "choice": "the user marked every take OK (pointing_a, pointing_b); Claude chose pointing_a: the two takes are near the same; this one's measurements were already in the app code"
+  },
+  {
+   "itemId": "lily_talk_pointing",
+   "file": "mascot/talk/lily_pointing.png",
+   "appPath": "images/mascot/talk/lily_pointing.png",
+   "word": "Lily pointing, talking frame (mouth painted out; TalkingLily draws the mouth)",
+   "sourceBatch": "2026-11-07-new-lily",
+   "pick": "out/mascot/talk/lily_pointing_a.png",
+   "source": "source/canva_page15.png (Canva image AI from the user's two pictures, page 15 of design DAHZTibHMH8)",
+   "tool": "tools/images/make_new_lily.py",
+   "eyes512": [
+    [
+     210.0,
+     181.0,
+     32.5
+    ],
+    [
+     304.5,
+     181.0,
+     32.8
+    ]
+   ],
+   "mouthBox512": [
+    240,
+    225,
+    275,
+    244
+   ],
+   "reviewCsv": "2026-11-07-new-lily_review.csv",
+   "userVerdict": "OK",
+   "userNote": "why does the 4th picture got no mouth",
+   "sha256": "199ed7339601444dc056a3b83f87f24c260ce805d529cef54cbe6a39fac1cab6",
+   "choice": "the user marked every take OK (pointing_a, pointing_b); Claude chose pointing_a: the two takes are near the same; this one's measurements were already in the app code"
+  },
+  {
+   "itemId": "lily_thinking",
+   "file": "mascot/lily_thinking.png",
+   "appPath": "images/mascot/lily_thinking.png",
+   "word": "Lily thinking, pose",
+   "sourceBatch": "2026-11-07-new-lily",
+   "pick": "out/mascot/lily_thinking.png",
+   "source": "source/user_sheet.jpg (the user's four-pose sheet (2026-11-07))",
+   "tool": "tools/images/make_new_lily.py",
+   "eyes512": [
+    [
+     237.5,
+     180.0,
+     33.2
+    ],
+    [
+     327.5,
+     211.0,
+     33.2
+    ]
+   ],
+   "mouthBox512": [
+    258,
+    242,
+    271,
+    256
+   ],
+   "reviewCsv": "2026-11-07-new-lily_review.csv",
+   "userVerdict": "OK",
+   "userNote": "why does the 4th picture got no mouth",
+   "sha256": "e49683facd022be81ecb7bae25c9a8757ffd604c587565e603ad1881c1da2417"
+  },
+  {
+   "itemId": "lily_talk_thinking",
+   "file": "mascot/talk/lily_thinking.png",
+   "appPath": "images/mascot/talk/lily_thinking.png",
+   "word": "Lily thinking, talking frame (mouth painted out; TalkingLily draws the mouth)",
+   "sourceBatch": "2026-11-07-new-lily",
+   "pick": "out/mascot/talk/lily_thinking.png",
+   "source": "source/user_sheet.jpg (the user's four-pose sheet (2026-11-07))",
+   "tool": "tools/images/make_new_lily.py",
+   "eyes512": [
+    [
+     237.5,
+     180.0,
+     33.2
+    ],
+    [
+     327.5,
+     211.0,
+     33.2
+    ]
+   ],
+   "mouthBox512": [
+    258,
+    242,
+    271,
+    256
+   ],
+   "reviewCsv": "2026-11-07-new-lily_review.csv",
+   "userVerdict": "OK",
+   "userNote": "why does the 4th picture got no mouth",
+   "sha256": "b5051ec6246271ea6a005994e150d5a45db68ae4ac15c03a40cd4d10f2f649cf"
+  },
+  {
+   "itemId": "lily_waving",
+   "file": "mascot/lily_waving.png",
+   "appPath": "images/mascot/lily_waving.png",
+   "word": "Lily waving, pose",
+   "sourceBatch": "2026-11-07-new-lily",
+   "pick": "out/mascot/lily_waving.png",
+   "source": "source/user_sheet.jpg (the user's four-pose sheet (2026-11-07))",
+   "tool": "tools/images/make_new_lily.py",
+   "eyes512": [
+    [
+     208.5,
+     186.0,
+     33.2
+    ],
+    [
+     303.5,
+     186.0,
+     33.2
+    ]
+   ],
+   "mouthBox512": [
+    234,
+    230,
+    278,
+    251
+   ],
+   "reviewCsv": "2026-11-07-new-lily_review.csv",
+   "userVerdict": "OK",
+   "userNote": "why does the 4th picture got no mouth",
+   "sha256": "421c939904ecb8523a73f48a3aabac7b3e1f612b825788d701a9ab2e0c0b294e"
+  },
+  {
+   "itemId": "lily_talk_waving",
+   "file": "mascot/talk/lily_waving.png",
+   "appPath": "images/mascot/talk/lily_waving.png",
+   "word": "Lily waving, talking frame (mouth painted out; TalkingLily draws the mouth)",
+   "sourceBatch": "2026-11-07-new-lily",
+   "pick": "out/mascot/talk/lily_waving.png",
+   "source": "source/user_sheet.jpg (the user's four-pose sheet (2026-11-07))",
+   "tool": "tools/images/make_new_lily.py",
+   "eyes512": [
+    [
+     208.5,
+     186.0,
+     33.2
+    ],
+    [
+     303.5,
+     186.0,
+     33.2
+    ]
+   ],
+   "mouthBox512": [
+    234,
+    230,
+    278,
+    251
+   ],
+   "reviewCsv": "2026-11-07-new-lily_review.csv",
+   "userVerdict": "OK",
+   "userNote": "why does the 4th picture got no mouth",
+   "sha256": "54966e6355c3254313e111c7588e410c627a417fdcfb6bab9abb1f19a0de16f2"
+  },
+  {
+   "itemId": "ic_launcher",
+   "file": "icon/ic_launcher.png",
+   "resPath": "res/mipmap-*dpi/ic_launcher.png (48 to 192 px), res/drawable-xxxhdpi",
+   "word": "the app icon: her head from the idle picture on the old icon's cream tile",
+   "sourceBatch": "2026-11-07-new-lily",
+   "pick": "out/icon/ic_launcher.png",
+   "source": "release mascot/lily_idle.png",
+   "tool": "tools/images/make_new_lily.py (make_icon)",
+   "reviewCsv": "2026-11-07-new-lily_review.csv",
+   "userVerdict": "OK",
+   "userNote": "why does the 4th picture got no mouth",
+   "sha256": "fd459766c6cb48843472529f82dc66977e72489f4b37cb8c8bd43d07cb8f777a"
+  },
+  {
+   "itemId": "ic_launcher_round",
+   "file": "icon/ic_launcher_round.png",
+   "resPath": "res/mipmap-*dpi/ic_launcher_round.png (48 to 192 px), res/drawable-xxxhdpi",
+   "word": "the app icon: her head from the idle picture on the old icon's cream tile",
+   "sourceBatch": "2026-11-07-new-lily",
+   "pick": "out/icon/ic_launcher_round.png",
+   "source": "release mascot/lily_idle.png",
+   "tool": "tools/images/make_new_lily.py (make_icon)",
+   "reviewCsv": "2026-11-07-new-lily_review.csv",
+   "userVerdict": "OK",
+   "userNote": "why does the 4th picture got no mouth",
+   "sha256": "7e7443fc2c79faeb01de6c1008701a22d423b8bf5a4095eeb253e0347381785f"
+  },
+  {
+   "itemId": "ic_launcher_foreground",
+   "file": "icon/ic_launcher_foreground.png",
+   "resPath": "res/mipmap-*dpi/ic_launcher_foreground.png (48 to 192 px), res/drawable-xxxhdpi",
+   "word": "the app icon: her head from the idle picture on the old icon's cream tile",
+   "sourceBatch": "2026-11-07-new-lily",
+   "pick": "out/icon/ic_launcher_foreground.png",
+   "source": "release mascot/lily_idle.png",
+   "tool": "tools/images/make_new_lily.py (make_icon)",
+   "reviewCsv": "2026-11-07-new-lily_review.csv",
+   "userVerdict": "OK",
+   "userNote": "why does the 4th picture got no mouth",
+   "sha256": "60fd62996b81343c4003ff20d79e399c01186749c47d79a60b3131156893b3e5"
+  },
+  {
+   "itemId": "ic_launcher_background",
+   "file": "icon/ic_launcher_background.png",
+   "resPath": "res/mipmap-*dpi/ic_launcher_background.png (48 to 192 px), res/drawable-xxxhdpi",
+   "word": "the app icon: her head from the idle picture on the old icon's cream tile",
+   "sourceBatch": "2026-11-07-new-lily",
+   "pick": "out/icon/ic_launcher_background.png",
+   "source": "release mascot/lily_idle.png",
+   "tool": "tools/images/make_new_lily.py (make_icon)",
+   "reviewCsv": "2026-11-07-new-lily_review.csv",
+   "userVerdict": "OK",
+   "userNote": "why does the 4th picture got no mouth",
+   "sha256": "cc1d51d37659562846d90e24d750cceb1638360862a51dc51602906f1fbfe904"
+  }
+ ]
+}

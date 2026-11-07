@@ -63,7 +63,7 @@ class LipSyncTest {
     @Test fun everyPoseHasATalkingFrameOfTheSameSize() {
         MascotState.values().forEach { pose ->
             val frame = File(assets, pose.talkFramePath())
-            assertTrue("missing ${pose.talkFramePath()}: run tools/design/make_lily_talk.py", frame.exists())
+            assertTrue("missing ${pose.talkFramePath()}: run tools/images/make_new_lily.py", frame.exists())
             assertEquals(pose.name, pngSize(File(assets, pose.assetPath)), pngSize(frame))
             val m = poseMouth(pose)
             assertTrue(pose.name, m.centerX in 0f..512f && m.top in 0f..512f && m.width > 0f)

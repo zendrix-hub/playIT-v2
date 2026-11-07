@@ -130,19 +130,26 @@ val CloudShadow = SurfaceCardShadow
 // Upgraded crisp border outline
 val DarkBrownOutline = ModernBorder
 
-// Lily the tarsier, sampled from images/mascot/lily_idle.png (image release 2026-10-12-mascot), so the
-// drawn splash tarsier matches her pictures. LilyOutline is the art's dark-brown line (style guide #4A2E18).
-val LilyOrange = Color(0xFFF97B27)
-val LilyOrangeShade = Color(0xFFDD621F)
-val LilyEarInner = Color(0xFFFEAC7A)
-val LilyCream = Color(0xFFFDEBD3)
-val LilyBlush = Color(0xFFFC9898)
-val LilyPupil = Color(0xFF3B1F0A)
+// Lily the tarsier as the user redesigned her (2026-11-07, image release 2026-11-07-new-lily), sampled from
+// images/mascot/lily_idle.png, so what TalkingLily and the splash draw matches her pictures: flat shapes with no
+// outline, her shade a darker orange, glasses-like peach rings round her eyes and a peach muzzle.
+val LilyOrange = Color(0xFFFA842C)
+val LilyOrangeShade = Color(0xFFE96D25)
+val LilyEarInner = Color(0xFFFECA91)
+val LilyCream = Color(0xFFFFE8CE)
+val LilyBlush = Color(0xFFFE9FA3)
+/** Her pupils, nose and mouth, and the lines of a shut eye or a closed mouth. */
+val LilyPupil = Color(0xFF615048)
+/** The peach of her glasses-like eye rings and her muzzle; also the lid of a blink. */
+val LilyPeach = Color(0xFFFEC484)
+/** The orange ring round the white of each eye. */
+val LilyEyeRing = Color(0xFFE76B25)
+// The art's dark-brown line (style guide #4A2E18): the map's drawings still use it; the new Lily has no outline.
 val LilyOutline = Color(0xFF4A2E18)
-// Her open mouth, sampled from lily_celebrating.png, for the mouth TalkingLily draws
-val LilyMouthInside = Color(0xFF402517)
-val LilyTongue = Color(0xFFDE5147)
-val LilyTeeth = Color(0xFFFFF8EE)
+// Her open mouth, for the mouth TalkingLily draws
+val LilyMouthInside = Color(0xFF615048)
+val LilyTongue = Color(0xFFFC7F7D)
+val LilyTeeth = Color(0xFFFFFFFF)
 
 val DestructiveRed = Color(0xFFE53935)
 val DestructiveRedShadow = Color(0xFFB71C1C)

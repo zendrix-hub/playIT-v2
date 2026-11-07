@@ -87,29 +87,32 @@ private val POINT = listOf(
     Key(500, lean(4.5f, 0.008f)), Key(850, lean(4.5f, 0.008f)), Key(1100, STANDING),
 )
 
-/** I'm listening: she tilts toward her cupped ear and leans in, a little past and back, and stays so. */
+/** I'm listening: she tilts toward her cupped ear (on the right of her picture) and leans in, a little past and back, and stays so. */
 private val LISTEN = listOf(
     Key(0, STANDING),
-    Key(280, LilyMove(rotation = -8.5f, scaleX = 1.045f, scaleY = 1.045f)),
-    Key(450, LilyMove(rotation = -6.5f, scaleX = 1.03f, scaleY = 1.03f)),
-    Key(600, LilyMove(rotation = -7f, scaleX = 1.035f, scaleY = 1.035f)),
+    Key(280, LilyMove(rotation = 8.5f, scaleX = 1.045f, scaleY = 1.045f)),
+    Key(450, LilyMove(rotation = 6.5f, scaleX = 1.03f, scaleY = 1.03f)),
+    Key(600, LilyMove(rotation = 7f, scaleX = 1.035f, scaleY = 1.035f)),
 )
 
-/** Hmm: she tilts slowly toward the hand at her chin, nods twice as she thinks, and stays tilted. */
+/** Hmm: her picture already tilts her head toward the paw at her chin; she tilts a little more, slowly, nods twice as she thinks, and stays tilted. */
 private val THINK = run {
-    val tilted = lean(6f)
-    val nod = LilyMove(rotation = 6f, scaleX = 1.02f, scaleY = 0.965f)
+    val tilted = lean(4f)
+    val nod = LilyMove(rotation = 4f, scaleX = 1.02f, scaleY = 0.965f)
     listOf(Key(0, STANDING), Key(600, tilted), Key(750, nod), Key(880, tilted), Key(1030, nod), Key(1180, tilted))
 }
 
-/** You can do it: two bounces toward her thumb, the second smaller, from the crouch (no RELEASE). */
+/**
+ * You can do it: hands on her hips, she puffs up proudly and bounces twice, straight up, the second smaller, from the
+ * crouch (no RELEASE).
+ */
 private val ENCOURAGE = listOf(
     Key(0, CROUCH),
-    Key(130, LilyMove(rotation = 4f, lift = 0.05f, scaleX = 0.95f, scaleY = 1.07f), ::easeOut),
-    Key(250, LilyMove(rotation = 3f, scaleX = 1.06f, scaleY = 0.91f), ::easeIn),
-    Key(370, LilyMove(rotation = 5f, lift = 0.035f, scaleX = 0.97f, scaleY = 1.04f), ::easeOut),
-    Key(480, LilyMove(rotation = 3f, scaleX = 1.04f, scaleY = 0.94f), ::easeIn),
-    Key(600, LilyMove(rotation = 2f, scaleX = 0.99f, scaleY = 1.01f)),
+    Key(130, LilyMove(lift = 0.05f, scaleX = 0.95f, scaleY = 1.07f), ::easeOut),
+    Key(250, LilyMove(scaleX = 1.06f, scaleY = 0.91f), ::easeIn),
+    Key(370, LilyMove(lift = 0.035f, scaleX = 0.97f, scaleY = 1.04f), ::easeOut),
+    Key(480, LilyMove(scaleX = 1.04f, scaleY = 0.94f), ::easeIn),
+    Key(600, LilyMove(scaleX = 1.03f, scaleY = 1.03f)),
     Key(800, STANDING),
 )
 

@@ -64,10 +64,10 @@ class LilyActingTest {
             assertClose("${pose.name} long after", STANDING, poseChangeAt(pose, poseChangeMs(pose) + 5000f, STANDING))
         }
         val listening = poseChangeAt(MascotState.LISTENING, 9999f, STANDING)
-        assertTrue("listening tilts toward her cupped ear, on the picture's left", listening.rotation in -8f..-5f)
+        assertTrue("listening tilts toward her cupped ear, on the right of the new picture", listening.rotation in 5f..8f)
         assertTrue("and leans in", listening.scaleX > 1.02f && listening.scaleX == listening.scaleY)
         val thinking = poseChangeAt(MascotState.THINKING, 9999f, STANDING)
-        assertTrue("thinking tilts toward the hand at her chin", thinking.rotation in 4f..8f)
+        assertTrue("thinking tilts a little more toward the paw at her chin", thinking.rotation in 3f..6f)
         assertEquals(1f, thinking.scaleY, 1e-4f)
     }
 
@@ -78,7 +78,8 @@ class LilyActingTest {
         assertTrue("pointing leans her toward her hand", span(MascotState.POINTING).maxOf { it.rotation } >= 7f)
         assertTrue("pointing never leans away", span(MascotState.POINTING).minOf { it.rotation } >= 0f)
         assertTrue("encouraging bounces", span(MascotState.ENCOURAGING).maxOf { it.lift } >= 0.04f)
-        assertTrue("toward her thumb", span(MascotState.ENCOURAGING).maxOf { it.rotation } >= 4f)
+        assertTrue("straight up, hands on her hips (new Lily, 2026-11-07)", span(MascotState.ENCOURAGING).all { it.rotation == 0f })
+        assertTrue("and puffs up proudly", span(MascotState.ENCOURAGING).any { it.scaleX > 1.02f && it.scaleY > 1.02f })
         assertTrue("celebrating jumps high", span(MascotState.CELEBRATING).maxOf { it.lift } >= 0.14f)
         val thinking = span(MascotState.THINKING)
         assertTrue("thinking nods", thinking.minOf { it.scaleY } < 0.97f && thinking.last().scaleY == 1f)

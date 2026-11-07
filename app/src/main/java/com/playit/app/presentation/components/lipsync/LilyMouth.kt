@@ -28,22 +28,25 @@ data class Mouth(
 }
 
 /**
- * Where a pose's mouth is in its 512 x 512 picture (tools/design/make_lily_talk.py prints these), and the
- * mouth it rests in between words: a smile line, or the open grin of the celebrating and waving poses.
- * [maxOpen] keeps the mouth clear of a hand drawn under it (the thinking pose's finger).
+ * Where a pose's mouth is in its 512 x 512 picture (its box, measured by tools/images/make_new_lily.py: [top] and
+ * [width] of the box, [centerX] its middle), and the mouth it rests in between words, drawn as the picture draws it:
+ * the open smile with its tongue, the grin with its teeth, the jump's wide-open cheer, the thinking pose's little "oo".
+ * [maxOpen] keeps the mouth clear of a paw drawn near it (the thinking pose's paw at her chin).
  */
 data class PoseMouth(val centerX: Float, val top: Float, val width: Float, val rest: Mouth, val maxOpen: Float = 1f)
 
-private val SMILE_LINE = Mouth(width = 1f, open = 0f, curve = 1f)
+/** Her pictures' open smile: a flat-topped mouth that dips in the middle, with the tongue at the bottom. */
+private fun openSmile(open: Float) = Mouth(width = 1f, open = open, curve = 0.5f, tongue = 0.6f)
 
 fun poseMouth(pose: MascotState): PoseMouth = when (pose) {
-    MascotState.CELEBRATING -> PoseMouth(254f, 232f, 68f, Mouth(0.8f, 0.5f, 0.8f, teethTop = 0.1f, tongue = 0.6f))
-    MascotState.ENCOURAGING -> PoseMouth(256f, 228f, 65f, SMILE_LINE)
-    MascotState.IDLE -> PoseMouth(248f, 226f, 65f, SMILE_LINE)
-    MascotState.LISTENING -> PoseMouth(249f, 231f, 50f, SMILE_LINE)
-    MascotState.POINTING -> PoseMouth(248f, 231f, 63f, SMILE_LINE)
-    MascotState.THINKING -> PoseMouth(262f, 232f, 46f, Mouth(width = 0.7f, open = 0f, curve = 0.1f), maxOpen = 0.35f)
-    MascotState.WAVING -> PoseMouth(252f, 226f, 58f, Mouth(0.8f, 0.35f, 0.8f, teethTop = 0.1f, tongue = 0.6f))
+    MascotState.CELEBRATING -> PoseMouth(255.5f, 218f, 45f, openSmile(0.7f))
+    MascotState.ENCOURAGING -> PoseMouth(255f, 232f, 52f, Mouth(width = 1f, open = 0.31f, curve = 0.6f, teethTop = 1f))
+    MascotState.IDLE -> PoseMouth(255.5f, 236f, 33f, openSmile(0.36f))
+    MascotState.LISTENING -> PoseMouth(257.5f, 226f, 35f, openSmile(0.5f))
+    MascotState.POINTING -> PoseMouth(257.5f, 225f, 35f, openSmile(0.39f))
+    // her "oo" is 13 px across; talking opens it wider, as far as her paw allows
+    MascotState.THINKING -> PoseMouth(264.5f, 242f, 30f, Mouth(width = 0.43f, open = 0.47f, curve = 0f, round = 1f), maxOpen = 0.6f)
+    MascotState.WAVING -> PoseMouth(256f, 230f, 44f, openSmile(0.33f))
 }
 
 /** Lily's mouth wide open in speech; ordinary talking moves between the rest mouth and this with the loudness. */

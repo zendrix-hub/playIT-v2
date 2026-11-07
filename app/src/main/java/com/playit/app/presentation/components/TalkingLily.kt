@@ -31,6 +31,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -66,8 +67,8 @@ import com.playit.app.presentation.components.lipsync.tapMs
 import com.playit.app.presentation.components.lipsync.poseEyes
 import com.playit.app.presentation.components.lipsync.poseMouth
 import com.playit.app.presentation.theme.LilyMouthInside
-import com.playit.app.presentation.theme.LilyOrange
-import com.playit.app.presentation.theme.LilyOutline
+import com.playit.app.presentation.theme.LilyPeach
+import com.playit.app.presentation.theme.LilyPupil
 import com.playit.app.presentation.theme.LilyTeeth
 import com.playit.app.presentation.theme.LilyTongue
 import com.playit.app.presentation.theme.LocalReducedMotion
@@ -78,7 +79,7 @@ import kotlinx.coroutines.launch
 /** The speech clip playing now (AudioPlayer.voice, provided by MainActivity); previews and tests see none. */
 val LocalVoicePlayback = staticCompositionLocalOf<StateFlow<VoiceClip?>> { MutableStateFlow(null) }
 
-/** The picture of a pose with its mouth painted out (tools/design/make_lily_talk.py). */
+/** The picture of a pose with its mouth painted out (tools/images/make_new_lily.py). */
 fun MascotState.talkFramePath(): String = assetPath.replace("images/mascot/", "images/mascot/talk/")
 
 // MediaPlayer reports the start before the sound reaches the speaker; the mouth waits this long
@@ -263,31 +264,32 @@ fun Modifier.lilyMove(move: () -> LilyMove): Modifier = graphicsLayer {
 }
 
 /**
- * Draws lids over [eyes], [closed] 0..1: an orange lid coming down with a dark lash edge, and when shut, the closed eye
- * as a soft curve. The lid is her face colour, so it reads as her own eyelid.
+ * Draws lids over [eyes], [closed] 0..1: a peach lid coming down inside the orange ring, with a dark lash edge, and
+ * when shut, the closed eye as a soft curve. The lid is the peach of her glasses-like rings, as her shut eyes are
+ * in the celebrating picture, so it reads as her own eyelid.
  */
 fun DrawScope.drawLilyBlink(eyes: PoseEyes, closed: Float) {
     val side = minOf(size.width, size.height)
     val scale = side / 512f
     val origin = Offset((size.width - side) / 2f, (size.height - side) / 2f)
     val r = eyes.radius * scale
-    for (eyeX in listOf(eyes.leftX, eyes.rightX)) {
-        val c = Offset(origin.x + eyeX * scale, origin.y + eyes.y * scale)
-        val eye = Path().apply { addOval(Rect(c, r + 1.5f * scale)) }
+    for ((eyeX, eyeY) in listOf(eyes.leftX to eyes.leftY, eyes.rightX to eyes.rightY)) {
+        val c = Offset(origin.x + eyeX * scale, origin.y + eyeY * scale)
+        val eye = Path().apply { addOval(Rect(c, r + 1f * scale)) }
         val lidTop = c.y - r - 2f * scale
         val lidBottom = c.y - r + 2f * r * closed
         clipPath(eye) {
-            drawRect(LilyOrange, Offset(c.x - r - 2f * scale, lidTop), Size(2f * r + 4f * scale, lidBottom - lidTop))
+            drawRect(LilyPeach, Offset(c.x - r - 2f * scale, lidTop), Size(2f * r + 4f * scale, lidBottom - lidTop))
         }
         if (closed > 0.85f) {
             val shut = Path().apply {
-                moveTo(c.x - 0.62f * r, c.y + 0.05f * r)
-                quadraticBezierTo(c.x, c.y + 0.45f * r, c.x + 0.62f * r, c.y + 0.05f * r)
+                moveTo(c.x - 0.6f * r, c.y + 0.05f * r)
+                quadraticBezierTo(c.x, c.y + 0.45f * r, c.x + 0.6f * r, c.y + 0.05f * r)
             }
-            drawPath(shut, LilyOutline, style = Stroke(width = 5f * scale, cap = StrokeCap.Round))
+            drawPath(shut, LilyPupil, style = Stroke(width = 4.5f * scale, cap = StrokeCap.Round))
         } else if (closed > 0.05f) {
             val half = kotlin.math.sqrt(maxOf(0f, r * r - (lidBottom - c.y) * (lidBottom - c.y)))
-            drawLine(LilyOutline, Offset(c.x - half, lidBottom), Offset(c.x + half, lidBottom), 3.5f * scale, StrokeCap.Round)
+            drawLine(LilyPupil, Offset(c.x - half, lidBottom), Offset(c.x + half, lidBottom), 3f * scale, StrokeCap.Round)
         }
     }
 }
@@ -308,8 +310,10 @@ fun DrawScope.drawLilyMouth(pm: PoseMouth, mouth: Mouth) {
     val open = minOf(mouth.open, pm.maxOpen)
     val left = pm.centerX - w / 2f
     val right = pm.centerX + w / 2f
-    val lipY = pm.top + 4f
-    val line = 5f * scale
+    val lipY = pm.top + 1f
+    // Her pictures draw the mouth as a flat dark shape with no outline; this thin edge in the same dark only keeps
+    // the shape crisp round the tongue and teeth.
+    val line = 2.5f * scale
 
     if (open < 0.05f) {
         // Closed: a smile line, or pressed lips when flat
@@ -317,16 +321,18 @@ fun DrawScope.drawLilyMouth(pm: PoseMouth, mouth: Mouth) {
             moveTo(x(left), y(lipY))
             quadraticBezierTo(x(pm.centerX), y(lipY + 2f * 0.22f * pm.width * mouth.curve), x(right), y(lipY))
         }
-        drawPath(path, LilyOutline, style = Stroke(width = if (mouth.curve < 0.2f) line * 1.3f else line, cap = StrokeCap.Round))
+        drawPath(path, LilyPupil, style = Stroke(width = if (mouth.curve < 0.2f) 5f * scale else 4f * scale, cap = StrokeCap.Round))
         return
     }
 
     val h = pm.width * open
     if (mouth.round > 0.5f) {
-        // "oo": a ring of lips around a small dark opening
+        // "oo": a small dark opening with the tongue at its bottom, as in the thinking picture
         val rect = Rect(Offset(x(pm.centerX - w / 2f), y(lipY)), Size(w * scale, h * scale))
         drawOval(LilyMouthInside, rect.topLeft, rect.size)
-        drawOval(LilyOutline, rect.topLeft, rect.size, style = Stroke(width = line * 1.4f))
+        clipPath(Path().apply { addOval(rect) }) {
+            drawOval(LilyTongue, Offset(rect.left + rect.width * 0.2f, rect.top + rect.height * 0.62f), Size(rect.width * 0.6f, rect.height * 0.5f))
+        }
         return
     }
 
@@ -355,5 +361,5 @@ fun DrawScope.drawLilyMouth(pm: PoseMouth, mouth: Mouth) {
             drawOval(LilyTongue, Offset(x(pm.centerX - tw / 2f), y(tongueTop)), Size(tw * scale, th * scale * 1.3f))
         }
     }
-    drawPath(path, LilyOutline, style = Stroke(width = line))
+    drawPath(path, LilyMouthInside, style = Stroke(width = line, join = StrokeJoin.Round))
 }
