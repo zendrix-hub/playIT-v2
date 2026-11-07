@@ -48,9 +48,9 @@ import kotlin.random.Random
 
 // Lily on the opening, as a puppet (user, 2026-10-29: "for our mascot how we make it better the design how it moves
 // how can it be natural"). She is drawn in parts (body, ears, glasses-like eye rings, eyes, muzzle, belly, arms,
-// tail), so each part moves on its own: her eyes look at what happens, her ears twitch and perk up, her tail sways and
-// swings behind a jump, she breathes with her belly, turns her face, blinks at odd moments and answers a tap a
-// different way each time.
+// tail). Her figure moves as one piece, because her head is the top of her body: she leans, breathes and hops whole.
+// On it, her eyes look at what happens, her ears twitch and perk up, her tail sways and swings behind a jump, she
+// blinks at odd moments and answers a tap a different way each time.
 // She is the user's new Lily (2026-11-07: "this is our updated mascot"; images/mascot/lily_idle.png, image release
 // 2026-11-07-new-lily), drawn as her pictures draw her: flat shapes with no outline, one rounded body with her head
 // at its top, a darker orange along her right side, big round ears, peach rings round her eyes like glasses with a tab
@@ -264,38 +264,59 @@ internal fun LilyPuppet(
             fun p(x: Float, y: Float) = Offset(cx + x * f, top + y * f)
             onDrawBehind {
                 val q = pose()
-                // Her body leans a little with a tilt of her head, from where she stands; her face turns the rest of
-                // the way, about her eyes, so a tilt reads as her head turning on her round body.
-                val bodyTurn = q.tilt * 0.35f
-                val faceTurn = q.tilt * 0.65f
-                val base = p(0f, 1f)
-                val face: DrawScope.(DrawScope.() -> Unit) -> Unit = { block ->
-                    withTransform({
-                        translate(top = q.headBob * f)
-                        rotate(faceTurn, pivot = p(0f, s.eyeY))
-                    }) { block() }
-                }
-                translate(top = -q.hopLift * f) {
-                    withTransform({
-                        // A hop lands with a squash from her feet; behind the panel, so only her top shows it.
-                        scale(1f + 0.05f * q.hopSquash, 1f - 0.06f * q.hopSquash, pivot = base)
-                    }) {
-                        drawTail(s, q, f, ::p)
-                        rotate(bodyTurn, pivot = base) {
-                            face { drawEars(s, q, f, ::p) }
-                            drawBody(s, q, f, ::p)
-                            // Her hands stay on the panel's edge as her body leans.
-                            val hands = listOf(-1f, 1f).map { side ->
-                                Offset(cx + side * handDx, ledgeY).rotatedAbout(base, -bodyTurn)
-                            }
-                            drawArms(s, f, ::p, hands)
-                            face { drawFace(s, q, eyes, voice, f, line, ::p) }
-                        }
-                    }
+                // Her head is the top of her one round body, so she moves as one piece (user, 2026-11-07: "body
+                // feels ... like its not attached together"): body, ears, face, tail and arms share one lean, breath
+                // and hop. Only her eyes, lids, mouth, ears' twitch and tail's sway move on their own, as they
+                // would on a real body. Her hands stay on the panel; her arms reach them however she moves.
+                val m = figureMove(q)
+                val feet = p(0f, 1f)
+                val hinge = Offset(cx, ledgeY)
+                val hands = listOf(-1f, 1f).map { side -> Offset(cx + side * handDx, ledgeY).intoFigure(m, f, feet, hinge) }
+                withTransform({
+                    translate(top = m.lift * f)
+                    scale(m.scaleX, m.scaleY, pivot = feet)
+                    rotate(m.lean, pivot = hinge)
+                }) {
+                    drawTail(s, q, f, ::p)
+                    drawEars(s, q, f, ::p)
+                    drawBody(s, f, ::p)
+                    drawArms(s, f, ::p, hands)
+                    drawFace(s, q, eyes, voice, f, line, ::p)
                 }
             }
         }
     )
+}
+
+/**
+ * How her whole figure moves at one moment, every part together: up by [lift] (a share of her figure's height),
+ * swelling or squashing from her feet, and leaning [lean] degrees from where her body meets the panel.
+ */
+internal data class FigureMove(val lift: Float, val scaleX: Float, val scaleY: Float, val lean: Float)
+
+/** A tilt of her head becomes this much lean of her whole body: her head is its top. */
+internal const val LEAN_SHARE = 0.6f
+
+internal fun figureMove(q: LilyPose) = FigureMove(
+    lift = q.headBob - q.hopLift,
+    // A hop lands with a squash from her feet; she breathes with her whole body, a little more up than across.
+    scaleX = (1f + 0.05f * q.hopSquash) * (1f + 0.008f * q.bellyBreath),
+    scaleY = (1f - 0.06f * q.hopSquash) * (1f + 0.015f * q.bellyBreath),
+    lean = q.tilt * LEAN_SHARE
+)
+
+/** Where this point on screen falls in her moving figure's own drawing: the figure's move undone. */
+internal fun Offset.intoFigure(m: FigureMove, f: Float, feet: Offset, hinge: Offset): Offset {
+    val t = Offset(x, y - m.lift * f)
+    val s = Offset(feet.x + (t.x - feet.x) / m.scaleX, feet.y + (t.y - feet.y) / m.scaleY)
+    return s.rotatedAbout(hinge, -m.lean)
+}
+
+/** Where a point of her figure's drawing shows on screen as the figure moves (as withTransform draws it). */
+internal fun Offset.outOfFigure(m: FigureMove, f: Float, feet: Offset, hinge: Offset): Offset {
+    val r = rotatedAbout(hinge, m.lean)
+    val s = Offset(feet.x + (r.x - feet.x) * m.scaleX, feet.y + (r.y - feet.y) * m.scaleY)
+    return Offset(s.x, s.y + m.lift * f)
 }
 
 /** A part in her orange with the pictures' shade along its right: the shade colour, then the lit colour a little to the left over it. */
@@ -304,7 +325,7 @@ private fun DrawScope.shaded(path: Path, width: Float, lit: Color = LilyOrange, 
     clipPath(path) { translate(left = -width * SHADE_SHIFT) { drawPath(path, lit) } }
 }
 
-private fun Offset.rotatedAbout(pivot: Offset, degrees: Float): Offset {
+internal fun Offset.rotatedAbout(pivot: Offset, degrees: Float): Offset {
     val a = degrees * PI.toFloat() / 180f
     val d = this - pivot
     return pivot + Offset(d.x * cos(a) - d.y * sin(a), d.x * sin(a) + d.y * cos(a))
@@ -348,19 +369,16 @@ private fun DrawScope.drawEars(s: LilyShape, q: LilyPose, f: Float, p: (Float, F
     }
 }
 
-/** Her body, head at its rounded top, with her belly: it breathes, swelling a little from below. */
-private fun DrawScope.drawBody(s: LilyShape, q: LilyPose, f: Float, p: (Float, Float) -> Offset) {
+/** Her body, head at its rounded top, with her belly (she breathes with her whole figure: figureMove). */
+private fun DrawScope.drawBody(s: LilyShape, f: Float, p: (Float, Float) -> Offset) {
     val tl = p(-s.bodyHalfW, s.bodyTop)
     val br = p(s.bodyHalfW, 1.3f)
     val r = CornerRadius(s.bodyHalfW * f, s.domeRy * f)
     val body = Path().apply {
         addRoundRect(RoundRect(Rect(tl, br), topLeft = r, topRight = r, bottomLeft = CornerRadius.Zero, bottomRight = CornerRadius.Zero))
     }
-    val bottom = p(0f, 1f)
-    withTransform({ scale(1f + 0.01f * q.bellyBreath, 1f + 0.02f * q.bellyBreath, pivot = bottom) }) {
-        shaded(body, 2f * s.bodyHalfW * f)
-        drawOval(LilyCream, p(-s.bellyRx, s.bellyY - s.bellyRy), Size(s.bellyRx * 2f * f, s.bellyRy * 2f * f))
-    }
+    shaded(body, 2f * s.bodyHalfW * f)
+    drawOval(LilyCream, p(-s.bellyRx, s.bellyY - s.bellyRy), Size(s.bellyRx * 2f * f, s.bellyRy * 2f * f))
 }
 
 /** Her arms reach down to her hands on the panel's edge: her orange, with the pictures' darker edge on the outside. */

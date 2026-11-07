@@ -32,6 +32,31 @@ class LilyPuppetTest {
         assertTrue("the shade is a thin band", SHADE_SHIFT in 0.03f..0.06f)
     }
 
+    /**
+     * User, 2026-11-07: on the opening her body felt "like its not attached together". Her head is the top of her one
+     * round body, so one move carries every part (no part leans, breathes or bobs on its own), and her arms always end
+     * on her hands on the panel, however she moves.
+     */
+    @Test fun sheMovesAsOnePiece_andHerArmsStayOnHerHands() {
+        val f = 1000f
+        val feet = androidx.compose.ui.geometry.Offset(500f, 1100f)
+        val hinge = androidx.compose.ui.geometry.Offset(500f, 900f)
+        val hand = androidx.compose.ui.geometry.Offset(300f, 900f)
+        listOf(
+            LilyPose(androidx.compose.ui.geometry.Offset.Zero, 0f, 0f, 0f, 7f, 0.004f, 1f, 0f, 0f, 0f, 0f),   // tilt, breath
+            LilyPose(androidx.compose.ui.geometry.Offset.Zero, 0f, 0f, 0f, -6f, -0.004f, -1f, 0f, 0f, 0.06f, 0f), // hop
+            LilyPose(androidx.compose.ui.geometry.Offset.Zero, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 1f),       // landing squash
+        ).forEach { q ->
+            val m = figureMove(q)
+            val back = hand.intoFigure(m, f, feet, hinge).outOfFigure(m, f, feet, hinge)
+            assertEquals("arm on the hand x for $m", hand.x, back.x, 0.01f)
+            assertEquals("arm on the hand y for $m", hand.y, back.y, 0.01f)
+        }
+        // A tilt of her head is a gentle lean of her whole body.
+        val lean = figureMove(LilyPose(androidx.compose.ui.geometry.Offset.Zero, 0f, 0f, 0f, 7f, 0f, 0f, 0f, 0f, 0f, 0f)).lean
+        assertTrue("lean $lean", lean in 3f..5f)
+    }
+
     @Test fun herEyes_followTheOpening() {
         assertEquals(0f, openingGazeAt(0f).x, 0f)
         val peek = (LILY_PEEK_END_MS..LILY_CROUCH_MS).map { openingGazeAt(it.toFloat()).x }
