@@ -57,6 +57,25 @@ class LilyPuppetTest {
         assertTrue("lean $lean", lean in 3f..5f)
     }
 
+    /** Her paws as her pictures draw them (user, 2026-11-07: the old paw looked "kind of wierd"). */
+    @Test fun herPaws_aPalmAndFourPaddedFingers_overTheEdge() {
+        val edge = 100f
+        val r = 16f
+        val pw = paw(200f, edge, r)
+        assertEquals(4, pw.fingers.size)
+        assertTrue("the palm sits on the edge", pw.palm.y in (edge - r)..edge)
+        val pads = pw.fingers.map { it.second }
+        pads.forEach { pad ->
+            assertTrue("each pad on the panel's front", pad.y > edge)
+            assertTrue("clear of the Start button", pad.y + pw.padR <= edge + 1.4f * r)
+            assertTrue("a thin finger shows between palm and pad", (pad - pw.palm).getDistance() - pw.palmR - pw.padR > 0.15f * r)
+        }
+        pads.zipWithNext().forEach { (a, b) ->
+            assertTrue("pads apart, not one blob", (b - a).getDistance() > 2f * pw.padR)
+        }
+        assertTrue("fingers thinner than their round pads", pw.fingerW < 2f * pw.padR && pw.padR < pw.palmR / 2f)
+    }
+
     @Test fun herEyes_followTheOpening() {
         assertEquals(0f, openingGazeAt(0f).x, 0f)
         val peek = (LILY_PEEK_END_MS..LILY_CROUCH_MS).map { openingGazeAt(it.toFloat()).x }

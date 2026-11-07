@@ -486,25 +486,50 @@ private fun DrawScope.drawFace(
     clipPath(mouth) { drawOval(LilyTongue, Offset(mc.x - w * 0.32f, y0 + d * 0.5f), Size(w * 0.64f, d * 0.7f)) }
 }
 
-/** Her hands on the panel's edge, in front of it, fingers over it: her paws as her pictures draw them, a palm with four round fingertips. */
+/**
+ * Her paw as her pictures draw it (user, 2026-11-07: the old one looked "kind of wierd"): a round palm and four thin
+ * fingers, each ending in a round pad, a tarsier's hand. [fingers] run from each finger's root to its pad.
+ */
+internal class Paw(val palm: Offset, val palmR: Float, val fingers: List<Pair<Offset, Offset>>, val fingerW: Float, val padR: Float)
+
+/**
+ * A paw holding the panel's edge at [edgeY], centred at [x], with a palm of radius [r]: the palm sits on the edge and
+ * covers the end of her arm, the fingers curl over it, and their pads rest on its front in a shallow arc, clear of
+ * each other and of the Start button below.
+ */
+internal fun paw(x: Float, edgeY: Float, r: Float): Paw {
+    val palm = Offset(x, edgeY - 0.55f * r)
+    // Fanned as in her pictures: the middle two curl down over the edge, the outer two spread along it, so each thin
+    // finger shows between the palm and its pad and the pads stay clear of the Start button.
+    val fingers = PAW_FINGER_ANGLES.map { deg ->
+        val a = Math.toRadians(deg.toDouble())
+        val dir = Offset(kotlin.math.sin(a).toFloat(), kotlin.math.cos(a).toFloat())
+        palm + dir * (0.55f * r) to palm + dir * (1.65f * r)
+    }
+    // As thick and as round as in her pictures: fingers 0.3 of the palm, pads 0.42.
+    return Paw(palm, r, fingers, fingerW = 0.3f * r, padR = 0.42f * r)
+}
+
+/** Each finger's angle from straight down, in degrees. */
+private val PAW_FINGER_ANGLES = listOf(-65f, -28f, 28f, 65f)
+
+/** Her hands on the panel's edge, in front of it, fingers over it (the edge is 14 dp below this drawing's top). */
 @Composable
 internal fun LilyHands(modifier: Modifier = Modifier) {
     Spacer(
         modifier = modifier.drawWithCache {
             val w = size.width
-            val h = size.height
-            val handW = minOf(w * 0.26f, 46.dp.toPx())
-            val centres = listOf(w * 0.18f, w * 0.82f)
+            val edgeY = 14.dp.toPx()
+            // A palm a little wider than her arm (0.06 of her figure, about 0.124 of this width), so it covers its end.
+            val r = minOf(w * 0.064f, 15.dp.toPx())
+            val paws = listOf(w * 0.18f, w * 0.82f).map { paw(it, edgeY, r) }
             onDrawBehind {
-                for (x in centres) {
-                    val palmTop = h * 0.2f
-                    val palmH = h * 0.66f
-                    drawRoundRect(LilyOrangeShade, Offset(x - handW * 0.42f, palmTop), Size(handW * 0.84f, palmH), CornerRadius(palmH / 2f))
-                    val tip = handW * 0.15f
-                    for (k in 0..3) {
-                        val fx = x - handW * 0.36f + handW * 0.24f * k
-                        drawCircle(LilyOrangeShade, tip, Offset(fx, palmTop + tip * 0.6f))
+                paws.forEach { pw ->
+                    pw.fingers.forEach { (root, pad) ->
+                        drawLine(LilyOrangeShade, root, pad, strokeWidth = pw.fingerW, cap = StrokeCap.Round)
+                        drawCircle(LilyOrangeShade, pw.padR, pad)
                     }
+                    drawCircle(LilyOrangeShade, pw.palmR, pw.palm)
                 }
             }
         }
