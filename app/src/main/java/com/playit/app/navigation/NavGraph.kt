@@ -84,9 +84,11 @@ fun NavGraph(
                     }
                 },
                 onAddProfileClick = {
+                    viewModel.leave()
                     navController.navigate(Routes.NAME_PROMPT)
                 },
                 onParentDashboardClick = {
+                    viewModel.leave()
                     navController.navigate(Routes.PARENT_DASHBOARD)
                 }
             )
@@ -112,6 +114,7 @@ fun NavGraph(
             MapScreen(
                 viewModel = viewModel,
                 onNodeSelected = { nodeId ->
+                    viewModel.leave()
                     if (nodeId.startsWith("blend_")) {
                         // Every word game opens with the sound check (user choice, 2026-11-06).
                         val groupId = nodeId.removePrefix("blend_")
@@ -122,6 +125,7 @@ fun NavGraph(
                 },
                 onBack = {
                     viewModel.clearSession()
+                    viewModel.leave()
                     navController.navigate(Routes.PROFILE_SELECT) {
                         popUpTo(Routes.MAP) { inclusive = true }
                     }

@@ -156,6 +156,8 @@ fun MapScreen(
     onBack: () -> Unit = {}
 ) {
     BackHandler(onBack = onBack)
+    // Back on screen (from a game): what plays here is the map's own again, so leaving stops it.
+    LaunchedEffect(Unit) { viewModel.onShown() }
 
     val mapNodes by viewModel.mapNodes.collectAsStateWithLifecycle()
     val userStats by viewModel.userStats.collectAsStateWithLifecycle()

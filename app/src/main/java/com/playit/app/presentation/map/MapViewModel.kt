@@ -145,6 +145,24 @@ class MapViewModel @Inject constructor(
     private var previousUnlockedIds: Set<String>? = null
     private var trackedProfileId: Long? = null
 
+    /**
+     * The map has handed the screen on (back to "Who is playing?", or into a letter or word game) and stopped its own
+     * audio then. The player is shared, and this ViewModel is cleared only after the next screen has begun to speak,
+     * so onCleared must not stop that voice (user, 2026-11-07: back from the map, "Who is playing?" said nothing).
+     */
+    private var handedOff = false
+
+    /** Leaving the map: its own audio stops now, not when it is cleared. */
+    fun leave() {
+        audioPlayer.stop()
+        handedOff = true
+    }
+
+    /** The map is on screen again (back from a game): what plays is its own again. */
+    fun onShown() {
+        handedOff = false
+    }
+
     private fun trackUnlocks(nodes: List<MapNode>) {
         val unlocked = nodes.filter { it.isUnlocked }.map { it.id }.toSet()
         val before = previousUnlockedIds
@@ -265,6 +283,6 @@ class MapViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        audioPlayer.stop()
+        if (!handedOff) audioPlayer.stop()
     }
 }

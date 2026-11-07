@@ -47,6 +47,13 @@ class ProfileViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
+    /**
+     * This screen has handed over to the next one (the map, the name step, the Parent Zone) and stopped its own audio
+     * then. The player is shared, and this ViewModel is cleared only after the next screen has begun to speak, so
+     * onCleared must not stop that voice (the map's welcome back, user 2026-11-07).
+     */
+    private var handedOff = false
+
     private val _uiState = MutableStateFlow<ProfileUiState>(ProfileUiState.Idle)
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 
@@ -79,9 +86,15 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun selectProfile(profileId: Long) {
+        leave()
+        sessionManager.setActiveProfile(profileId)
+    }
+
+    /** Leaving this screen for the next: its own audio stops now, not when it is cleared. */
+    fun leave() {
         audioPlayer.stop()
         _isPlayingGreeting.value = false
-        sessionManager.setActiveProfile(profileId)
+        handedOff = true
     }
 
     fun playProfileSelectSound() {
@@ -105,6 +118,7 @@ class ProfileViewModel @Inject constructor(
     val greeting: StateFlow<String> = _greeting.asStateFlow()
 
     fun playWelcomeGreeting() {
+        handedOff = false  // on screen again: what plays is its own
         viewModelScope.launch {
             val firstUse = profileRepository.getAllProfiles().first().isEmpty()
             _greeting.value = if (firstUse) FIRST_HELLO else WHO_IS_PLAYING
@@ -140,7 +154,7 @@ class ProfileViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        audioPlayer.stop()
+        if (!handedOff) audioPlayer.stop()
     }
 
     fun createProfile(name: String, avatarResId: Int) {
@@ -151,6 +165,7 @@ class ProfileViewModel @Inject constructor(
             val result = profileRepository.createProfile(finalName, avatarResId)
             result.onSuccess { newId ->
                 sessionManager.setActiveProfile(newId)
+                leave()
                 _uiState.value = ProfileUiState.Created(newId)
             }.onFailure { exception ->
                 _uiState.value = ProfileUiState.Error(

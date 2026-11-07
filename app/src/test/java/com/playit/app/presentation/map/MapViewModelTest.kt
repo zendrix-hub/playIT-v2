@@ -89,6 +89,46 @@ class MapViewModelTest {
         Dispatchers.resetMain()
     }
 
+    private fun clear(vm: MapViewModel) =
+        MapViewModel::class.java.getDeclaredMethod("onCleared").apply { isAccessible = true }.invoke(vm)
+
+    /**
+     * User, 2026-11-07: back from the map to "Who is playing?", Lily said nothing. The map's ViewModel is cleared
+     * after the next screen has begun to speak, and stopping the shared player then cut its greeting. Leaving the map
+     * stops the map's own audio at once; clearing it later leaves the next screen's voice alone.
+     */
+    @Test
+    fun leavingTheMap_stopsItsAudioThen_notWhenCleared() = runTest {
+        viewModel = MapViewModel(
+            phonemeRepository, letterGroupRepository, letterGroupMemberRepository,
+            lessonProgressRepository, profileRepository, achievementRepository,
+            sessionManager, unlockManager, groupUnlockManager, streakTracker,
+            audioPlayer, audioResolver, sayItAttemptRepository
+        )
+        advanceUntilIdle()
+        clearMocks(audioPlayer, answers = false, recordedCalls = true)
+        viewModel.leave()
+        verify(exactly = 1) { audioPlayer.stop() }
+        clear(viewModel)
+        verify(exactly = 1) { audioPlayer.stop() }
+    }
+
+    @Test
+    fun aMapClearedWithoutLeaving_stillStopsItsAudio_andShownAgainOwnsItsAudio() = runTest {
+        viewModel = MapViewModel(
+            phonemeRepository, letterGroupRepository, letterGroupMemberRepository,
+            lessonProgressRepository, profileRepository, achievementRepository,
+            sessionManager, unlockManager, groupUnlockManager, streakTracker,
+            audioPlayer, audioResolver, sayItAttemptRepository
+        )
+        advanceUntilIdle()
+        viewModel.leave()
+        viewModel.onShown()   // back from a game
+        clearMocks(audioPlayer, answers = false, recordedCalls = true)
+        clear(viewModel)
+        verify(exactly = 1) { audioPlayer.stop() }
+    }
+
     @Test
     fun init_recordsActivityAndResetsStreakIfInactive() = runTest {
         viewModel = MapViewModel(
