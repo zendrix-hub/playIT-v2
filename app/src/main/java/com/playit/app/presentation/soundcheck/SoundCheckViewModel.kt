@@ -111,7 +111,7 @@ class SoundCheckViewModel @Inject constructor(
 
     private val idleTimer = IdleTimer(
         scope = viewModelScope,
-        isBusy = { _isPlaying.value || !_acceptingTaps.value },
+        isBusy = { _isPlaying.value || !_acceptingTaps.value || audioPlayer.isSpeaking() },
         onIdle = { replaySound() }
     )
 

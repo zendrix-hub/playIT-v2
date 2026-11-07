@@ -89,7 +89,7 @@ class FindItViewModel @Inject constructor(
 
     private val idleTimer = IdleTimer(
         scope = viewModelScope,
-        isBusy = { _isPlaying.value || _isPlayingPrompt.value }
+        isBusy = { _isPlaying.value || _isPlayingPrompt.value || audioPlayer.isSpeaking() }
     ) {
         _idleNudge.value++
         if (_nextHighlighted.value) {

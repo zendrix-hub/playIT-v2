@@ -162,7 +162,7 @@ class BlendItViewModel @Inject constructor(
 
     private val idleTimer = IdleTimer(
         scope = viewModelScope,
-        isBusy = { _isPlayingPrompt.value },
+        isBusy = { _isPlayingPrompt.value || audioPlayer.isSpeaking() },
         onIdle = { playBlendItIntroAudio() }
     )
 

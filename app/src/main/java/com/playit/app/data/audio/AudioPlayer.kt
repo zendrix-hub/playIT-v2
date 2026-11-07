@@ -51,6 +51,9 @@ class AudioPlayer @Inject constructor(
     /** The speech clip playing now, so Lily's mouth can move with it (TalkingLily); null when none plays. */
     val voice: StateFlow<VoiceClip?> = _voice.asStateFlow()
 
+    /** A spoken line is playing now. An idle reminder waits for it, so it never talks over Lily. */
+    fun isSpeaking(): Boolean = _voice.value != null
+
     init {
         preloadCommonSfx()
     }

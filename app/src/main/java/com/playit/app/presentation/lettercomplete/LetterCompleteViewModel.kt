@@ -58,7 +58,7 @@ class LetterCompleteViewModel @Inject constructor(
 
     private val idleTimer = IdleTimer(
         scope = viewModelScope,
-        isBusy = { _isPlaying.value },
+        isBusy = { _isPlaying.value || audioPlayer.isSpeaking() },
         onIdle = {
             _idleNudge.value++
             audioPlayer.playAssetAudio(audioResolver.getUiPath("ui_complete_next"))

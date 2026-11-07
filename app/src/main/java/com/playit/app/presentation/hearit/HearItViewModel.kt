@@ -67,7 +67,9 @@ class HearItViewModel @Inject constructor(
 
     private val idleTimer = IdleTimer(
         scope = viewModelScope,
-        isBusy = { _isPlaying.value || _isPlayingPrompt.value }
+        // Her own line after the sequence ("Great listening! Tap Next...") counts too: a reminder that fired as it
+        // began restarted it (user, 2026-11-07: "Great listening" twice on M).
+        isBusy = { _isPlaying.value || _isPlayingPrompt.value || audioPlayer.isSpeaking() }
     ) {
         _idleNudge.value++
         if (_nextHighlighted.value) {

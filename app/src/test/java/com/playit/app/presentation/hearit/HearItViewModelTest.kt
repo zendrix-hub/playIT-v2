@@ -181,6 +181,34 @@ class HearItViewModelTest {
         verify(exactly = 2) { audioPlayer.playAssetAudio("ui/ui_hearit_next.wav", any()) }
     }
 
+    /**
+     * User, 2026-11-07: on M, "Great listening" came twice, then "Tap Next". M's sequence is long, so it ended just
+     * before the 10 s idle check; the check fired while "Great listening! Tap Next to keep going." was starting and
+     * played it again from the top. While Lily is speaking, the reminder now waits.
+     */
+    @Test
+    fun aReminder_neverRestartsTheNextLine_whileLilyIsSpeakingIt() = runTest {
+        val fakePhoneme = Phoneme(id = 1, letter = "m", audioPath = "path", imagePath = "path", exampleWord = "mouse")
+        coEvery { phonemeRepository.getPhonemeById(1) } returns fakePhoneme
+        var finishSequence: (() -> Unit)? = null
+        every { audioPlayer.playSequence(any(), any(), any()) } answers { finishSequence = thirdArg() }
+        var speaking = false
+        every { audioPlayer.isSpeaking() } answers { speaking }
+        every { audioPlayer.playAssetAudio(any(), any()) } answers { speaking = true }  // the line plays on
+
+        viewModel = HearItViewModel(phonemeRepository, audioPlayer, audioResolver, savedStateHandle)
+        viewModel.onScreenVisible()
+        runCurrent()
+        advanceTimeBy(9_900)
+        finishSequence!!.invoke()          // the sequence ends 0.1 s before the idle check...
+        advanceTimeBy(200)                 // ...which comes while the Next line is speaking
+        verify(exactly = 1) { audioPlayer.playAssetAudio("ui/ui_hearit_next.wav", any()) }
+
+        speaking = false                   // the line ends; a later reminder may still come
+        advanceTimeBy(10_001)
+        verify(exactly = 2) { audioPlayer.playAssetAudio("ui/ui_hearit_next.wav", any()) }
+    }
+
     @Test
     fun noIdlePrompt_withoutScreenVisible() = runTest {
         val fakePhoneme = Phoneme(id = 1, letter = "m", audioPath = "path", imagePath = "path", exampleWord = "mouse")
