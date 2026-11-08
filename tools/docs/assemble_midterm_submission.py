@@ -328,8 +328,10 @@ def release_counts():
         data = json.loads(manifest.read_text(encoding="utf-8"))
         release_dates.append(manifest.parent.name[:10])
         for item in data.get("images", []):
-            pictures.add(item["appPath"])
-            tool = item.get("generator", "").split(" (")[0] or "not recorded"
+            path = item.get("appPath") or item.get("resPath")
+            if path:
+                pictures.add(path)
+            tool = (item.get("generator") or item.get("tool") or "").split(" (")[0] or "not recorded"
             generators[tool] = generators.get(tool, 0) + 1
     clips = 0
     for manifest in sorted((REPO_ROOT / "docs" / "audio-release").glob("*/manifest.json")):
@@ -1678,16 +1680,17 @@ captures/
 __pycache__/
 *.pyc
 """
-# (Roborazzi capture on the A21s profile, title, caption) for the README's screen gallery.
+# (Roborazzi capture on the mobile profile, title, caption) for the README's screen gallery.
+# Maps (source_in_roborazzi_dir, clean_target_name, title, caption)
 README_SCREENS = [
-    ("splash_a21s.png", "Splash", "Start sits below Lily, the tarsier guide"),
-    ("nameprompt_a21s.png", "New learner", "Avatar-only onboarding: no typing"),
-    ("map_a21s.png", "Map", "Chapter 1 trail; 16-character name in the header"),
-    ("hearit_a21s.png", "Hear It", "Lily models the sound, then the key word"),
-    ("sayit_a21s.png", "Say It", "Say the key word; judged on the phone"),
-    ("sayit_cue_a21s.png", "Say It, second miss", "Mouth-shape cue beside the microphone"),
-    ("findit_a21s.png", "Find It", "Tap the 3 pictures that start with /m/"),
-    ("blendit_a21s.png", "Blend It", "Build SAM from tiles dealt out of order"),
+    ("splash_a21s.png", "splash.png", "Splash", "Start sits below Lily, the tarsier guide"),
+    ("nameprompt_a21s.png", "nameprompt.png", "New learner", "Avatar-only onboarding: no typing"),
+    ("map_a21s.png", "map.png", "Map", "Chapter 1 trail; 16-character name in the header"),
+    ("hearit_a21s.png", "hearit.png", "Hear It", "Lily models the sound, then the key word"),
+    ("sayit_a21s.png", "sayit.png", "Say It", "Say the key word; judged on the phone"),
+    ("sayit_cue_a21s.png", "sayit_cue.png", "Say It, second miss", "Mouth-shape cue beside the microphone"),
+    ("findit_a21s.png", "findit.png", "Find It", "Tap the 3 pictures that start with /m/"),
+    ("blendit_a21s.png", "blendit.png", "Blend It", "Build SAM from tiles dealt out of order"),
 ]
 # The team asked for no mentions of its development environment in the public repository.
 # Prose and comments only; identifiers such as wslpath are left alone.
@@ -1738,7 +1741,7 @@ def scrub_wsl(root):
 
 
 def require_readme_screens():
-    missing = [name for name, _, _ in README_SCREENS if not (ROBORAZZI_DIR / name).exists()]
+    missing = [src for src, _, _, _ in README_SCREENS if not (ROBORAZZI_DIR / src).exists()]
     if missing:
         sys.exit("Error: README screenshots missing from app/build/outputs/roborazzi/ "
                  f"({', '.join(missing)}). Run: gradlew :app:recordRoborazziDebug --tests \"com.playit.app.screenshot.*\"")
@@ -1756,11 +1759,6 @@ def stage_clean_academic_repo(ctx):
     print(f"Staged {len(files)} tracked files from: {', '.join(CLEAN_INCLUDE_DIRS + CLEAN_INCLUDE_FILES)}")
 
     (CLEAN_REPO_DIR / ".gitignore").write_text(CLEAN_GITIGNORE, encoding="utf-8", newline="\n")
-    shots = CLEAN_REPO_DIR / "screenshots"
-    shots.mkdir(parents=True, exist_ok=True)
-    for name, _, _ in README_SCREENS:
-        shutil.copyfile(ROBORAZZI_DIR / name, shots / name)
-    print(f"Staged {len(README_SCREENS)} README screenshots in screenshots/")
 
     generate_academic_readme(CLEAN_REPO_DIR / "README.md", ctx)
     print("Generated README.md")
@@ -1803,15 +1801,6 @@ def academic_readme_markdown(ctx):
     kotlin = library_version("kotlin")
     generators = " and ".join(f"{tool} ({n})" for tool, n in sorted(releases["generators"].items()))
 
-    gallery = ["<table>"]
-    for start in (0, 4):
-        gallery.append("  <tr>")
-        for name, title, caption in README_SCREENS[start:start + 4]:
-            gallery.append(f'    <td align="center" width="25%"><strong>{title}</strong><br/>'
-                           f'<img src="screenshots/{name}" alt="{title}" width="180"/><br/><em>{caption}</em></td>')
-        gallery.append("  </tr>")
-    gallery.append("</table>")
-
     curriculum = ["| Chapter | Letters (key word) | Blend It words |", "|:---:|---|---|"]
     for c in chapters:
         letters = ", ".join(f"**{l}** ({w.lower()})" for l, w in c["letters"])
@@ -1835,12 +1824,6 @@ IT411 Capstone & Research 2 (Section G7), Group 56, College of Computer Studies,
 ## The Midterm Build
 
 The build submitted for the IT411 midterm is debug **APK H**, built from commit `{APK_H_COMMIT}` of the team's development branch and tested in the Software Test Document (STD v1.0, in `docs/submission/`). This repository holds that code with its tests. {repo_vs_apk_h(ctx)}
-
-## Screens
-
-Captured with Roborazzi from this repository's code on the 360x740 dp profile of the team's test phone (Samsung Galaxy A21s){", so they show the pictures released after APK H" if ctx["changes_since_apk_h"][0] else ""}.
-
-{chr(10).join(gallery)}
 
 ## Curriculum
 
@@ -1873,7 +1856,6 @@ Requirements: JDK 17 and the Android SDK (API 34). Point Gradle at the SDK with 
 ```bash
 ./gradlew assembleDebug        # app/build/outputs/apk/debug/app-debug.apk
 ./gradlew testDebugUnitTest    # {tests_line}
-./gradlew :app:recordRoborazziDebug --tests "com.playit.app.screenshot.*"   # screen captures
 ```
 
 The six skipped tests are the font-scale 1.3 checks on the 360x640 profile, which is below the supported floor. Test results are written to `app/build/test-results/testDebugUnitTest/`.
