@@ -1759,6 +1759,11 @@ def stage_clean_academic_repo(ctx):
     print(f"Staged {len(files)} tracked files from: {', '.join(CLEAN_INCLUDE_DIRS + CLEAN_INCLUDE_FILES)}")
 
     (CLEAN_REPO_DIR / ".gitignore").write_text(CLEAN_GITIGNORE, encoding="utf-8", newline="\n")
+    shots = CLEAN_REPO_DIR / "docs" / "screenshots"
+    shots.mkdir(parents=True, exist_ok=True)
+    for src, dst, _, _ in README_SCREENS:
+        shutil.copyfile(ROBORAZZI_DIR / src, shots / dst)
+    print(f"Staged {len(README_SCREENS)} README screenshots in docs/screenshots/")
 
     generate_academic_readme(CLEAN_REPO_DIR / "README.md", ctx)
     print("Generated README.md")
@@ -1801,6 +1806,15 @@ def academic_readme_markdown(ctx):
     kotlin = library_version("kotlin")
     generators = " and ".join(f"{tool} ({n})" for tool, n in sorted(releases["generators"].items()))
 
+    gallery = ["<table>"]
+    for start in range(0, len(README_SCREENS), 4):
+        gallery.append("  <tr>")
+        for src, dst, title, caption in README_SCREENS[start:start + 4]:
+            gallery.append(f'    <td align="center" width="25%"><strong>{title}</strong><br/>'
+                           f'<img src="docs/screenshots/{dst}" alt="{title}" width="180"/><br/><em>{caption}</em></td>')
+        gallery.append("  </tr>")
+    gallery.append("</table>")
+
     curriculum = ["| Chapter | Letters (key word) | Blend It words |", "|:---:|---|---|"]
     for c in chapters:
         letters = ", ".join(f"**{l}** ({w.lower()})" for l, w in c["letters"])
@@ -1824,6 +1838,12 @@ IT411 Capstone & Research 2 (Section G7), Group 56, College of Computer Studies,
 ## The Midterm Build
 
 The build submitted for the IT411 midterm is debug **APK H**, built from commit `{APK_H_COMMIT}` of the team's development branch and tested in the Software Test Document (STD v1.0, in `docs/submission/`). This repository holds that code with its tests. {repo_vs_apk_h(ctx)}
+
+## Screens
+
+Visual interface captures rendered directly from this repository's code on a standard mobile device profile (360x740 dp).
+
+{chr(10).join(gallery)}
 
 ## Curriculum
 
