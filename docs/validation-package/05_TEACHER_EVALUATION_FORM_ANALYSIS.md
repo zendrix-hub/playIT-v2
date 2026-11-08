@@ -93,9 +93,9 @@ The active development branch (`enhance/adviser-feedback`) reflects intensive it
      - *"Does the app’s progress reporting and PDF class record format align with DepEd grading standards (DepEd Order 8, s. 2015)?"*
      - *"Are the progress descriptors and 'Practice at home' recommendations clear and useful for parent-teacher conferences?"*
 2. **The Pre-Blend It Diagnostic Sound Check:**
-   - *Current Implementation:* Before entering the Blend It word game, the child undergoes a 4-sound diagnostic checkpoint (*"Which letter says /m/?"*). Tracks first attempt and latest attempt across days.
+   - *Current Implementation:* Before entering the Blend It word game, the child undergoes a diagnostic checkpoint of the chapter's 3 or 4 sounds, once each and with no second try (*"Which letter says /m/?"*). Tracks first attempt and latest attempt across days.
    - *Evaluation Need:* Teachers must evaluate:
-     - *"Is a 4-sound diagnostic check before word blending an effective indicator of blending readiness?"*
+     - *"Is a short diagnostic check of the chapter's sounds before word blending an effective indicator of blending readiness?"*
 3. **Mouth Articulation Visualizer (NFR-ACC-01):**
    - *Current Implementation:* On the second miss in Say It (or upon tapping the magnifier), an enlarged mouth shape pulses with Lily's voice to demonstrate lip and tongue placement.
    - *Evaluation Need:*
@@ -165,7 +165,7 @@ PlayIT teaches 26 English letter sounds across 7 sequential chapters through:
 1. Hear It (clear phonetic sound modeling + animated mouth-shape articulation cues)
 2. Say It (offline voice practice with speech recognition)
 3. Find It (picture discrimination with progressive word-label scaffolding)
-4. Blend It (word construction preceded by a diagnostic Sound Check)
+4. Blend It (word construction, opened by a short Sound Check of the chapter's letters)
 5. Parent/Teacher Dashboard (DepEd Order 8, s. 2015 class record progress & PDF export)
 
 Your expert evaluation will directly validate our software and challenge our pedagogical choices 
@@ -208,9 +208,9 @@ Privacy Act of 2012 (RA 10173). Evaluators are reported anonymously as coded par
 ### Section 2: Curriculum Alignment & Marungko Sequence
 
 *Rate each statement on a 5-point scale: (1) Strongly Disagree, (2) Disagree, (3) Neutral, (4) Agree, (5) Strongly Agree, (N/A) Not Applicable.* `[Multiple Choice Grid, Required]`
-1. **[CUR-01]** The letter sequence (starting with m, s, a, i, o, b...) is appropriate for teaching English phonics to Filipino Grade 1 learners.
+1. **[CUR-01]** The letter sequence (m, s, a, i first, then o, b, e, u, and so on through the 26 letters) is appropriate for teaching English phonics to Filipino Grade 1 learners.
 2. **[CUR-02]** Excluding Filipino digraphs (`NG`) and graphemes (`Ñ`) to focus strictly on the 26 English alphabet letters is pedagogically sound for an English phonics app.
-3. **[CUR-03]** The 4-letter chapter pacing (introducing 4 letters before requiring word blending) provides adequate scaffolding for beginning readers.
+3. **[CUR-03]** The chapter pacing (3 or 4 new letters per chapter before the word-blending game) provides adequate scaffolding for beginning readers.
 4. **[CUR-04]** The vocabulary words used throughout the app are familiar, culturally appropriate, and non-confusing for Filipino children.
 
 ---
@@ -220,10 +220,10 @@ Privacy Act of 2012 (RA 10173). Evaluators are reported anonymously as coded par
 *Rate each statement on the 5-point scale.* `[Multiple Choice Grid, Required]`
 1. **[MOD-01] Hear It:** The letter sounds are pronounced accurately as pure phonemes without unwanted trailing vowels or letter names (e.g., held /m/ as "mmm", not "ma").
 2. **[MOD-02] Articulation Modeling:** The enlarged, voice-pulsing mouth shapes provide effective visual cues for children struggling to produce unfamiliar English sounds.
-3. **[MOD-03] Say It (Speech Practice):** Asking the child to say the anchor word (e.g., "mouse" for /m/) is an effective and realistic way to practice initial letter sounds.
+3. **[MOD-03] Say It (Speech Practice):** Asking the child to say the anchor word (e.g., "mouse" for /m/) after hearing the sound is an effective and realistic way to practice initial letter sounds.
 4. **[MOD-04] Speech Fairness:** The speech recognition responds fairly to children's natural voices and regional accents without excessive false rejections.
-5. **[MOD-05] Find It (Scaffolding):** Showing word labels in Chapter 1 and gradually removing them in later chapters effectively reinforces phonetic recognition rather than sight guessing.
-6. **[MOD-06] Diagnostic Sound Check:** Administering a quick 4-sound identification check before unlocking Blend It is an effective checkpoint for blending readiness.
+5. **[MOD-05] Find It (Scaffolding):** Showing every word label in Chapter 1, some in Chapter 2, and none from Chapter 3 on effectively reinforces phonetic recognition rather than sight guessing.
+6. **[MOD-06] Diagnostic Sound Check:** Opening each Blend It game with a quick check (each of the chapter's 3 or 4 sounds once, no second try) is an effective way to see which sounds a child knows before blending.
 7. **[MOD-07] Blend It (Word Synthesis):** Assembling 3-letter CVC words from letters already mastered supports early blending and decodability.
 
 ---
@@ -231,10 +231,11 @@ Privacy Act of 2012 (RA 10173). Evaluators are reported anonymously as coded par
 ### Section 4: DepEd Progress Reporting & Classroom Feasibility
 
 *Rate each statement on the 5-point scale.* `[Multiple Choice Grid, Required]`
-1. **[REP-01] DepEd Order 8, s. 2015 Alignment:** The app's progress levels (Outstanding, Very Satisfactory, Satisfactory, Did Not Meet Expectations) and transmuted grades (60% = 75) accurately reflect DepEd classroom assessment standards.
-2. **[REP-02] Teacher Class Record (PDF):** The downloadable landscape A4 Class Report provides actionable diagnostic data suitable for teacher monitoring and parent consultations.
-3. **[REP-03] Independent Use:** The audio narration, clear visual buttons, and mascot guidance allow a Grade 1 learner to practice independently with minimal teacher intervention.
-4. **[REP-04] Gamification Balance:** The 3-heart retry system and star rewards encourage perseverance without causing frustration when errors occur.
+1. **[REP-01a] Progress Levels:** The app's five progress levels (Outstanding, Very Satisfactory, Satisfactory, Fairly Satisfactory, Did Not Meet Expectations) match DepEd Order 8, s. 2015.
+2. **[REP-01b] Transmuted Grades:** The transmutation of a child's percentage score into a grade (e.g., 60% = 75) is appropriate for a Grade 1 class record.
+3. **[REP-02] Teacher Class Record (PDF):** The downloadable landscape A4 Class Report provides actionable diagnostic data suitable for teacher monitoring and parent consultations.
+4. **[REP-03] Independent Use:** The audio narration, clear visual buttons, and mascot guidance allow a Grade 1 learner to practice independently with minimal teacher intervention.
+5. **[REP-04] Gamification Balance:** The hearts (5 per lesson, regained after 3 correct answers in a row) and star rewards in Find It and Blend It encourage perseverance without causing frustration when errors occur.
 
 ---
 
@@ -250,7 +251,7 @@ Privacy Act of 2012 (RA 10173). Evaluators are reported anonymously as coded par
   - [ ] Lenient: Focus primarily on vocal effort and engagement; avoid rejecting developing speech.
   - Comments / Nuance: `[Short Text]`
 * **Q10. Name Typing vs. Avatar Selection:**  
-  *The app asks new learners to type their first name on an on-screen keyboard. Do your Grade 1 learners have sufficient digital literacy to do this independently, or will this become a barrier in the classroom?*  
+  *The app asks each new learner to pick an avatar and type their first name (letters only) on an on-screen keyboard, so Lily can greet them by name. Can your Grade 1 learners do this independently, or will it become a barrier? Should a parent or teacher enter the name instead?*  
   `[Long Text, Required]`
 * **Q11. Specific Problematic Content:**  
   *Were there any specific letter sounds, images, or vocabulary words that you believe need immediate correction or replacement? (Please name the letter/word and why).*  
